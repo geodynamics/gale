@@ -506,7 +506,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
   Index var_I;
   int header_printed=0;
   int nDims, i;
-  int lower[3], upper[3], p_lower[3], p_upper[3];
+  int lower[3], upper[3];
 
   HydrostaticTerm *hydrostaticTerm;
   char* field_filename;
@@ -586,7 +586,8 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
     FieldVariable* fieldVar;
     fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register,
                                                   var_I );
-    if (Stg_Class_IsInstance( fieldVar, FeVariable_Type )) {
+    if (Stg_Class_IsInstance( fieldVar, FeVariable_Type )
+        && ((FeVariable*)fieldVar)->name!=std::string("PressureField") ) {
       FeVariable* feVar;
       Dof_Index          dofAtEachNodeCount;
       int *low, *up;
@@ -611,24 +612,20 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
           vertGrid=gen->vertGrid;
           nDims=gen->nDims;
 
-          p_lower[2]=lower[2]=0;
-          p_upper[2]=upper[2]=1;
+          lower[2]=0;
+          upper[2]=1;
           for(i=0;i<nDims;++i)
             {
-              p_lower[i]=gen->origin[i];
-              p_upper[i]=p_lower[i]+gen->range[i];
+              lower[i]=gen->vertOrigin[i];
+              upper[i]=lower[i]+gen->vertRange[i];
 
               /* The grid is split up by elements, so for the element
                  grid, we simply add the ghost zones.  Ghost zones are
                  only added at the top, not the bottom. */
-              if(p_upper[i]!=gen->elGrid->sizes[i])
-                ++p_upper[i];
+              if(upper[i]!=gen->vertGrid->sizes[i])
+                ++upper[i];
 
-              /* Then we get the vertices by adding appropriate
-                 offsets to the element grid. */
-              upper[i]=p_upper[i]+1;
-              lower[i]=p_lower[i];
-              if(p_lower[i]!=0)
+              if(lower[i]!=0)
                 --lower[i];
             }
 
