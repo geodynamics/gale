@@ -134,8 +134,8 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 	Index						loop_I;
 	Index						count            = Dictionary_GetUnsignedInt_WithDefault( context->dictionary, "SampleSize", 5000 );
 	void*						data=NULL;
-		      IntegrationPoint* intParticle;
-		      MaterialPoint*  materialPoint;
+		      // IntegrationPoint* intParticle;
+		      // MaterialPoint*  materialPoint;
 	/* Create FeVariable */
 	feVariable = FeVariable_New_Full(
 		"feVariable",
@@ -167,18 +167,18 @@ void testElementIntegral_CircleInterface( PICelleratorContext* context, double* 
 		/* The following function should not be called here as it is already called ultimately via the above function */
 		/* calling this function again causes a first iteration in Lloyd's algorithm for the Voronoi cells which we don't want here */
 		//WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
-		if(loop_I%10 == 0){
-		      Index i;
+		// if(loop_I%10 == 0){
+		//       Index i;
 
-		      for(i=0;i<integrationSwarm->cellParticleCountTbl[0];i++){
-			    intParticle  =  (IntegrationPoint*)Swarm_ParticleInCellAt( integrationSwarm, 0, i );
-			    materialPoint = (MaterialPoint*)Swarm_ParticleInCellAt( materialSwarm, 0, i );
-			    //printf("In %s M(%10.7lf %10.7lf) I(%10.7lf %10.7lf) W(%.4lf) particle layout type %s: point %d in cell %d\n",__func__,materialPoint->coord[0], materialPoint->coord[1],
-			//	   intParticle->xi[0], intParticle->xi[1], intParticle->weight, materialSwarm->particleLayout->type, i, 0);
+		//       for(i=0;i<integrationSwarm->cellParticleCountTbl[0];i++){
+		// 	    intParticle  =  (IntegrationPoint*)Swarm_ParticleInCellAt( integrationSwarm, 0, i );
+		// 	    materialPoint = (MaterialPoint*)Swarm_ParticleInCellAt( materialSwarm, 0, i );
+		// 	    //printf("In %s M(%10.7lf %10.7lf) I(%10.7lf %10.7lf) W(%.4lf) particle layout type %s: point %d in cell %d\n",__func__,materialPoint->coord[0], materialPoint->coord[1],
+		// 	//	   intParticle->xi[0], intParticle->xi[1], intParticle->weight, materialSwarm->particleLayout->type, i, 0);
 		
-			    //printf("%lf %lf\n",intParticle->xi[0],intParticle->xi[1]);
-		      }
-                }
+		// 	    //printf("%lf %lf\n",intParticle->xi[0],intParticle->xi[1]);
+		//       }
+                // }
 
 		/* Evaluate Integral */
 		integral = FeVariable_IntegrateElement( feVariable, integrationSwarm, lElement_I );

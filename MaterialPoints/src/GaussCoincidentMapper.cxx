@@ -164,10 +164,10 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 	IntegrationPointsSwarm*	integrationSwarm = self->integrationSwarm;
 	MaterialPointsSwarm*    materialSwarm = self->materialSwarm;
 	IntegrationPoint*			integrationPoint;
-	MaterialPoint*				materialPoint;
 	MaterialPointRef*			ref;
 	Particle_Index				particle_lI;
 #if 0
+	MaterialPoint*				materialPoint;
 	FeMesh*						mesh = materialSwarm->mesh;
 	Cell_Index					cell_dI;
 #endif
@@ -210,9 +210,10 @@ void _GaussCoincidentMapper_Map( void* mapper ) {
 	/* Map each point */
 	for ( particle_lI = 0; particle_lI < integrationSwarm->particleLocalCount; particle_lI++ ) {
 		integrationPoint = (IntegrationPoint*)Swarm_ParticleAt( integrationSwarm, particle_lI );
-		materialPoint = (MaterialPoint*)Swarm_ParticleAt( materialSwarm, particle_lI );
 
 #if 0
+		materialPoint = (MaterialPoint*)Swarm_ParticleAt( materialSwarm, particle_lI );
+
 		cell_dI = integrationPoint->owningCell;
 
 		Journal_DPrintfL( debugStream, 3, "Referring to local material point %u, from material swarm cell %u:\n", particle_lI, cell_dI );

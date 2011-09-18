@@ -550,7 +550,7 @@ void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm*  intSwarm, Mater
     Particle_Index    matNewParticle_IndexOnCPU;
     IntegrationPoint* intNewParticle;
     MaterialPoint*    matNewParticle;
-    Particle_Index    intNewParticle_IndexWithinCell;/* the number of the particle within the cell */
+    // Particle_Index    intNewParticle_IndexWithinCell;/* the number of the particle within the cell */
     //Particle_Index    matNewParticle_IndexWithinCell;
     IntegrationPoint* intParticleToSplit;
     MaterialPoint*    matParticleToSplit;
@@ -597,7 +597,7 @@ void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm*  intSwarm, Mater
     /* Copy new global position to coord on new mat particle */
     memcpy( matNewParticle->coord, newCoord, sizeof(Coord) );
 	      
-    intNewParticle_IndexWithinCell = Swarm_GetParticleIndexWithinCell( intSwarm, lCell_I, intNewParticle_IndexOnCPU);
+    // intNewParticle_IndexWithinCell = Swarm_GetParticleIndexWithinCell( intSwarm, lCell_I, intNewParticle_IndexOnCPU);
     /*
       printf("\e[1;33m");
       printf("Creating int particle number %d from cell %d local within cell particle num = %d\n\n", intNewParticle_IndexOnCPU ,lCell_I, intNewParticle_IndexWithinCell);
@@ -614,7 +614,7 @@ void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm*  intSwarm, MaterialPo
     Particle_Index    matNewParticle_IndexOnCPU;
     IntegrationPoint* intNewParticle;
     MaterialPoint*    matNewParticle;
-    Particle_Index    intNewParticle_IndexWithinCell;/* the number of the particle within the cell */
+    // Particle_Index    intNewParticle_IndexWithinCell;/* the number of the particle within the cell */
     //Particle_Index    matNewParticle_IndexWithinCell;
     IntegrationPoint* intParticleToSplit;
     MaterialPoint*    matParticleToSplit;
@@ -672,7 +672,7 @@ void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm*  intSwarm, MaterialPo
     /* Copy new global position to coord on new mat particle */
     memcpy( matNewParticle->coord, newCoord, sizeof(Coord) );
 	      
-    intNewParticle_IndexWithinCell = Swarm_GetParticleIndexWithinCell( intSwarm, lCell_I, intNewParticle_IndexOnCPU);
+    // intNewParticle_IndexWithinCell = Swarm_GetParticleIndexWithinCell( intSwarm, lCell_I, intNewParticle_IndexOnCPU);
     /*
       printf("\e[1;33m");
       printf("Creating int particle number %d from cell %d local within cell particle num = %d\n\n", intNewParticle_IndexOnCPU ,lCell_I, intNewParticle_IndexWithinCell);

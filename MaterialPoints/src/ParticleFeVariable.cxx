@@ -140,13 +140,11 @@ void* _ParticleFeVariable_Copy( const void* feVariable, void* dest, Bool deep, N
 void _ParticleFeVariable_AssignFromXML( void* materialFeVariable, Stg_ComponentFactory* cf, void* data ){
 	ParticleFeVariable*		self = (ParticleFeVariable*) materialFeVariable;
 	IntegrationPointsSwarm*	swarm;
-	FiniteElementContext*	context;
 	FeMesh*						mesh;
 
 	_FieldVariable_AssignFromXML( self, cf, data );
 
 	swarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", IntegrationPointsSwarm, True, data  );
-	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", FiniteElementContext, False, data  );
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Mesh", FeMesh, True, data );
 
 	_FeVariable_Init( (FeVariable* )self, mesh, NULL, NULL, NULL, NULL, NULL, NULL, False, False );

@@ -67,7 +67,7 @@ IntegrationPointMapper* _IntegrationPointMapper_New(  INTEGRATIONPOINTMAPPER_DEF
 	self->_getMaterialPointsSwarms = _getMaterialPointsSwarms;
 	self->_getMaterialIndexOn = _getMaterialIndexOn;
 	self->_getExtensionOn = _getExtensionOn;
-    self->_getDoubleFromExtension        = _getDoubleFromExtension;
+        self->_getDoubleFromExtension        = _getDoubleFromExtension;
 	self->_getDoubleFromMaterial         = _getDoubleFromMaterial;
 
 	return self;
@@ -123,24 +123,15 @@ void _IntegrationPointMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* 
 }
 
 void _IntegrationPointMapper_Build( void* mapper, void* data ) {
-	IntegrationPointMapper*	self;
-
-	self = (IntegrationPointMapper*)mapper;
 }
 
 void _IntegrationPointMapper_Initialise( void* mapper, void* data ) {
-	IntegrationPointMapper*	self;
-
-	self = (IntegrationPointMapper*)mapper;
 }
 
 void _IntegrationPointMapper_Execute( void* mapper, void* data ) {
 }
 
 void _IntegrationPointMapper_Destroy( void* mapper, void* data ) {
-	IntegrationPointMapper* self;
-	
-	self = (IntegrationPointMapper*)mapper;
 }
 
 void IntegrationPointMapper_Map( void* mapper ) {
