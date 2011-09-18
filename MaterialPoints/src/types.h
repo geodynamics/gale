@@ -63,6 +63,7 @@
 	typedef struct OneToOneMapper               OneToOneMapper;
         typedef struct OneToManyRef OneToManyRef;
         typedef struct OneToManyMapper OneToManyMapper;
+        typedef struct NearestNeighborMapper NearestNeighborMapper;
 	typedef struct CoincidentMapper             CoincidentMapper;
 	typedef struct GaussCoincidentMapper        GaussCoincidentMapper;
 	typedef struct GaussMapper                  GaussMapper;
