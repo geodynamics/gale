@@ -79,7 +79,7 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(
 	double*                    leastCoord;
 	double*                    greatestCoord;
 	Node_LocalIndex            nodeIndex_LeastValues, nodeIndex_GreatestValues;
-	unsigned                   nInc, *inc;
+	unsigned                   *inc;
 	IArray*		 incArray;
 	
 	Cell_Index                 cell_I;
@@ -124,7 +124,6 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(
 	/* Calculate Length Scales - See Fig 3.4 - ASSUMES BOX MESH TODO - fix */
 	incArray = self->incarray;
 	FeMesh_GetElementNodes( mesh, lElement_I, incArray );
-	nInc = IArray_GetSize( incArray );
 	inc = (unsigned*)IArray_GetPtr( incArray );
 	
 	
