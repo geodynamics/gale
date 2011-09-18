@@ -164,6 +164,11 @@
 		Element_LocalIndex                                 lElement_I,
 		int                                                particleIndex,
 		IntegrationPoint*                                  particle );
+        void ConstitutiveMatrix_Assemble(void* constitutiveMatrix,
+                                         Element_LocalIndex lElement_I,
+                                         int particleIndex,
+                                         IntegrationPoint* particle,
+                                         IntegrationPointsSwarm* swarm);
 
         void ConstitutiveMatrix_AssembleMaterialPoint(void *constitutiveMatrix, int element,
 						      MaterialPointsSwarm *matSwarm, int matPointInd);

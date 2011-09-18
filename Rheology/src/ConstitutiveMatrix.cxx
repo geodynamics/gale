@@ -102,7 +102,9 @@ void _ConstitutiveMatrix_Init(
       self->integrationSwarm->name );
 
    Journal_Firewall(
-      Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToOneMapper_Type ) || Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type ),
+      Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToOneMapper_Type )
+      || Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type )
+      || Stg_Class_IsInstance( ((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, NearestNeighborMapper_Type ),
       Journal_MyStream( Error_Type, self ),
       "Error In %s - ConstitutiveMatrix %s cannot use %s. ConstitutiveMatrix only works with IntegrationPointsSwarms"
       " which uses one-to-one mapping\n",
@@ -270,8 +272,20 @@ void ConstitutiveMatrix_Assemble(
       int                                                particleIndex,
       IntegrationPoint*                                  particle )
 {
+  ConstitutiveMatrix*     self          = (ConstitutiveMatrix*)constitutiveMatrix;
+  ConstitutiveMatrix_Assemble(constitutiveMatrix,lElement_I,particleIndex,
+                              particle,
+                              (IntegrationPointsSwarm*)self->integrationSwarm);
+}
+
+void ConstitutiveMatrix_Assemble(
+      void*                                              constitutiveMatrix,
+      Element_LocalIndex                                 lElement_I,
+      int                                                particleIndex,
+      IntegrationPoint*                                  particle,
+      IntegrationPointsSwarm* swarm)
+{
    ConstitutiveMatrix*     self          = (ConstitutiveMatrix*)constitutiveMatrix;
-   IntegrationPointsSwarm* swarm         = (IntegrationPointsSwarm*)self->integrationSwarm;
    RheologyMaterial*       material;
    MaterialPointsSwarm*    materialSwarm;
    MaterialPoint*          materialPoint;

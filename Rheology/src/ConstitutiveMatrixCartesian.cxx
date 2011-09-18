@@ -60,7 +60,7 @@
 #include <assert.h>
 #include <string.h>
 #include <time.h>
-
+#include <limits>
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type ConstitutiveMatrixCartesian_Type = "ConstitutiveMatrixCartesian";
@@ -235,7 +235,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
    Dof_Index               nodeDofCount;
    double**                Dtilda_B;
    double                  vel[3], velDerivs[9], *Ni, eta;
-   Bool                    oneToMany;
+   Bool                    oneToMany, nearestNeighbor;
 
    self->sle = sle;
 
@@ -276,92 +276,129 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	*/
 
    oneToMany = Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type);
+   nearestNeighbor = Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, NearestNeighborMapper_Type);
 
    /* Loop over points to build Stiffness Matrix */
    for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
      particle = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
-      /* Calculate Determinant of Jacobian and Shape Function Global Derivatives */
-      ElementType_ShapeFunctionsGlobalDerivs(
-         elementType,
-         variable1->feMesh, lElement_I,
-         particle->xi, dim, &detJac, GNx );
+     /* Calculate Determinant of Jacobian and Shape Function Global Derivatives */
+     ElementType_ShapeFunctionsGlobalDerivs(elementType,
+                                            variable1->feMesh, lElement_I,
+                                            particle->xi, dim, &detJac, GNx );
 
-                /* Evalulate velocity and velocity derivatives at this particle. */
-                FeVariable_InterpolateWithinElement(
-                   variable1, lElement_I, particle->xi, vel );
-                FeVariable_InterpolateDerivatives_WithGNx(
-                   variable1, lElement_I, GNx, velDerivs );
+     /* Evalulate velocity and velocity derivatives at this particle. */
+     FeVariable_InterpolateWithinElement(variable1, lElement_I, particle->xi, vel );
+     FeVariable_InterpolateDerivatives_WithGNx(variable1, lElement_I, GNx, velDerivs );
 
-        /*
-		 * Assemble constitutive matrix. Note that we have to handle one-to-many swarms
-		 * differently.
-		 */
+     /*
+      * Assemble constitutive matrix. Note that we have to handle one-to-many swarms
+      * differently.
+      */
 
-		if(!oneToMany) {
-		    // TODO : pass in the context here?
-		    ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I,
-						 swarm->cellParticleTbl[cell_I][cParticle_I], particle );
-		}
-		else {
-		    /*
-		     * We're dealing with a one-to-many mapper. We will assemble each material point's
-		     * constitutive matrix and combine them using their weights.
-		     */
+     if(oneToMany) {
+       /*
+        * We're dealing with a one-to-many mapper. We will assemble each material point's
+        * constitutive matrix and combine them using their weights.
+        */
 
-		    OneToManyRef *ref;
-		    double **matrixData;
-		    int ii, jj, kk;
+       OneToManyRef *ref;
+       double **matrixData;
+       uint ii, jj, kk;
 
-		    matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
-		    memset(matrixData[0], 0, self->columnSize*self->rowSize*sizeof(double));
-		    ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
-		    for(ii = 0; ii < ref->numParticles; ii++) {
-			/* Assemble this material point. */
-			ConstitutiveMatrix_AssembleMaterialPoint(
-			    constitutiveMatrix, lElement_I,
-			    ((OneToManyMapper*)((IntegrationPointsSwarm*)swarm)->mapper)->materialSwarm,
-			    ref->particleInds[ii]);
-			/* Add to cumulative matrix. */
-			for(jj = 0; jj < self->rowSize; jj++) {
-			    for(kk = 0; kk < self->columnSize; kk++)
-				matrixData[jj][kk] += ref->weights[ii]*self->matrixData[jj][kk];
-			}
-		    }
-		    /* Copy matrix data and free temporary array. */
-		    memcpy(self->matrixData[0], matrixData[0], self->columnSize*self->rowSize*sizeof(double));
-		    Memory_Free(matrixData);
-		}
+       matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
+       memset(matrixData[0], 0, self->columnSize*self->rowSize*sizeof(double));
+       ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
+       for(ii = 0; ii < ref->numParticles; ii++) {
+         /* Assemble this material point. */
+         ConstitutiveMatrix_AssembleMaterialPoint(
+                                                  constitutiveMatrix, lElement_I,
+                                                  ((OneToManyMapper*)((IntegrationPointsSwarm*)swarm)->mapper)->materialSwarm,
+                                                  ref->particleInds[ii]);
+         /* Add to cumulative matrix. */
+         for(jj = 0; jj < self->rowSize; jj++) {
+           for(kk = 0; kk < self->columnSize; kk++)
+             matrixData[jj][kk] += ref->weights[ii]*self->matrixData[jj][kk];
+         }
+       }
+       /* Copy matrix data and free temporary array. */
+       memcpy(self->matrixData[0], matrixData[0], self->columnSize*self->rowSize*sizeof(double));
+       Memory_Free(matrixData);
+     }
+     else if(nearestNeighbor) {
+       /* This does a search over all of the particles in the swarm in
+          the element to find the one that is closest to the gauss
+          point.  There may be more efficient ways of doing this, but
+          this works for now. */
+       IntegrationPointsSwarm* NNswarm=
+         ((NearestNeighborMapper*)((IntegrationPointsSwarm*)self->integrationSwarm)->mapper)->swarm;
+       int NNcell_I            = CellLayout_MapElementIdToCellId( NNswarm->cellLayout, lElement_I );
+       int NNcellParticleCount = NNswarm->cellParticleCountTbl[ NNcell_I ];
 
-		eta = self->matrixData[2][2];
+       Journal_Firewall( NNcellParticleCount != 0, Journal_Register( Error_Type, (Name)ConstitutiveMatrix_Type  ),
+         "In func %s: NNcellParticleCount is 0.\n", __func__ );
 
-      /* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */
-      ConstitutiveMatrix_MultiplyByValue( constitutiveMatrix, detJac * particle->weight );
+       double min_dist(std::numeric_limits<double>::max());
+       int nearest_particle(-1);
 
-      for( rowNode_I = 0 ; rowNode_I < elementNodeCount ; rowNode_I++ ) {
-         rowNodeDof_I = rowNode_I*nodeDofCount;
-                        Bj_x = GNx[0][rowNode_I];
-                        Bj_y = GNx[1][rowNode_I];
+       for ( int NNcParticle_I = 0 ; NNcParticle_I < NNcellParticleCount ; NNcParticle_I++ ) {
+         IntegrationPoint* NNparticle = (IntegrationPoint*)Swarm_ParticleInCellAt( NNswarm, NNcell_I, NNcParticle_I );
+         double dist=StGermain_DistanceBetweenPoints(particle->xi,NNparticle->xi,dim);
+         if(dist<min_dist)
+           {
+             nearest_particle=NNcParticle_I;
+             min_dist=dist;
+           }
+       }
+       IntegrationPoint* NNparticle = (IntegrationPoint*)Swarm_ParticleInCellAt( NNswarm, NNcell_I, nearest_particle );
+       ConstitutiveMatrix_Assemble(constitutiveMatrix, lElement_I,
+                                   NNswarm->cellParticleTbl[NNcell_I][nearest_particle], NNparticle,
+                                   NNswarm);
+     }
+     else {
+       // TODO : pass in the context here?
+       ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I,
+                                    swarm->cellParticleTbl[cell_I][cParticle_I], particle );
+     }
 
-         /* Build D~ * B */
-         ConstitutiveMatrix_Assemble_D_B( constitutiveMatrix, GNx, rowNode_I, Dtilda_B );
+     eta = self->matrixData[2][2];
 
-         for( colNode_I = 0 ; colNode_I < elementNodeCount ; colNode_I++ ) {
-            colNodeDof_I = colNode_I*nodeDofCount;
-            Bi_x = GNx[ I_AXIS ][colNode_I];
-            Bi_y = GNx[ J_AXIS ][colNode_I];
+     // std::cout << "detJac "
+     //           << cParticle_I << " "
+     //           << detJac << " "
+     //           << particle->weight << " "
+     //           << &(particle->weight) << " "
+     //           << particle->xi[0] << " "
+     //           << particle->xi[1] << " "
+     //           << "\n";
 
-            /* Build BTrans * ( D~ * B ) */
-            if ( dim == 2 ) {
-          if( !sle->nlFormJacobian ) {
+     /* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */
+     ConstitutiveMatrix_MultiplyByValue( constitutiveMatrix, detJac * particle->weight );
+
+     for( rowNode_I = 0 ; rowNode_I < elementNodeCount ; rowNode_I++ ) {
+       rowNodeDof_I = rowNode_I*nodeDofCount;
+       Bj_x = GNx[0][rowNode_I];
+       Bj_y = GNx[1][rowNode_I];
+
+       /* Build D~ * B */
+       ConstitutiveMatrix_Assemble_D_B( constitutiveMatrix, GNx, rowNode_I, Dtilda_B );
+
+       for( colNode_I = 0 ; colNode_I < elementNodeCount ; colNode_I++ ) {
+         colNodeDof_I = colNode_I*nodeDofCount;
+         Bi_x = GNx[ I_AXIS ][colNode_I];
+         Bi_y = GNx[ J_AXIS ][colNode_I];
+
+         /* Build BTrans * ( D~ * B ) */
+         if ( dim == 2 ) {
+           if( !sle->nlFormJacobian ) {
 
              elStiffMat[ colNodeDof_I     ][ rowNodeDof_I     ] += Bi_x * Dtilda_B[0][0] + Bi_y * Dtilda_B[2][0];
              elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 1 ] += Bi_x * Dtilda_B[0][1] + Bi_y * Dtilda_B[2][1];
              elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I     ] += Bi_y * Dtilda_B[1][0] + Bi_x * Dtilda_B[2][0];
              elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 1 ] += Bi_y * Dtilda_B[1][1] + Bi_x * Dtilda_B[2][1];
 
-          }
-          else {
+           }
+           else {
              double DuDx, DuDy, DvDx, DvDy;
              double DetaDu, DetaDv;
              double intFac, fac;
@@ -374,44 +411,44 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
              fac = eta * Bj_y + DuDy * DetaDu + DvDx * DetaDu;
              elStiffMat[colNodeDof_I][rowNodeDof_I] +=
-                intFac * (2.0 * Bi_x * (eta * Bj_x + DuDx * DetaDu) + Bi_y * fac);
+               intFac * (2.0 * Bi_x * (eta * Bj_x + DuDx * DetaDu) + Bi_y * fac);
              elStiffMat[colNodeDof_I + 1][rowNodeDof_I] +=
-                intFac * (2.0 * Bi_y * DvDy * DetaDu + Bi_x * fac);
+               intFac * (2.0 * Bi_y * DvDy * DetaDu + Bi_x * fac);
 
              fac = eta * Bj_x + DvDx * DetaDv + DuDy * DetaDv;
              elStiffMat[colNodeDof_I][rowNodeDof_I + 1] +=
-                intFac * (2.0 * Bi_x * DuDx * DetaDv + Bi_y * fac);
+               intFac * (2.0 * Bi_x * DuDx * DetaDv + Bi_y * fac);
              elStiffMat[colNodeDof_I + 1][rowNodeDof_I + 1] +=
-                intFac * (2.0 * Bi_y * (eta * Bj_y + DvDy * DetaDv) + Bi_x * fac);
+               intFac * (2.0 * Bi_y * (eta * Bj_y + DvDy * DetaDv) + Bi_x * fac);
 
-          }
-            }
-            else {
-               Bi_z = GNx[ K_AXIS ][colNode_I];
-
-               elStiffMat[ colNodeDof_I     ][ rowNodeDof_I     ] +=
-                  Bi_x * Dtilda_B[0][0] + Bi_y * Dtilda_B[3][0] + Bi_z * Dtilda_B[4][0];
-               elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 1 ] +=
-                  Bi_x * Dtilda_B[0][1] + Bi_y * Dtilda_B[3][1] + Bi_z * Dtilda_B[4][1];
-               elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 2 ] +=
-                  Bi_x * Dtilda_B[0][2] + Bi_y * Dtilda_B[3][2] + Bi_z * Dtilda_B[4][2];
-
-               elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I     ] +=
-                  Bi_y * Dtilda_B[1][0] + Bi_x * Dtilda_B[3][0] + Bi_z * Dtilda_B[5][0];
-               elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 1 ] +=
-                  Bi_y * Dtilda_B[1][1] + Bi_x * Dtilda_B[3][1] + Bi_z * Dtilda_B[5][1];
-               elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 2 ] +=
-                  Bi_y * Dtilda_B[1][2] + Bi_x * Dtilda_B[3][2] + Bi_z * Dtilda_B[5][2];
-
-               elStiffMat[ colNodeDof_I + 2 ][ rowNodeDof_I     ] +=
-                  Bi_z * Dtilda_B[2][0] + Bi_x * Dtilda_B[4][0] + Bi_y * Dtilda_B[5][0];
-               elStiffMat[ colNodeDof_I + 2 ][ rowNodeDof_I + 1 ] +=
-                  Bi_z * Dtilda_B[2][1] + Bi_x * Dtilda_B[4][1] + Bi_y * Dtilda_B[5][1];
-               elStiffMat[ colNodeDof_I + 2 ][ rowNodeDof_I + 2 ] +=
-                  Bi_z * Dtilda_B[2][2] + Bi_x * Dtilda_B[4][2] + Bi_y * Dtilda_B[5][2];
-            }
+           }
          }
-      }
+         else {
+           Bi_z = GNx[ K_AXIS ][colNode_I];
+
+           elStiffMat[ colNodeDof_I     ][ rowNodeDof_I     ] +=
+             Bi_x * Dtilda_B[0][0] + Bi_y * Dtilda_B[3][0] + Bi_z * Dtilda_B[4][0];
+           elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 1 ] +=
+             Bi_x * Dtilda_B[0][1] + Bi_y * Dtilda_B[3][1] + Bi_z * Dtilda_B[4][1];
+           elStiffMat[ colNodeDof_I     ][ rowNodeDof_I + 2 ] +=
+             Bi_x * Dtilda_B[0][2] + Bi_y * Dtilda_B[3][2] + Bi_z * Dtilda_B[4][2];
+
+           elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I     ] +=
+             Bi_y * Dtilda_B[1][0] + Bi_x * Dtilda_B[3][0] + Bi_z * Dtilda_B[5][0];
+           elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 1 ] +=
+             Bi_y * Dtilda_B[1][1] + Bi_x * Dtilda_B[3][1] + Bi_z * Dtilda_B[5][1];
+           elStiffMat[ colNodeDof_I + 1 ][ rowNodeDof_I + 2 ] +=
+             Bi_y * Dtilda_B[1][2] + Bi_x * Dtilda_B[3][2] + Bi_z * Dtilda_B[5][2];
+
+           elStiffMat[ colNodeDof_I + 2 ][ rowNodeDof_I     ] +=
+             Bi_z * Dtilda_B[2][0] + Bi_x * Dtilda_B[4][0] + Bi_y * Dtilda_B[5][0];
+           elStiffMat[ colNodeDof_I + 2 ][ rowNodeDof_I + 1 ] +=
+             Bi_z * Dtilda_B[2][1] + Bi_x * Dtilda_B[4][1] + Bi_y * Dtilda_B[5][1];
+           elStiffMat[ colNodeDof_I + 2 ][ rowNodeDof_I + 2 ] +=
+             Bi_z * Dtilda_B[2][2] + Bi_x * Dtilda_B[4][2] + Bi_y * Dtilda_B[5][2];
+         }
+       }
+     }
    }
 }
 
