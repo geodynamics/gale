@@ -64,7 +64,7 @@ void _Ra_CheckScalings_Func( void* context, void* ptrToContext ) {
     RheologyMaterial* material;
     Rheology* rheology;
     Materials_Register*     materials_Register = self->materials_Register;
-    char* errorMesg = "";
+    char* errorMesg;
     double Ra, Ra_0, eta0, diffusivity, gravity, thermalExp=1;
     int isValid = 1; /* is this scaling check valid */
 

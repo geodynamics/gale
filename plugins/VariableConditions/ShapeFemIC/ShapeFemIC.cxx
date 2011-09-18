@@ -305,9 +305,6 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 
 void _Underworld_ShapeFemIC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
 	ConditionFunction*      condFunc;
-	UnderworldContext*      context;
-
-	context = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data  ); 
 	
 	condFunc = ConditionFunction_New( Underworld_SimpleShapeIC, (Name)"Inside1_Outside0_ShapeIC"  );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
