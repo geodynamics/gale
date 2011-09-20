@@ -50,6 +50,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <string>
 
 const Type Underworld_VTKOutput_Type = "Underworld_VTKOutput";
 
