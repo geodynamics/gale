@@ -51,6 +51,7 @@
 /* Textual name of this class */
 const Type Mesh_HexType_Type = "Mesh_HexType";
 
+const int max_vertices(27);
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
@@ -89,8 +90,10 @@ Mesh_HexType* _Mesh_HexType_New(  MESH_HEXTYPE_DEFARGS  ) {
 void _Mesh_HexType_Init( Mesh_HexType* self ) {
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 
-	self->vertMap = AllocArray( unsigned, 8 );
-	self->inc = AllocArray( unsigned, 8 );
+        self->num_simplexes[0]=2;
+        self->num_simplexes[1]=10;
+	self->vertMap = AllocArray( unsigned, max_vertices );
+	self->inc = AllocArray( unsigned, max_vertices );
 	Mesh_HexType_SetVertexMap( self, NULL );
 
 	self->elementHasPoint = NULL;
@@ -307,9 +310,51 @@ void Mesh_HexType_SetVertexMap( void* hexType, unsigned* map ) {
 	}
 	else {
 		self->mapSize = 0;
-		for( v_i = 0; v_i < 8; v_i++ )
+		for( v_i = 0; v_i < max_vertices; v_i++ )
 			self->vertMap[v_i] = v_i;
 	}
+}
+
+/* Modify triInds and tetInds for Q2 elements */
+
+void Mesh_HexType_SetQ2Inds( void* hexType) {
+  Mesh_HexType*	self = (Mesh_HexType*)hexType;
+
+  unsigned index_map[]={0,1,3,4,9,10,12,13};
+  unsigned start_index[]={0,1,3,4,9,10,12,13};
+
+  /* Set vertmap so that MinimumSeparation will work */
+  for(int i=0; i<max_vertices; i++)
+    self->vertMap[i] = index_map[i];
+
+  unsigned triInds[8][3], tetInds[80][4];
+
+  for(int n=0;n<4;++n)
+    for(int i=0;i<2;++i)
+      for(int j=0;j<3;++j)
+        {
+          triInds[2*n+i][j]=index_map[self->triInds[i][j]]+start_index[n];
+        }
+
+  self->triInds = ReallocArray2D( self->triInds, unsigned, 8, 3 );
+  for(int i=0;i<8;++i)
+    for(int j=0;j<3;++j)
+      self->triInds[i][j]=triInds[i][j];
+
+  for(int n=0;n<8;++n)
+    for(int i=0;i<10;++i)
+      for(int j=0;j<4;++j)
+        {
+          tetInds[10*n+i][j]=index_map[self->tetInds[i][j]]+start_index[n];
+        }
+
+  self->tetInds = ReallocArray2D( self->tetInds, unsigned, 80, 4 );
+  for(int i=0;i<80;++i)
+    for(int j=0;j<4;++j)
+      self->tetInds[i][j]=tetInds[i][j];
+
+  self->num_simplexes[0]=8;
+  self->num_simplexes[1]=80;
 }
 
 
@@ -347,14 +392,18 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 
 		for( v_i = 0; v_i < self->mapSize; v_i++ )
 			self->inc[v_i] = inc[self->vertMap[v_i]];
-		if( Simplex_Search3D( mesh->verts, self->inc, 10, self->tetInds, point, bc, &inside ) ) {
+		if( Simplex_Search3D( mesh->verts, self->inc,
+                                      self->num_simplexes[1], self->tetInds,
+                                      point, bc, &inside ) ) {
 			*dim = MT_VOLUME;
 			*ind = elInd;
 			return True;
 		}
 	}
 	else {
-		if( Simplex_Search3D( mesh->verts, (unsigned*)inc, 10, self->tetInds, point, bc, &inside ) ) {
+		if( Simplex_Search3D( mesh->verts, (unsigned*)inc,
+                                      self->num_simplexes[1], self->tetInds,
+                                      point, bc, &inside ) ) {
 			*dim = MT_VOLUME;
 			*ind = elInd;
 			return True;
@@ -397,10 +446,14 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned e
 
 		for( v_i = 0; v_i < self->mapSize; v_i++ )
 			self->inc[v_i] = inc[self->vertMap[v_i]];
-		fnd = Simplex_Search3D( mesh->verts, self->inc, 10, self->tetInds, point, bc, &inside );
+		fnd = Simplex_Search3D( mesh->verts, self->inc,
+                                        self->num_simplexes[1], self->tetInds,
+                                        point, bc, &inside );
 	}
 	else
-		fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc, 10, self->tetInds, point, bc, &inside );
+		fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc,
+                                        self->num_simplexes[1], self->tetInds,
+                                        point, bc, &inside );
 	if( fnd ) {
 		unsigned*	inds = self->tetInds[inside];
 
@@ -895,10 +948,14 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 
 		for( v_i = 0; v_i < self->mapSize; v_i++ )
 			self->inc[v_i] = inc[self->vertMap[v_i]];
-		fnd = Simplex_Search2D( mesh->verts, self->inc, 2, self->triInds, point, bc, &inside );
+		fnd = Simplex_Search2D( mesh->verts, self->inc,
+                                        self->num_simplexes[0], self->triInds,
+                                        point, bc, &inside );
 	}
 	else
-		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc, 2, self->triInds, point, bc, &inside );
+		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
+                                        self->num_simplexes[0], self->triInds,
+                                        point, bc, &inside );
 	if( fnd ) {
 		*dim = MT_FACE;
 		*ind = elInd;
@@ -941,10 +998,15 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
 
 		for( v_i = 0; v_i < self->mapSize; v_i++ )
 			self->inc[v_i] = inc[self->vertMap[v_i]];
-		fnd = Simplex_Search2D( mesh->verts, self->inc, 2, self->triInds, point, bc, &inside );
+		fnd = Simplex_Search2D( mesh->verts, self->inc,
+                                        self->num_simplexes[0],
+                                        self->triInds, point, bc,
+                                        &inside );
 	}
 	else
-		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc, 2, self->triInds, point, bc, &inside );
+		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
+                                        self->num_simplexes[0],
+                                        self->triInds, point, bc, &inside );
 	if( fnd ) {
 		unsigned	*inds = self->triInds[inside];
 

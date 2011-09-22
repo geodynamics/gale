@@ -60,6 +60,7 @@
 		Mesh_ElementType_ElementHasPointFunc*	elementHasPoint;	\
 		unsigned**				triInds;		\
 		unsigned**				tetInds;		\
+                unsigned                                num_simplexes[2];       \
 		IArray*					incArray;
 
 	struct Mesh_HexType { __Mesh_HexType };
@@ -102,7 +103,7 @@
 	*/
 
 	void Mesh_HexType_SetVertexMap( void* hexType, unsigned* map );
-
+        void Mesh_HexType_SetQ2Inds( void* hexType);
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
