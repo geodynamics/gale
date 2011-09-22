@@ -466,7 +466,6 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 	C2Generator*	self = (C2Generator*)meshGenerator;
 	Stream*		stream;
 	unsigned	nDomainEls;
-	unsigned	vertMap[8] = {0, 2, 6, 8, 18, 20, 24, 26};
 	unsigned	e_i;
 
 	assert( self );
@@ -479,7 +478,7 @@ void C2Generator_GenElementTypes( void* meshGenerator, Mesh* mesh ) {
 	mesh->elTypes = AllocArray( Mesh_ElementType*, mesh->nElTypes );
 	mesh->elTypes[0] = (Mesh_ElementType*)Mesh_HexType_New();
 	Mesh_ElementType_SetMesh( mesh->elTypes[0], mesh );
-	Mesh_HexType_SetVertexMap( mesh->elTypes[0], vertMap );
+	Mesh_HexType_SetQ2Inds( mesh->elTypes[0] );
 	nDomainEls = Mesh_GetDomainSize( mesh, Mesh_GetDimSize( mesh ) );
 	mesh->elTypeMap = AllocArray( unsigned, nDomainEls );
 	for( e_i = 0; e_i < nDomainEls; e_i++ )
