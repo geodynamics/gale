@@ -4,10 +4,10 @@
     <toolbox>Underworld</toolbox>
   </import>
   <plugins>
-    <!-- <struct> -->
-    <!--   <param name="Type">Underworld_EulerDeform</param> -->
-    <!--   <param name="Context">context</param> -->
-    <!-- </struct> -->
+    <struct>
+      <param name="Type">Underworld_EulerDeform</param>
+      <param name="Context">context</param>
+    </struct>
     <struct>
       <param name="Type">Underworld_VTKOutput</param>
       <param name="Context">context</param>
@@ -50,10 +50,8 @@
     <struct name="mesh-Pm1">
       <param name="Type">FeMesh</param>
       <param name="elementType">linear-inner</param>
-      <!-- <param name="elementType">linear</param> -->
     </struct>
     <struct name="Pm1Mesh-generator">
-      <!-- <param name="Type">CartesianGenerator</param> -->
       <param name="Type">Inner2DGenerator</param>
       <param name="mesh">mesh-Pm1</param>
       <param name="elementMesh">mesh-Q2</param>
@@ -329,7 +327,6 @@
     <struct name="constitutiveMatrix">
       <param name="Type">ConstitutiveMatrixCartesian</param>
       <param name="Swarm">gaussSwarm</param>
-      <!-- <param name="Swarm">picIntegrationPoints</param> -->
       <param name="StiffnessMatrix">k_matrix</param>
     </struct>
     <struct name="g_matrix">
@@ -354,7 +351,6 @@
     </struct>
     <struct name="preconditionerTerm">
       <param name="Type">UzawaPreconditionerTerm</param>
-      <!-- <param name="Swarm">picIntegrationPoints</param> -->
       <param name="Swarm">gaussSwarm</param>
       <param name="StiffnessMatrix">preconditioner</param>
     </struct>
@@ -390,20 +386,6 @@
       <param name="RHS">cont_force</param>
       <param name="allowZeroElementContributions">True</param>
     </struct>
-    <!-- <struct name="mixedStabiliser"> -->
-    <!--   <param name="Type">MixedStabiliserTerm</param> -->
-    <!--   <param name="Swarm">gaussSwarm</param> -->
-    <!--   <param name="picSwarm">picIntegrationPoints</param> -->
-    <!--   <param name="storeVisc">storeViscosity</param> -->
-    <!--   <param name="StiffnessMatrix">c_matrix</param> -->
-    <!-- </struct> -->
-
-    <!-- <struct name="buoyancyForceTerm"> -->
-    <!--   <param name="Type">BuoyancyForceTerm</param> -->
-    <!--   <param name="ForceVector">mom_force</param> -->
-    <!--   <param name="Swarm">picIntegrationPoints</param> -->
-    <!--   <param name="gravity">gravity</param> -->
-    <!-- </struct> -->
     <struct name="background">
       <param name="Type">Everywhere</param>
     </struct>
@@ -460,7 +442,7 @@
     <param>PressureField</param>
   </list>
   <param name="timeIntegratorOrder">1</param>
-  <param name="maxTimeSteps">1</param>
+  <param name="maxTimeSteps">10</param>
   <param name="outputEvery">1</param>
   <param name="dumpEvery">1</param>
   <param name="outputPath">./output</param>
@@ -472,8 +454,8 @@
   <param name="maxX">1.0f</param>
   <param name="maxY">1.0f</param>
   <param name="maxZ">0.3f</param>
-  <param name="elementResI">1</param>
-  <param name="elementResJ">1</param>
+  <param name="elementResI">16</param>
+  <param name="elementResJ">16</param>
   <param name="elementResK">4</param>
   <param name="allowUnbalancing">True</param>
   <param name="buildNodeNeighbourTbl">True</param>
@@ -483,16 +465,16 @@
   <param name="gaussParticlesX">2</param>
   <param name="gaussParticlesY">2</param>
   <param name="gaussParticlesZ">2</param>
-  <!-- <struct name="EulerDeform"> -->
-  <!--   <list name="systems"> -->
-  <!--     <struct> -->
-  <!--       <param name="mesh">mesh-Q2</param> -->
-  <!--       <param name="remesher">velocityRemesher</param> -->
-  <!--       <param name="velocityField">VelocityField</param> -->
-  <!--       <param name="wrapTop">True</param> -->
-  <!--     </struct> -->
-  <!--   </list> -->
-  <!-- </struct> -->
+  <struct name="EulerDeform">
+    <list name="systems">
+      <struct>
+        <param name="mesh">mesh-Q2</param>
+        <param name="remesher">velocityRemesher</param>
+        <param name="velocityField">VelocityField</param>
+        <param name="wrapTop">True</param>
+      </struct>
+    </list>
+  </struct>
   <struct name="velocityBCs">
     <param name="type">CompositeVC</param>
     <list name="vcList">
