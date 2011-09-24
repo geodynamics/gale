@@ -209,6 +209,7 @@
     </struct>
     <struct name="particleLayout">
       <param name="Type">GaussParticleLayout</param>
+      <param name="gaussParticles">3</param>
     </struct>
     <struct name="gaussSwarm">
       <param name="Type">IntegrationPointsSwarm</param>
@@ -216,18 +217,15 @@
       <param name="ParticleLayout">particleLayout</param>
       <param name="FeMesh">mesh-Q2</param>
       <param name="TimeIntegrator">timeIntegrator</param>
-      <param name="IntegrationPointMapper">gaussMapper</param>
+      <param name="IntegrationPointMapper">nearestMapper</param>
     </struct>
-    <struct name="gaussMapper">
+    <struct name="nearestMapper">
       <param name="Type">NearestNeighborMapper</param>
       <param name="IntegrationPointsSwarm">gaussSwarm</param>
       <param name="MappedSwarm">picIntegrationPoints</param>
     </struct>
     <struct name="backgroundLayout">
       <param name="Type">BackgroundParticleLayout</param>
-    </struct>
-    <struct name="gaussMSwarmMovementHandler">
-      <param name="Type">ParticleMovementHandler</param>
     </struct>
     <struct name="timeIntegrator">
       <param name="Type">TimeIntegrator</param>
@@ -261,6 +259,7 @@
       <param name="WeightsCalculator">weights</param>
       <param name="TimeIntegrator">timeIntegrator</param>
       <param name="IntegrationPointMapper">mapper</param>
+      <param name="Inflow">True</param>
     </struct>
     <struct name="mapper">
       <param name="Type">CoincidentMapper</param>
@@ -451,16 +450,16 @@
   <param name="minX">0.0f</param>
   <param name="minY">0.0f</param>
   <param name="minZ">0.0f</param>
-  <param name="maxX">1.0f</param>
-  <param name="maxY">1.0f</param>
+  <param name="maxX">2.0f</param>
+  <param name="maxY">0.35f</param>
   <param name="maxZ">0.3f</param>
   <param name="elementResI">16</param>
-  <param name="elementResJ">16</param>
+  <param name="elementResJ">8</param>
   <param name="elementResK">4</param>
   <param name="allowUnbalancing">True</param>
   <param name="buildNodeNeighbourTbl">True</param>
   <param name="buildElementNeighbourTbl">True</param>
-  <param name="particlesPerCell">10</param>
+  <param name="particlesPerCell">40</param>
   <param name="seed">13</param>
   <param name="gaussParticlesX">2</param>
   <param name="gaussParticlesY">2</param>
@@ -472,6 +471,8 @@
         <param name="remesher">velocityRemesher</param>
         <param name="velocityField">VelocityField</param>
         <param name="wrapTop">True</param>
+        <param name="staticLeft">True</param>
+        <param name="staticBottom">True</param>
       </struct>
     </list>
   </struct>
@@ -484,19 +485,8 @@
         <list name="variables">
           <struct>
             <param name="name">vx</param>
-            <param name="type">double</param>
-            <param name="value">0.0</param>
-          </struct>
-        </list>
-      </struct>
-      <struct>
-        <param name="type">WallVC</param>
-        <param name="wall">right</param>
-        <list name="variables">
-          <struct>
-            <param name="name">vx</param>
-            <param name="type">double</param>
-            <param name="value">1.0</param>
+            <param name="type">func</param>
+            <param name="value">Equation1</param>
           </struct>
         </list>
       </struct>
@@ -506,8 +496,13 @@
         <list name="variables">
           <struct>
             <param name="name">vy</param>
-            <param name="type">double</param>
-            <param name="value">0.0</param>
+            <param name="type">func</param>
+            <param name="value">Equation2</param>
+          </struct>
+          <struct>
+            <param name="name">vx</param>
+            <param name="type">func</param>
+            <param name="value">Equation3</param>
           </struct>
         </list>
       </struct>
@@ -515,9 +510,8 @@
   </struct>
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
- <param name="journal.info">True</param>
- <param name="journal.debug">True</param>
- <param name="journal-level.info">2</param> 
- <param name="journal-level.debug">2</param>
 <param name="linearTolerance">1.0e-10</param>
+<param name="Equation1">step(y-0.1)*step(0.2-y)</param>
+<param name="Equation2">-step(x-0.9)*step(1.1-x)</param>
+<param name="Equation3">step(x-0.9)*step(1.1-x)</param>
 </StGermainData>
