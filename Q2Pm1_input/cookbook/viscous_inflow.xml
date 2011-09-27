@@ -74,32 +74,6 @@
         <param>maxZ</param>
       </list>
     </struct>
-    <struct name="mesh-Q1">
-      <param name="Type">FeMesh</param>
-      <param name="elementType">linear</param>
-    </struct>
-    <struct name="Q1Mesh-generator">
-      <param name="Type">CartesianGenerator</param>
-      <param name="mesh">mesh-Q1</param>
-      <param name="dim">dim</param>
-      <param name="shadowDepth">shadowDepth</param>
-      <param name="regular">False</param>
-      <list name="size">
-        <param>elementResI</param>
-        <param>elementResJ</param>
-        <param>elementResK</param>
-      </list>
-      <list name="minCoord">
-        <param>minX</param>
-        <param>minY</param>
-        <param>minZ</param>
-      </list>
-      <list name="maxCoord">
-        <param>maxX</param>
-        <param>maxY</param>
-        <param>maxZ</param>
-      </list>
-    </struct>
     <struct name="velocity">
       <param name="Type">MeshVariable</param>
       <param name="mesh">mesh-Q2</param>
@@ -138,29 +112,14 @@
       <param name="IC">velocityICs</param>
       <param name="LinkedDofInfo">velocityLinkedDofs</param>
     </struct>
-    <struct name="VelocityMagnitudeField">
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">Magnitude</param>
-      <param name="FeVariable">VelocityField</param>
-    </struct>
     <struct name="VelocityGradientsField">
       <param name="Type">OperatorFeVariable</param>
       <param name="Operator">Gradient</param>
       <param name="FeVariable">VelocityField</param>
     </struct>
-    <struct name="VelocityGradientsInvariantField">
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TensorInvariant</param>
-      <param name="FeVariable">VelocityGradientsField</param>
-    </struct>
     <struct name="StrainRateField">
       <param name="Type">OperatorFeVariable</param>
       <param name="Operator">TensorSymmetricPart</param>
-      <param name="FeVariable">VelocityGradientsField</param>
-    </struct>
-    <struct name="VorticityField">
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TensorAntisymmetricPart</param>
       <param name="FeVariable">VelocityGradientsField</param>
     </struct>
     <struct name="StrainRateInvariantField">
@@ -187,22 +146,22 @@
       <param name="DofLayout">pressureDofLayout</param>
       <param name="LinkedDofInfo">pressureLinkedDofs</param>
     </struct>
-    <!-- <struct name="StressField"> -->
-    <!--   <param name="Type">StressField</param> -->
-    <!--   <param name="StrainRateField">StrainRateField</param> -->
-    <!--   <param name="Context">context</param> -->
-    <!--   <param name="ConstitutiveMatrix">constitutiveMatrix</param> -->
-    <!--   <param name="Swarm">picIntegrationPoints</param> -->
-    <!--   <param name="Mesh">mesh-Pm1</param> -->
-    <!--   <param name="IC">stressICs</param> -->
-    <!-- </struct> -->
-    <!-- <struct name="ViscosityField"> -->
-    <!--   <param name="Type">ViscosityField</param> -->
-    <!--   <param name="Context">context</param> -->
-    <!--   <param name="Swarm">picIntegrationPoints</param> -->
-    <!--   <param name="Mesh">mesh-Pm1</param> -->
-    <!--   <param name="ConstitutiveMatrix">constitutiveMatrix</param> -->
-    <!-- </struct> -->
+    <struct name="StressField">
+      <param name="Type">StressField</param>
+      <param name="StrainRateField">StrainRateField</param>
+      <param name="Context">context</param>
+      <param name="ConstitutiveMatrix">constitutiveMatrix</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Mesh">mesh-Q2</param>
+      <param name="IC">stressICs</param>
+    </struct>
+    <struct name="ViscosityField">
+      <param name="Type">ViscosityField</param>
+      <param name="Context">context</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Mesh">mesh-Q2</param>
+      <param name="ConstitutiveMatrix">constitutiveMatrix</param>
+    </struct>
     <struct name="cellLayout">
       <param name="Type">ElementCellLayout</param>
       <param name="Mesh">mesh-Q2</param>
@@ -224,42 +183,35 @@
       <param name="IntegrationPointsSwarm">gaussSwarm</param>
       <param name="MappedSwarm">picIntegrationPoints</param>
     </struct>
-    <struct name="backgroundLayout">
-      <param name="Type">BackgroundParticleLayout</param>
-    </struct>
     <struct name="timeIntegrator">
       <param name="Type">TimeIntegrator</param>
       <param name="order">timeIntegratorOrder</param>
       <param name="simultaneous">f</param>
       <param name="Context">context</param>
     </struct>
-    <struct name="elementCellLayout">
-      <param name="Type">ElementCellLayout</param>
-      <param name="Mesh">mesh-Q2</param>
-    </struct>
     <struct name="weights">
       <param name="Type">PCDVC</param>
-      <param name="resolutionX">10</param>
-      <param name="resolutionY">10</param>
-      <param name="resolutionZ">10</param>
+      <param name="resolutionX">20</param>
+      <param name="resolutionY">20</param>
+      <param name="resolutionZ">20</param>
       <param name="lowerT">0.6</param>
       <param name="upperT">25</param>
       <param name="maxDeletions">3</param>
       <param name="maxSplits">3</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="Inflow">True</param>
     </struct>
     <struct name="localLayout">
       <param name="Type">MappedParticleLayout</param>
     </struct>
     <struct name="picIntegrationPoints">
       <param name="Type">IntegrationPointsSwarm</param>
-      <param name="CellLayout">elementCellLayout</param>
+      <param name="CellLayout">cellLayout</param>
       <param name="ParticleLayout">localLayout</param>
       <param name="FeMesh">mesh-Q2</param>
       <param name="WeightsCalculator">weights</param>
       <param name="TimeIntegrator">timeIntegrator</param>
       <param name="IntegrationPointMapper">mapper</param>
-      <param name="Inflow">True</param>
     </struct>
     <struct name="mapper">
       <param name="Type">CoincidentMapper</param>
@@ -279,7 +231,7 @@
     </struct>
     <struct name="materialSwarm">
       <param name="Type">MaterialPointsSwarm</param>
-      <param name="CellLayout">elementCellLayout</param>
+      <param name="CellLayout">cellLayout</param>
       <param name="ParticleLayout">materialSwarmParticleLayout</param>
       <param name="FeMesh">mesh-Q2</param>
       <list name="ParticleCommHandlers">
@@ -369,7 +321,6 @@
       <param name="StressTensorMatrix">k_matrix</param>
       <param name="GradientMatrix">g_matrix</param>
       <param name="DivergenceMatrix"></param>
-      <param name="CompressibilityMatrix">c_matrix</param>
       <param name="VelocityVector">solutionVelocity</param>
       <param name="PressureVector">solutionPressure</param>
       <param name="ForceVector">mom_force</param>
@@ -378,12 +329,11 @@
       <param name="nonLinearTolerance">nonLinearTolerance</param>
       <param name="makeConvergenceFile">false</param>
     </struct>
-    <struct name="c_matrix">
-      <param name="Type">StiffnessMatrix</param>
-      <param name="RowVariable">PressureField</param>
-      <param name="ColumnVariable">PressureField</param>
-      <param name="RHS">cont_force</param>
-      <param name="allowZeroElementContributions">True</param>
+    <struct name="buoyancyForceTerm">
+      <param name="Type">BuoyancyForceTerm</param>
+      <param name="ForceVector">mom_force</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="gravity">gravity</param>
     </struct>
     <struct name="background">
       <param name="Type">Everywhere</param>
@@ -415,22 +365,22 @@
       <param name="Type">MaterialViscosity</param>
       <param name="eta0">1.0</param>
     </struct>
-    <!-- <struct name="storeViscosity"> -->
-    <!--   <param name="Type">StoreVisc</param> -->
-    <!--   <param name="MaterialPointsSwarm">materialSwarm</param> -->
-    <!-- </struct> -->
-    <!-- <struct name="storeStress"> -->
-    <!--   <param name="Type">StoreStress</param> -->
-    <!--   <param name="MaterialPointsSwarm">materialSwarm</param> -->
-    <!-- </struct> -->
+    <struct name="storeViscosity">
+      <param name="Type">StoreVisc</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+    </struct>
+    <struct name="storeStress">
+      <param name="Type">StoreStress</param>
+      <param name="MaterialPointsSwarm">materialSwarm</param>
+    </struct>
     <struct name="viscous">
       <param name="Type">RheologyMaterial</param>
       <param name="Shape">boxShape</param>
       <param name="density">1.0</param>
       <list name="Rheology">
         <param>backgroundViscosity</param>
-        <!-- <param>storeViscosity</param> -->
-        <!-- <param>storeStress</param> -->
+        <param>storeViscosity</param>
+        <param>storeStress</param>
       </list>
     </struct>
 
@@ -461,9 +411,6 @@
   <param name="buildElementNeighbourTbl">True</param>
   <param name="particlesPerCell">40</param>
   <param name="seed">13</param>
-  <param name="gaussParticlesX">2</param>
-  <param name="gaussParticlesY">2</param>
-  <param name="gaussParticlesZ">2</param>
   <struct name="EulerDeform">
     <list name="systems">
       <struct>
@@ -492,6 +439,17 @@
       </struct>
       <struct>
         <param name="type">WallVC</param>
+        <param name="wall">right</param>
+        <list name="variables">
+          <struct>
+            <param name="name">vx</param>
+            <param name="type">double</param>
+            <param name="value">0.0</param>
+          </struct>
+        </list>
+      </struct>
+      <struct>
+        <param name="type">WallVC</param>
         <param name="wall">bottom</param>
         <list name="variables">
           <struct>
@@ -510,8 +468,7 @@
   </struct>
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
-<param name="linearTolerance">1.0e-10</param>
-<param name="Equation1">step(y-0.1)*step(0.2-y)</param>
-<param name="Equation2">-step(x-0.9)*step(1.1-x)</param>
-<param name="Equation3">step(x-0.9)*step(1.1-x)</param>
+  <param name="Equation1">step(y-0.1)*step(0.2-y)</param>
+  <param name="Equation2">-step(x-0.9)*step(1.1-x)</param>
+  <param name="Equation3">step(x-0.9)*step(1.1-x)</param>
 </StGermainData>

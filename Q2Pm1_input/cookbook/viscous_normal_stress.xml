@@ -199,6 +199,7 @@
       <param name="maxDeletions">3</param>
       <param name="maxSplits">3</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
+      <param name="Inflow">True</param>
     </struct>
     <struct name="localLayout">
       <param name="Type">MappedParticleLayout</param>
@@ -383,6 +384,14 @@
       </list>
     </struct>
 
+    <struct name="stressBC">
+      <param name="Type">StressBC</param>
+      <param name="ForceVector">mom_force</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="wall">bottom</param>
+      <param name="y_type">double</param>
+      <param name="y_value">0.35</param>
+    </struct>
   </struct>
 
   <list name="FieldVariablesToCheckpoint">
@@ -417,6 +426,7 @@
         <param name="remesher">velocityRemesher</param>
         <param name="velocityField">VelocityField</param>
         <param name="wrapTop">True</param>
+        <param name="staticBottom">True</param>
       </struct>
     </list>
   </struct>
@@ -432,6 +442,11 @@
             <param name="type">double</param>
             <param name="value">0.0</param>
           </struct>
+          <struct>
+            <param name="name">vy</param>
+            <param name="type">double</param>
+            <param name="value">0.0</param>
+          </struct>
         </list>
       </struct>
       <struct>
@@ -443,12 +458,6 @@
             <param name="type">double</param>
             <param name="value">1.0</param>
           </struct>
-        </list>
-      </struct>
-      <struct>
-        <param name="type">WallVC</param>
-        <param name="wall">bottom</param>
-        <list name="variables">
           <struct>
             <param name="name">vy</param>
             <param name="type">double</param>
