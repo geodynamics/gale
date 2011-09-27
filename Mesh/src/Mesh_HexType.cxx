@@ -137,9 +137,6 @@ void _Mesh_HexType_Delete( void* elementType ) {
 
 void _Mesh_HexType_Print( void* elementType, Stream* stream ) {
 	Mesh_HexType*	self = (Mesh_HexType*)elementType;
-	Stream*			elementTypeStream;
-
-	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"Mesh_HexTypeStream"  );
 
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_HexType (ptr): (%p)\n", self );
@@ -201,7 +198,7 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 	unsigned*		map = NULL;
 	double			curSep = 0.0;
 	double*			dimSep = NULL;
-	unsigned		e_i, nInc = 0;
+	unsigned		e_i;
 	int			*inc = NULL;
 
 	assert( self );
@@ -220,7 +217,6 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 		dimSep[e_i] = 0.0;
 
 	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), elInd, MT_VERTEX, self->incArray );
-	nInc = IArray_GetSize( self->incArray );
 	inc = IArray_GetPtr( self->incArray );
 	map = self->vertMap;
 
@@ -300,7 +296,7 @@ double Mesh_HexType_GetMinimumSeparation( void* hexType, unsigned elInd, double*
 
 void Mesh_HexType_SetVertexMap( void* hexType, unsigned* map ) {
 	Mesh_HexType*	self = (Mesh_HexType*)hexType;
-	unsigned	v_i;
+	int v_i;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 
@@ -366,7 +362,6 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 					    MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc;
 	double		bc[4];
 	unsigned	inside;
 	const int	*inc;
@@ -383,7 +378,6 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 
 	/* Get element to vertex incidence. */
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
-	nInc = IArray_GetSize( self->incArray );
 	inc = IArray_GetPtr( self->incArray );
 
 	/* Search for tetrahedra. */
@@ -413,11 +407,101 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 	return False;
 }
 
-Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned elInd, double* point, 
-						  MeshTopology_Dim* dim, unsigned* ind )
+namespace {
+
+  /* We compute incidence based on a cube with 8 nodes and 10
+     simlexes.  For quadratic elements, there are 27 nodes and 80
+     simplexes.  So we calculate which edge or face a point
+     intersects, and this routine tells us whether that edge or face
+     is actually interior to the quadratic element. */
+
+  bool valid_index(const int &num_simplexes, const int &inside,
+                   MeshTopology_Dim* dim, unsigned* ind)
+  {
+    if(num_simplexes==10)
+      return true;
+    const int block=inside/10;
+    switch(*dim)
+      {
+      case MT_EDGE:
+        switch(*ind)
+          {
+          case 0:
+            return block==0 || block==1;
+          case 1:
+            return block==2 || block==3;
+          case 2:
+            return block==0 || block==2;
+          case 3:
+            return block==1 || block==3;
+          case 4:
+            return block==4 || block==5;
+          case 5:
+            return block==6 || block==7;
+          case 6:
+            return block==4 || block==6;
+          case 7:
+            return block==5 || block==7;
+          case 8:
+            return block==0 || block==4;
+          case 9:
+            return block==1 || block==5;
+          case 10:
+            return block==2 || block==6;
+          case 11:
+            return block==3 || block==7;
+          }
+      case MT_FACE:
+        switch(*ind)
+          {
+          case 0:
+            return block<4;
+          case 1:
+            return !(block<4);
+          case 2:
+            return block%4<2;
+          case 3:
+            return !(block%4<2);
+          case 4:
+            return block%2<1;
+          case 5:
+            return !(block%2<1);
+          }
+      default:
+        ;
+      }
+    abort();
+    return false;
+  }
+
+  void set_index(const int &num_simplexes,
+                 IGraph* topo,
+                 const MeshTopology_Dim &volume, const unsigned elInd,
+                 const MeshTopology_Dim incidence_dim[],
+                 const int incidence_index[], const int &inside,
+                 MeshTopology_Dim* dim, unsigned* ind)
+  {
+    *dim=incidence_dim[inside%10];
+    if(*dim==volume)
+      *ind=elInd;
+    else
+      {
+        *ind=topo->incEls[volume][*dim][elInd][incidence_index[inside%10]];
+        if(!valid_index(num_simplexes,inside,dim,ind))
+          {
+            *dim=volume;
+            *ind=elInd;
+          }
+      }
+  }
+}
+
+
+Bool Mesh_HexType_ElementHasPoint3DWithIncidence
+( Mesh_HexType* self, unsigned elInd, double* point, 
+  MeshTopology_Dim* dim, unsigned* ind )
 {
   Mesh*		mesh;
-  unsigned	nInc;
   Bool		fnd;
   double		bc[4];
   IGraph*		topo;
@@ -426,7 +510,8 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned e
 
   assert( self && Stg_CheckType( self, Mesh_HexType ) );
   assert( Mesh_GetDimSize( self->mesh ) == 3 );
-  assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
+  assert( elInd < Mesh_GetDomainSize( self->mesh,
+                                      Mesh_GetDimSize( self->mesh ) ) );
   assert( point );
   assert( dim );
   assert( ind );
@@ -436,8 +521,8 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned e
   topo = (IGraph*)mesh->topo;
 
   /* Get element to vertex incidence. */
-  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
-  nInc = IArray_GetSize( self->incArray );
+  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX,
+                     self->incArray );
   inc = IArray_GetPtr( self->incArray );
 
   /* Search for tetrahedra. */
@@ -458,568 +543,149 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned e
     unsigned*	inds = self->tetInds[inside];
 
     /* Check boundary ownership. */
-    if( bc[0] == 0.0 || bc[0] == -0.0 ) {
-      if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-        if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-          *dim = MT_VERTEX;
-          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[3]];
-        }
-        else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-          *dim = MT_VERTEX;
-          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[2]];
-        }
-        else {
-          switch(self->num_simplexes[1])
-            {
-            case 10:
-              if( inside == 0 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-              }
-              else if( inside == 1 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][11];
-              }
-              else if( inside == 2 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][7];
-              }
-              else if( inside == 3 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][5];
-              }
-              else if( inside == 4 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-              }
-              else if( inside == 5 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-              }
-              else if( inside == 6 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-              }
-              else if( inside == 7 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-              }
-              else if( inside == 8 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][5];
-              }
-              else {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-              }
-              break;
-            case 80:
-              abort();
-              break;
-            default:
-              abort;
-            }
-        }
-      }
-      else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-        if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-          *dim = MT_VERTEX;
-          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[1]];
-        }
-        else {
-          switch(self->num_simplexes[1])
-            {
-            case 10:
-              if( inside == 0 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-              }
-              else if( inside == 1 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-              }
-              else if( inside == 2 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-              }
-              else if( inside == 3 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-              }
-              else if( inside == 4 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-              }
-              else if( inside == 5 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][9];
-              }
-              else if( inside == 6 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][6];
-              }
-              else if( inside == 7 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][10];
-              }
-              else if( inside == 8 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][7];
-              }
-              else {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-              }
-              break;
-            case 80:
-              abort();
-              break;
-            default:
-              abort;
-            }
-        }
-      }
-      else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-        switch(self->num_simplexes[1])
+    if( bc[0] == 0.0 || bc[0] == -0.0 )
+      {
+        if( bc[1] == 0.0 || bc[1] == -0.0 )
           {
-          case 10:
-            if( inside == 0 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-            }
-            else if( inside == 1 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][1];
-            }
-            else if( inside == 2 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][4];
-            }
-            else if( inside == 3 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][6];
-            }
-            else if( inside == 4 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-            }
-            else if( inside == 5 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][3];
-            }
-            else if( inside == 6 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][4];
-            }
-            else if( inside == 7 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][1];
-            }
-            else if( inside == 8 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-            }
-            else {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-            }
-            break;
-          case 80:
-            abort();
-            break;
-          default:
-            abort;
+            if( bc[2] == 0.0 || bc[2] == -0.0 )
+              {
+                *dim = MT_VERTEX;
+                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[3]];
+              }
+            else if( bc[3] == 0.0 || bc[3] == -0.0 )
+              {
+                *dim = MT_VERTEX;
+                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[2]];
+              }
+            else
+              {
+                const MeshTopology_Dim incidence_dim[]=
+                  { MT_FACE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_FACE,
+                    MT_FACE, MT_FACE, MT_EDGE, MT_FACE };
+                const int incidence_index[]={ 4, 11, 7, 5, 1, 5, 1, 3, 5, 1 };
+                set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                          incidence_dim,incidence_index,inside,dim,ind);
+              }
           }
-      }
-      else {
-        switch(self->num_simplexes[1])
+        else if( bc[2] == 0.0 || bc[2] == -0.0 )
           {
-          case 10:
-            if( inside == 0 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 1 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-            }
-            else if( inside == 2 ) {
-              *dim = 	MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-            }
-            else if( inside == 3 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-            }
-            else if( inside == 4 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 5 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-            }
-            else if( inside == 6 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-            }
-            else if( inside == 7 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-            }
-            else if( inside == 8 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-            }
-            else {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            break;
-          case 80:
-            abort();
-            break;
-          default:
-            abort;
+            if( bc[3] == 0.0 || bc[3] == -0.0 )
+              {
+                *dim = MT_VERTEX;
+                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[1]];
+              }
+            else
+              {
+                MeshTopology_Dim incidence_dim[]=
+                  { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_EDGE,
+                    MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE };
+                int incidence_index[]={ 2, 3, 1, 1, 3, 9, 6, 10, 7, 3 };
+                set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                          incidence_dim,incidence_index,inside,dim,ind);
+              }
           }
-      }
-    }
-    else if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-      if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-        if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-          *dim = MT_VERTEX;
-          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[0]];
-        }
-        else {
-          switch(self->num_simplexes[1])
-            {
-            case 10:
-              if( inside == 0 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][8];
-              }
-              else if( inside == 1 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-              }
-              else if( inside == 2 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-              }
-              else if( inside == 3 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-              }
-              else if( inside == 4 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-              }
-              else if( inside == 5 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-              }
-              else if( inside == 6 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-              }
-              else if( inside == 7 ) {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-              }
-              else if( inside == 8 ) {
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][11];
-              }
-              else {
-                *dim = MT_FACE;
-                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-              }
-              break;
-            case 80:
-              abort();
-              break;
-            default:
-              abort;
-            }
-        }
-      }
-      else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-        switch(self->num_simplexes[1])
+        else if( bc[3] == 0.0 || bc[3] == -0.0 )
           {
-          case 10:
-            if( inside == 0 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][2];
-            }
-            else if( inside == 1 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][3];
-            }
-            else if( inside == 2 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][9];
-            }
-            else if( inside == 3 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][10];
-            }
-            else if( inside == 4 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-            }
-            else if( inside == 5 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-            }
-            else if( inside == 6 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-            }
-            else if( inside == 7 ) {
-              *dim = 	MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-            }
-            else if( inside == 8 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-            }
-            else {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-            }
-            break;
-          case 80:
-            abort();
-            break;
-          default:
-            abort;
+            MeshTopology_Dim incidence_dim[]=
+              { MT_FACE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_EDGE,
+                MT_EDGE, MT_EDGE, MT_FACE, MT_FACE };
+            int incidence_index[]={ 0, 1, 4, 6, 4, 3, 4, 1, 1, 5 };
+            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                      incidence_dim,incidence_index,inside,dim,ind);
           }
-      }
-      else {
-        switch(self->num_simplexes[1])
+        else
           {
-          case 10:
-            if( inside == 0 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-            }
-            else if( inside == 1 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-            }
-            else if( inside == 2 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-            }
-            else if( inside == 3 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-            }
-            else if( inside == 4 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 5 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 6 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 7 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 8 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-            }
-            else {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            break;
-          case 80:
-            abort();
-            break;
-          default:
-            abort;
+            MeshTopology_Dim incidence_dim[]=
+              { MT_VOLUME, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_FACE,
+                MT_FACE, MT_FACE, MT_FACE, MT_VOLUME };
+            int incidence_index[]={ 0, 3, 1, 1, 0, 5, 1, 3, 1, 0 };
+            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                      incidence_dim,incidence_index,inside,dim,ind);
           }
       }
-    }
-    else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-      if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-        switch(self->num_simplexes[1])
+    else if( bc[1] == 0.0 || bc[1] == -0.0 )
+      {
+        if( bc[2] == 0.0 || bc[2] == -0.0 )
           {
-          case 10:
-            if( inside == 0 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][0];
-            }
-            else if( inside == 1 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-            }
-            else if( inside == 2 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-            }
-            else if( inside == 3 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-            }
-            else if( inside == 4 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-            }
-            else if( inside == 5 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][0];
-            }
-            else if( inside == 6 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][8];
-            }
-            else if( inside == 7 ) {
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][2];
-            }
-            else if( inside == 8 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-            }
-            else {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-            }
-            break;
-          case 80:
-            abort();
-            break;
-          default:
-            abort;
+            if( bc[3] == 0.0 || bc[3] == -0.0 )
+              {
+                *dim = MT_VERTEX;
+                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[0]];
+              }
+            else
+              {
+                MeshTopology_Dim incidence_dim[]=
+                  { MT_EDGE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_FACE,
+                    MT_FACE, MT_FACE, MT_EDGE, MT_FACE };
+                int incidence_index[]={ 8, 5, 5, 3, 5, 2, 4, 4, 11, 4 };
+                set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                          incidence_dim,incidence_index,inside,dim,ind);
+              }
           }
-      }
-      else {
-        switch(self->num_simplexes[1])
+        else if( bc[3] == 0.0 || bc[3] == -0.0 )
           {
-          case 10:
-            if( inside == 0 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-            }
-            else if( inside == 1 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 2 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 3 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 4 ) {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            else if( inside == 5 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-            }
-            else if( inside == 6 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-            }
-            else if( inside == 7 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-            }
-            else if( inside == 8 ) {
-              *dim = MT_FACE;
-              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-            }
-            else {
-              *dim = MT_VOLUME;
-              *ind = elInd;
-            }
-            break;
-          case 80:
-            abort();
-            break;
-          default:
-            abort;
+            MeshTopology_Dim incidence_dim[]=
+              { MT_EDGE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_FACE,
+                MT_FACE, MT_FACE, MT_FACE, MT_FACE };
+            int incidence_index[]={ 2, 3, 9, 10, 2, 0, 2, 0, 3, 2 };
+            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                      incidence_dim,incidence_index,inside,dim,ind);
+          }
+        else
+          {
+            MeshTopology_Dim incidence_dim[]=
+              { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_VOLUME,
+                MT_VOLUME, MT_VOLUME, MT_FACE, MT_VOLUME };
+            int incidence_index[]={ 4, 5, 5, 3, 0, 0, 0, 0, 3, 0};
+            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                      incidence_dim,incidence_index,inside,dim,ind);
           }
       }
-    }
-    else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-      switch(self->num_simplexes[1])
-        {
-        case 10:
-          if( inside == 0 ) {
-            *dim = MT_FACE;
-            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+    else if( bc[2] == 0.0 || bc[2] == -0.0 )
+      {
+        if( bc[3] == 0.0 || bc[3] == -0.0 )
+          {
+            MeshTopology_Dim incidence_dim[]=
+              { MT_EDGE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_EDGE,
+                MT_EDGE, MT_EDGE, MT_FACE, MT_FACE };
+            int incidence_index[]={ 0, 0, 2, 4, 0, 0, 8, 2, 5, 0 };
+            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                      incidence_dim,incidence_index,inside,dim,ind);
           }
-          else if( inside == 1 ) {
-            *dim = MT_FACE;
-            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+        else
+          {
+            MeshTopology_Dim incidence_dim[]=
+              { MT_FACE, MT_VOLUME, MT_VOLUME, MT_VOLUME, MT_VOLUME,
+                MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME };
+            int incidence_index[]={ 2, 0, 0, 0, 0, 2, 4, 4, 5, 0 };
+            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                      incidence_dim,incidence_index,inside,dim,ind);
           }
-          else if( inside == 2 ) {
-            *dim = MT_FACE;
-            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-          }
-          else if( inside == 3 ) {
-            *dim = MT_FACE;
-            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-          }
-          else if( inside == 4 ) {
-            *dim = MT_VOLUME;
-            *ind = elInd;
-          }
-          else if( inside == 5 ) {
-            *dim = MT_FACE;
-            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-          }
-          else if( inside == 6 ) {
-            *dim = MT_FACE;
-            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-          }
-          else if( inside == 7 ) {
-            *dim = MT_FACE;
-            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-          }
-          else if( inside == 8 ) {
-            *dim = MT_VOLUME;
-            *ind = elInd;
-          }
-          else {
-            *dim = MT_VOLUME;
-            *ind = elInd;
-          }
-          break;
-        case 80:
-          abort();
-          break;
-        default:
-          abort;
-        }
-    }
-    else {
-      *dim = MT_VOLUME;
-      *ind = elInd;
-    }
+      }
+    else if( bc[3] == 0.0 || bc[3] == -0.0 )
+      {
+        MeshTopology_Dim incidence_dim[]=
+          { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME,
+            MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_VOLUME };
+        int incidence_index[]={ 0, 0, 2, 4, 0, 0, 2, 0, 0, 0 };
+        set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                  incidence_dim,incidence_index,inside,dim,ind);
+      }
+    else
+      {
+        *dim = MT_VOLUME;
+        *ind = elInd;
+      }
     return True;
   }
   return False;
 }
 
-Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
-					    MeshTopology_Dim* dim, unsigned* ind )
+Bool Mesh_HexType_ElementHasPoint2DGeneral
+( Mesh_HexType* self, unsigned elInd, double* point, 
+  MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc;
 	Bool		fnd;
 	double		bc[3];
 	unsigned	inside;
@@ -1027,7 +693,8 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 	assert( Mesh_GetDimSize( self->mesh ) == 2 );
-	assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
+	assert( elInd < Mesh_GetDomainSize( self->mesh,
+                                            Mesh_GetDimSize( self->mesh ) ) );
 	assert( point );
 	assert( dim );
 	assert( ind );
@@ -1036,8 +703,8 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 	mesh = self->mesh;
 
 	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
-	nInc = IArray_GetSize( self->incArray );
+	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ),
+                           elInd, MT_VERTEX, self->incArray );
 	inc = IArray_GetPtr( self->incArray );
 
 	/* Search for triangle. */
@@ -1063,11 +730,11 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 	return False;
 }
 
-Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned elInd, double* point, 
-						  MeshTopology_Dim* dim, unsigned* ind )
+Bool Mesh_HexType_ElementHasPoint2DWithIncidence
+( Mesh_HexType* self, unsigned elInd, double* point, 
+  MeshTopology_Dim* dim, unsigned* ind )
 {
   Mesh*		mesh;
-  unsigned	nInc;
   Bool		fnd;
   double		bc[3];
   IGraph*		topo;
@@ -1076,7 +743,7 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
 
   assert( self && Stg_CheckType( self, Mesh_HexType ) );
   assert( Mesh_GetDimSize( self->mesh ) == 2 );
-  assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
+  assert( elInd < Mesh_GetDomainSize(self->mesh,Mesh_GetDimSize(self->mesh)));
   assert( point );
   assert( dim );
   assert( ind );
@@ -1086,8 +753,8 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
   topo = (IGraph*)mesh->topo;
 
   /* Get element to vertex incidence. */
-  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
-  nInc = IArray_GetSize( self->incArray );
+  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX,
+                     self->incArray );
   inc = IArray_GetPtr( self->incArray );
 
   /* Search for triangle. */
@@ -1198,7 +865,7 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
                 break;
               }
           default:
-            abort;
+            abort();
           }
       }
     }
@@ -1241,7 +908,7 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned e
             }
           break;
         default:
-          abort;
+          abort();
         }
     }
     else {
@@ -1257,7 +924,6 @@ Bool Mesh_HexType_ElementHasPoint1DGeneral( Mesh_HexType* self, unsigned elInd, 
 					    MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc;
 	const int*	inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
@@ -1269,7 +935,6 @@ Bool Mesh_HexType_ElementHasPoint1DGeneral( Mesh_HexType* self, unsigned elInd, 
 
 	mesh = self->mesh;
 	Mesh_GetIncidence( mesh, MT_EDGE, elInd, MT_VERTEX, self->incArray );
-	nInc = IArray_GetSize( self->incArray );
 	inc = IArray_GetPtr( self->incArray );
 
 	if( point[0] > *Mesh_GetVertex( mesh, inc[self->vertMap[0]] ) && 
