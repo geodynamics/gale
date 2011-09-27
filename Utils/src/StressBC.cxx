@@ -296,6 +296,12 @@ void _StressBC_Destroy( void* forceTerm, void* data ) {
 	_ForceTerm_Destroy( forceTerm, data );
 }
 
+double StressBC_compute_node_area(Wall wall, FeMesh *mesh, Index lElement_I, 
+                                  Dimension_Index dim,
+                                  const int block_map[9][8],
+                                  const int &block,
+                                  int *elementNodes);
+
 void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
   StressBC*               self               = (StressBC*) forceTerm;
   Dimension_Index                  dim                = forceVector->dim;
@@ -324,180 +330,223 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                                                                 "vertexGrid"));
   
   incidence=IArray_New();
-  area=StressBC_compute_face_area(self->_wall,mesh,lElement_I,dim,incidence);
-  elementNodeCount=IArray_GetSize(incidence);
+  Mesh_GetIncidence(mesh, Mesh_GetDimSize(mesh), lElement_I,
+                    MT_VERTEX,incidence);
   elementNodes=IArray_GetPtr(incidence);
+  elementNodeCount=IArray_GetSize(incidence);
+                              
+  int block_map[9][8];
 
-  if(dim==2)
+  block_map[0][0]=0;
+  block_map[0][1]=1;
+  block_map[0][2]=2;
+  block_map[0][3]=3;
+  block_map[0][4]=4;
+  block_map[0][5]=5;
+  block_map[0][6]=6;
+  block_map[0][7]=7;
+
+  block_map[1][0]=0;
+  block_map[1][1]=1;
+  block_map[1][2]=3;
+  block_map[1][3]=4;
+  block_map[1][4]=9;
+  block_map[1][5]=10;
+  block_map[1][6]=12;
+  block_map[1][7]=13;
+
+  for(int i=0;i<8;i++)
     {
-      overcount=2;
+      block_map[2][i]=block_map[1][i]+1;
+      block_map[3][i]=block_map[1][i]+3;
+      block_map[4][i]=block_map[1][i]+4;
+      block_map[5][i]=block_map[1][i]+9;
+      block_map[6][i]=block_map[1][i]+10;
+      block_map[7][i]=block_map[1][i]+12;
+      block_map[8][i]=block_map[1][i]+13;
     }
-  else
+
+  int block_start(0), nblocks(1), nodes_per_block(1<<dim);
+  if(dim==2 && elementNodeCount==9)
     {
-      overcount=4;
+      block_start=1;
+      nblocks=4;
     }
-  /* Apply the stress */
-  for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) {
-    /* Make sure that we are on the boundary */
-    int condition, entry_I;
-    ConditionFunction* cf;
-    RegularMeshUtils_Node_1DTo3D
-      (mesh,Mesh_DomainToGlobal(mesh,MT_VERTEX,elementNodes[eNode_I]),ijk);
+  else if(dim==3 && elementNodeCount==27)
+    {
+      block_start=1;
+      nblocks=8;
+    }
+  for(int block=block_start;block<block_start+nblocks;++block)
+    {
+      area=StressBC_compute_node_area(self->_wall,mesh,lElement_I,dim,
+                                      block_map,block,elementNodes);
+
+      /* Apply the stress */
+      for( eNode_I = 0 ; eNode_I < nodes_per_block; eNode_I++ ) {
+        /* Make sure that we are on the boundary */
+        int condition, entry_I;
+        ConditionFunction* cf;
+        RegularMeshUtils_Node_1DTo3D
+          (mesh,
+           Mesh_DomainToGlobal(mesh,MT_VERTEX,
+                               elementNodes[block_map[block][eNode_I]]),
+           ijk);
     
-    switch(self->_wall)
-      {
-      case Wall_Left:
-        condition=(ijk[0] == 0);
-        break;
-      case Wall_Right:
-        condition=(ijk[0] == ( grid->sizes[0] - 1 ));
-        break;
-      case Wall_Bottom:
-        condition=(ijk[1] == 0);
-        break;
-      case Wall_Top:
-        condition=(ijk[1] == ( grid->sizes[1] - 1 ));
-        break;
-      case Wall_Front:
-        condition=(ijk[2] == 0);
-        break;
-      case Wall_Back:
-        condition=(ijk[2] == ( grid->sizes[2] - 1 ));
-        break;
-      }
-    
-    if(condition)
-      {
-        for(entry_I=0; entry_I<self->numEntries; ++entry_I)
+        switch(self->_wall)
           {
-            switch(self->_entryTbl[entry_I].type)
+          case Wall_Left:
+            condition=(ijk[0] == 0);
+            break;
+          case Wall_Right:
+            condition=(ijk[0] == ( grid->sizes[0] - 1 ));
+            break;
+          case Wall_Bottom:
+            condition=(ijk[1] == 0);
+            break;
+          case Wall_Top:
+            condition=(ijk[1] == ( grid->sizes[1] - 1 ));
+            break;
+          case Wall_Front:
+            condition=(ijk[2] == 0);
+            break;
+          case Wall_Back:
+            condition=(ijk[2] == ( grid->sizes[2] - 1 ));
+            break;
+          }
+    
+        if(condition)
+          {
+
+            for(entry_I=0; entry_I<self->numEntries; ++entry_I)
               {
-              case StressBC_Double:
-                stress=self->_entryTbl[entry_I].DoubleValue;
-                break;
-              case StressBC_ConditionFunction:
-                cf=self->conFunc_Register->
-                  _cf[self->_entryTbl[entry_I].CFIndex];
+                switch(self->_entryTbl[entry_I].type)
+                  {
+                  case StressBC_Double:
+                    stress=self->_entryTbl[entry_I].DoubleValue;
+                    break;
+                  case StressBC_ConditionFunction:
+                    cf=self->conFunc_Register->
+                      _cf[self->_entryTbl[entry_I].CFIndex];
                 
-                /* We use a variable number of zero "0", because
-                   we don't use the variable number and that one
-                   is always going to exist. */
-                ConditionFunction_Apply(cf,elementNodes[eNode_I],
-                                        0,self->context,&stress);
-                break;
-              case StressBC_HydrostaticTerm:
-                if(self->_wall!=Wall_Top && self->_wall!=Wall_Bottom)
-                  {
-                    Stream* errorStr=Journal_Register( Error_Type, self->type );
-                    Journal_Firewall(0,errorStr,"You can only apply a HydrostaticTerm StressBC to the top or bottom wall.\nYou applied it to the %s wall",WallVC_WallEnumToStr[self->_wall]);
-                  }
+                    /* We use a variable number of zero "0", because
+                       we don't use the variable number and that one
+                       is always going to exist. */
+                    ConditionFunction_Apply(cf,elementNodes[block_map[block][eNode_I]],
+                                            0,self->context,&stress);
+                    break;
+                  case StressBC_HydrostaticTerm:
+                    if(self->_wall!=Wall_Top && self->_wall!=Wall_Bottom)
+                      {
+                        Stream* errorStr=Journal_Register( Error_Type, self->type );
+                        Journal_Firewall(0,errorStr,"You can only apply a HydrostaticTerm StressBC to the top or bottom wall.\nYou applied it to the %s wall",WallVC_WallEnumToStr[self->_wall]);
+                      }
 
-                coord=Mesh_GetVertex(mesh,elementNodes[eNode_I]);
-                stress=
-                  -HydrostaticTerm_Pressure(self->_entryTbl[entry_I].hydrostaticTerm,
-                                            coord);
-                /* For the bottom, we need to add in the effects of
-                   material outside the mesh. */
+                    coord=Mesh_GetVertex(mesh,elementNodes[block_map[block][eNode_I]]);
+                    stress=
+                      -HydrostaticTerm_Pressure(self->_entryTbl[entry_I].hydrostaticTerm,
+                                                coord);
+                    /* For the bottom, we need to add in the effects of
+                       material outside the mesh. */
 
-                if(self->_wall==Wall_Bottom)
-                  {
-                    Coord bottom;
-                    double dy;
-                    bottom[0]=coord[0];
-                    bottom[1]=0;
-                    bottom[2]=coord[2];
-                    dy=bottom[1] - coord[1];
-                    stress+=HydrostaticTerm_Pressure(self->_entryTbl[entry_I].hydrostaticTerm,bottom);
-                    stress-=self->bottom_density
-                      * self->_entryTbl[entry_I].hydrostaticTerm->gravity
-                      * dy;
-                  }
+                    if(self->_wall==Wall_Bottom)
+                      {
+                        Coord bottom;
+                        double dy;
+                        bottom[0]=coord[0];
+                        bottom[1]=0;
+                        bottom[2]=coord[2];
+                        dy=bottom[1] - coord[1];
+                        stress+=HydrostaticTerm_Pressure(self->_entryTbl[entry_I].hydrostaticTerm,bottom);
+                        stress-=self->bottom_density
+                          * self->_entryTbl[entry_I].hydrostaticTerm->gravity
+                          * dy;
+                      }
                     
-                if(dim==2)
-                  {
-                    double dx, dy, *coord0, *coord1;
-                    /* StGermain uses the ordering
+                    if(dim==2)
+                      {
+                        double dx, dy, *coord0, *coord1;
+                        /* StGermain uses the ordering
 
-                       0:x,y
-                       1:x+,y
-                       2:x+,y+
-                       3:x,y+
+                           0:x,y
+                           1:x+,y
+                           2:x+,y+
+                           3:x,y+
 
-                       So the top two vertices are 2 and 3 */
+                           So the top two vertices are 2 and 3 */
 
-                    coord0=Mesh_GetVertex(mesh,elementNodes[3]);
-                    coord1=Mesh_GetVertex(mesh,elementNodes[2]);
+                        coord0=Mesh_GetVertex(mesh,elementNodes[block_map[block][3]]);
+                        coord1=Mesh_GetVertex(mesh,elementNodes[block_map[block][2]]);
 
-                    dx=coord1[0]-coord0[0];
-                    dy=-(coord1[1]-coord0[1]);
+                        dx=coord1[0]-coord0[0];
+                        dy=-(coord1[1]-coord0[1]);
 
-                    elForceVec[eNode_I*nodeDofCount + I_AXIS]+=
-                      stress*dy/overcount;
-                    elForceVec[eNode_I*nodeDofCount + J_AXIS]+=
-                      stress*dx/overcount;
-                  }
-                else
-                  {
-                    double *coord0,*coord1,*coord2,*coord3,
-                      vector0[3],vector1[3],normal[3];
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + I_AXIS]+=
+                          stress*dy/overcount;
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + J_AXIS]+=
+                          stress*dx/overcount;
+                      }
+                    else
+                      {
+                        double *coord0,*coord1,*coord2,*coord3,
+                          vector0[3],vector1[3],normal[3];
                     
-                    /* Decompose the quadrilateral into two triangles.
-                       For each triangle, take the cross product and
-                       apply the force in that direction. */
+                        /* Decompose the quadrilateral into two triangles.
+                           For each triangle, take the cross product and
+                           apply the force in that direction. */
 
-                    coord0=Mesh_GetVertex(mesh,elementNodes[2]);
-                    coord1=Mesh_GetVertex(mesh,elementNodes[3]);
-                    coord2=Mesh_GetVertex(mesh,elementNodes[7]);
-                    coord3=Mesh_GetVertex(mesh,elementNodes[6]);
+                        coord0=Mesh_GetVertex(mesh,elementNodes[block_map[block][2]]);
+                        coord1=Mesh_GetVertex(mesh,elementNodes[block_map[block][3]]);
+                        coord2=Mesh_GetVertex(mesh,elementNodes[block_map[block][7]]);
+                        coord3=Mesh_GetVertex(mesh,elementNodes[block_map[block][6]]);
                     
-                    StGermain_VectorSubtraction( vector0, coord1, coord0, dim) ;
-                    StGermain_VectorSubtraction( vector1, coord2, coord1, dim) ;
-                    StGermain_VectorCrossProduct( normal, vector0, vector1 );
+                        StGermain_VectorSubtraction( vector0, coord1, coord0, dim) ;
+                        StGermain_VectorSubtraction( vector1, coord2, coord1, dim) ;
+                        StGermain_VectorCrossProduct( normal, vector0, vector1 );
 
-                    elForceVec[eNode_I*nodeDofCount + I_AXIS]+=
-                      stress*normal[0]/(2*overcount);
-                    elForceVec[eNode_I*nodeDofCount + J_AXIS]+=
-                      stress*normal[1]/(2*overcount);
-                    elForceVec[eNode_I*nodeDofCount + K_AXIS]+=
-                      stress*normal[2]/(2*overcount);
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + I_AXIS]+=
+                          stress*normal[0]/(2*overcount);
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + J_AXIS]+=
+                          stress*normal[1]/(2*overcount);
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + K_AXIS]+=
+                          stress*normal[2]/(2*overcount);
 
-                    StGermain_VectorSubtraction( vector0, coord2, coord1, dim) ;
-                    StGermain_VectorSubtraction( vector1, coord3, coord2, dim) ;
-                    StGermain_VectorCrossProduct( normal, vector0, vector1 );
+                        StGermain_VectorSubtraction( vector0, coord2, coord1, dim) ;
+                        StGermain_VectorSubtraction( vector1, coord3, coord2, dim) ;
+                        StGermain_VectorCrossProduct( normal, vector0, vector1 );
 
-                    elForceVec[eNode_I*nodeDofCount + I_AXIS]+=
-                      stress*normal[0]/(2*overcount);;
-                    elForceVec[eNode_I*nodeDofCount + J_AXIS]+=
-                      stress*normal[1]/(2*overcount);;
-                    elForceVec[eNode_I*nodeDofCount + K_AXIS]+=
-                      stress*normal[2]/(2*overcount);;
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + I_AXIS]+=
+                          stress*normal[0]/(2*overcount);;
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + J_AXIS]+=
+                          stress*normal[1]/(2*overcount);;
+                        elForceVec[block_map[block][eNode_I]*nodeDofCount + K_AXIS]+=
+                          stress*normal[2]/(2*overcount);;
+                      }
+                    break;
                   }
-                break;
+                /* Actually apply the stress */
+                if(self->_entryTbl[entry_I].type!=StressBC_HydrostaticTerm)
+                  elForceVec[block_map[block][eNode_I]*nodeDofCount
+                             + self->_entryTbl[entry_I].axis]+=
+                    stress*area;
               }
-            /* We have to divide by an overcount_factor, because
-               otherwise different elements will count the same node
-               more than once.  In 2D, nodes are counted twice, in 3D,
-               nodes are counted four times. */
-            if(self->_entryTbl[entry_I].type!=StressBC_HydrostaticTerm)
-              elForceVec[eNode_I*nodeDofCount + self->_entryTbl[entry_I].axis]+=
-                stress*area/overcount;
           }
       }
-  }
+    }
   NewClass_Delete(incidence);
 }
 
-
-double StressBC_compute_face_area(Wall wall, FeMesh *mesh, Index lElement_I, 
+double StressBC_compute_node_area(Wall wall, FeMesh *mesh, Index lElement_I, 
                                   Dimension_Index dim,
-                                  IArray *incidence)
+                                  const int block_map[9][8],
+                                  const int &block,
+                                  int *elementNodes)
 {
   /* Compute the area of the face. */
   if(dim==2)
     {
       double *coord1, *coord2;
       int lower,upper,direction;
-      int *elementNodes;
       switch(wall)
         {
         case Wall_Left:
@@ -522,19 +571,16 @@ double StressBC_compute_face_area(Wall wall, FeMesh *mesh, Index lElement_I,
           break;
         }
 
-      Mesh_GetIncidence(mesh, Mesh_GetDimSize(mesh), lElement_I,
-                        MT_VERTEX,incidence);
-      elementNodes=IArray_GetPtr(incidence);
-                              
-      coord1=Mesh_GetVertex(mesh,elementNodes[lower]);
-      coord2=Mesh_GetVertex(mesh,elementNodes[upper]);
-      return coord2[direction]-coord1[direction];
+      coord1=Mesh_GetVertex(mesh,elementNodes[block_map[block][lower]]);
+      coord2=Mesh_GetVertex(mesh,elementNodes[block_map[block][upper]]);
+      /* Scale by 2 since each node only claims 1/2 of the area of a
+         face. */
+      return (coord2[direction]-coord1[direction])/2;
     }
   else
     {
       double *coord1, *coord2, *coord3, *coord4;
       int first, second, third, fourth;
-      int *elementNodes;
                               
       /* StGermain uses the ordering
          0: x,y,z
@@ -588,17 +634,16 @@ double StressBC_compute_face_area(Wall wall, FeMesh *mesh, Index lElement_I,
           break;
         }
 
-      Mesh_GetIncidence(mesh, Mesh_GetDimSize(mesh), lElement_I,
-                        MT_VERTEX,incidence);
-      elementNodes=IArray_GetPtr(incidence);
+      coord1=Mesh_GetVertex(mesh,elementNodes[block_map[block][first]]);
+      coord2=Mesh_GetVertex(mesh,elementNodes[block_map[block][second]]);
+      coord3=Mesh_GetVertex(mesh,elementNodes[block_map[block][third]]);
+      coord4=Mesh_GetVertex(mesh,elementNodes[block_map[block][fourth]]);
 
-      coord1=Mesh_GetVertex(mesh,elementNodes[first]);
-      coord2=Mesh_GetVertex(mesh,elementNodes[second]);
-      coord3=Mesh_GetVertex(mesh,elementNodes[third]);
-      coord4=Mesh_GetVertex(mesh,elementNodes[fourth]);
-
+      /* Scale by 4 since each node only claims 1/4 of the area of a
+         face. */
       return StGermain_ConvexQuadrilateralArea(coord1,coord2,coord3,coord4,
-                                               dim);
+                                               dim)/4;
     }
 }
+
 
