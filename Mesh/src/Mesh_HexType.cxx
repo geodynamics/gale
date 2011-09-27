@@ -416,505 +416,603 @@ Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
 Bool Mesh_HexType_ElementHasPoint3DWithIncidence( Mesh_HexType* self, unsigned elInd, double* point, 
 						  MeshTopology_Dim* dim, unsigned* ind )
 {
-	Mesh*		mesh;
-	unsigned	nInc;
-	Bool		fnd;
-	double		bc[4];
-	IGraph*		topo;
-	unsigned	inside;
-	const int*	inc;
+  Mesh*		mesh;
+  unsigned	nInc;
+  Bool		fnd;
+  double		bc[4];
+  IGraph*		topo;
+  unsigned	inside;
+  const int*	inc;
 
-	assert( self && Stg_CheckType( self, Mesh_HexType ) );
-	assert( Mesh_GetDimSize( self->mesh ) == 3 );
-	assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
-	assert( point );
-	assert( dim );
-	assert( ind );
+  assert( self && Stg_CheckType( self, Mesh_HexType ) );
+  assert( Mesh_GetDimSize( self->mesh ) == 3 );
+  assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
+  assert( point );
+  assert( dim );
+  assert( ind );
 
-	/* Shortcuts. */
-	mesh = self->mesh;
-	topo = (IGraph*)mesh->topo;
+  /* Shortcuts. */
+  mesh = self->mesh;
+  topo = (IGraph*)mesh->topo;
 
-	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
-	nInc = IArray_GetSize( self->incArray );
-	inc = IArray_GetPtr( self->incArray );
+  /* Get element to vertex incidence. */
+  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+  nInc = IArray_GetSize( self->incArray );
+  inc = IArray_GetPtr( self->incArray );
 
-	/* Search for tetrahedra. */
-	if( self->mapSize ) {
-		unsigned	v_i;
+  /* Search for tetrahedra. */
+  if( self->mapSize ) {
+    unsigned	v_i;
 
-		for( v_i = 0; v_i < self->mapSize; v_i++ )
-			self->inc[v_i] = inc[self->vertMap[v_i]];
-		fnd = Simplex_Search3D( mesh->verts, self->inc,
-                                        self->num_simplexes[1], self->tetInds,
-                                        point, bc, &inside );
-	}
-	else
-		fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc,
-                                        self->num_simplexes[1], self->tetInds,
-                                        point, bc, &inside );
-	if( fnd ) {
-		unsigned*	inds = self->tetInds[inside];
+    for( v_i = 0; v_i < self->mapSize; v_i++ )
+      self->inc[v_i] = inc[self->vertMap[v_i]];
+    fnd = Simplex_Search3D( mesh->verts, self->inc,
+                            self->num_simplexes[1], self->tetInds,
+                            point, bc, &inside );
+  }
+  else
+    fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc,
+                            self->num_simplexes[1], self->tetInds,
+                            point, bc, &inside );
+  if( fnd ) {
+    unsigned*	inds = self->tetInds[inside];
 
-		/* Check boundary ownership. */
-		if( bc[0] == 0.0 || bc[0] == -0.0 ) {
-			if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-				if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-					*dim = MT_VERTEX;
-					*ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[3]];
-				}
-				else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-					*dim = MT_VERTEX;
-					*ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[2]];
-				}
-				else {
-					if( inside == 0 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-					}
-					else if( inside == 1 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][11];
-					}
-					else if( inside == 2 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][7];
-					}
-					else if( inside == 3 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][5];
-					}
-					else if( inside == 4 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-					}
-					else if( inside == 5 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-					}
-					else if( inside == 6 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-					}
-					else if( inside == 7 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-					}
-					else if( inside == 8 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][5];
-					}
-					else {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-					}
-				}
-			}
-			else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-				if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-					*dim = MT_VERTEX;
-					*ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[1]];
-				}
-				else {
-					if( inside == 0 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-					}
-					else if( inside == 1 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-					}
-					else if( inside == 2 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-					}
-					else if( inside == 3 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-					}
-					else if( inside == 4 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-					}
-					else if( inside == 5 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][9];
-					}
-					else if( inside == 6 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][6];
-					}
-					else if( inside == 7 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][10];
-					}
-					else if( inside == 8 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][7];
-					}
-					else {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-					}
-				}
-			}
-			else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-				if( inside == 0 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-				}
-				else if( inside == 1 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][1];
-				}
-				else if( inside == 2 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][4];
-				}
-				else if( inside == 3 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][6];
-				}
-				else if( inside == 4 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-				}
-				else if( inside == 5 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][3];
-				}
-				else if( inside == 6 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][4];
-				}
-				else if( inside == 7 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][1];
-				}
-				else if( inside == 8 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-				}
-				else {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-				}
-			}
-			else {
-				if( inside == 0 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 1 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-				}
-				else if( inside == 2 ) {
-					*dim = 	MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-				}
-				else if( inside == 3 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-				}
-				else if( inside == 4 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 5 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-				}
-				else if( inside == 6 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-				}
-				else if( inside == 7 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-				}
-				else if( inside == 8 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
-				}
-				else {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-			}
-		}
-		else if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-			if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-				if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-					*dim = MT_VERTEX;
-					*ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[0]];
-				}
-				else {
-					if( inside == 0 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][8];
-					}
-					else if( inside == 1 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-					}
-					else if( inside == 2 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-					}
-					else if( inside == 3 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-					}
-					else if( inside == 4 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-					}
-					else if( inside == 5 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-					}
-					else if( inside == 6 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-					}
-					else if( inside == 7 ) {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-					}
-					else if( inside == 8 ) {
-						*dim = MT_EDGE;
-						*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][7];
-					}
-					else {
-						*dim = MT_FACE;
-						*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-					}
-				}
-			}
-			else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-				if( inside == 0 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][2];
-				}
-				else if( inside == 1 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][3];
-				}
-				else if( inside == 2 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][9];
-				}
-				else if( inside == 3 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][10];
-				}
-				else if( inside == 4 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-				}
-				else if( inside == 5 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-				}
-				else if( inside == 6 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-				}
-				else if( inside == 7 ) {
-					*dim = 	MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-				}
-				else if( inside == 8 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-				}
-				else {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-				}
-			}
-			else {
-				if( inside == 0 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-				}
-				else if( inside == 1 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-				}
-				else if( inside == 2 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-				}
-				else if( inside == 3 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-				}
-				else if( inside == 4 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 5 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 6 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 7 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 8 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
-				}
-				else {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-			}
-		}
-		else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-			if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-				if( inside == 0 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][0];
-				}
-				else if( inside == 1 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-				}
-				else if( inside == 2 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-				}
-				else if( inside == 3 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-				}
-				else if( inside == 4 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-				}
-				else if( inside == 5 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][0];
-				}
-				else if( inside == 6 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][8];
-				}
-				else if( inside == 7 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][2];
-				}
-				else if( inside == 8 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-				}
-				else {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-				}
-			}
-			else {
-				if( inside == 0 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-				}
-				else if( inside == 1 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 2 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 3 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 4 ) {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-				else if( inside == 5 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-				}
-				else if( inside == 6 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-				}
-				else if( inside == 7 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-				}
-				else if( inside == 8 ) {
-					*dim = MT_FACE;
-					*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
-				}
-				else {
-					*dim = MT_VOLUME;
-					*ind = elInd;
-				}
-			}
-		}
-		else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
-			if( inside == 0 ) {
-				*dim = MT_FACE;
-				*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-			}
-			else if( inside == 1 ) {
-				*dim = MT_FACE;
-				*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-			}
-			else if( inside == 2 ) {
-				*dim = MT_FACE;
-				*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-			}
-			else if( inside == 3 ) {
-				*dim = MT_FACE;
-				*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
-			}
-			else if( inside == 4 ) {
-				*dim = MT_VOLUME;
-				*ind = elInd;
-			}
-			else if( inside == 5 ) {
-				*dim = MT_FACE;
-				*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-			}
-			else if( inside == 6 ) {
-				*dim = MT_FACE;
-				*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
-			}
-			else if( inside == 7 ) {
-				*dim = MT_FACE;
-				*ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
-			}
-			else if( inside == 8 ) {
-				*dim = MT_VOLUME;
-				*ind = elInd;
-			}
-			else {
-				*dim = MT_VOLUME;
-				*ind = elInd;
-			}
-		}
-		else {
-			*dim = MT_VOLUME;
-			*ind = elInd;
-		}
-
-		return True;
-	}
-
-	return False;
+    /* Check boundary ownership. */
+    if( bc[0] == 0.0 || bc[0] == -0.0 ) {
+      if( bc[1] == 0.0 || bc[1] == -0.0 ) {
+        if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+          *dim = MT_VERTEX;
+          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[3]];
+        }
+        else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
+          *dim = MT_VERTEX;
+          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[2]];
+        }
+        else {
+          switch(self->num_simplexes[1])
+            {
+            case 10:
+              if( inside == 0 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+              }
+              else if( inside == 1 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][11];
+              }
+              else if( inside == 2 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][7];
+              }
+              else if( inside == 3 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][5];
+              }
+              else if( inside == 4 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+              }
+              else if( inside == 5 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+              }
+              else if( inside == 6 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+              }
+              else if( inside == 7 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+              }
+              else if( inside == 8 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][5];
+              }
+              else {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+              }
+              break;
+            case 80:
+              abort();
+              break;
+            default:
+              abort;
+            }
+        }
+      }
+      else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+        if( bc[3] == 0.0 || bc[3] == -0.0 ) {
+          *dim = MT_VERTEX;
+          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[1]];
+        }
+        else {
+          switch(self->num_simplexes[1])
+            {
+            case 10:
+              if( inside == 0 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+              }
+              else if( inside == 1 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+              }
+              else if( inside == 2 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+              }
+              else if( inside == 3 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+              }
+              else if( inside == 4 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+              }
+              else if( inside == 5 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][9];
+              }
+              else if( inside == 6 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][6];
+              }
+              else if( inside == 7 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][10];
+              }
+              else if( inside == 8 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][7];
+              }
+              else {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+              }
+              break;
+            case 80:
+              abort();
+              break;
+            default:
+              abort;
+            }
+        }
+      }
+      else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
+        switch(self->num_simplexes[1])
+          {
+          case 10:
+            if( inside == 0 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+            }
+            else if( inside == 1 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][1];
+            }
+            else if( inside == 2 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][4];
+            }
+            else if( inside == 3 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][6];
+            }
+            else if( inside == 4 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+            }
+            else if( inside == 5 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][3];
+            }
+            else if( inside == 6 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][4];
+            }
+            else if( inside == 7 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][1];
+            }
+            else if( inside == 8 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+            }
+            else {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+            }
+            break;
+          case 80:
+            abort();
+            break;
+          default:
+            abort;
+          }
+      }
+      else {
+        switch(self->num_simplexes[1])
+          {
+          case 10:
+            if( inside == 0 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 1 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+            }
+            else if( inside == 2 ) {
+              *dim = 	MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+            }
+            else if( inside == 3 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+            }
+            else if( inside == 4 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 5 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+            }
+            else if( inside == 6 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+            }
+            else if( inside == 7 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+            }
+            else if( inside == 8 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][1];
+            }
+            else {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            break;
+          case 80:
+            abort();
+            break;
+          default:
+            abort;
+          }
+      }
+    }
+    else if( bc[1] == 0.0 || bc[1] == -0.0 ) {
+      if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+        if( bc[3] == 0.0 || bc[3] == -0.0 ) {
+          *dim = MT_VERTEX;
+          *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[0]];
+        }
+        else {
+          switch(self->num_simplexes[1])
+            {
+            case 10:
+              if( inside == 0 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][8];
+              }
+              else if( inside == 1 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+              }
+              else if( inside == 2 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+              }
+              else if( inside == 3 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+              }
+              else if( inside == 4 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+              }
+              else if( inside == 5 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+              }
+              else if( inside == 6 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+              }
+              else if( inside == 7 ) {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+              }
+              else if( inside == 8 ) {
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][11];
+              }
+              else {
+                *dim = MT_FACE;
+                *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+              }
+              break;
+            case 80:
+              abort();
+              break;
+            default:
+              abort;
+            }
+        }
+      }
+      else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
+        switch(self->num_simplexes[1])
+          {
+          case 10:
+            if( inside == 0 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][2];
+            }
+            else if( inside == 1 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][3];
+            }
+            else if( inside == 2 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][9];
+            }
+            else if( inside == 3 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][10];
+            }
+            else if( inside == 4 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+            }
+            else if( inside == 5 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+            }
+            else if( inside == 6 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+            }
+            else if( inside == 7 ) {
+              *dim = 	MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+            }
+            else if( inside == 8 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+            }
+            else {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+            }
+            break;
+          case 80:
+            abort();
+            break;
+          default:
+            abort;
+          }
+      }
+      else {
+        switch(self->num_simplexes[1])
+          {
+          case 10:
+            if( inside == 0 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+            }
+            else if( inside == 1 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+            }
+            else if( inside == 2 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+            }
+            else if( inside == 3 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+            }
+            else if( inside == 4 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 5 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 6 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 7 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 8 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][3];
+            }
+            else {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            break;
+          case 80:
+            abort();
+            break;
+          default:
+            abort;
+          }
+      }
+    }
+    else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+      if( bc[3] == 0.0 || bc[3] == -0.0 ) {
+        switch(self->num_simplexes[1])
+          {
+          case 10:
+            if( inside == 0 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][0];
+            }
+            else if( inside == 1 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+            }
+            else if( inside == 2 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+            }
+            else if( inside == 3 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+            }
+            else if( inside == 4 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+            }
+            else if( inside == 5 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][0];
+            }
+            else if( inside == 6 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][8];
+            }
+            else if( inside == 7 ) {
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_VOLUME][MT_EDGE][elInd][2];
+            }
+            else if( inside == 8 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+            }
+            else {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+            }
+            break;
+          case 80:
+            abort();
+            break;
+          default:
+            abort;
+          }
+      }
+      else {
+        switch(self->num_simplexes[1])
+          {
+          case 10:
+            if( inside == 0 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+            }
+            else if( inside == 1 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 2 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 3 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 4 ) {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            else if( inside == 5 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+            }
+            else if( inside == 6 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+            }
+            else if( inside == 7 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+            }
+            else if( inside == 8 ) {
+              *dim = MT_FACE;
+              *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][5];
+            }
+            else {
+              *dim = MT_VOLUME;
+              *ind = elInd;
+            }
+            break;
+          case 80:
+            abort();
+            break;
+          default:
+            abort;
+          }
+      }
+    }
+    else if( bc[3] == 0.0 || bc[3] == -0.0 ) {
+      switch(self->num_simplexes[1])
+        {
+        case 10:
+          if( inside == 0 ) {
+            *dim = MT_FACE;
+            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+          }
+          else if( inside == 1 ) {
+            *dim = MT_FACE;
+            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+          }
+          else if( inside == 2 ) {
+            *dim = MT_FACE;
+            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+          }
+          else if( inside == 3 ) {
+            *dim = MT_FACE;
+            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][4];
+          }
+          else if( inside == 4 ) {
+            *dim = MT_VOLUME;
+            *ind = elInd;
+          }
+          else if( inside == 5 ) {
+            *dim = MT_FACE;
+            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+          }
+          else if( inside == 6 ) {
+            *dim = MT_FACE;
+            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][2];
+          }
+          else if( inside == 7 ) {
+            *dim = MT_FACE;
+            *ind = topo->incEls[MT_VOLUME][MT_FACE][elInd][0];
+          }
+          else if( inside == 8 ) {
+            *dim = MT_VOLUME;
+            *ind = elInd;
+          }
+          else {
+            *dim = MT_VOLUME;
+            *ind = elInd;
+          }
+          break;
+        case 80:
+          abort();
+          break;
+        default:
+          abort;
+        }
+    }
+    else {
+      *dim = MT_VOLUME;
+      *ind = elInd;
+    }
+    return True;
+  }
+  return False;
 }
 
 Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
@@ -968,104 +1066,191 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, 
 Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned elInd, double* point, 
 						  MeshTopology_Dim* dim, unsigned* ind )
 {
-	Mesh*		mesh;
-	unsigned	nInc;
-	Bool		fnd;
-	double		bc[3];
-	IGraph*		topo;
-	unsigned	inside;
-	const int*	inc;
+  Mesh*		mesh;
+  unsigned	nInc;
+  Bool		fnd;
+  double		bc[3];
+  IGraph*		topo;
+  unsigned	inside;
+  const int*	inc;
 
-	assert( self && Stg_CheckType( self, Mesh_HexType ) );
-	assert( Mesh_GetDimSize( self->mesh ) == 2 );
-	assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
-	assert( point );
-	assert( dim );
-	assert( ind );
+  assert( self && Stg_CheckType( self, Mesh_HexType ) );
+  assert( Mesh_GetDimSize( self->mesh ) == 2 );
+  assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
+  assert( point );
+  assert( dim );
+  assert( ind );
 
-	/* Shortcuts. */
-	mesh = self->mesh;
-	topo = (IGraph*)mesh->topo;
+  /* Shortcuts. */
+  mesh = self->mesh;
+  topo = (IGraph*)mesh->topo;
 
-	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
-	nInc = IArray_GetSize( self->incArray );
-	inc = IArray_GetPtr( self->incArray );
+  /* Get element to vertex incidence. */
+  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+  nInc = IArray_GetSize( self->incArray );
+  inc = IArray_GetPtr( self->incArray );
 
-	/* Search for triangle. */
-	if( self->mapSize ) {
-		unsigned	v_i;
+  /* Search for triangle. */
+  if( self->mapSize ) {
+    unsigned	v_i;
 
-		for( v_i = 0; v_i < self->mapSize; v_i++ )
-			self->inc[v_i] = inc[self->vertMap[v_i]];
-		fnd = Simplex_Search2D( mesh->verts, self->inc,
-                                        self->num_simplexes[0],
-                                        self->triInds, point, bc,
-                                        &inside );
-	}
-	else
-		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
-                                        self->num_simplexes[0],
-                                        self->triInds, point, bc, &inside );
-	if( fnd ) {
-		unsigned	*inds = self->triInds[inside];
+    for( v_i = 0; v_i < self->mapSize; v_i++ )
+      self->inc[v_i] = inc[self->vertMap[v_i]];
+    fnd = Simplex_Search2D( mesh->verts, self->inc,
+                            self->num_simplexes[0],
+                            self->triInds, point, bc,
+                            &inside );
+  }
+  else
+    fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
+                            self->num_simplexes[0],
+                            self->triInds, point, bc, &inside );
+  if( fnd ) {
+    unsigned	*inds = self->triInds[inside];
 
-		/* Check boundary ownership. */
-		if( bc[0] == 0.0 || bc[0] == -0.0 ) {
-			if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-				*dim = MT_VERTEX;
-				*ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[2]];
-			}
-			else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-				*dim = MT_VERTEX;
-				*ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[1]];
-			}
-			else {
-				if( inside == 0 ) {
-					*dim = MT_FACE;
-					*ind = elInd;
-				}
-				else if( inside == 1 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
-				}
-			}
-		}
-		else if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-			if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-				*dim = MT_VERTEX;
-				*ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[0]];
-			}
-			else {
-				if( inside == 0 ) {
-					*dim = MT_EDGE;
-					*ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
-				}
-				else if( inside == 1 ) {
-					*dim = MT_FACE;
-					*ind = elInd;
-				}
-			}
-		}
-		else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-			if( inside == 0 ) {
-				*dim = MT_EDGE;
-				*ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
-			}
-			else if( inside == 1 ) {
-				*dim = MT_EDGE;
-				*ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
-			}
-		}
-		else {
-			*dim = MT_FACE;
-			*ind = elInd;
-		}
-
-		return True;
-	}
-
-	return False;
+    /* Check boundary ownership. */
+    if( bc[0] == 0.0 || bc[0] == -0.0 ) {
+      if( bc[1] == 0.0 || bc[1] == -0.0 ) {
+        *dim = MT_VERTEX;
+        *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[2]];
+      }
+      else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+        *dim = MT_VERTEX;
+        *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[1]];
+      }
+      else {
+        switch(self->num_simplexes[0])
+          {
+          case 2:
+            switch(inside)
+              {
+              case 0:
+                *dim = MT_FACE;
+                *ind = elInd;
+                break;
+              case 1:
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
+                break;
+              }
+            break;
+          case 8:
+            switch(inside)
+              {
+              case 0:
+              case 1:
+              case 2:
+              case 3:
+              case 4:
+              case 6:
+                *dim = MT_FACE;
+                *ind = elInd;
+                break;
+              case 5:
+              case 7:
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
+                break;
+              }
+            break;
+          default:
+            abort();
+          }
+      }
+    }
+    else if( bc[1] == 0.0 || bc[1] == -0.0 ) {
+      if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+        *dim = MT_VERTEX;
+        *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[0]];
+      }
+      else {
+        switch(self->num_simplexes[0])
+          {
+          case 2:
+            switch(inside)
+              {
+              case 0:
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
+                break;
+              case 1:
+                *dim = MT_FACE;
+                *ind = elInd;
+                break;
+              }
+            break;
+          case 8:
+            switch(inside)
+              {
+              case 0:
+              case 4:
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
+                break;
+              case 1:
+              case 2:
+              case 3:
+              case 5:
+              case 6:
+              case 7:
+                *dim = MT_FACE;
+                *ind = elInd;
+                break;
+              }
+          default:
+            abort;
+          }
+      }
+    }
+    else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+      switch(self->num_simplexes[0])
+        {
+        case 2:
+          switch(inside)
+            {
+            case 0:
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
+              break;
+            case 1:
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
+              break;
+            }
+          break;
+        case 8:
+          switch(inside)
+            {
+            case 0:
+            case 2:
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
+              break;
+            case 1:
+            case 4:
+            case 5:
+            case 6:
+              *dim = MT_FACE;
+              *ind = elInd;
+              break;
+            case 3:
+            case 7:
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
+              break;
+            }
+          break;
+        default:
+          abort;
+        }
+    }
+    else {
+      *dim = MT_FACE;
+      *ind = elInd;
+    }
+    return True;
+  }
+  return False;
 }
 
 Bool Mesh_HexType_ElementHasPoint1DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
