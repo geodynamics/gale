@@ -181,17 +181,14 @@ MaterialPointsSwarm** _NearestNeighborMapper_GetMaterialPointsSwarms
 
 Material_Index _NearestNeighborMapper_GetMaterialIndexOn
 ( void* mapper, void* point ) {
-  NearestNeighborMapper* self = (NearestNeighborMapper*)mapper;
   abort();
-  return IntegrationPointMapper_GetMaterialIndexOn(self->swarm->mapper,point);
+  return 0;
 }
 
 void* _NearestNeighborMapper_GetExtensionOn( void* mapper, void* point,
                                              ExtensionInfo_Index extHandle ) {
-  NearestNeighborMapper* self = (NearestNeighborMapper*)mapper;
   abort();
-  return IntegrationPointMapper_GetExtensionOn(self->swarm->mapper,point,
-                                               extHandle);
+  return NULL;
 }
 
 double _NearestNeighborMapper_GetDoubleFromExtension
@@ -199,11 +196,8 @@ double _NearestNeighborMapper_GetDoubleFromExtension
  void* intPoint,
  ExtensionInfo_Index extHandle,
  int offs) {
-  NearestNeighborMapper* self = (NearestNeighborMapper*)mapper;
   abort();
-  return IntegrationPointMapper_GetDoubleFromExtension(self->swarm->mapper,
-                                                       intPoint,
-                                                       extHandle, offs);
+  return 0;
 }
 
 double _NearestNeighborMapper_GetDoubleFromMaterial
@@ -211,9 +205,6 @@ double _NearestNeighborMapper_GetDoubleFromMaterial
  void* intPoint,
  ExtensionInfo_Index extHandle,
  int offs) {
-  NearestNeighborMapper* self = (NearestNeighborMapper*)mapper;
   abort();
-  return IntegrationPointMapper_GetDoubleFromMaterial(self->swarm->mapper,
-                                                      intPoint,
-                                                      extHandle, offs);
+  return 0;
 }
