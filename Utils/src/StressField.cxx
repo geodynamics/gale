@@ -57,10 +57,6 @@ void _StressField_Init(
 		self->_valueAtParticle = _StressField_ValueAtParticle_FromVariable;
 	}
 		
-	/* Set pointers to swarm to be the same as the one on the constitutive matrix */
-	self->assemblyTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
-	self->massMatrixForceTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
-
 	/*
 	** If we're using this field for non-linear feedback, we'll need to update it in between
 	** non-linear iterations. */
@@ -288,7 +284,7 @@ void _StressField_ValueAtParticle_Recalculate( void* stressField, IntegrationPoi
 	
 	/* Calculate stress from strain rate and constitutive matrix */
 	ConstitutiveMatrix_Assemble( self->constitutiveMatrix, lElement_I,
-                                     self->currentParticleIndex, particle );
+                                     self->currentParticleIndex, particle, swarm);
 	FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, particle->xi, strainRate );
 	ConstitutiveMatrix_CalculateStress( self->constitutiveMatrix, strainRate, stress );
 

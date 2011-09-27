@@ -42,10 +42,6 @@ void _ViscosityField_Init(
 	/* Assign Pointers */
 	self->variable_Register = variable_Register;
 	self->constitutiveMatrix = constitutiveMatrix;
-	
-	/* Set pointers to swarm to be the same as the one on the constitutive matrix */
-	self->assemblyTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;
-	self->massMatrixForceTerm->integrationSwarm = self->constitutiveMatrix->integrationSwarm;	
 }
 
 /* --- Virtual Function Implementations --- */
@@ -171,7 +167,8 @@ void _ViscosityField_ValueAtParticle( void* viscosityField, IntegrationPointsSwa
 	
 	/* Calculate viscosity from constitutive matrix */
 	ConstitutiveMatrix_Assemble( self->constitutiveMatrix, lElement_I,
-                                     self->currentParticleIndex, particle );
+                                     self->currentParticleIndex, particle,
+                                     swarm);
 	*viscosity = ConstitutiveMatrix_GetIsotropicViscosity( self->constitutiveMatrix );
 }
 
