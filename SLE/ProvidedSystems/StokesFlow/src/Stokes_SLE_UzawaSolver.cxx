@@ -526,7 +526,9 @@ void _Stokes_SLE_UzawaSolver_Solve( void* solver, void* stokesSLE ) {
 		/* No nice way of viewing Matrices, so commented out as incompatible with
 		 * new 3D decomp at present --Kathleen Humble 30-04-07 
 		 * Matrix_View( sle->kStiffMat->matrix, self->debug ); */
+                MatView( K_Mat, PETSC_VIEWER_STDOUT_WORLD );
 		Journal_DPrintf( self->debug, "G Matrix:\n" );
+                MatView( G_Mat, PETSC_VIEWER_STDOUT_WORLD );
 		if ( D_Mat ) {
 			Journal_DPrintf( self->debug, "D Matrix:\n" );
 		}	
