@@ -363,15 +363,6 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
      eta = self->matrixData[2][2];
 
-     // std::cout << "detJac "
-     //           << cParticle_I << " "
-     //           << detJac << " "
-     //           << particle->weight << " "
-     //           << &(particle->weight) << " "
-     //           << particle->xi[0] << " "
-     //           << particle->xi[1] << " "
-     //           << "\n";
-
      /* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */
      ConstitutiveMatrix_MultiplyByValue( constitutiveMatrix, detJac * particle->weight );
 
