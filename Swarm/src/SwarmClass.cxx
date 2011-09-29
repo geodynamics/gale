@@ -572,7 +572,6 @@ void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 	double                  extraParticlesFactor     = 0.0;
 	Particle_InCellIndex    cellParticleTblDelta     = 0;
 	Dimension_Index         dim;
-	Type                    particleType;
 	Variable_Register*      variable_Register        = NULL;
 	VariableCondition* 	ic            		 = NULL;
 
@@ -581,8 +580,6 @@ void _Swarm_AssignFromXML( void* swarm, Stg_ComponentFactory* cf, void* data ) {
 		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  );
 
 	dim = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"dim", 0  );
-	
-	particleType = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"ParticleType", IntegrationPoint_Type  );
 	
 	cellLayout =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)CellLayout_Type, CellLayout, True, data  ) ;
 	particleLayout =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)ParticleLayout_Type, ParticleLayout, True, data );
