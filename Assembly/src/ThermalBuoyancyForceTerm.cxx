@@ -184,7 +184,6 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	IntegrationPoint*				particle;
 	FeVariable*						temperatureField;
 	FeMesh*							mesh;
-	FeMesh*							temperatureMesh;
 	double*							xi;
 	Particle_InCellIndex			cParticle_I;
 	Particle_InCellIndex			cellParticleCount;
@@ -195,7 +194,6 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	Cell_Index						cell_I;
 	double							detJac;
 	double							factor;
-	/*double							Ni[8];*/
 	double							Ni[27];
 	double							force;
 	double							rayleighNumber;
@@ -204,7 +202,6 @@ void _ThermalBuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 	/* Get context extension */
 	rayleighNumber   = self->rayleighNumber;
 	temperatureField = self->temperatureField;
-	temperatureMesh  = temperatureField->feMesh;
 
 	/* Since we are integrating over the velocity mesh - we want the velocity mesh here and not the temperature mesh */
 	mesh             = forceVector->feVariable->feMesh;

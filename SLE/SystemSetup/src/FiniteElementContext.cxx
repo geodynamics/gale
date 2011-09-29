@@ -453,7 +453,6 @@ void _FiniteElementContext_SaveSwarms( void* context ) {
 
 
 void _FiniteElementContext_SaveMesh( void* context ) {
-   FiniteElementContext*   self;
 	Stream*                 info = Journal_Register( Info_Type, (Name)"Context" );
    unsigned                componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister );
    unsigned                compI;
@@ -462,7 +461,6 @@ void _FiniteElementContext_SaveMesh( void* context ) {
    
 	Journal_Printf( info, "In %s(): about to save the mesh to disk:\n", __func__ );
 
-	self = (FiniteElementContext*) context;
 
    /** search for entire live component register for feMesh types  **/
    for( compI = 0 ; compI < componentCount ; compI++){
@@ -569,7 +567,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
    Node_LocalIndex         lNode_I = 0;
    Node_GlobalIndex        gNode_I = 0;
    double*                 coord;
-   int                     buf_int[5];
+   int                     buf_int[27];
    MPI_Status              status;
    int                     confirmation = 0;
    Stream*                 errorStr = Journal_Register( Error_Type, (Name)self->type );
