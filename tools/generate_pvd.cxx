@@ -3,7 +3,7 @@
    You will need Boost (www.boost.org) to compile this.  Almost any
    version should do.  On Debian, you compile it with
 
-     g++ generate_pvd.cxx -o generate_pvd -lboost_filesystem
+     g++ generate_pvd.cxx -o generate_pvd -lboost_filesystem -lboost_system
 
    To generate a static binary, compile it with
 

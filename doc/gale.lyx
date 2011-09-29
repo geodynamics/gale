@@ -1,5 +1,5 @@
-#LyX 1.6.7 created this file. For more info see http://www.lyx.org/
-\lyxformat 345
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
 \begin_document
 \begin_header
 \textclass book
@@ -10,18 +10,26 @@
 \renewcommand{\url}[1]{(\myUrl{#1})}
 \end_preamble
 \use_default_options false
+\maintain_unincluded_children false
 \language english
+\language_package default
 \inputencoding auto
+\fontencoding global
 \font_roman default
 \font_sans default
 \font_typewriter default
 \font_default_family default
+\use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
 
 \graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
 \paperfontsize default
 \spacing single
 \use_hyperref false
@@ -29,9 +37,18 @@
 \use_geometry true
 \use_amsmath 1
 \use_esint 0
+\use_mhchem 1
+\use_mathdots 1
 \cite_engine basic
 \use_bibtopic false
+\use_indices false
 \paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
 \leftmargin 1in
 \topmargin 1in
 \rightmargin 1in
@@ -39,15 +56,16 @@
 \secnumdepth 3
 \tocdepth 3
 \paragraph_separation indent
-\defskip medskip
+\paragraph_indentation default
 \quotes_language swedish
 \papercolumns 1
 \papersides 2
 \paperpagestyle headings
 \tracking_changes false
 \output_changes false
-\author "" 
-\author "" 
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
 \end_header
 
 \begin_body
@@ -455,8 +473,10 @@ We start by decomposing the stress tensor
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-\sigma_{ij}=\tau_{ij}-p\delta_{ij},\label{eq:stress}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+\sigma_{ij}=\tau_{ij}-p\delta_{ij},\label{eq:stress}
+\end{equation}
 
 \end_inset
 
@@ -469,8 +489,10 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-\tau_{ij,j}-p_{,i}=0,\label{eq:simple momentum conservation}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+\tau_{ij,j}-p_{,i}=0,\label{eq:simple momentum conservation}
+\end{equation}
 
 \end_inset
 
@@ -478,8 +500,10 @@ subject to the (incompressible) continuity equation
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-v_{i,i}=0,\label{eq:continuity}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+v_{i,i}=0,\label{eq:continuity}
+\end{equation}
 
 \end_inset
 
@@ -497,8 +521,10 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-v_{i,i}\equiv v_{x,x}+v_{y,y}+v_{z,z}.\label{eq:implicit summation}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+v_{i,i}\equiv v_{x,x}+v_{y,y}+v_{z,z}.\label{eq:implicit summation}
+\end{equation}
 
 \end_inset
 
@@ -536,8 +562,10 @@ Assuming a simple Newtonian fluid, we can write
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-\tau_{ij}=2\eta\dot{\varepsilon}_{ij}\equiv\eta\left(v_{i,j}+v_{j,i}\right),\label{eq:stress strain}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+\tau_{ij}=2\eta\dot{\varepsilon}_{ij}\equiv\eta\left(v_{i,j}+v_{j,i}\right),\label{eq:stress strain}
+\end{equation}
 
 \end_inset
 
@@ -613,8 +641,10 @@ reference "eq:simple momentum conservation"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-\tau_{ij,j}-p_{,i}=f_{i},\label{eq:body force}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+\tau_{ij,j}-p_{,i}=f_{i},\label{eq:body force}
+\end{equation}
 
 \end_inset
 
@@ -622,11 +652,14 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
+\begin_inset Formula 
+\begin{equation}
 \begin{array}{ccc}
 f_{x} & = & 0\\
 f_{y} & = & -g\rho\\
-f_{z} & = & 0\end{array}.\label{eq:gravity body force}\end{equation}
+f_{z} & = & 0
+\end{array}.\label{eq:gravity body force}
+\end{equation}
 
 \end_inset
 
@@ -676,8 +709,10 @@ reference "eq:continuity"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-v_{i,i}=d,\label{eq:divergence}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+v_{i,i}=d,\label{eq:divergence}
+\end{equation}
 
 \end_inset
 
@@ -702,8 +737,10 @@ reference "eq:simple momentum conservation"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-\eta\left(v_{i,jj}+v_{j,ij}\right)+p_{,i}=0.\label{eq:1D momentum}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+\eta\left(v_{i,jj}+v_{j,ij}\right)+p_{,i}=0.\label{eq:1D momentum}
+\end{equation}
 
 \end_inset
 
@@ -718,8 +755,10 @@ reference "eq:divergence"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-v_{x,x}=d,\label{eq:1D divergence}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+v_{x,x}=d,\label{eq:1D divergence}
+\end{equation}
 
 \end_inset
 
@@ -727,8 +766,10 @@ v_{x,x}=d,\label{eq:1D divergence}\end{equation}
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-2\eta d_{,x}+p_{,x}=0.\label{eq:pressure_divergence_derivative}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+2\eta d_{,x}+p_{,x}=0.\label{eq:pressure_divergence_derivative}
+\end{equation}
 
 \end_inset
 
@@ -808,8 +849,10 @@ reference "eq:body force"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-\frac{\partial T}{\partial t}+v\cdot\nabla T=\kappa\nabla^{2}T+Q,\label{eq:energy}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial T}{\partial t}+v\cdot\nabla T=\kappa\nabla^{2}T+Q,\label{eq:energy}
+\end{equation}
 
 \end_inset
 
@@ -872,8 +915,10 @@ key "Fast Solvers"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-v_{i,i}+Cp=d,\label{eq:stabilized}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+v_{i,i}+Cp=d,\label{eq:stabilized}
+\end{equation}
 
 \end_inset
 
@@ -881,11 +926,14 @@ v_{i,i}+Cp=d,\label{eq:stabilized}\end{equation}
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{ccc}
 C & \equiv & \frac{1}{\nu}\left(M-D\right)\\
 M & \equiv & \int_{\Omega_{e}}\psi(x)\psi^{T}(x)d\Omega_{e}\\
-D & \equiv & \int_{\Omega_{e}}d\Omega_{e}\end{array},\]
+D & \equiv & \int_{\Omega_{e}}d\Omega_{e}
+\end{array},
+\]
 
 \end_inset
 
@@ -1076,10 +1124,13 @@ reference "eq:stabilized"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{ccc}
 s & \rightarrow & 10^{25}s,\\
-kg & \rightarrow & 10^{50}kg.\end{array}\]
+kg & \rightarrow & 10^{50}kg.
+\end{array}
+\]
 
 \end_inset
 
@@ -1236,8 +1287,10 @@ reference "eq:body force"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
-\tau_{ij,j}-p_{0,i}-\delta p_{,i}=f_{0i}+\delta f_{i},\label{eq:hydrostatic}\end{equation}
+\begin_inset Formula 
+\begin{equation}
+\tau_{ij,j}-p_{0,i}-\delta p_{,i}=f_{0i}+\delta f_{i},\label{eq:hydrostatic}
+\end{equation}
 
 \end_inset
 
@@ -1277,10 +1330,13 @@ reference "eq:divergence"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
+\begin_inset Formula 
+\begin{equation}
 \begin{array}{ccc}
 \tau_{ij,j}-\delta p_{,i} & = & \delta f_{i}\\
-v_{i,i}+C\delta p & = & d\end{array}.\label{eq:complete numerical stokes}\end{equation}
+v_{i,i}+C\delta p & = & d
+\end{array}.\label{eq:complete numerical stokes}
+\end{equation}
 
 \end_inset
 
@@ -1310,14 +1366,19 @@ Using standard finite-element techniques, you can collect all of the terms
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
+\begin_inset Formula 
+\begin{equation}
 \left(\begin{array}{cc}
 K & G\\
-G^{T} & C\end{array}\right)\left(\begin{array}{c}
+G^{T} & C
+\end{array}\right)\left(\begin{array}{c}
 v\\
-p\end{array}\right)=\left(\begin{array}{c}
+p
+\end{array}\right)=\left(\begin{array}{c}
 f\\
-d\end{array}\right),\label{eq:matrix form}\end{equation}
+d
+\end{array}\right),\label{eq:matrix form}
+\end{equation}
 
 \end_inset
 
@@ -1343,10 +1404,13 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{equation}
+\begin_inset Formula 
+\begin{equation}
 \begin{array}{ccc}
 Kv+Gp & = & f\\
-G^{T}v+Cp & = & d\end{array}.\label{eq:expanded matrix}\end{equation}
+G^{T}v+Cp & = & d
+\end{array}.\label{eq:expanded matrix}
+\end{equation}
 
 \end_inset
 
@@ -1359,8 +1423,10 @@ In order to solve this, it turns out to be useful to solve a simplified
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\left(G^{T}K^{-1}G\right)z=r,\]
+\begin_inset Formula 
+\[
+\left(G^{T}K^{-1}G\right)z=r,
+\]
 
 \end_inset
 
@@ -1380,8 +1446,10 @@ In order to solve this, it turns out to be useful to solve a simplified
 \end_inset
 
  with 
-\begin_inset Formula \[
-Q\equiv G^{T}\left[diag\left(K\right)\right]^{-1}G.\]
+\begin_inset Formula 
+\[
+Q\equiv G^{T}\left[diag\left(K\right)\right]^{-1}G.
+\]
 
 \end_inset
 
@@ -2417,8 +2485,10 @@ reference "fig:Two-blocks-sliding"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-L_{\eta_{min}}=\frac{\eta_{min}v}{C},\]
+\begin_inset Formula 
+\[
+L_{\eta_{min}}=\frac{\eta_{min}v}{C},
+\]
 
 \end_inset
 
@@ -2501,8 +2571,10 @@ So the other solution Gale provides is to set a maximum strain rate.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-L_{\dot{\epsilon}_{max}}=\frac{v}{\dot{\epsilon}_{max}}.\]
+\begin_inset Formula 
+\[
+L_{\dot{\epsilon}_{max}}=\frac{v}{\dot{\epsilon}_{max}}.
+\]
 
 \end_inset
 
@@ -6471,7 +6543,7 @@ Add the components
 \end_layout
 
 \begin_layout LyX-Code
-    <param>VelocityMagnitudeField</param>
+    <param>PressureField</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6544,7 +6616,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/tracers.png
+	filename images/tracers.eps
 	width 70col%
 
 \end_inset
@@ -6574,224 +6646,6 @@ Particle tracks of tracers
 \end_inset
 
 
-\end_layout
-
-\begin_layout Section
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Hydrostatic-Term"
-
-\end_inset
-
-Hydrostatic Term
-\end_layout
-
-\begin_layout Standard
-This example will add a HydrostaticTerm to the simple extension model (Section
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Viscous-Material-in"
-
-\end_inset
-
-) to improve its accuracy.
- So first copy 
-\family typewriter
-myviscous_extension.xml
-\family default
- to 
-\family typewriter
-myhydrostatic.xml
-\family default
-.
- Then add a 
-\family typewriter
-HydrostaticTerm
-\family default
- and 
-\family typewriter
-StressBC
-\family default
- just before the 
-\family typewriter
-BuoyancyForceTerm
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="hydrostaticTerm">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">HydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="density">step(.35-y)</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="pressure">step(.35-y)*(.35-y)</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="stressBC">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StressBC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ForceVector">mom_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">top</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="y_type">HydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="y_value">hydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
-Then, in the 
-\family typewriter
-BuoyancyForceTerm
-\family default
-, add an entry for 
-\family typewriter
-HydrostaticTerm
-\family default
- so that the 
-\family typewriter
-BuoyancyForceTerm
-\family default
- now looks like
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="buoyancyForceTerm">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">BuoyancyForceTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ForceVector">mom_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="gravity">gravity</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="HydrostaticTerm">hydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Hydro_sri"
-
-\end_inset
-
- shows the strain rate invariant with the same color scale as Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Strain-viscous-extension"
-
-\end_inset
-
-.
- With the 
-\family typewriter
-HydrostaticTerm
-\family default
-, the artifacts seen at the top and bottom in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Strain-viscous-extension"
-
-\end_inset
-
- disappear.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Paraview_hydro.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Hydro_sri"
-
-\end_inset
-
-Strain rate invariant for an extension model with the hydrostatic pressure
- subtracted out.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A worked example is in 
-\family typewriter
-input/cookbook/hydrostatic.xml
-\family default
-.
 \end_layout
 
 \begin_layout Section
@@ -7973,7 +7827,7 @@ Specify the background material's thermal expansivity, thermal diffusivity,
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Shape">boxShape</param>
+  <param name="Shape">nonSphereShape</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -8095,7 +7949,7 @@ Modify the buoyancy force term by adding the temperature field after
 \end_layout
 
 \begin_layout Standard
-with the line
+the line
 \end_layout
 
 \begin_layout LyX-Code
@@ -8240,8 +8094,10 @@ input/cookbook/temperature
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-1+0.05\cos(6x)\cos(10y).\]
+\begin_inset Formula 
+\[
+1+0.05\cos(6x)\cos(10y).
+\]
 
 \end_inset
 
@@ -8455,6 +8311,10 @@ Add the NonNewtonian rheology after NonSphereShape
 
 \begin_layout LyX-Code
   <param name="StrainRateInvariantField">StrainRateInvariantField</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="TemperatureField">TemperatureField</param> 
 \end_layout
 
 \begin_layout LyX-Code
@@ -9640,7 +9500,7 @@ reference "sub:Plugins"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="35" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -10468,11 +10328,26 @@ reference "sec:Deformed-Upper-Boundary"
 
 \begin_layout Description
 elementResI,elementResJ,elementResK The number of elements in each direction.
- Note that the number of grid points is one larger (e.g., 64 elements 
+ Note that the number of grid points depends on the type of element.
+ Constant (
+\begin_inset Formula $P_{0}$
+\end_inset
+
+) elements have their grid points in the center of the element, so they
+ have the same number of grid points as elements.
+ Linear (
+\begin_inset Formula $Q_{1}$
+\end_inset
+
+) elements have their grid points on the corners, so the number of grid
+ points is one larger (e.g., 64 elements 
 \begin_inset Formula $\Rightarrow$
 \end_inset
 
  65 grid points).
+ Note that when numbering grid points, we start from 0.
+ So the index for 65 grid points runs from 0 to 64.
+ 
 \end_layout
 
 \begin_layout Description
@@ -12396,7 +12271,7 @@ reference "sec:Materials"
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -12458,11 +12333,89 @@ name "sec:Shapes"
 \end_layout
 
 \begin_layout Standard
-When setting up a simulation, Gale reads in shapes to determine what to
- put where.
- For example, you can create a simulation with different materials by creating
- different shapes and putting different materials in them.
- As a simple example, you can create a 3D box
+When setting up the simulation, Gale first creates the computational domain.
+ That domain may be irregular if you are using a 
+\family typewriter
+SurfaceAdaptor
+\family default
+ (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Deformed-Upper-Boundary"
+
+\end_inset
+
+).
+ Gale then starts putting down materials within that domain.
+ When putting down a material at a particular point, Gale asks all of the
+ materials (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Materials"
+
+\end_inset
+
+) whether that point belongs to that material.
+ So it is perfectly fine to have material shapes that cover more than the
+ computational domain.
+ Figure 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Computational_Domain"
+
+\end_inset
+
+ shows an example with irregular top and bottom materials.
+ Materials for the upper and lower lithosphere are defined in large, regular
+ boxes, but material is only created within the blue region.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float figure
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\align center
+\begin_inset Graphics
+	filename images/computational_domain.pdf
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Computational_Domain"
+
+\end_inset
+
+Areas covered by material box shapes and the computational domain.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+As a simple example, you can create a 3D box
 \end_layout
 
 \begin_layout LyX-Code
@@ -12559,7 +12512,7 @@ Note that the exclamation point ``!'' in front of
 \family typewriter
 simpleSphere
 \family default
- means ``not.'' So 
+ means ``not.'' So this 
 \family typewriter
 Intersection
 \family default
@@ -12684,11 +12637,14 @@ The Euler angles use the
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 R=\left(\begin{array}{ccc}
 -\sin\alpha\sin\gamma+\cos\alpha\cos\beta\cos\gamma & \sin\alpha\cos\gamma+\cos\beta\sin\gamma\cos\alpha & -\cos\alpha\sin\beta\\
 -\cos\alpha\sin\gamma-\cos\beta\cos\gamma\sin\alpha & \cos\alpha\cos\gamma-\cos\beta\sin\gamma\sin\alpha & \sin\alpha\sin\beta\\
-\sin\beta\cos\alpha & \sin\beta\sin\alpha & \cos\beta\end{array}\right).\]
+\sin\beta\cos\alpha & \sin\beta\sin\alpha & \cos\beta
+\end{array}\right).
+\]
 
 \end_inset
 
@@ -12700,17 +12656,22 @@ R=\left(\begin{array}{ccc}
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \left(\begin{array}{c}
 x'\\
 y'\\
-z'\end{array}\right)=\left(\left(\begin{array}{c}
+z'
+\end{array}\right)=\left(\left(\begin{array}{c}
 x\\
 y\\
-z\end{array}\right)-\left(\begin{array}{c}
+z
+\end{array}\right)-\left(\begin{array}{c}
 CentreX\\
 CentreY\\
-CentreZ\end{array}\right)\right)R,\]
+CentreZ
+\end{array}\right)\right)R,
+\]
 
 \end_inset
 
@@ -12737,7 +12698,7 @@ invert
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -12912,8 +12873,10 @@ BelowCosinePlane
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-y<offset+delta*\cos\left(\frac{\pi period}{180}*x+phase\right)\]
+\begin_inset Formula 
+\[
+y<offset+delta*\cos\left(\frac{\pi period}{180}*x+phase\right)
+\]
 
 \end_inset
 
@@ -12929,7 +12892,7 @@ y<offset+delta*\cos\left(\frac{\pi period}{180}*x+phase\right)\]
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -13051,8 +13014,10 @@ BelowPlane
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-y<offset\]
+\begin_inset Formula 
+\[
+y<offset
+\]
 
 \end_inset
 
@@ -13096,7 +13061,7 @@ This shape also uses the variables
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -13271,20 +13236,26 @@ Box
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{c}
 startX<x<endX\\
 startY<y<endY\\
-startZ<z<endZ\end{array}\]
+startZ<z<endZ
+\end{array}
+\]
 
 \end_inset
 
 Alternately, you can use widths, in which case 
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{c}
 |x|<widthX/2\\
 |y|<widthY/2\\
-|z|<widthZ/2\end{array}.\]
+|z|<widthZ/2
+\end{array}.
+\]
 
 \end_inset
 
@@ -13310,7 +13281,7 @@ You may mix and match these specification (e.g., use start/end for
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="4" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -13492,12 +13463,15 @@ This shape uses a variable
 \begin_layout Standard
 \noindent
 \align center
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{c}
 radius^{2}>x^{2}+y^{2}\\
 startX<x<endX\\
 startY<y<endY\\
-startZ<z<endZ\end{array}.\]
+startZ<z<endZ
+\end{array}.
+\]
 
 \end_inset
 
@@ -13508,7 +13482,7 @@ startZ<z<endZ\end{array}.\]
  
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -13788,7 +13762,7 @@ You can extrude this shape into three dimensions by specifying startZ and
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -13863,8 +13837,10 @@ Sphere
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-x^{2}+y^{2}+z^{2}<radius^{2}\]
+\begin_inset Formula 
+\[
+x^{2}+y^{2}+z^{2}<radius^{2}
+\]
 
 \end_inset
 
@@ -13880,7 +13856,7 @@ x^{2}+y^{2}+z^{2}<radius^{2}\]
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -13939,8 +13915,10 @@ In two dimensions
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\left(\frac{x}{radiusX}\right)^{2/epsilon1}+\left(\frac{y}{radiusY}\right)^{2/epsilon1}<1,\]
+\begin_inset Formula 
+\[
+\left(\frac{x}{radiusX}\right)^{2/epsilon1}+\left(\frac{y}{radiusY}\right)^{2/epsilon1}<1,
+\]
 
 \end_inset
 
@@ -13950,8 +13928,10 @@ and in three dimensions
 \begin_layout Standard
 \noindent
 \align center
-\begin_inset Formula \[
-\left(\left(\frac{x}{radiusX}\right)^{2/epsilon2}+\left(\frac{y}{radiusY}\right)^{2/epsilon2}\right)^{epsilon2/epsilon1}+\left(\frac{z}{radiusZ}\right)^{2/epsilon1}<1.\]
+\begin_inset Formula 
+\[
+\left(\left(\frac{x}{radiusX}\right)^{2/epsilon2}+\left(\frac{y}{radiusY}\right)^{2/epsilon2}\right)^{epsilon2/epsilon1}+\left(\frac{z}{radiusZ}\right)^{2/epsilon1}<1.
+\]
 
 \end_inset
 
@@ -13962,7 +13942,7 @@ and in three dimensions
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -14220,7 +14200,7 @@ reference "sec:Shapes"
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Shape">yieldingShape</param>
+  <param name="Shape">materialShape</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -14342,8 +14322,10 @@ At a given time
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-Qe^{-\lambda t}\]
+\begin_inset Formula 
+\[
+Qe^{-\lambda t}
+\]
 
 \end_inset
 
@@ -14362,7 +14344,7 @@ Qe^{-\lambda t}\]
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -14533,7 +14515,7 @@ materialSwarm
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -14614,7 +14596,7 @@ eta0
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -14676,8 +14658,10 @@ Frank-Kamenetskii
 
 \begin_layout Standard
 This is a temperature-dependent viscosity
-\begin_inset Formula \[
-eta=eta0*\exp\left(-theta*T\right).\]
+\begin_inset Formula 
+\[
+eta=eta0*\exp\left(-theta*T\right).
+\]
 
 \end_inset
 
@@ -14693,7 +14677,7 @@ eta=eta0*\exp\left(-theta*T\right).\]
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -14778,8 +14762,10 @@ This is another temperature dependent viscosity
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-eta=eta0*\exp\left(\left(activationEnergy+activationVolume*(height-y)\right)/\left(T+referenceTemperature\right)\right).\]
+\begin_inset Formula 
+\[
+eta=eta0*\exp\left(\left(activationEnergy+activationVolume*(height-y)\right)/\left(T+referenceTemperature\right)\right).
+\]
 
 \end_inset
 
@@ -14805,7 +14791,7 @@ eta=eta0*\exp\left(\left(activationEnergy+activationVolume*(height-y)\right)/\le
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -14931,8 +14917,10 @@ This is a strain rate dependent rheology.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\dot{\varepsilon}=A\tau^{n}\exp\left(-T_{0}/T\right),\]
+\begin_inset Formula 
+\[
+\dot{\varepsilon}=A\tau^{n}\exp\left(-T_{0}/T\right),
+\]
 
 \end_inset
 
@@ -14958,8 +14946,10 @@ This is a strain rate dependent rheology.
 
  are constants.
  Using 
-\begin_inset Formula \[
-\tau=2\eta\dot{\varepsilon},\]
+\begin_inset Formula 
+\[
+\tau=2\eta\dot{\varepsilon},
+\]
 
 \end_inset
 
@@ -14967,8 +14957,10 @@ This is a strain rate dependent rheology.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\eta=\frac{\dot{\varepsilon}^{\frac{1}{n}-1}\exp\left(T_{0}/nT\right)}{2A^{\frac{1}{n}}}.\]
+\begin_inset Formula 
+\[
+\eta=\frac{\dot{\varepsilon}^{\frac{1}{n}-1}\exp\left(T_{0}/nT\right)}{2A^{\frac{1}{n}}}.
+\]
 
 \end_inset
 
@@ -14999,7 +14991,7 @@ You may set maximum and minimum values for the resulting viscosity.
 
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -15237,8 +15229,10 @@ materialSwarm
 \begin_layout Description
 healingRate With this parameter, accumulated strain can decrease.
  Specifically, the time derivative of accumulated strain becomes
-\begin_inset Formula \[
-\frac{\sigma_{yield}}{\eta}\left(\frac{\beta}{1-\beta}-healingRate\right),\]
+\begin_inset Formula 
+\[
+\frac{\sigma_{yield}}{\eta}\left(\frac{\beta}{1-\beta}-healingRate\right),
+\]
 
 \end_inset
 
@@ -15361,7 +15355,7 @@ You can also define a strain weakening ratio
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="11" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -15611,8 +15605,10 @@ This is the simplest yielding rheology in Gale.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\sqrt{J_{2}}=C'\]
+\begin_inset Formula 
+\[
+\sqrt{J_{2}}=C'
+\]
 
 \end_inset
 
@@ -15661,8 +15657,10 @@ StrainRateSoftening
 True
 \family default
 , then the viscosity is set to 
-\begin_inset Formula \[
-\eta_{new}=2C'^{2}\eta/\left(C'^{2}+J_{2}\right).\]
+\begin_inset Formula 
+\[
+\eta_{new}=2C'^{2}\eta/\left(C'^{2}+J_{2}\right).
+\]
 
 \end_inset
 
@@ -15673,8 +15671,10 @@ True
 
 \begin_deeper
 \begin_layout Standard
-\begin_inset Formula \[
-\eta_{new}=\eta C'/\sqrt{J_{2}},\]
+\begin_inset Formula 
+\[
+\eta_{new}=\eta C'/\sqrt{J_{2}},
+\]
 
 \end_inset
 
@@ -15694,7 +15694,7 @@ True
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -15818,8 +15818,10 @@ DruckerPrager
 This rheology uses the same parameters as Von Mises, but also adds a friction
  coefficient that can soften.
  Specifically, the yield condition is
-\begin_inset Formula \[
-\sqrt{J_{2}}=Ap+B,\]
+\begin_inset Formula 
+\[
+\sqrt{J_{2}}=Ap+B,
+\]
 
 \end_inset
 
@@ -15842,8 +15844,10 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\sigma_{MC}=C'+\sigma_{\bot}\tan\phi',\]
+\begin_inset Formula 
+\[
+\sigma_{MC}=C'+\sigma_{\bot}\tan\phi',
+\]
 
 \end_inset
 
@@ -15851,10 +15855,13 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{ccc}
 A & = & \sin\phi'\\
-B & = & C'\cos\phi'\end{array}.\]
+B & = & C'\cos\phi'
+\end{array}.
+\]
 
 \end_inset
 
@@ -15867,10 +15874,13 @@ B & = & C'\cos\phi'\end{array}.\]
 \end_inset
 
  is more complicated 
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{ccc}
 A & = & \frac{2\sin\phi'}{\sqrt{3}\left(3-\sin\phi'\right)}\\
-B & = & \frac{6C'\cos\phi'}{\sqrt{3}\left(3-\sin\phi'\right)}\end{array}.\]
+B & = & \frac{6C'\cos\phi'}{\sqrt{3}\left(3-\sin\phi'\right)}
+\end{array}.
+\]
 
 \end_inset
 
@@ -15935,8 +15945,10 @@ maximumStrainRate
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\eta_{new}=\frac{Ap+B}{\sqrt{\dot{\epsilon}_{max}}}.\]
+\begin_inset Formula 
+\[
+\eta_{new}=\frac{Ap+B}{\sqrt{\dot{\epsilon}_{max}}}.
+\]
 
 \end_inset
 
@@ -15945,8 +15957,10 @@ maximumStrainRate
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\eta_{new}=\frac{Ap+B}{\sqrt{\dot{\epsilon}}}.\]
+\begin_inset Formula 
+\[
+\eta_{new}=\frac{Ap+B}{\sqrt{\dot{\epsilon}}}.
+\]
 
 \end_inset
 
@@ -16044,7 +16058,7 @@ reference "sec:HydrostaticTerm"
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="18" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -16521,7 +16535,7 @@ ignoreOldOrientation
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -17602,8 +17616,10 @@ This sets the height of the surface to
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-h=h_{0}+amplitude*\cos\left(x*frequency\right),\]
+\begin_inset Formula 
+\[
+h=h_{0}+amplitude*\cos\left(x*frequency\right),
+\]
 
 \end_inset
 
@@ -17763,11 +17779,14 @@ Gradient
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 h=\left\{ \begin{array}{cc}
 h_{0} & x<BeginOffset\\
 h_{0}+Gradient\left(x-BeginOffset\right) & BeginOffset<x<EndOffset\\
-h_{0}+Gradient\left(EndOffset-BeginOffset\right) & x>EndOffset\end{array}\right..\]
+h_{0}+Gradient\left(EndOffset-BeginOffset\right) & x>EndOffset
+\end{array}\right..
+\]
 
 \end_inset
 
@@ -17808,10 +17827,13 @@ Sign
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{c}
 x'\equiv\max\left(\min\left(x,MaxX\right),MinX\right)\\
-d\equiv\sqrt{Radius^{2}-(x-x')^{2}}\end{array},\]
+d\equiv\sqrt{Radius^{2}-(x-x')^{2}}
+\end{array},
+\]
 
 \end_inset
 
@@ -17823,10 +17845,13 @@ then the height is set to
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 h=\left\{ \begin{array}{cc}
 h_{0}+Y0+d & Sign=true\\
-h_{0}+Y0-d & Sign=false\end{array}\right..\]
+h_{0}+Y0-d & Sign=false
+\end{array}\right..
+\]
 
 \end_inset
 
@@ -17999,8 +18024,10 @@ This plugin applies a diffusive operator to the top.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\frac{\partial y}{\partial t}=-diffusionCoefficient\frac{\partial^{2}y}{\partial x^{2}}.\]
+\begin_inset Formula 
+\[
+\frac{\partial y}{\partial t}=-diffusionCoefficient\frac{\partial^{2}y}{\partial x^{2}}.
+\]
 
 \end_inset
 
@@ -18029,8 +18056,10 @@ key "HRS"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\alpha=\overline{a}_{old}+\tan^{-1}\left(2vTW^{-2}-\frac{\left(2Kk{}_{a}^{m}\right)W^{hm-1}S^{n}}{\left(hm+1\right)dt_{erosion}}\right),\]
+\begin_inset Formula 
+\[
+\alpha=\overline{a}_{old}+\tan^{-1}\left(2vTW^{-2}-\frac{\left(2Kk{}_{a}^{m}\right)W^{hm-1}S^{n}}{\left(hm+1\right)dt_{erosion}}\right),
+\]
 
 \end_inset
 
@@ -18042,9 +18071,11 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{eqnarray*}
+\begin_inset Formula 
+\begin{eqnarray*}
 S & \equiv & \tan^{-1}\left(\overline{a}_{old}\right),\\
-\overline{a} & \equiv & \left(y_{max}-y_{0}\right)/W,\end{eqnarray*}
+\overline{a} & \equiv & \left(y_{max}-y_{0}\right)/W,
+\end{eqnarray*}
 
 \end_inset
 
@@ -18154,7 +18185,7 @@ Geometry for HRS Erosion
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -18445,7 +18476,7 @@ Stokes_SLE_UzawaSolver
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -18599,7 +18630,7 @@ Stokes_SLE
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -19069,7 +19100,7 @@ critical
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="3" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -19177,8 +19208,10 @@ If you add this component, then there will be a force on each particle of
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F=-\rho g.\]
+\begin_inset Formula 
+\[
+F=-\rho g.
+\]
 
 \end_inset
 
@@ -19190,8 +19223,10 @@ TemperatureField
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F=-\rho g\left(1-\alpha T\right).\]
+\begin_inset Formula 
+\[
+F=-\rho g\left(1-\alpha T\right).
+\]
 
 \end_inset
 
@@ -19259,7 +19294,7 @@ BuoyancyForceTerm
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -19426,8 +19461,10 @@ If you add this component, then there will be a vertical force on each particle
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F=-\rho Ra_{C}.\]
+\begin_inset Formula 
+\[
+F=-\rho Ra_{C}.
+\]
 
 \end_inset
 
@@ -19439,8 +19476,10 @@ TemperatureField
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F=Ra_{T}T-\rho Ra_{C}.\]
+\begin_inset Formula 
+\[
+F=Ra_{T}T-\rho Ra_{C}.
+\]
 
 \end_inset
 
@@ -19501,7 +19540,7 @@ HydrostaticTerm
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="6" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -19748,8 +19787,10 @@ is equivalent to the formula
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-e^{-2\left(x^{2}+y^{2}\right)}.\]
+\begin_inset Formula 
+\[
+e^{-2\left(x^{2}+y^{2}\right)}.
+\]
 
 \end_inset
 
@@ -19811,7 +19852,7 @@ http://muParser.sf.net
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="5" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -19932,7 +19973,7 @@ In addition, the available functions are
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="34" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -20719,7 +20760,7 @@ a
 \begin_layout Standard
 \begin_inset Tabular
 <lyxtabular version="3" rows="8" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -21560,7 +21601,7 @@ particleStepping
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="2" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -21659,7 +21700,7 @@ status open
 \align center
 \begin_inset Tabular
 <lyxtabular version="3" rows="7" columns="2">
-<features>
+<features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
 <row>
@@ -21993,8 +22034,10 @@ reference "sec:Geomod-2008"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-error\propto h+O(h^{2}),\]
+\begin_inset Formula 
+\[
+error\propto h+O(h^{2}),
+\]
 
 \end_inset
 
@@ -22101,8 +22144,10 @@ has instructions on running this benchmark.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F=6\pi\eta ru,\]
+\begin_inset Formula 
+\[
+F=6\pi\eta ru,
+\]
 
 \end_inset
 
@@ -22123,8 +22168,10 @@ F=6\pi\eta ru,\]
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F=\frac{4}{3}\pi r^{3}g\delta\rho,\]
+\begin_inset Formula 
+\[
+F=\frac{4}{3}\pi r^{3}g\delta\rho,
+\]
 
 \end_inset
 
@@ -22141,8 +22188,10 @@ where
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-u=\frac{2}{9}r^{2}g\delta\rho/\eta.\]
+\begin_inset Formula 
+\[
+u=\frac{2}{9}r^{2}g\delta\rho/\eta.
+\]
 
 \end_inset
 
@@ -22170,8 +22219,10 @@ Setting
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-u=0.00222.\]
+\begin_inset Formula 
+\[
+u=0.00222.
+\]
 
 \end_inset
 
@@ -22192,8 +22243,10 @@ key "Landau & Lifschitz"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-u=\frac{1}{3}\frac{r^{2}g\delta\rho}{\eta}\frac{\eta+\eta'}{\eta+\frac{3}{2}\eta'},\]
+\begin_inset Formula 
+\[
+u=\frac{1}{3}\frac{r^{2}g\delta\rho}{\eta}\frac{\eta+\eta'}{\eta+\frac{3}{2}\eta'},
+\]
 
 \end_inset
 
@@ -22228,8 +22281,10 @@ key "Stokes Sphere"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F_{H}=6\pi\eta ru\frac{1-0.75857\cdot\left(\frac{r}{R}\right)^{5}}{1+f_{H}\left(\frac{r}{R}\right)},\]
+\begin_inset Formula 
+\[
+F_{H}=6\pi\eta ru\frac{1-0.75857\cdot\left(\frac{r}{R}\right)^{5}}{1+f_{H}\left(\frac{r}{R}\right)},
+\]
 
 \end_inset
 
@@ -22237,8 +22292,10 @@ F_{H}=6\pi\eta ru\frac{1-0.75857\cdot\left(\frac{r}{R}\right)^{5}}{1+f_{H}\left(
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-f_{H}\left(\frac{r}{R}\right)=-2.1050(r/R)+2.0865(r/R)^{3}-1.7068(r/R)^{5}+0.72603(r/R)^{6}.\]
+\begin_inset Formula 
+\[
+f_{H}\left(\frac{r}{R}\right)=-2.1050(r/R)+2.0865(r/R)^{3}-1.7068(r/R)^{5}+0.72603(r/R)^{6}.
+\]
 
 \end_inset
 
@@ -22258,8 +22315,10 @@ For our case with
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-u=1.122747319\cdot10^{-3}.\]
+\begin_inset Formula 
+\[
+u=1.122747319\cdot10^{-3}.
+\]
 
 \end_inset
 
@@ -22278,8 +22337,10 @@ key "Stokes Sphere"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-F_{F}=6\pi\eta ru/\left(1+f_{F}(r/R)\right),\]
+\begin_inset Formula 
+\[
+F_{F}=6\pi\eta ru/\left(1+f_{F}(r/R)\right),
+\]
 
 \end_inset
 
@@ -22287,9 +22348,11 @@ F_{F}=6\pi\eta ru/\left(1+f_{F}(r/R)\right),\]
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{eqnarray*}
+\begin_inset Formula 
+\begin{eqnarray*}
 f_{f}(r/R) & = & -2.10444(r/R)+2.08877(r/R)^{3}-0.94813(r/R)^{5}\\
- &  & -1.372(r/R)^{6}+3.87(r/R)^{8}-4.19(r/R)^{10}.\end{eqnarray*}
+ &  & -1.372(r/R)^{6}+3.87(r/R)^{8}-4.19(r/R)^{10}.
+\end{eqnarray*}
 
 \end_inset
 
@@ -22297,8 +22360,10 @@ For our case, this gives a speed of
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-u=1.12293603939\cdot10^{-3},\]
+\begin_inset Formula 
+\[
+u=1.12293603939\cdot10^{-3},
+\]
 
 \end_inset
 
@@ -22517,9 +22582,11 @@ d.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \begin{eqnarray*}
+\begin_inset Formula 
+\begin{eqnarray*}
 v_{x} & = & -\dot{\epsilon}y,\\
-v_{y} & = & \dot{\epsilon}x,\end{eqnarray*}
+v_{y} & = & \dot{\epsilon}x,
+\end{eqnarray*}
 
 \end_inset
 
@@ -22562,8 +22629,10 @@ A characteristic of the analytic solution is that the pressure is zero inside
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-p_{m}=4\dot{\epsilon}\frac{\mu_{m}\left(\mu_{i}-\mu_{m}\right)}{\mu_{i}+\mu_{m}}\frac{r_{i}^{2}}{r^{2}}\cos\left(2\theta\right),\]
+\begin_inset Formula 
+\[
+p_{m}=4\dot{\epsilon}\frac{\mu_{m}\left(\mu_{i}-\mu_{m}\right)}{\mu_{i}+\mu_{m}}\frac{r_{i}^{2}}{r^{2}}\cos\left(2\theta\right),
+\]
 
 \end_inset
 
@@ -22849,8 +22918,10 @@ key "Folds"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-t_{r}=\frac{4\pi\eta}{gL},\]
+\begin_inset Formula 
+\[
+t_{r}=\frac{4\pi\eta}{gL},
+\]
 
 \end_inset
 
@@ -23107,10 +23178,13 @@ reference "fig:Divergence_v_sri"
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{ccc}
 v_{x} & = & x\cdot d/2\\
-v_{y} & = & y\cdot d/2\end{array}.\]
+v_{y} & = & y\cdot d/2
+\end{array}.
+\]
 
 \end_inset
 
@@ -23118,11 +23192,14 @@ v_{y} & = & y\cdot d/2\end{array}.\]
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
+\begin_inset Formula 
+\[
 \begin{array}{ccc}
 v_{x} & = & x\cdot d/3\\
 v_{y} & = & y\cdot d/3\\
-v_{z} & = & z\cdot d/3\end{array}.\]
+v_{z} & = & z\cdot d/3
+\end{array}.
+\]
 
 \end_inset
 
@@ -23317,8 +23394,10 @@ For the Drucker-Prager rheology in 2D, we can write the yielding relation
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\sigma_{ns}=\sigma_{nn}\tan\varphi+C,\]
+\begin_inset Formula 
+\[
+\sigma_{ns}=\sigma_{nn}\tan\varphi+C,
+\]
 
 \end_inset
 
@@ -23355,8 +23434,10 @@ For the Drucker-Prager rheology in 2D, we can write the yielding relation
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\sin\left(2\Theta\right)\left(\sigma_{I}-\sigma_{III}\right)/2=\tan\varphi\left(\left(\sigma_{I}+\sigma_{III}\right)/2+\cos\left(2\Theta\right)\left(\sigma_{I}-\sigma_{III}\right)/2\right)+C,\]
+\begin_inset Formula 
+\[
+\sin\left(2\Theta\right)\left(\sigma_{I}-\sigma_{III}\right)/2=\tan\varphi\left(\left(\sigma_{I}+\sigma_{III}\right)/2+\cos\left(2\Theta\right)\left(\sigma_{I}-\sigma_{III}\right)/2\right)+C,
+\]
 
 \end_inset
 
@@ -23373,8 +23454,10 @@ For the Drucker-Prager rheology in 2D, we can write the yielding relation
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula \[
-\Theta=\pm\left(\frac{\pi}{4}+\frac{\varphi}{2}\right).\]
+\begin_inset Formula 
+\[
+\Theta=\pm\left(\frac{\pi}{4}+\frac{\varphi}{2}\right).
+\]
 
 \end_inset
 
@@ -25864,6 +25947,7 @@ This General Public License does not permit incorporating your program into
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "1"
@@ -25883,6 +25967,7 @@ Geophys.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "2"
@@ -25912,6 +25997,7 @@ ANZIAM J
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "3"
@@ -25935,6 +26021,7 @@ J.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "4"
@@ -25956,6 +26043,7 @@ Philosophical Magazine, 86
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "5"
@@ -25982,6 +26070,7 @@ Phys.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "6"
@@ -26011,6 +26100,7 @@ Comput.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "7"
@@ -26036,6 +26126,7 @@ J.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "8"
@@ -26059,6 +26150,7 @@ Geophys.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "9"
@@ -26075,6 +26167,7 @@ Fluid Mechanics
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "10"
@@ -26091,6 +26184,7 @@ Folding of Viscous Layers
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "11"
@@ -26122,6 +26216,7 @@ Analogue and Numerical Modelling of Crustal-Scale Processes
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "12"
@@ -26143,6 +26238,7 @@ Physica Scriptae
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "13"
@@ -26157,6 +26253,7 @@ key "FD Stokes"
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "14"
@@ -26188,6 +26285,7 @@ Int.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 
 \color none
 \begin_inset CommandInset bibitem
@@ -26210,6 +26308,7 @@ Finite Elements and Fast Iterative Solvers: with Applications in Incompressible
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "16"
@@ -26222,6 +26321,7 @@ Buiter, S., and G.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "17"
@@ -26240,6 +26340,7 @@ Dahlen, F.A.
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "18"
@@ -26261,6 +26362,7 @@ Tectonophysics
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "19"
@@ -26282,6 +26384,7 @@ Nature
 \end_layout
 
 \begin_layout Bibliography
+\labelwidthstring Bibliography
 \begin_inset CommandInset bibitem
 LatexCommand bibitem
 label "20"

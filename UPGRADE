@@ -1,3 +1,14 @@
+Upgrading Gale from 1.6 to 2.0
+------------------------------
+
+There is no strict need to convert input files from 1.6 to 2.0.  All
+valid 1.6 input files should run without change in 2.0.  However, the
+Q2 P-1 elements supported in 2.0 are much more suitable for general
+geodynamic modelling.  In particular, there is no longer a need for a
+HydrostaticTerm.
+
+
+
 Upgrading Gale from 1.5.0 to 1.6.0
 ----------------------------------
 
