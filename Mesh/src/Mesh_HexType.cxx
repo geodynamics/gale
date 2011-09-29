@@ -316,19 +316,7 @@ void Mesh_HexType_SetQ2Inds( void* hexType) {
   for(int i=0; i<max_vertices; i++)
     self->vertMap[i] = index_map[i];
 
-  unsigned triInds[8][3], tetInds[80][4];
-
-  for(int n=0;n<4;++n)
-    for(int i=0;i<2;++i)
-      for(int j=0;j<3;++j)
-        {
-          triInds[2*n+i][j]=index_map[self->triInds[i][j]]+start_index[n];
-        }
-
-  self->triInds = ReallocArray2D( self->triInds, unsigned, 8, 3 );
-  for(int i=0;i<8;++i)
-    for(int j=0;j<3;++j)
-      self->triInds[i][j]=triInds[i][j];
+  unsigned tetInds[80][4];
 
   for(int n=0;n<8;++n)
     for(int i=0;i<10;++i)
@@ -807,42 +795,16 @@ bool Mesh_HexType_ElementHasPoint2DWithIncidence
             *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[1]];
           }
           else {
-            switch(self->num_simplexes[0])
+            switch(inside)
               {
-              case 2:
-                switch(inside)
-                  {
-                  case 0:
-                    *dim = MT_FACE;
-                    *ind = elInd;
-                    break;
-                  case 1:
-                    *dim = MT_EDGE;
-                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
-                    break;
-                  }
+              case 0:
+                *dim = MT_FACE;
+                *ind = elInd;
                 break;
-              case 8:
-                switch(inside)
-                  {
-                  case 0:
-                  case 1:
-                  case 2:
-                  case 3:
-                  case 4:
-                  case 6:
-                    *dim = MT_FACE;
-                    *ind = elInd;
-                    break;
-                  case 5:
-                  case 7:
-                    *dim = MT_EDGE;
-                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
-                    break;
-                  }
+              case 1:
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
                 break;
-              default:
-                abort();
               }
           }
         }
@@ -852,84 +814,30 @@ bool Mesh_HexType_ElementHasPoint2DWithIncidence
             *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[0]];
           }
           else {
-            switch(self->num_simplexes[0])
+            switch(inside)
               {
-              case 2:
-                switch(inside)
-                  {
-                  case 0:
-                    *dim = MT_EDGE;
-                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
-                    break;
-                  case 1:
-                    *dim = MT_FACE;
-                    *ind = elInd;
-                    break;
-                  }
+              case 0:
+                *dim = MT_EDGE;
+                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
                 break;
-              case 8:
-                switch(inside)
-                  {
-                  case 0:
-                  case 4:
-                    *dim = MT_EDGE;
-                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
-                    break;
-                  case 1:
-                  case 2:
-                  case 3:
-                  case 5:
-                  case 6:
-                  case 7:
-                    *dim = MT_FACE;
-                    *ind = elInd;
-                    break;
-                  }
-              default:
-                abort();
+              case 1:
+                *dim = MT_FACE;
+                *ind = elInd;
+                break;
               }
           }
         }
         else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-          switch(self->num_simplexes[0])
+          switch(inside)
             {
-            case 2:
-              switch(inside)
-                {
-                case 0:
-                  *dim = MT_EDGE;
-                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
-                  break;
-                case 1:
-                  *dim = MT_EDGE;
-                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
-                  break;
-                }
+            case 0:
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
               break;
-            case 8:
-              switch(inside)
-                {
-                case 0:
-                case 2:
-                  *dim = MT_EDGE;
-                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
-                  break;
-                case 1:
-                case 4:
-                case 5:
-                case 6:
-                  *dim = MT_FACE;
-                  *ind = elInd;
-                  break;
-                case 3:
-                case 7:
-                  *dim = MT_EDGE;
-                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
-                  break;
-                }
+            case 1:
+              *dim = MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
               break;
-            default:
-              abort();
             }
         }
         else {
