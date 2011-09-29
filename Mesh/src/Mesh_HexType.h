@@ -54,7 +54,6 @@
 		/* Virtual info */						\
 										\
 		/* Mesh_HexType info */						\
-		unsigned				mapSize;		\
 		unsigned*				vertMap;		\
 		unsigned*				inc;			\
 		Mesh_ElementType_ElementHasPointFunc*	elementHasPoint;	\
@@ -102,7 +101,7 @@
 	** Public functions
 	*/
 
-	void Mesh_HexType_SetVertexMap( void* hexType, unsigned* map );
+	void Mesh_HexType_SetVertexMap( void* hexType );
         void Mesh_HexType_SetQ2Inds( void* hexType);
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
