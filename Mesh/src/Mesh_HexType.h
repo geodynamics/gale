@@ -114,7 +114,7 @@
 							  MeshTopology_Dim* dim, unsigned* ind );
 	Bool Mesh_HexType_ElementHasPoint2DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
 						    MeshTopology_Dim* dim, unsigned* ind );
-	Bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned elInd, double* point, 
+	bool Mesh_HexType_ElementHasPoint2DWithIncidence( Mesh_HexType* self, unsigned elInd, double* point, 
 							  MeshTopology_Dim* dim, unsigned* ind );
 	Bool Mesh_HexType_ElementHasPoint1DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
 						    MeshTopology_Dim* dim, unsigned* ind );

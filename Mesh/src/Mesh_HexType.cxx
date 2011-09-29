@@ -681,61 +681,71 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence
   return False;
 }
 
+namespace {
+  bool Side_Search2D(const int *inc, double **verts, 
+                     const double* point, int on_edge[4]);
+}
+
 Bool Mesh_HexType_ElementHasPoint2DGeneral
 ( Mesh_HexType* self, unsigned elInd, double* point, 
   MeshTopology_Dim* dim, unsigned* ind )
 {
-	Mesh*		mesh;
-	Bool		fnd;
-	double		bc[3];
-	unsigned	inside;
-	const int*	inc;
+  Mesh*		mesh;
+  bool		fnd;
+  double		bc[3];
+  unsigned	inside;
+  const int*	inc;
 
-	assert( self && Stg_CheckType( self, Mesh_HexType ) );
-	assert( Mesh_GetDimSize( self->mesh ) == 2 );
-	assert( elInd < Mesh_GetDomainSize( self->mesh,
-                                            Mesh_GetDimSize( self->mesh ) ) );
-	assert( point );
-	assert( dim );
-	assert( ind );
+  assert( self && Stg_CheckType( self, Mesh_HexType ) );
+  assert( Mesh_GetDimSize( self->mesh ) == 2 );
+  assert( elInd < Mesh_GetDomainSize( self->mesh,
+                                      Mesh_GetDimSize( self->mesh ) ) );
+  assert( point );
+  assert( dim );
+  assert( ind );
 
-	/* Shortcuts. */
-	mesh = self->mesh;
+  /* Shortcuts. */
+  mesh = self->mesh;
 
-	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ),
-                           elInd, MT_VERTEX, self->incArray );
-	inc = IArray_GetPtr( self->incArray );
+  /* Get element to vertex incidence. */
+  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ),
+                     elInd, MT_VERTEX, self->incArray );
+  inc = IArray_GetPtr( self->incArray );
 
-	/* Search for triangle. */
-	if( self->mapSize ) {
-		unsigned	v_i;
+  if(IArray_GetSize(self->incArray)==9)
+    {
+      int on_edge[4];
+      fnd=Side_Search2D(inc,mesh->verts,point,on_edge);
+    }
+  /* Search for triangle. */
+  else if( self->mapSize ) {
+    unsigned	v_i;
 
-		for( v_i = 0; v_i < self->mapSize; v_i++ )
-			self->inc[v_i] = inc[self->vertMap[v_i]];
-		fnd = Simplex_Search2D( mesh->verts, self->inc,
-                                        self->num_simplexes[0], self->triInds,
-                                        point, bc, &inside );
-	}
-	else
-		fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
-                                        self->num_simplexes[0], self->triInds,
-                                        point, bc, &inside );
-	if( fnd ) {
-		*dim = MT_FACE;
-		*ind = elInd;
-		return True;
-	}
+    for( v_i = 0; v_i < self->mapSize; v_i++ )
+      self->inc[v_i] = inc[self->vertMap[v_i]];
+    fnd = Simplex_Search2D( mesh->verts, self->inc,
+                            self->num_simplexes[0], self->triInds,
+                            point, bc, &inside );
+  }
+  else
+    fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
+                            self->num_simplexes[0], self->triInds,
+                            point, bc, &inside );
+  if( fnd ) {
+    *dim = MT_FACE;
+    *ind = elInd;
+    return True;
+  }
 
-	return False;
+  return False;
 }
 
-Bool Mesh_HexType_ElementHasPoint2DWithIncidence
+bool Mesh_HexType_ElementHasPoint2DWithIncidence
 ( Mesh_HexType* self, unsigned elInd, double* point, 
   MeshTopology_Dim* dim, unsigned* ind )
 {
   Mesh*		mesh;
-  Bool		fnd;
+  bool		fnd;
   double		bc[3];
   IGraph*		topo;
   unsigned	inside;
@@ -757,167 +767,230 @@ Bool Mesh_HexType_ElementHasPoint2DWithIncidence
                      self->incArray );
   inc = IArray_GetPtr( self->incArray );
 
-  /* Search for triangle. */
-  if( self->mapSize ) {
-    unsigned	v_i;
+  /* Use edges instead of simplices for quadratic elements */
+  if(IArray_GetSize(self->incArray)==9)
+    {
+      int on_edge[4];
+      fnd=Side_Search2D(inc,mesh->verts,point,on_edge);
 
-    for( v_i = 0; v_i < self->mapSize; v_i++ )
-      self->inc[v_i] = inc[self->vertMap[v_i]];
-    fnd = Simplex_Search2D( mesh->verts, self->inc,
-                            self->num_simplexes[0],
-                            self->triInds, point, bc,
-                            &inside );
-  }
-  else
-    fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
-                            self->num_simplexes[0],
-                            self->triInds, point, bc, &inside );
-  if( fnd ) {
-    unsigned	*inds = self->triInds[inside];
-
-    /* Check boundary ownership. */
-    if( bc[0] == 0.0 || bc[0] == -0.0 ) {
-      if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-        *dim = MT_VERTEX;
-        *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[2]];
-      }
-      else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-        *dim = MT_VERTEX;
-        *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[1]];
-      }
-      else {
-        switch(self->num_simplexes[0])
-          {
-          case 2:
-            switch(inside)
-              {
-              case 0:
-                *dim = MT_FACE;
-                *ind = elInd;
-                break;
-              case 1:
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
-                break;
-              }
-            break;
-          case 8:
-            switch(inside)
-              {
-              case 0:
-              case 1:
-              case 2:
-              case 3:
-              case 4:
-              case 6:
-                *dim = MT_FACE;
-                *ind = elInd;
-                break;
-              case 5:
-              case 7:
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
-                break;
-              }
-            break;
-          default:
-            abort();
-          }
-      }
-    }
-    else if( bc[1] == 0.0 || bc[1] == -0.0 ) {
-      if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-        *dim = MT_VERTEX;
-        *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[0]];
-      }
-      else {
-        switch(self->num_simplexes[0])
-          {
-          case 2:
-            switch(inside)
-              {
-              case 0:
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
-                break;
-              case 1:
-                *dim = MT_FACE;
-                *ind = elInd;
-                break;
-              }
-            break;
-          case 8:
-            switch(inside)
-              {
-              case 0:
-              case 4:
-                *dim = MT_EDGE;
-                *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
-                break;
-              case 1:
-              case 2:
-              case 3:
-              case 5:
-              case 6:
-              case 7:
-                *dim = MT_FACE;
-                *ind = elInd;
-                break;
-              }
-          default:
-            abort();
-          }
-      }
-    }
-    else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
-      switch(self->num_simplexes[0])
+      if(fnd)
         {
-        case 2:
-          switch(inside)
+          if(on_edge[0]==0)
             {
-            case 0:
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
-              break;
-            case 1:
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
-              break;
+              if(on_edge[2]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_FACE][MT_VERTEX][elInd][0];
+                }
+              else if(on_edge[3]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_FACE][MT_VERTEX][elInd][2];
+                }
+              else
+                {
+                  *dim=MT_EDGE;
+                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
+                }
             }
-          break;
-        case 8:
-          switch(inside)
+          else if(on_edge[1]==0)
             {
-            case 0:
-            case 2:
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
-              break;
-            case 1:
-            case 4:
-            case 5:
-            case 6:
-              *dim = MT_FACE;
-              *ind = elInd;
-              break;
-            case 3:
-            case 7:
-              *dim = MT_EDGE;
-              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
-              break;
+              if(on_edge[2]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_FACE][MT_VERTEX][elInd][6];
+                }
+              else if(on_edge[3]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_FACE][MT_VERTEX][elInd][8];
+                }
+              else
+                {
+                  *dim=MT_EDGE;
+                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
+                }
             }
-          break;
-        default:
-          abort();
+          else if(on_edge[2]==0)
+            {
+              *dim=MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
+            }
+          else if(on_edge[3]==0)
+            {
+              *dim=MT_EDGE;
+              *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
+            }
+          else
+            {
+              *dim=MT_FACE;
+              *ind=elInd;
+            }
         }
     }
-    else {
-      *dim = MT_FACE;
-      *ind = elInd;
+  else
+    {
+      /* Search for triangle. */
+      if( self->mapSize ) {
+        unsigned	v_i;
+
+        for( v_i = 0; v_i < self->mapSize; v_i++ )
+          self->inc[v_i] = inc[self->vertMap[v_i]];
+        fnd = Simplex_Search2D( mesh->verts, self->inc,
+                                self->num_simplexes[0],
+                                self->triInds, point, bc,
+                                &inside );
+      }
+      else
+        fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
+                                self->num_simplexes[0],
+                                self->triInds, point, bc, &inside );
+      if( fnd ) {
+        unsigned	*inds = self->triInds[inside];
+
+        /* Check boundary ownership. */
+        if( bc[0] == 0.0 || bc[0] == -0.0 ) {
+          if( bc[1] == 0.0 || bc[1] == -0.0 ) {
+            *dim = MT_VERTEX;
+            *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[2]];
+          }
+          else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+            *dim = MT_VERTEX;
+            *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[1]];
+          }
+          else {
+            switch(self->num_simplexes[0])
+              {
+              case 2:
+                switch(inside)
+                  {
+                  case 0:
+                    *dim = MT_FACE;
+                    *ind = elInd;
+                    break;
+                  case 1:
+                    *dim = MT_EDGE;
+                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
+                    break;
+                  }
+                break;
+              case 8:
+                switch(inside)
+                  {
+                  case 0:
+                  case 1:
+                  case 2:
+                  case 3:
+                  case 4:
+                  case 6:
+                    *dim = MT_FACE;
+                    *ind = elInd;
+                    break;
+                  case 5:
+                  case 7:
+                    *dim = MT_EDGE;
+                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][1];
+                    break;
+                  }
+                break;
+              default:
+                abort();
+              }
+          }
+        }
+        else if( bc[1] == 0.0 || bc[1] == -0.0 ) {
+          if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+            *dim = MT_VERTEX;
+            *ind = topo->incEls[MT_FACE][MT_VERTEX][elInd][inds[0]];
+          }
+          else {
+            switch(self->num_simplexes[0])
+              {
+              case 2:
+                switch(inside)
+                  {
+                  case 0:
+                    *dim = MT_EDGE;
+                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
+                    break;
+                  case 1:
+                    *dim = MT_FACE;
+                    *ind = elInd;
+                    break;
+                  }
+                break;
+              case 8:
+                switch(inside)
+                  {
+                  case 0:
+                  case 4:
+                    *dim = MT_EDGE;
+                    *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][2];
+                    break;
+                  case 1:
+                  case 2:
+                  case 3:
+                  case 5:
+                  case 6:
+                  case 7:
+                    *dim = MT_FACE;
+                    *ind = elInd;
+                    break;
+                  }
+              default:
+                abort();
+              }
+          }
+        }
+        else if( bc[2] == 0.0 || bc[2] == -0.0 ) {
+          switch(self->num_simplexes[0])
+            {
+            case 2:
+              switch(inside)
+                {
+                case 0:
+                  *dim = MT_EDGE;
+                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
+                  break;
+                case 1:
+                  *dim = MT_EDGE;
+                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
+                  break;
+                }
+              break;
+            case 8:
+              switch(inside)
+                {
+                case 0:
+                case 2:
+                  *dim = MT_EDGE;
+                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][0];
+                  break;
+                case 1:
+                case 4:
+                case 5:
+                case 6:
+                  *dim = MT_FACE;
+                  *ind = elInd;
+                  break;
+                case 3:
+                case 7:
+                  *dim = MT_EDGE;
+                  *ind = topo->incEls[MT_FACE][MT_EDGE][elInd][3];
+                  break;
+                }
+              break;
+            default:
+              abort();
+            }
+        }
+        else {
+          *dim = MT_FACE;
+          *ind = elInd;
+        }
+      }
     }
-    return True;
-  }
-  return False;
+  return fnd;
 }
 
 Bool Mesh_HexType_ElementHasPoint1DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
@@ -990,3 +1063,59 @@ Bool Mesh_HexType_ElementHasPoint1DWithIncidence( Mesh_HexType* self, unsigned e
 }
 
 
+namespace {
+  /* Check whether a point is inside an quadratic element by checking
+     whether it is above or below the 4 edges of the element.  For now,
+     only works when the spacing on each edge is even.  Currently, this
+     is enforced by EulerDeform. */
+
+  int is_line_over_point(const int minus, const int zero, const int plus,
+                         double **verts, const int x, const double *point);
+
+  bool Side_Search2D(const int *inc, double **verts, 
+                     const double* point, int on_edge[4])
+  {
+    on_edge[0]=-1*is_line_over_point(inc[0],inc[1],inc[2],verts,0,point);
+    on_edge[1]=is_line_over_point(inc[6],inc[7],inc[8],verts,0,point);
+    on_edge[2]=-1*is_line_over_point(inc[0],inc[3],inc[6],verts,1,point);
+    on_edge[3]=is_line_over_point(inc[8],inc[5],inc[2],verts,1,point);
+
+    return (on_edge[0]>=0) && (on_edge[1]>=0) && (on_edge[2]>=0) && (on_edge[3]>=0);
+  }
+
+  template <typename T> int sgn(T val)
+  {
+    return (val > T(0)) - (val < T(0));
+  }
+
+  /* Checks whether a point is above, below, or on a line.  To reverse
+     the direction, reverse the order of indces (plus, zero, minus).
+     Only works for when the spacing between the "x" points within the
+     element is the same.  This is enforced by EulerDeform.  This could
+     be generalized to any spacing, but there is no good solution in
+     3D.  */
+
+  int is_line_over_point(const int minus, const int zero, const int plus,
+                         double **verts, const int x, const double *point)
+  {
+    int y=(x+1)%2;
+  
+    double x_0, y_0, dy_p, dy_m, dx, b, c, computed_y;
+
+    x_0=verts[zero][x];
+    y_0=verts[zero][y];
+    dy_p=verts[plus][y]-y_0;
+    dy_m=verts[minus][y]-y_0;
+
+    dx=verts[plus][x]-x_0;
+    if(!Num_Approx(dx,x_0-verts[minus][x]))
+      abort();
+  
+    c=(dy_p + dy_m)/(2*dx*dx);
+    b=(dy_p - dy_m)/(2*dx);
+
+    computed_y=y_0 + b*(point[x]-x_0) + c*(point[x]-x_0)*(point[x]-x_0);
+
+    return sgn(computed_y-point[y]);
+  }
+}
