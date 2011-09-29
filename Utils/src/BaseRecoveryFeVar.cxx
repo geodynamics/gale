@@ -321,11 +321,10 @@ void _BaseRecoveryFeVar_GetValueInElementWithStdInterpolation( void* feVariable,
 	FeMesh             *mesh = self->feMesh;
 	ElementType        *elementType = NULL;
 	IArray*            inc  = self->inc;
-	double             valueAtNode[8][9];  /* TODO: make non static */
-	double             Ni[8]; 
-	int nNodes, *nodes, node_I, order, dof_I, dofThatExist;
+	double             valueAtNode[27][9];  /* TODO: make non static */
+	double             Ni[27]; 
+	int nNodes, *nodes, node_I, dof_I, dofThatExist;
 
-	order = self->orderOfInterpolation;
 	dofThatExist = self->fieldComponentCount;
 
 	/* Get nodes in element lEl_I */
@@ -356,7 +355,7 @@ void _BaseRecoveryFeVar_GetValueInElementWithCoeffInterpolation( void* feVariabl
 	IArray*              inc  = self->inc;
 	double               globalCoord[3];
 	double               coeff[50]; 
-	int nNodes, *nodes, order, dof_I, dofThatExist;
+	int order, dof_I, dofThatExist;
 
 	order = self->orderOfInterpolation;
 	dofThatExist = self->fieldComponentCount;
@@ -364,8 +363,6 @@ void _BaseRecoveryFeVar_GetValueInElementWithCoeffInterpolation( void* feVariabl
 
 	/* Get nodes in element lEl_I */
 	FeMesh_GetElementNodes( mesh, lEl_I, self->inc );
-	nNodes = IArray_GetSize( inc );
-	nodes = IArray_GetPtr( inc );
 
 	/** Get the coeffieients of each node **/
 	_FeVariable_InterpolateNodeValuesToElLocalCoord( self, lEl_I, xi, coeff );
