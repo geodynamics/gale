@@ -154,7 +154,7 @@
       <param name="Swarm">picIntegrationPoints</param>
       <param name="Mesh">mesh-Q2</param>
       <param name="IC">stressICs</param>
-    </struct> 
+    </struct>
     <struct name="ViscosityField">
       <param name="Type">ViscosityField</param>
       <param name="Context">context</param>
@@ -200,8 +200,6 @@
       <param name="maxSplits">3</param>
       <param name="MaterialPointsSwarm">materialSwarm</param>
       <param name="Inflow">True</param>
-      <param name="Threshold">0.8</param>
-      <param name="CentPosRatio">0.01</param>
     </struct>
     <struct name="localLayout">
       <param name="Type">MappedParticleLayout</param>
