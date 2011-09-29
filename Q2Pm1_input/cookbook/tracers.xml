@@ -342,7 +342,6 @@
     </struct>
     <struct name="escapedRoutine">
       <param name="Type">EscapedRoutine</param>
-      <param name="idealParticleCount">0</param>
     </struct>
     <struct name="velocityRemesher">
       <param name="Type">RegularRemesherCmpt</param>
@@ -398,6 +397,54 @@
       <param name="bottomMaxX">CylinderMaxX</param>
     </struct>
 
+    <struct name="pLayout">
+      <param name="Type">ManualParticleLayout</param>
+      <param name="totalInitialParticles">1</param>
+      <list name="manualParticlePositions">
+        <asciidata>
+          <columnDefinition name = "x" type="double"/>
+          <columnDefinition name = "y" type="double"/>
+          <columnDefinition name = "z" type="double"/>
+          1.0 .1 .1
+          1.3 .1 .1
+          1.6 .1 .1
+          1.9 .1 .1
+          1.0 .2 .1
+          1.3 .2 .1
+          1.6 .2 .1
+          1.9 .2 .1
+        </asciidata>
+      </list>
+    </struct>
+    <struct name="passiveSwarmMovementHandler">
+      <param name="Type"> ParticleMovementHandler </param>
+    </struct>
+    <struct name="passiveTracerSwarm">
+      <param name="Type">MaterialPointsSwarm</param>
+      <param name="CellLayout">cellLayout</param>
+      <param name="ParticleLayout">pLayout</param>
+      <param name="FeMesh">mesh-Q2</param>
+      <list name="ParticleCommHandlers">
+        <param> passiveSwarmMovementHandler </param>
+      </list>
+      <param name="EscapedRoutine">escapedRoutine</param>
+    </struct>
+    <struct name="passiveTracerAdvect">
+      <param name="Type">SwarmAdvector</param>
+      <param name="Swarm">passiveTracerSwarm</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="VelocityField">VelocityField</param>
+    </struct>
+    <struct name="swarmOutput">
+      <param name="Type">TracerOutput</param>
+      <param name="Swarm">passiveTracerSwarm</param>
+      <param name="PressureField">PressureField</param>
+      <list name="Fields">
+        <param>PressureField</param>
+        <param>StrainRateInvariantField</param>
+      </list>
+    </struct>
+
   </struct>
 
   <list name="FieldVariablesToCheckpoint">
@@ -405,7 +452,7 @@
     <param>PressureField</param>
   </list>
   <param name="timeIntegratorOrder">1</param>
-  <param name="maxTimeSteps">10</param>
+  <param name="maxTimeSteps">100</param>
   <param name="outputEvery">1</param>
   <param name="dumpEvery">1</param>
   <param name="outputPath">./output</param>
