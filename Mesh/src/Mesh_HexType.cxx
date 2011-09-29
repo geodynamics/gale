@@ -964,7 +964,7 @@ namespace {
     dy_m=verts[minus][y]-y_0;
 
     dx=verts[plus][x]-x_0;
-    if(!Num_Approx(dx,x_0-verts[minus][x]))
+    if(!Num_Approx(1,(x_0-verts[minus][x])/dx))
       abort();
   
     c=(dy_p + dy_m)/(2*dx*dx);
