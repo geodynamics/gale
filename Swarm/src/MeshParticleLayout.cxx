@@ -222,7 +222,7 @@ void _MeshParticleLayout_InitialiseParticlesOfCell( void* meshParticleLayout, vo
 	Coord               	min = {-1.0, -1.0, -1.0};
 	Coord               	max = {1.0, 1.0, 1.0};
 	Coord			localCoord;
-	double			basis[8];
+	double			basis[27];
 	unsigned		nDims = Mesh_GetDimSize( self->mesh );
 	double**		nodeCoords = self->mesh->verts;
 	unsigned		nNodes, *incNodes;
