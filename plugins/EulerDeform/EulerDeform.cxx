@@ -142,7 +142,6 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			Dictionary_Entry_Value*	varLst;
 			char*							meshName;
 			char*							remesherName;
-			char*							velFieldName;
 			char*							name;
 
 			/* Get the dictionary for this system. */
@@ -162,7 +161,6 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			else
 			    sys->dispField = NULL;
 
-			velFieldName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"VelocityField"  );
 			sys->interval = Dictionary_GetInt_WithDefault( sysDict, (Dictionary_Entry_Key)"interval", -1  );
 			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapTop", False  );
 			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapBottom", False  );
@@ -961,6 +959,12 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     }
     Journal_Printf( Underworld_Info, "*** EulerDeform: Remeshing.\n" );
 
+    /* Shrink wrap the top/bottom surface. */
+    if( sys->wrapTop )
+      EulerDeform_WrapSurface( sys, sys->mesh->verts, 1 );
+    if( sys->wrapBottom )
+      EulerDeform_WrapSurface( sys, sys->mesh->verts, 0 );
+
     /* Store old coordinates. */
     nDomainNodes = FeMesh_GetNodeDomainSize( sys->mesh );
     oldCrds = AllocArray2D( double, nDomainNodes, nDims );
@@ -970,12 +974,6 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     /* Remesh the system. */
     Stg_Component_Execute( sys->remesher, NULL, True );
     Mesh_Sync( sys->mesh );
-
-    /* Shrink wrap the top/bottom surface. */
-    if( sys->wrapTop )
-      EulerDeform_WrapSurface( sys, oldCrds, 1 );
-    if( sys->wrapBottom )
-      EulerDeform_WrapSurface( sys, oldCrds, 0 );
 
     /* Swap old coordinates back in temporarily. */
     newCrds = sys->mesh->verts;
