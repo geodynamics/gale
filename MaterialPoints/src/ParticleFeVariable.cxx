@@ -256,7 +256,7 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 	Dof_Index                  dofCount          = self->fieldComponentCount;
 	Dof_Index                  dof_I;
 	Dof_Index                  dim               = self->dim;
-	double                     shapeFunc[8], detJac;
+	double                     shapeFunc[27], detJac;
 	double                     particleValue[9];
 
 	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
@@ -293,7 +293,7 @@ void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector*
 	Particle_InCellIndex       cParticle_I;
 	IntegrationPoint*          particle;
 	double                     detJac;
-	double                     shapeFunc[8];
+	double                     shapeFunc[27];
 	Node_Index                 node_I;
 	Dof_Index                  dofCount          = self->fieldComponentCount;
 	Dof_Index                  dof_I;
