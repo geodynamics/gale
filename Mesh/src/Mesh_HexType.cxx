@@ -90,8 +90,6 @@ Mesh_HexType* _Mesh_HexType_New(  MESH_HEXTYPE_DEFARGS  ) {
 void _Mesh_HexType_Init( Mesh_HexType* self ) {
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 
-        self->num_simplexes[0]=2;
-        self->num_simplexes[1]=10;
 	self->vertMap = AllocArray( unsigned, max_vertices );
 	self->inc = AllocArray( unsigned, max_vertices );
 	Mesh_HexType_SetVertexMap( self );
@@ -310,28 +308,10 @@ void Mesh_HexType_SetQ2Inds( void* hexType) {
   Mesh_HexType*	self = (Mesh_HexType*)hexType;
 
   unsigned index_map[]={0,1,3,4,9,10,12,13};
-  unsigned start_index[]={0,1,3,4,9,10,12,13};
 
   /* Set vertmap so that MinimumSeparation will work */
   for(int i=0; i<max_vertices; i++)
     self->vertMap[i] = index_map[i];
-
-  unsigned tetInds[80][4];
-
-  for(int n=0;n<8;++n)
-    for(int i=0;i<10;++i)
-      for(int j=0;j<4;++j)
-        {
-          tetInds[10*n+i][j]=index_map[self->tetInds[i][j]]+start_index[n];
-        }
-
-  self->tetInds = ReallocArray2D( self->tetInds, unsigned, 80, 4 );
-  for(int i=0;i<80;++i)
-    for(int j=0;j<4;++j)
-      self->tetInds[i][j]=tetInds[i][j];
-
-  self->num_simplexes[0]=8;
-  self->num_simplexes[1]=80;
 }
 
 
@@ -367,6 +347,7 @@ bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
   inc = IArray_GetPtr( self->incArray );
 
   bool fnd;
+  /* If quad elements, use face search instead of simplexes.*/
   if(IArray_GetSize(self->incArray)==27)
     {
       int on_face[6];
@@ -375,8 +356,7 @@ bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, 
   /* Search for tetrahedra. */
   else
     {
-      fnd=Simplex_Search3D( mesh->verts, (unsigned*)inc,
-                            self->num_simplexes[1], self->tetInds,
+      fnd=Simplex_Search3D( mesh->verts, (unsigned*)inc, 10, self->tetInds,
                             point, bc, &inside);
     }
   if(fnd)
@@ -435,6 +415,7 @@ bool Mesh_HexType_ElementHasPoint3DWithIncidence
                      self->incArray );
   inc = IArray_GetPtr( self->incArray );
 
+  /* If quad elements, use face search instead of simplexes.*/
   if(IArray_GetSize(self->incArray)==27)
     {
       int on_face[6];
@@ -603,8 +584,7 @@ bool Mesh_HexType_ElementHasPoint3DWithIncidence
   /* Search for tetrahedra. */
   else
     {
-      fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc,
-                              self->num_simplexes[1], self->tetInds,
+      fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc, 10, self->tetInds,
                               point, bc, &inside );
       if( fnd ) {
         unsigned*	inds = self->tetInds[inside];
@@ -787,8 +767,7 @@ bool Mesh_HexType_ElementHasPoint2DGeneral
     }
   /* Search for triangle. */
   else
-    fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
-                            self->num_simplexes[0], self->triInds,
+    fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc, 2, self->triInds,
                             point, bc, &inside );
   if( fnd ) {
     *dim = MT_FACE;
@@ -824,7 +803,7 @@ bool Mesh_HexType_ElementHasPoint2DWithIncidence
                      self->incArray );
   inc = IArray_GetPtr( self->incArray );
 
-  /* Use edges instead of simplices for quadratic elements */
+  /* If a quadratic element, use side search instead of simplexes. */
   if(IArray_GetSize(self->incArray)==9)
     {
       int on_edge[4];
@@ -888,9 +867,8 @@ bool Mesh_HexType_ElementHasPoint2DWithIncidence
   else
     {
       /* Search for triangle. */
-      fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc,
-                              self->num_simplexes[0],
-                              self->triInds, point, bc, &inside );
+      fnd = Simplex_Search2D( mesh->verts, (unsigned*)inc, 2, self->triInds, 
+                              point, bc, &inside );
       if( fnd ) {
         unsigned	*inds = self->triInds[inside];
 
