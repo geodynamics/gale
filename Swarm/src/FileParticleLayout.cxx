@@ -414,7 +414,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
                /* if we still cannot find the specified dataSpace, there is a problem */
                if(self->fileData[swarmVar_I][ii-1] < 0)
                      Journal_Firewall( 
-                        NULL, 
+                        false,
                         self->errorStream,
                         "\n\nError in %s for %s '%s' \n Cannot open dataSpace for checkpointed swarmvariable (%s) that requries reloading.\n  Checkpoint files may be invalid.\n\n", 
                         __func__, 
@@ -478,8 +478,8 @@ void _FileParticleLayout_InitialiseParticle(
 {
    FileParticleLayout*	self = (FileParticleLayout*)particleLayout;
    Swarm*					swarm = (Swarm*)_swarm;
-   SizeT						particleSize; 
    int						result;
+   SizeT             particleSize; 
 
 #ifdef READ_HDF5
    SwarmVariable*    swarmVar;

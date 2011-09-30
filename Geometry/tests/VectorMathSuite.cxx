@@ -157,8 +157,6 @@ void VectorMathSuite_TestVectorFunctions( VectorMathSuiteData* data ) {
 		double k[] = {0.0,0.0,1.0};
 		double A[] = { 7.4, 2  ,   5  ,  1,  3 ,   -42};
 		double B[] = { 4  , 2.3,   5.8,  6, -12, 39289};
-		double C[] = {23  , 5  , -14  , 32, -21,    78};
-		double D[] = {23  , 5  , -14  , 32, -21,    78};
 		double angle;
 		double vector[6];
 		int d;

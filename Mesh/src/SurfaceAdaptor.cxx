@@ -122,10 +122,6 @@ void _SurfaceAdaptor_Delete( void* adaptor ) {
 void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
 	SurfaceAdaptor*	self = (SurfaceAdaptor*)adaptor;
 	
-	/* Set the Journal for printing informations */
-	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, (Name)"SurfaceAdaptorStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "SurfaceAdaptor (ptr): (%p)\n", self );
 	_MeshAdaptor_Print( self, stream );

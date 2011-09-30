@@ -136,10 +136,6 @@ void _Mesh_Delete( void* mesh ) {
 void _Mesh_Print( void* mesh, Stream* stream ) {
 	Mesh*	self = (Mesh*)mesh;
 	
-	/* Set the Journal for printing informations */
-	Stream* meshStream;
-	meshStream = Journal_Register( InfoStream_Type, (Name)"MeshStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Mesh (ptr): (%p)\n", self );
 	Journal_Printf( stream, "\t_getBasis (func ptr): %p\n", self->_getBasis );

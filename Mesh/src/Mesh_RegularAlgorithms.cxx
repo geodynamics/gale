@@ -113,10 +113,6 @@ void _Mesh_RegularAlgorithms_Delete( void* algorithms ) {
 void _Mesh_RegularAlgorithms_Print( void* algorithms, Stream* stream ) {
 	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
 	
-	/* Set the Journal for printing informations */
-	Stream* algorithmsStream;
-	algorithmsStream = Journal_Register( InfoStream_Type, (Name)"Mesh_RegularAlgorithmsStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_RegularAlgorithms (ptr): (%p)\n", self );
 	_Mesh_Algorithms_Print( self, stream );
@@ -231,10 +227,6 @@ Bool Mesh_RegularAlgorithms_SearchElements( void* algorithms, double* point, uns
 }
 
 double _Mesh_RegularAlgorithms_GetMinimumSeparation( void* algorithms, void* _mesh, double* perDim ) {
-	Mesh* mesh;
-
-	mesh = (Mesh*)_mesh;
-
 	/* TODO */
 	abort();
 

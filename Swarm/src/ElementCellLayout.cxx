@@ -226,12 +226,10 @@ void _ElementCellLayout_InitialisePoints( void* elementCellLayout, Cell_Index ce
 {
 	ElementCellLayout* self = (ElementCellLayout*)elementCellLayout;
 	Cell_PointIndex point_I;
-	unsigned	nInc;
 	unsigned*	inc;
 
 	Mesh_GetIncidence( self->mesh, Mesh_GetDimSize( self->mesh ), cellIndex, MT_VERTEX, 
 			   self->incArray );
-	nInc = IArray_GetSize( self->incArray );
 	inc = (unsigned*)IArray_GetPtr( self->incArray );
 	
 	/* point to the mesh's node's coordinates */

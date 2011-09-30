@@ -124,10 +124,6 @@ void _Mesh_Algorithms_Delete( void* algorithms ) {
 void _Mesh_Algorithms_Print( void* algorithms, Stream* stream ) {
 	Mesh_Algorithms*	self = (Mesh_Algorithms*)algorithms;
 	
-	/* Set the Journal for printing informations */
-	Stream* algorithmsStream;
-	algorithmsStream = Journal_Register( InfoStream_Type, (Name)"Mesh_AlgorithmsStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_Algorithms (ptr): (%p)\n", self );
 	_Stg_Component_Print( self, stream );
@@ -256,7 +252,6 @@ Bool _Mesh_Algorithms_SearchElements( void* algorithms, double* point,
 		nDims = Mesh_GetDimSize( mesh );
 		if( dim != nDims ) {
 			unsigned	nInc, *inc;
-			unsigned	nLocalEls;
 			unsigned	lowest;
 			unsigned	global;
 			unsigned	inc_i;
@@ -265,8 +260,6 @@ Bool _Mesh_Algorithms_SearchElements( void* algorithms, double* point,
 			assert(Mesh_HasIncidence(mesh,(MeshTopology_Dim)dim,
                                                  (MeshTopology_Dim)nDims));
 
-			nLocalEls = Mesh_GetLocalSize(mesh,
-                                                      (MeshTopology_Dim)nDims);
 			Mesh_GetIncidence( mesh, (MeshTopology_Dim)dim,
                                            ind, (MeshTopology_Dim)nDims,
                                            self->incArray );

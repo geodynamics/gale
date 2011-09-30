@@ -112,10 +112,6 @@ void _Mesh_CentroidAlgorithms_Delete( void* centroidAlgorithms ) {
 void _Mesh_CentroidAlgorithms_Print( void* _centroidAlgorithms, Stream* stream ) {
 	Mesh_CentroidAlgorithms* self= (Mesh_CentroidAlgorithms*)_centroidAlgorithms;
 	
-	/* Set the Journal for printing informations */
-	Stream* centroidAlgorithmsStream;
-	centroidAlgorithmsStream = Journal_Register( InfoStream_Type, (Name)"Mesh_CentroidAlgorithmsStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Mesh_CentroidAlgorithms (ptr): (%p)\n", self );
 	_Mesh_Algorithms_Print( self, stream );

@@ -321,10 +321,7 @@ void _GaussBorderParticleLayout_InitialiseParticlesOfCell( void* gaussBorderPart
   above to be generalised and not consist of a largish switch-case statement.
 */
 Dimension_Index GaussBorderParticleLayout_GetFaceAxis( void* gaussBorderParticleLayout, Index face_I, Dimension_Index axis) {
-	GaussBorderParticleLayout*	self;
 	Dimension_Index				faceAxes3D[6][3];
-
-	self = (GaussBorderParticleLayout*)gaussBorderParticleLayout;
 
 	faceAxes3D[0][ I_AXIS ] = I_AXIS; faceAxes3D[0][ J_AXIS ] = K_AXIS; faceAxes3D[0][ K_AXIS ] = J_AXIS;
 	faceAxes3D[1][ I_AXIS ] = I_AXIS; faceAxes3D[1][ J_AXIS ] = K_AXIS; faceAxes3D[1][ K_AXIS ] = J_AXIS;

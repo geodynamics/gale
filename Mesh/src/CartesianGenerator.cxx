@@ -690,7 +690,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid***
 	Grid*			grid;
 	unsigned		nEls;
 	unsigned		nLocals, *locals;
-	unsigned		nRemotes/*, *remotes*/;
+	// unsigned		nRemotes/*, *remotes*/;
 	unsigned		*dstArray, *dstCount;
 	unsigned		*dimInds, *rankInds;
 	unsigned	d_i, e_i;
@@ -723,7 +723,7 @@ void _CartesianGenerator_GenVertices( void* meshGenerator, IGraph* topo, Grid***
 	Grid_Lift( self->procGrid, rank, rankInds );
 
 	nLocals = 0;
-	nRemotes = 0;
+	// nRemotes = 0;
 	for( e_i = 0; e_i < nEls; e_i++ ) {
 		Grid_Lift( grid, e_i, dimInds );
 /*
