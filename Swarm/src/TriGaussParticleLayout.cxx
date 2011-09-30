@@ -186,9 +186,7 @@ Particle_InCellIndex _TriGaussParticleLayout_InitialCount( void* triGaussParticl
 {
 	TriGaussParticleLayout* self = (TriGaussParticleLayout*)triGaussParticleLayout;
 	Particle_InCellIndex count;
-	int dim;	
-	
-	dim = self->dim;
+
 	count = (Particle_InCellIndex)( self->particlesPerCell );
 	
 	return count;

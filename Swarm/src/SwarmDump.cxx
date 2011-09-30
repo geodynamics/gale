@@ -291,7 +291,7 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, Name filename ) {
    hid_t                   attribData_id, attrib_id, group_id;
    /*herr_t                  status;*/
    hsize_t                 size[2];
-   hsize_t                 cdims[2];
+   // hsize_t                 cdims[2];
    hsize_t                 a_dims;
    int                     attribData;
    hsize_t                 count[2];
@@ -350,8 +350,8 @@ void SwarmDump_DumpToHDF5( SwarmDump* self, Swarm* swarm, Name filename ) {
             /* set data chunking size.  as we are not opening and closing
                dataset frequently, a large chunk size (the largest!) seems
                appropriate, and gives good compression */
-            cdims[0] = swarm->particleLocalCount;
-            cdims[1] = swarmVar->dofCount;
+            // cdims[0] = swarm->particleLocalCount;
+            // cdims[1] = swarmVar->dofCount;
             
             props  = H5Pcreate( H5P_DATASET_CREATE );
             /* turn on hdf chunking.. as it is required for compression */

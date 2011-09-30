@@ -284,7 +284,6 @@ void _ParticleShadowSync_SendParticleTotalsInShadowCellsToNbrs( ParticleCommHand
 
 void _ParticleShadowSync_FinishReceiveOfIncomingParticleCounts( ParticleCommHandler* self ) {
 	MPI_Status			status;
-	Processor_Index			proc_I;
 	ShadowInfo*		        cellShadowInfo = CellLayout_GetShadowInfo( self->swarm->cellLayout );
 	ProcNbrInfo*		        procNbrInfo = cellShadowInfo->procNbrInfo;
 	Neighbour_Index		        nbr_I;
@@ -293,8 +292,6 @@ void _ParticleShadowSync_FinishReceiveOfIncomingParticleCounts( ParticleCommHand
 	self->swarm->shadowParticleCount = 0;
 	/* TODO: may be worth converting the below into an MPI_Test loop */
 	for ( nbr_I=0; nbr_I < procNbrInfo->procNbrCnt; nbr_I++ ) {
-		proc_I = procNbrInfo->procNbrTbl[nbr_I];
-		
 		MPI_Wait( self->particlesArrivingFromNbrShadowCellCountsHandles[nbr_I], &status );
 
 		self->particlesArrivingFromNbrShadowCellsTotalCounts[nbr_I] = 0;
@@ -355,7 +352,6 @@ void _ParticleShadowSync_BeginReceiveOfIncomingParticles( ParticleCommHandler* p
 void _ParticleShadowSync_FinishReceiveOfIncomingParticles( ParticleCommHandler* pCommHandler ) {
 	ParticleShadowSync *self = (ParticleShadowSync*)pCommHandler;
 	MPI_Status			status;
-	Processor_Index			proc_I;
 	ShadowInfo*		        cellShadowInfo = CellLayout_GetShadowInfo( self->swarm->cellLayout );
 	ProcNbrInfo*		        procNbrInfo = cellShadowInfo->procNbrInfo;
 	Neighbour_Index		        nbr_I;
@@ -366,8 +362,6 @@ void _ParticleShadowSync_FinishReceiveOfIncomingParticles( ParticleCommHandler* 
 	shadowParticleCounter = 0;
 	/* TODO: may be worth converting the below into an MPI_Test loop */
 	for ( nbr_I=0; nbr_I < procNbrInfo->procNbrCnt; nbr_I++ ) {
-		proc_I = procNbrInfo->procNbrTbl[nbr_I];
-		
 		if( self->particlesArrivingFromNbrShadowCellsTotalCounts[nbr_I] > 0 ){
 			MPI_Wait( self->particlesArrivingFromNbrShadowCellsHandles[nbr_I], &status );
 		}
