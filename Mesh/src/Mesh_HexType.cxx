@@ -339,136 +339,80 @@ void Mesh_HexType_SetQ2Inds( void* hexType) {
 ** Private Functions
 */
 
-Bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
+namespace {
+  bool Face_Search3D(const int *inc, double **verts, 
+                     const double* point, int on_face[6]);
+}
+
+bool Mesh_HexType_ElementHasPoint3DGeneral( Mesh_HexType* self, unsigned elInd, double* point, 
 					    MeshTopology_Dim* dim, unsigned* ind )
 {
-	Mesh*		mesh;
-	double		bc[4];
-	unsigned	inside;
-	const int	*inc;
+  Mesh*		mesh;
+  double		bc[4];
+  unsigned	inside;
+  const int	*inc;
 
-	assert( self && Stg_CheckType( self, Mesh_HexType ) );
-	assert( Mesh_GetDimSize( self->mesh ) == 3 );
-	assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
-	assert( point );
-	assert( dim );
-	assert( ind );
+  assert( self && Stg_CheckType( self, Mesh_HexType ) );
+  assert( Mesh_GetDimSize( self->mesh ) == 3 );
+  assert( elInd < Mesh_GetDomainSize( self->mesh, Mesh_GetDimSize( self->mesh ) ) );
+  assert( point );
+  assert( dim );
+  assert( ind );
 
-	/* Shortcuts. */
-	mesh = self->mesh;
+  /* Shortcuts. */
+  mesh = self->mesh;
 
-	/* Get element to vertex incidence. */
-	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
-	inc = IArray_GetPtr( self->incArray );
+  /* Get element to vertex incidence. */
+  Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elInd, MT_VERTEX, self->incArray );
+  inc = IArray_GetPtr( self->incArray );
 
-	/* Search for tetrahedra. */
-        if( Simplex_Search3D( mesh->verts, (unsigned*)inc,
-                              self->num_simplexes[1], self->tetInds,
-                              point, bc, &inside ) ) {
-          *dim = MT_VOLUME;
-          *ind = elInd;
-          return True;
-        }
-
-	return False;
+  bool fnd;
+  if(IArray_GetSize(self->incArray)==27)
+    {
+      int on_face[6];
+      fnd=Face_Search3D(inc,mesh->verts,point,on_face);
+    }
+  /* Search for tetrahedra. */
+  else
+    {
+      fnd=Simplex_Search3D( mesh->verts, (unsigned*)inc,
+                            self->num_simplexes[1], self->tetInds,
+                            point, bc, &inside);
+    }
+  if(fnd)
+    {
+      *dim = MT_VOLUME;
+      *ind = elInd;
+    }
+  return fnd;
 }
 
 namespace {
-
-  /* We compute incidence based on a cube with 8 nodes and 10
-     simlexes.  For quadratic elements, there are 27 nodes and 80
-     simplexes.  So we calculate which edge or face a point
-     intersects, and this routine tells us whether that edge or face
-     is actually interior to the quadratic element. */
-
-  bool valid_index(const int &num_simplexes, const int &inside,
-                   MeshTopology_Dim* dim, unsigned* ind)
-  {
-    if(num_simplexes==10)
-      return true;
-    const int block=inside/10;
-    switch(*dim)
-      {
-      case MT_EDGE:
-        switch(*ind)
-          {
-          case 0:
-            return block==0 || block==1;
-          case 1:
-            return block==2 || block==3;
-          case 2:
-            return block==0 || block==2;
-          case 3:
-            return block==1 || block==3;
-          case 4:
-            return block==4 || block==5;
-          case 5:
-            return block==6 || block==7;
-          case 6:
-            return block==4 || block==6;
-          case 7:
-            return block==5 || block==7;
-          case 8:
-            return block==0 || block==4;
-          case 9:
-            return block==1 || block==5;
-          case 10:
-            return block==2 || block==6;
-          case 11:
-            return block==3 || block==7;
-          }
-      case MT_FACE:
-        switch(*ind)
-          {
-          case 0:
-            return block<4;
-          case 1:
-            return !(block<4);
-          case 2:
-            return block%4<2;
-          case 3:
-            return !(block%4<2);
-          case 4:
-            return block%2<1;
-          case 5:
-            return !(block%2<1);
-          }
-      default:
-        ;
-      }
-    abort();
-    return false;
-  }
-
-  void set_index(const int &num_simplexes,
-                 IGraph* topo,
+  void set_index(IGraph* topo,
                  const MeshTopology_Dim &volume, const unsigned elInd,
                  const MeshTopology_Dim incidence_dim[],
                  const int incidence_index[], const int &inside,
                  MeshTopology_Dim* dim, unsigned* ind)
   {
-    *dim=incidence_dim[inside%10];
+    *dim=incidence_dim[inside];
     if(*dim==volume)
-      *ind=elInd;
+      {
+        *ind=elInd;
+      }
     else
       {
-        *ind=topo->incEls[volume][*dim][elInd][incidence_index[inside%10]];
-        if(!valid_index(num_simplexes,inside,dim,ind))
-          {
-            *dim=volume;
-            *ind=elInd;
-          }
+        *ind=topo->incEls[volume][*dim][elInd][incidence_index[inside]];
       }
   }
 }
 
 
-Bool Mesh_HexType_ElementHasPoint3DWithIncidence
+bool Mesh_HexType_ElementHasPoint3DWithIncidence
 ( Mesh_HexType* self, unsigned elInd, double* point, 
   MeshTopology_Dim* dim, unsigned* ind )
 {
   Mesh*		mesh;
-  Bool		fnd;
+  bool		fnd;
   double		bc[4];
   IGraph*		topo;
   unsigned	inside;
@@ -491,35 +435,276 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence
                      self->incArray );
   inc = IArray_GetPtr( self->incArray );
 
-  /* Search for tetrahedra. */
-  fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc,
-                          self->num_simplexes[1], self->tetInds,
-                          point, bc, &inside );
-  if( fnd ) {
-    unsigned*	inds = self->tetInds[inside];
+  if(IArray_GetSize(self->incArray)==27)
+    {
+      int on_face[6];
+      fnd=Face_Search3D(inc,mesh->verts,point,on_face);
 
-    /* Check boundary ownership. */
-    if( bc[0] == 0.0 || bc[0] == -0.0 )
-      {
-        if( bc[1] == 0.0 || bc[1] == -0.0 )
+      if(on_face[0]==0)
+        {
+          if(on_face[2]==0)
+            {
+              if(on_face[4]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][0];
+                }
+              else if(on_face[5]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][2];
+                }
+              else
+                {
+                  *dim=MT_EDGE;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][0];
+                }
+            }
+          else if(on_face[3]==0)
+            {
+              if(on_face[4]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][6];
+                }
+              else if(on_face[5]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][8];
+                }
+              else
+                {
+                  *dim=MT_EDGE;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][1];
+                }
+            }
+          else if(on_face[4]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][2];
+              }
+          else if(on_face[5]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][3];
+            }
+          else
+            {
+              *dim=MT_FACE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][0];
+            }
+        }
+      else if(on_face[1]==0)
+        {
+          if(on_face[2]==0)
+            {
+              if(on_face[4]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][18];
+                }
+              else if(on_face[5]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][20];
+                }
+              else
+                {
+                  *dim=MT_EDGE;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][4];
+                }
+            }
+          else if(on_face[3]==0)
+            {
+              if(on_face[4]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][24];
+                }
+              else if(on_face[5]==0)
+                {
+                  *dim=MT_VERTEX;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][26];
+                }
+              else
+                {
+                  *dim=MT_EDGE;
+                  *ind=topo->incEls[MT_VOLUME][*dim][elInd][5];
+                }
+            }
+          else if(on_face[4]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][6];
+              }
+          else if(on_face[5]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][7];
+            }
+          else
+            {
+              *dim=MT_FACE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][1];
+            }
+        }
+      else if(on_face[2]==0)
+        {
+          if(on_face[4]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][8];
+            }
+          else if(on_face[5]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][9];
+            }
+          else
+            {
+              *dim=MT_FACE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][2];
+            }
+        }
+      else if(on_face[3]==0)
+        {
+          if(on_face[4]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][10];
+            }
+          else if(on_face[5]==0)
+            {
+              *dim=MT_EDGE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][11];
+            }
+          else
+            {
+              *dim=MT_FACE;
+              *ind=topo->incEls[MT_VOLUME][*dim][elInd][3];
+            }
+        }
+      else if(on_face[4]==0)
+        {
+          *dim=MT_FACE;
+          *ind=topo->incEls[MT_VOLUME][*dim][elInd][4];
+        }
+      else if(on_face[5]==0)
+        {
+          *dim=MT_FACE;
+          *ind=topo->incEls[MT_VOLUME][*dim][elInd][5];
+        }
+      else
+        {
+          *dim=MT_VOLUME;
+          *ind=elInd;
+        }
+    }
+  /* Search for tetrahedra. */
+  else
+    {
+      fnd = Simplex_Search3D( mesh->verts, (unsigned*)inc,
+                              self->num_simplexes[1], self->tetInds,
+                              point, bc, &inside );
+      if( fnd ) {
+        unsigned*	inds = self->tetInds[inside];
+
+        /* Check boundary ownership. */
+        if( bc[0] == 0.0 || bc[0] == -0.0 )
           {
-            if( bc[2] == 0.0 || bc[2] == -0.0 )
+            if( bc[1] == 0.0 || bc[1] == -0.0 )
               {
-                *dim = MT_VERTEX;
-                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[3]];
+                if( bc[2] == 0.0 || bc[2] == -0.0 )
+                  {
+                    *dim = MT_VERTEX;
+                    *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[3]];
+                  }
+                else if( bc[3] == 0.0 || bc[3] == -0.0 )
+                  {
+                    *dim = MT_VERTEX;
+                    *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[2]];
+                  }
+                else
+                  {
+                    const MeshTopology_Dim incidence_dim[]=
+                      { MT_FACE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_FACE,
+                        MT_FACE, MT_FACE, MT_EDGE, MT_FACE };
+                    const int incidence_index[]={ 4, 11, 7, 5, 1, 5, 1, 3, 5, 1 };
+                    set_index(topo,MT_VOLUME,elInd,
+                              incidence_dim,incidence_index,inside,dim,ind);
+                  }
+              }
+            else if( bc[2] == 0.0 || bc[2] == -0.0 )
+              {
+                if( bc[3] == 0.0 || bc[3] == -0.0 )
+                  {
+                    *dim = MT_VERTEX;
+                    *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[1]];
+                  }
+                else
+                  {
+                    MeshTopology_Dim incidence_dim[]=
+                      { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_EDGE,
+                        MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE };
+                    int incidence_index[]={ 2, 3, 1, 1, 3, 9, 6, 10, 7, 3 };
+                    set_index(topo,MT_VOLUME,elInd,
+                              incidence_dim,incidence_index,inside,dim,ind);
+                  }
               }
             else if( bc[3] == 0.0 || bc[3] == -0.0 )
               {
-                *dim = MT_VERTEX;
-                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[2]];
+                MeshTopology_Dim incidence_dim[]=
+                  { MT_FACE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_EDGE,
+                    MT_EDGE, MT_EDGE, MT_FACE, MT_FACE };
+                int incidence_index[]={ 0, 1, 4, 6, 4, 3, 4, 1, 1, 5 };
+                set_index(topo,MT_VOLUME,elInd,
+                          incidence_dim,incidence_index,inside,dim,ind);
               }
             else
               {
-                const MeshTopology_Dim incidence_dim[]=
-                  { MT_FACE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_FACE,
-                    MT_FACE, MT_FACE, MT_EDGE, MT_FACE };
-                const int incidence_index[]={ 4, 11, 7, 5, 1, 5, 1, 3, 5, 1 };
-                set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                MeshTopology_Dim incidence_dim[]=
+                  { MT_VOLUME, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_FACE,
+                    MT_FACE, MT_FACE, MT_FACE, MT_VOLUME };
+                int incidence_index[]={ 0, 3, 1, 1, 0, 5, 1, 3, 1, 0 };
+                set_index(topo,MT_VOLUME,elInd,
+                          incidence_dim,incidence_index,inside,dim,ind);
+              }
+          }
+        else if( bc[1] == 0.0 || bc[1] == -0.0 )
+          {
+            if( bc[2] == 0.0 || bc[2] == -0.0 )
+              {
+                if( bc[3] == 0.0 || bc[3] == -0.0 )
+                  {
+                    *dim = MT_VERTEX;
+                    *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[0]];
+                  }
+                else
+                  {
+                    MeshTopology_Dim incidence_dim[]=
+                      { MT_EDGE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_FACE,
+                        MT_FACE, MT_FACE, MT_EDGE, MT_FACE };
+                    int incidence_index[]={ 8, 5, 5, 3, 5, 2, 4, 4, 11, 4 };
+                    set_index(topo,MT_VOLUME,elInd,
+                              incidence_dim,incidence_index,inside,dim,ind);
+                  }
+              }
+            else if( bc[3] == 0.0 || bc[3] == -0.0 )
+              {
+                MeshTopology_Dim incidence_dim[]=
+                  { MT_EDGE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_FACE,
+                    MT_FACE, MT_FACE, MT_FACE, MT_FACE };
+                int incidence_index[]={ 2, 3, 9, 10, 2, 0, 2, 0, 3, 2 };
+                set_index(topo,MT_VOLUME,elInd,
+                          incidence_dim,incidence_index,inside,dim,ind);
+              }
+            else
+              {
+                MeshTopology_Dim incidence_dim[]=
+                  { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_VOLUME,
+                    MT_VOLUME, MT_VOLUME, MT_FACE, MT_VOLUME };
+                int incidence_index[]={ 4, 5, 5, 3, 0, 0, 0, 0, 3, 0};
+                set_index(topo,MT_VOLUME,elInd,
                           incidence_dim,incidence_index,inside,dim,ind);
               }
           }
@@ -527,114 +712,40 @@ Bool Mesh_HexType_ElementHasPoint3DWithIncidence
           {
             if( bc[3] == 0.0 || bc[3] == -0.0 )
               {
-                *dim = MT_VERTEX;
-                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[1]];
+                MeshTopology_Dim incidence_dim[]=
+                  { MT_EDGE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_EDGE,
+                    MT_EDGE, MT_EDGE, MT_FACE, MT_FACE };
+                int incidence_index[]={ 0, 0, 2, 4, 0, 0, 8, 2, 5, 0 };
+                set_index(topo,MT_VOLUME,elInd,
+                          incidence_dim,incidence_index,inside,dim,ind);
               }
             else
               {
                 MeshTopology_Dim incidence_dim[]=
-                  { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_EDGE,
-                    MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE };
-                int incidence_index[]={ 2, 3, 1, 1, 3, 9, 6, 10, 7, 3 };
-                set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+                  { MT_FACE, MT_VOLUME, MT_VOLUME, MT_VOLUME, MT_VOLUME,
+                    MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME };
+                int incidence_index[]={ 2, 0, 0, 0, 0, 2, 4, 4, 5, 0 };
+                set_index(topo,MT_VOLUME,elInd,
                           incidence_dim,incidence_index,inside,dim,ind);
               }
           }
         else if( bc[3] == 0.0 || bc[3] == -0.0 )
           {
             MeshTopology_Dim incidence_dim[]=
-              { MT_FACE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_EDGE,
-                MT_EDGE, MT_EDGE, MT_FACE, MT_FACE };
-            int incidence_index[]={ 0, 1, 4, 6, 4, 3, 4, 1, 1, 5 };
-            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
+              { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME,
+                MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_VOLUME };
+            int incidence_index[]={ 0, 0, 2, 4, 0, 0, 2, 0, 0, 0 };
+            set_index(topo,MT_VOLUME,elInd,
                       incidence_dim,incidence_index,inside,dim,ind);
           }
         else
           {
-            MeshTopology_Dim incidence_dim[]=
-              { MT_VOLUME, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_FACE,
-                MT_FACE, MT_FACE, MT_FACE, MT_VOLUME };
-            int incidence_index[]={ 0, 3, 1, 1, 0, 5, 1, 3, 1, 0 };
-            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
-                      incidence_dim,incidence_index,inside,dim,ind);
+            *dim = MT_VOLUME;
+            *ind = elInd;
           }
       }
-    else if( bc[1] == 0.0 || bc[1] == -0.0 )
-      {
-        if( bc[2] == 0.0 || bc[2] == -0.0 )
-          {
-            if( bc[3] == 0.0 || bc[3] == -0.0 )
-              {
-                *dim = MT_VERTEX;
-                *ind = topo->incEls[MT_VOLUME][MT_VERTEX][elInd][inds[0]];
-              }
-            else
-              {
-                MeshTopology_Dim incidence_dim[]=
-                  { MT_EDGE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_FACE,
-                    MT_FACE, MT_FACE, MT_EDGE, MT_FACE };
-                int incidence_index[]={ 8, 5, 5, 3, 5, 2, 4, 4, 11, 4 };
-                set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
-                          incidence_dim,incidence_index,inside,dim,ind);
-              }
-          }
-        else if( bc[3] == 0.0 || bc[3] == -0.0 )
-          {
-            MeshTopology_Dim incidence_dim[]=
-              { MT_EDGE, MT_EDGE, MT_EDGE, MT_EDGE, MT_FACE, MT_FACE,
-                MT_FACE, MT_FACE, MT_FACE, MT_FACE };
-            int incidence_index[]={ 2, 3, 9, 10, 2, 0, 2, 0, 3, 2 };
-            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
-                      incidence_dim,incidence_index,inside,dim,ind);
-          }
-        else
-          {
-            MeshTopology_Dim incidence_dim[]=
-              { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_VOLUME,
-                MT_VOLUME, MT_VOLUME, MT_FACE, MT_VOLUME };
-            int incidence_index[]={ 4, 5, 5, 3, 0, 0, 0, 0, 3, 0};
-            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
-                      incidence_dim,incidence_index,inside,dim,ind);
-          }
-      }
-    else if( bc[2] == 0.0 || bc[2] == -0.0 )
-      {
-        if( bc[3] == 0.0 || bc[3] == -0.0 )
-          {
-            MeshTopology_Dim incidence_dim[]=
-              { MT_EDGE, MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_EDGE,
-                MT_EDGE, MT_EDGE, MT_FACE, MT_FACE };
-            int incidence_index[]={ 0, 0, 2, 4, 0, 0, 8, 2, 5, 0 };
-            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
-                      incidence_dim,incidence_index,inside,dim,ind);
-          }
-        else
-          {
-            MeshTopology_Dim incidence_dim[]=
-              { MT_FACE, MT_VOLUME, MT_VOLUME, MT_VOLUME, MT_VOLUME,
-                MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME };
-            int incidence_index[]={ 2, 0, 0, 0, 0, 2, 4, 4, 5, 0 };
-            set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
-                      incidence_dim,incidence_index,inside,dim,ind);
-          }
-      }
-    else if( bc[3] == 0.0 || bc[3] == -0.0 )
-      {
-        MeshTopology_Dim incidence_dim[]=
-          { MT_FACE, MT_FACE, MT_FACE, MT_FACE, MT_VOLUME,
-            MT_FACE, MT_FACE, MT_FACE, MT_VOLUME, MT_VOLUME };
-        int incidence_index[]={ 0, 0, 2, 4, 0, 0, 2, 0, 0, 0 };
-        set_index(self->num_simplexes[1],topo,MT_VOLUME,elInd,
-                  incidence_dim,incidence_index,inside,dim,ind);
-      }
-    else
-      {
-        *dim = MT_VOLUME;
-        *ind = elInd;
-      }
-    return True;
-  }
-  return False;
+    }
+  return fnd;
 }
 
 namespace {
@@ -642,7 +753,7 @@ namespace {
                      const double* point, int on_edge[4]);
 }
 
-Bool Mesh_HexType_ElementHasPoint2DGeneral
+bool Mesh_HexType_ElementHasPoint2DGeneral
 ( Mesh_HexType* self, unsigned elInd, double* point, 
   MeshTopology_Dim* dim, unsigned* ind )
 {
@@ -668,6 +779,7 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral
                      elInd, MT_VERTEX, self->incArray );
   inc = IArray_GetPtr( self->incArray );
 
+  /* If a quadratic element, use side search instead of simplexes. */
   if(IArray_GetSize(self->incArray)==9)
     {
       int on_edge[4];
@@ -681,10 +793,8 @@ Bool Mesh_HexType_ElementHasPoint2DGeneral
   if( fnd ) {
     *dim = MT_FACE;
     *ind = elInd;
-    return True;
   }
-
-  return False;
+  return fnd;
 }
 
 bool Mesh_HexType_ElementHasPoint2DWithIncidence
@@ -920,6 +1030,138 @@ Bool Mesh_HexType_ElementHasPoint1DWithIncidence( Mesh_HexType* self, unsigned e
 
 
 namespace {
+
+  int is_face_over_point(const int mm, const int mz, const int mp,
+                         const int zm, const int zz, const int zp,
+                         const int pm, const int pz, const int pp,
+                         double **verts, const int z, const double *point);
+
+  bool about_equal(const double &a, const double &b)
+  {
+    return (fabs(a)>1 && Num_Approx(1,b/a))
+      || Num_Approx(a,b);
+  }
+
+  bool about_equal(const double &a, const double &b, const double &c)
+  {
+    return (fabs(a)>1 && Num_Approx(1,b/a) && Num_Approx(1,c/a))
+      || (Num_Approx(a,b) && Num_Approx(a,c));
+  }
+
+  bool Face_Search3D(const int *inc, double **verts, 
+                     const double* point, int on_face[6])
+  {
+    on_face[0]=-1*is_face_over_point(inc[0],inc[1],inc[2],inc[3],inc[4],inc[5],
+                                     inc[6],inc[7],inc[8],verts,2,point);
+    on_face[1]=is_face_over_point(inc[18],inc[19],inc[20],inc[21],inc[22],
+                                  inc[23],inc[24],inc[25],inc[26],
+                                  verts,2,point);
+    on_face[2]=-1*is_face_over_point(inc[0],inc[9],inc[18],inc[1],inc[10],
+                                     inc[19],inc[2],inc[11],inc[20],
+                                     verts,1,point);
+    on_face[3]=is_face_over_point(inc[6],inc[15],inc[24],inc[7],inc[16],
+                                  inc[25],inc[8],inc[17],inc[26],
+                                  verts,1,point);
+    on_face[4]=-1*is_face_over_point(inc[0],inc[3],inc[6],inc[9],inc[12],
+                                     inc[15],inc[18],inc[21],inc[24],
+                                     verts,0,point);
+    on_face[5]=is_face_over_point(inc[2],inc[5],inc[8],inc[11],inc[14],
+                                  inc[17],inc[20],inc[23],inc[26],
+                                  verts,0,point);
+    return (on_face[0]>=0) && (on_face[1]>=0) && (on_face[2]>=0)
+      && (on_face[3]>=0) && (on_face[4]>=0) && (on_face[5]>=0);
+  }
+
+  void set_N(const double &xi, double N[3])
+  {
+    N[0]=xi*(xi-1)/2;
+    N[1]=(1-xi*xi);
+    N[2]=xi*(xi+1)/2;
+  }
+
+  template <typename T> int sgn(T val)
+  {
+    return (val > T(0)) - (val < T(0));
+  }
+
+  int is_face_over_point(const int mm, const int zm, const int pm,
+                         const int mz, const int zz, const int pz,
+                         const int mp, const int zp, const int pp,
+                         double **verts, const int z, const double *point)
+  {
+    int x((z+1)%3), y((z+2)%3);
+    /* First, find which walls are vertical and evenly spaced. */
+
+    bool x_equal=about_equal(verts[mz][x],verts[mm][x],verts[mp][x])
+      && about_equal(verts[zz][x],verts[zm][x],verts[zp][x])
+      && about_equal(verts[pz][x],verts[pm][x],verts[pp][x])
+      && about_equal(verts[pz][x]-verts[zz][x],verts[zz][x]-verts[mz][x]);
+
+    bool y_equal=about_equal(verts[zm][y],verts[mm][y],verts[pm][y])
+      && about_equal(verts[zz][y],verts[mz][y],verts[pz][y])
+      && about_equal(verts[zp][y],verts[mp][y],verts[pp][y])
+      && about_equal(verts[zp][y]-verts[zz][y],verts[zz][y]-verts[zm][y]);
+
+    Journal_Firewall(x_equal || y_equal,
+                     Journal_Register( Error_Type,"Mesh_HexType"),
+                     "The coordinates in either direction %d or %d must be lined up and evenly spaced.\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\nDid you forget to enable EulerDeform?",
+                     x,y,verts[mm][0],verts[mm][1],verts[mm][2],
+                     verts[mz][0],verts[mz][1],verts[mz][2],
+                     verts[mp][0],verts[mp][1],verts[mp][2],
+                     verts[zm][0],verts[zm][1],verts[zm][2],
+                     verts[zz][0],verts[zz][1],verts[zz][2],
+                     verts[zp][0],verts[zp][1],verts[zp][2],
+                     verts[pm][0],verts[pm][1],verts[pm][2],
+                     verts[pz][0],verts[pz][1],verts[pz][2],
+                     verts[pp][0],verts[pp][1],verts[pp][2]);
+
+    /* Compute xi and eta */
+
+    const double dx[]={ (verts[pm][x]-verts[mm][x])/2,
+                        (verts[pz][x]-verts[mz][x])/2,
+                        (verts[pp][x]-verts[mp][x])/2 };
+
+    const double dy[]={ (verts[mp][y]-verts[mm][y])/2,
+                        (verts[zp][y]-verts[zm][y])/2,
+                        (verts[pp][y]-verts[pm][y])/2 };
+
+    double xi, eta, Nx[3], Ny[3];
+
+    if(x_equal)
+      {
+        xi=(point[x]-verts[zz][x])/dx[1];
+        set_N(xi,Nx);
+
+        eta=(point[y]
+             - (Nx[0]*verts[mz][y] + Nx[1]*verts[zz][y] + Nx[2]*verts[pz][y]))/
+        (Nx[0]*dy[0] + Nx[1]*dy[1] + Nx[2]*dy[2]);
+        set_N(eta,Ny);
+      }
+    else
+      {
+        eta=(point[y]-verts[zz][y])/dy[1];
+        set_N(eta,Ny);
+
+        xi=(point[x]
+             - (Ny[0]*verts[zm][y] + Ny[1]*verts[zz][y] + Ny[2]*verts[zp][y]))/
+        (Ny[0]*dx[0] + Ny[1]*dx[1] + Ny[2]*dx[2]);
+        set_N(xi,Nx);
+      }
+
+    /* Compute z */
+    double computed_z=
+      Nx[0]*(Ny[0]*verts[mm][z] + Ny[1]*verts[mz][z] + Ny[2]*verts[mp][z])
+      + Nx[1]*(Ny[0]*verts[zm][z] + Ny[1]*verts[zz][z] + Ny[2]*verts[zp][z])
+      + Nx[2]*(Ny[0]*verts[pm][z] + Ny[1]*verts[pz][z] + Ny[2]*verts[pp][z]);
+
+    if(about_equal(computed_z,point[z]))
+      return 0;
+    else
+      return sgn(computed_z-point[z]);
+  }
+
+
+
   /* Check whether a point is inside an quadratic element by checking
      whether it is above or below the 4 edges of the element.  For now,
      only works when the spacing on each edge is even.  Currently, this
@@ -936,12 +1178,8 @@ namespace {
     on_edge[2]=-1*is_line_over_point(inc[0],inc[3],inc[6],verts,1,point);
     on_edge[3]=is_line_over_point(inc[8],inc[5],inc[2],verts,1,point);
 
-    return (on_edge[0]>=0) && (on_edge[1]>=0) && (on_edge[2]>=0) && (on_edge[3]>=0);
-  }
-
-  template <typename T> int sgn(T val)
-  {
-    return (val > T(0)) - (val < T(0));
+    return (on_edge[0]>=0) && (on_edge[1]>=0) && (on_edge[2]>=0)
+      && (on_edge[3]>=0);
   }
 
   /* Checks whether a point is above, below, or on a line.  To reverse
@@ -964,14 +1202,21 @@ namespace {
     dy_m=verts[minus][y]-y_0;
 
     dx=verts[plus][x]-x_0;
-    if(!Num_Approx(1,(x_0-verts[minus][x])/dx))
-      abort();
+    Journal_Firewall(about_equal(dx,x_0-verts[minus][x]),
+                     Journal_Register( Error_Type,"Mesh_HexType"),
+                     "The coordinates in direction %d must be evenly spaced.\n\t(%g %g)\n\t(%g %g)\n\t(%g %g)\nDid you forget to enable EulerDeform?",
+                     x,verts[minus][0],verts[minus][1],
+                     verts[zero][0],verts[zero][1],
+                     verts[plus][0],verts[plus][1]);
   
     c=(dy_p + dy_m)/(2*dx*dx);
     b=(dy_p - dy_m)/(2*dx);
 
     computed_y=y_0 + b*(point[x]-x_0) + c*(point[x]-x_0)*(point[x]-x_0);
 
-    return sgn(computed_y-point[y]);
+    if(about_equal(computed_y,point[y]))
+      return 0;
+    else
+      return sgn(computed_y-point[y]);
   }
 }
