@@ -24,7 +24,7 @@
 **  License along with this library; if not, write to the Free Software
 **  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 **
-** $Id: Inner2DGenerator.c 3584 2006-05-16 11:11:07Z PatrickSunter $
+** $Id: InnerGenerator.c 3584 2006-05-16 11:11:07Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
@@ -40,50 +40,50 @@
 
 
 /* Textual name of this class */
-const Type Inner2DGenerator_Type = "Inner2DGenerator";
+const Type InnerGenerator_Type = "InnerGenerator";
 
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
 */
 
-Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context ) {
+InnerGenerator* InnerGenerator_New( Name name, AbstractContext* context ) {
 	/* Variables set in this function */
-	SizeT                                              _sizeOfSelf = sizeof(Inner2DGenerator);
-	Type                                                      type = Inner2DGenerator_Type;
-	Stg_Class_DeleteFunction*                              _delete = _Inner2DGenerator_Delete;
-	Stg_Class_PrintFunction*                                _print = _Inner2DGenerator_Print;
+	SizeT                                              _sizeOfSelf = sizeof(InnerGenerator);
+	Type                                                      type = InnerGenerator_Type;
+	Stg_Class_DeleteFunction*                              _delete = _InnerGenerator_Delete;
+	Stg_Class_PrintFunction*                                _print = _InnerGenerator_Print;
 	Stg_Class_CopyFunction*                                  _copy = NULL;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_Inner2DGenerator_New;
-	Stg_Component_ConstructFunction*                    _construct = _Inner2DGenerator_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = _Inner2DGenerator_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = _Inner2DGenerator_Initialise;
-	Stg_Component_ExecuteFunction*                        _execute = _Inner2DGenerator_Execute;
+	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = (void* (*)(Name))_InnerGenerator_New;
+	Stg_Component_ConstructFunction*                    _construct = _InnerGenerator_AssignFromXML;
+	Stg_Component_BuildFunction*                            _build = _InnerGenerator_Build;
+	Stg_Component_InitialiseFunction*                  _initialise = _InnerGenerator_Initialise;
+	Stg_Component_ExecuteFunction*                        _execute = _InnerGenerator_Execute;
 	Stg_Component_DestroyFunction*                        _destroy = NULL;
 	AllocationType                              nameAllocationType = NON_GLOBAL;
 	MeshGenerator_SetDimSizeFunc*                   setDimSizeFunc = _MeshGenerator_SetDimSize;
-	MeshGenerator_GenerateFunc*                       generateFunc = (MeshGenerator_GenerateFunc*)Inner2DGenerator_Generate;
+	MeshGenerator_GenerateFunc*                       generateFunc = (MeshGenerator_GenerateFunc*)InnerGenerator_Generate;
 
-	Inner2DGenerator* self = _Inner2DGenerator_New(  INNER2DGENERATOR_PASSARGS  );
+	InnerGenerator* self = _InnerGenerator_New(  INNERGENERATOR_PASSARGS  );
 
    _MeshGenerator_Init( (MeshGenerator*)self, context );
-   _Inner2DGenerator_Init( self );
+   _InnerGenerator_Init( self );
 
    return self;
 }
 
-Inner2DGenerator* _Inner2DGenerator_New(  INNER2DGENERATOR_DEFARGS  ) {
-	Inner2DGenerator*	self;
+InnerGenerator* _InnerGenerator_New(  INNERGENERATOR_DEFARGS  ) {
+	InnerGenerator*	self;
 
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(Inner2DGenerator) );
-	self = (Inner2DGenerator*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
+	assert( _sizeOfSelf >= sizeof(InnerGenerator) );
+	self = (InnerGenerator*)_MeshGenerator_New(  MESHGENERATOR_PASSARGS  );
 
 	return self;
 }
 
-void _Inner2DGenerator_Init( Inner2DGenerator* self ) {
-	assert( self && Stg_CheckType( self, Inner2DGenerator ) );
+void _InnerGenerator_Init( InnerGenerator* self ) {
+	assert( self && Stg_CheckType( self, InnerGenerator ) );
 
 	self->elMesh = NULL;
 }
@@ -93,27 +93,27 @@ void _Inner2DGenerator_Init( Inner2DGenerator* self ) {
 ** Virtual functions
 */
 
-void _Inner2DGenerator_Delete( void* generator ) {
-	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+void _InnerGenerator_Delete( void* generator ) {
+	InnerGenerator*	self = (InnerGenerator*)generator;
 
 	/* Delete the parent. */
 	_MeshGenerator_Delete( self );
 }
 
-void _Inner2DGenerator_Print( void* generator, Stream* stream ) {
-	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+void _InnerGenerator_Print( void* generator, Stream* stream ) {
+	InnerGenerator*	self = (InnerGenerator*)generator;
 	
 	/* Set the Journal for printing informations */
 	Stream* generatorStream;
-	generatorStream = Journal_Register( InfoStream_Type, (Name)"Inner2DGeneratorStream"  );
+	generatorStream = Journal_Register( InfoStream_Type, (Name)"InnerGeneratorStream"  );
 
 	/* Print parent */
-	Journal_Printf( stream, "Inner2DGenerator (ptr): (%p)\n", self );
+	Journal_Printf( stream, "InnerGenerator (ptr): (%p)\n", self );
 	_MeshGenerator_Print( self, stream );
 }
 
-void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data ) {
-	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+void _InnerGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data ) {
+	InnerGenerator*	self = (InnerGenerator*)generator;
 	Mesh*		elMesh;
 
 	assert( self );
@@ -122,39 +122,39 @@ void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf,
 	_MeshGenerator_AssignFromXML( self, cf, data );
 
 	elMesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"elementMesh", Mesh, True, data  );
-	Inner2DGenerator_SetElementMesh( self, elMesh );
+	InnerGenerator_SetElementMesh( self, elMesh );
 }
 
-void _Inner2DGenerator_Build( void* generator, void* data ) {
+void _InnerGenerator_Build( void* generator, void* data ) {
 	_MeshGenerator_Build( generator, data );
 }
 
-void _Inner2DGenerator_Initialise( void* generator, void* data ) {
+void _InnerGenerator_Initialise( void* generator, void* data ) {
 	_MeshGenerator_Initialise( generator, data );
 }
 
-void _Inner2DGenerator_Execute( void* generator, void* data ) {
+void _InnerGenerator_Execute( void* generator, void* data ) {
 }
 
-void _Inner2DGenerator_Destroy( void* generator, void* data ) {
-	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+void _InnerGenerator_Destroy( void* generator, void* data ) {
+	InnerGenerator*	self = (InnerGenerator*)generator;
 
    Stg_Component_Destroy( self->elMesh, data, False );
    _MeshGenerator_Destroy( self, data );
 }
 
-void Inner2DGenerator_Generate( void* generator, void* _mesh ) {
-	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+void InnerGenerator_Generate( void* generator, void* _mesh ) {
+	InnerGenerator*	self = (InnerGenerator*)generator;
 	FeMesh*		mesh = (FeMesh*)_mesh;
 	Grid**		grid;
 	Grid*		elGrid;
 
-	assert( self && Stg_CheckType( self, Inner2DGenerator ) );
+	assert( self && Stg_CheckType( self, InnerGenerator ) );
 	assert( mesh && Stg_CheckType( mesh, FeMesh ) );
 
-	Inner2DGenerator_BuildTopology( self, mesh );
-	Inner2DGenerator_BuildGeometry( self, mesh );
-	Inner2DGenerator_BuildElementTypes( self, mesh );
+	InnerGenerator_BuildTopology( self, mesh );
+	InnerGenerator_BuildGeometry( self, mesh );
+	InnerGenerator_BuildElementTypes( self, mesh );
 
 	elGrid = *(Grid**)ExtensionManager_Get( self->elMesh->info, self->elMesh, 
 					       ExtensionManager_GetHandle( self->elMesh->info, (Name)"elementGrid" )  );
@@ -171,10 +171,10 @@ void Inner2DGenerator_Generate( void* generator, void* _mesh ) {
 ** Public Functions
 */
 
-void Inner2DGenerator_SetElementMesh( void* generator, void* mesh ) {
-	Inner2DGenerator*	self = (Inner2DGenerator*)generator;
+void InnerGenerator_SetElementMesh( void* generator, void* mesh ) {
+	InnerGenerator*	self = (InnerGenerator*)generator;
 
-	assert( self && Stg_CheckType( self, Inner2DGenerator ) );
+	assert( self && Stg_CheckType( self, InnerGenerator ) );
 
 	self->elMesh = (Mesh*)mesh;
 }
@@ -184,7 +184,7 @@ void Inner2DGenerator_SetElementMesh( void* generator, void* mesh ) {
 ** Private Functions
 */
 
-void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
+void InnerGenerator_BuildTopology( InnerGenerator* self, FeMesh* mesh ) {
 	Mesh*		elMesh;
 	MeshTopology	*topo, *elTopo;
 	unsigned	nDims;
@@ -216,7 +216,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 
 	if( nDims == 2 ) {
 		nLocals = Decomp_GetNumLocals( elDecomp ) * 3;
-		locals = MemArray( int, nLocals, Inner2DGenerator_Type );
+		locals = MemArray( int, nLocals, InnerGenerator_Type );
 		for( l_i = 0; l_i < Decomp_GetNumLocals( elDecomp ); l_i++ ) {
 			global = Decomp_LocalToGlobal( elDecomp, l_i );
 			locals[l_i * 3 + 0] = global * 3;
@@ -226,7 +226,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	}
 	else if( nDims == 3 ) {
 		nLocals = Decomp_GetNumLocals( elDecomp ) * 4;
-		locals = MemArray( int, nLocals, Inner2DGenerator_Type );
+		locals = MemArray( int, nLocals, InnerGenerator_Type );
 		for( l_i = 0; l_i < Decomp_GetNumLocals( elDecomp ); l_i++ ) {
 			global = Decomp_LocalToGlobal( elDecomp, l_i );
 			locals[l_i * 4 + 0] = global * 4;
@@ -244,7 +244,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 
 	if( nDims == 2 ) {
 		nRemotes = Sync_GetNumRemotes( elSync ) * 3;
-		remotes = MemArray( int, nRemotes, Inner2DGenerator_Type );
+		remotes = MemArray( int, nRemotes, InnerGenerator_Type );
 		for( r_i = 0; r_i < Sync_GetNumRemotes( elSync ); r_i++ ) {
 			global = Sync_RemoteToGlobal( elSync, r_i );
 			remotes[r_i * 3 + 0] = global * 3;
@@ -254,7 +254,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	}
 	else if( nDims == 3 ) {
 		nRemotes = Sync_GetNumRemotes( elSync ) * 4;
-		remotes = MemArray( int, nRemotes, Inner2DGenerator_Type );
+		remotes = MemArray( int, nRemotes, InnerGenerator_Type );
 		for( r_i = 0; r_i < Sync_GetNumRemotes( elSync ); r_i++ ) {
 			global = Sync_RemoteToGlobal( elSync, r_i );
 			remotes[r_i * 4 + 0] = global * 4;
@@ -275,7 +275,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
 	if( nDims == 2 ) {
 		nIncEls = 3;
-		incEls = MemArray( unsigned, 3, Inner2DGenerator_Type );
+		incEls = MemArray( unsigned, 3, InnerGenerator_Type );
 		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
 			incEls[0] = e_i * 3;
 			incEls[1] = e_i * 3 + 1;
@@ -285,7 +285,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	}
 	else if( nDims == 3 ) {
 		nIncEls = 4;
-		incEls = MemArray( unsigned, 4, Inner2DGenerator_Type );
+		incEls = MemArray( unsigned, 4, InnerGenerator_Type );
 		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
 			incEls[0] = e_i * 4;
 			incEls[1] = e_i * 4 + 1;
@@ -299,7 +299,7 @@ void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh ) {
 	IGraph_InvertIncidence( topo, MT_VERTEX, nDims );
 }
 
-void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {
+void InnerGenerator_BuildGeometry( InnerGenerator* self, FeMesh* mesh ) {
 	Mesh*		elMesh;
 	double		localCrds[3][2] = {{-0.5, -0.5}, 
 					   {0.5, -0.5}, 
@@ -366,7 +366,7 @@ void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh ) {
 	}
 }
 
-void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh ) {
+void InnerGenerator_BuildElementTypes( InnerGenerator* self, FeMesh* mesh ) {
 	unsigned		nDomainEls;
 	Mesh_Algorithms*	algs;
 	unsigned		e_i;

@@ -11,7 +11,7 @@
     </struct>
 
     <struct name="linearInnerMeshGenerator">
-      <param name="Type">Inner2DGenerator</param>
+      <param name="Type">InnerGenerator</param>
       <param name="mesh">linearInnerMesh</param>
       <param name="elementMesh">elementMesh</param>
       <param name="dims">dim</param>

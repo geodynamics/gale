@@ -34,29 +34,29 @@
 **
 ** Comments:
 **
-** $Id: Inner2DGenerator.h 3584 2006-05-16 11:11:07Z PatrickSunter $
+** $Id: InnerGenerator.h 3584 2006-05-16 11:11:07Z PatrickSunter $
 **
 **~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
 
-#ifndef __StgFEM_Discretisaton_Inner2DGenerator_h__
-#define __StgFEM_Discretisaton_Inner2DGenerator_h__
+#ifndef __StgFEM_Discretisaton_InnerGenerator_h__
+#define __StgFEM_Discretisaton_InnerGenerator_h__
 
 	/** Textual name of this class */
-	extern const Type Inner2DGenerator_Type;
+	extern const Type InnerGenerator_Type;
 
 	/** Virtual function types */
 
-	/** Inner2DGenerator class contents */
-	#define __Inner2DGenerator		\
+	/** InnerGenerator class contents */
+	#define __InnerGenerator		\
 		/* General info */		\
 		__MeshGenerator			\
 						\
 		/* Virtual info */		\
 						\
-		/* Inner2DGenerator info */		\
+		/* InnerGenerator info */		\
 		Mesh*		elMesh;
 
-	struct Inner2DGenerator { __Inner2DGenerator };
+	struct InnerGenerator { __InnerGenerator };
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructors
@@ -69,43 +69,43 @@
 	#define ZERO 0
 	#endif
 
-	#define INNER2DGENERATOR_DEFARGS \
+	#define INNERGENERATOR_DEFARGS \
                 MESHGENERATOR_DEFARGS
 
-	#define INNER2DGENERATOR_PASSARGS \
+	#define INNERGENERATOR_PASSARGS \
                 MESHGENERATOR_PASSARGS
 
-	Inner2DGenerator* Inner2DGenerator_New( Name name, AbstractContext* context );
-	Inner2DGenerator* _Inner2DGenerator_New(  INNER2DGENERATOR_DEFARGS  );
-	void _Inner2DGenerator_Init( Inner2DGenerator* self );
+	InnerGenerator* InnerGenerator_New( Name name, AbstractContext* context );
+	InnerGenerator* _InnerGenerator_New(  INNERGENERATOR_DEFARGS  );
+	void _InnerGenerator_Init( InnerGenerator* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
 
-	void _Inner2DGenerator_Delete( void* generator );
-	void _Inner2DGenerator_Print( void* generator, Stream* stream );
-	void _Inner2DGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data );
-	void _Inner2DGenerator_Build( void* generator, void* data );
-	void _Inner2DGenerator_Initialise( void* generator, void* data );
-	void _Inner2DGenerator_Execute( void* generator, void* data );
-	void _Inner2DGenerator_Destroy( void* generator, void* data );
+	void _InnerGenerator_Delete( void* generator );
+	void _InnerGenerator_Print( void* generator, Stream* stream );
+	void _InnerGenerator_AssignFromXML( void* generator, Stg_ComponentFactory* cf, void* data );
+	void _InnerGenerator_Build( void* generator, void* data );
+	void _InnerGenerator_Initialise( void* generator, void* data );
+	void _InnerGenerator_Execute( void* generator, void* data );
+	void _InnerGenerator_Destroy( void* generator, void* data );
 
-	void Inner2DGenerator_Generate( void* generator, void* _mesh );
+	void InnerGenerator_Generate( void* generator, void* _mesh );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Public functions
 	*/
 
-	void Inner2DGenerator_SetElementMesh( void* generator, void* mesh );
+	void InnerGenerator_SetElementMesh( void* generator, void* mesh );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
 	*/
 
-	void Inner2DGenerator_BuildTopology( Inner2DGenerator* self, FeMesh* mesh );
-	void Inner2DGenerator_BuildGeometry( Inner2DGenerator* self, FeMesh* mesh );
-	void Inner2DGenerator_BuildElementTypes( Inner2DGenerator* self, FeMesh* mesh );
+	void InnerGenerator_BuildTopology( InnerGenerator* self, FeMesh* mesh );
+	void InnerGenerator_BuildGeometry( InnerGenerator* self, FeMesh* mesh );
+	void InnerGenerator_BuildElementTypes( InnerGenerator* self, FeMesh* mesh );
 
-#endif /* __StgFEM_Discretisaton_Inner2DGenerator_h__ */
+#endif /* __StgFEM_Discretisaton_InnerGenerator_h__ */
 

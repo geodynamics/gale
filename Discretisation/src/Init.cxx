@@ -90,7 +90,7 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
                                    (Stg_Component_DefaultConstructorFunction*)C0Generator_New  );
 	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, (Name)"0",
                                    (Stg_Component_DefaultConstructorFunction*)C2Generator_New  );
-	Stg_ComponentRegister_Add( componentRegister, Inner2DGenerator_Type, (Name)"0", (Stg_Component_DefaultConstructorFunction*)Inner2DGenerator_New  );
+	Stg_ComponentRegister_Add( componentRegister, InnerGenerator_Type, (Name)"0", (Stg_Component_DefaultConstructorFunction*)InnerGenerator_New  );
 	Stg_ComponentRegister_Add( componentRegister, FieldTest_Type, (Name)"0", _FieldTest_DefaultNew  );
 	
 	/** Register Parents for type checking */
@@ -111,7 +111,7 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	RegisterParent( FeMesh_Type, Mesh_Type );
 	RegisterParent( C0Generator_Type, MeshGenerator_Type );
 	RegisterParent( C2Generator_Type, CartesianGenerator_Type );
-	RegisterParent( Inner2DGenerator_Type, MeshGenerator_Type );
+	RegisterParent( InnerGenerator_Type, MeshGenerator_Type );
 	
 	RegisterParent( FeVariable_Type, FieldVariable_Type );
 	RegisterParent( OperatorFeVariable_Type, FeVariable_Type );

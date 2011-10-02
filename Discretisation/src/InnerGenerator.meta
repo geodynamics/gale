@@ -2,7 +2,7 @@
 <!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
 <StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
 
-<param name="Name">Inner2DGenerator</param>
+<param name="Name">InnerGenerator</param>
 <param name="Organisation">VPAC</param>
 <param name="Project">StgFEM</param>
 <param name="Location">./StgFEM/Discretisation/src/</param>

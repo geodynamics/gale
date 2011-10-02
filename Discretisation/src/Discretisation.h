@@ -83,7 +83,7 @@
 	#include "FeMesh.h"
 	#include "C0Generator.h"
 	#include "C2Generator.h"
-	#include "Inner2DGenerator.h"
+	#include "InnerGenerator.h"
 	#include "LinkedDofInfo.h"
 	#include "FeEquationNumber.h"
 	#include "FeVariable.h"
