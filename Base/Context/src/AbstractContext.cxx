@@ -893,207 +893,207 @@ void _AbstractContext_Step( void* _context, double dt ) {
 
 
 void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep, double* dtLoadedFromFile ) {
-	AbstractContext*       self = (AbstractContext*)_context;
-	char*                  timeInfoFileName = NULL;
-	char*                  timeInfoFileNamePart = NULL;
-	FILE*                  timeInfoFile;		
-	Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
+  AbstractContext*       self = (AbstractContext*)_context;
+  char*                  timeInfoFileName = NULL;
+  char*                  timeInfoFileNamePart = NULL;
+  FILE*                  timeInfoFile;		
+  Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 #ifdef READ_HDF5
-	hid_t             file, fileSpace, fileData;
+  hid_t             file, fileSpace, fileData;
 #endif
 
 	
-   timeInfoFileNamePart = Context_GetCheckPointReadPrefixString( self );
+  timeInfoFileNamePart = Context_GetCheckPointReadPrefixString( self );
 #ifdef WRITE_HDF5
-	timeInfoFile = NULL;
-   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->restartTimestep );
+  timeInfoFile = NULL;
+  Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->restartTimestep );
 	 
-	/* Open the file and data set. */
-	file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
-	Journal_Firewall( 
-		file >= 0, 
-		errorStr, "\n\nError- in %s(), Couldn't find checkpoint time info file with "
-		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
+  /* Open the file and data set. */
+  file = H5Fopen( timeInfoFileName, H5F_ACC_RDONLY, H5P_DEFAULT );
+  Journal_Firewall( 
+                   file >= 0, 
+                   errorStr, "\n\nError- in %s(), Couldn't find checkpoint time info file with "
+                   "filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
 		   	
-	/* Read currentTime from file */
-	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	fileData = H5Dopen( file, "/currentTime" );
-	#else
-	fileData = H5Dopen2( file, "/currentTime", H5P_DEFAULT );
-	#endif
-	fileSpace = H5Dget_space( fileData );
+  /* Read currentTime from file */
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+  fileData = H5Dopen( file, "/currentTime" );
+#else
+  fileData = H5Dopen2( file, "/currentTime", H5P_DEFAULT );
+#endif
+  fileSpace = H5Dget_space( fileData );
 	   
-	H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &self->currentTime );
+  H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, &self->currentTime );
 	   
-	H5Sclose( fileSpace );
-	H5Dclose( fileData );
+  H5Sclose( fileSpace );
+  H5Dclose( fileData );
 	
-	/* Read Dt from file */
-	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	fileData = H5Dopen( file, "/Dt" );
-	#else
-	fileData = H5Dopen2( file, "/Dt", H5P_DEFAULT );
-	#endif
-	fileSpace = H5Dget_space( fileData );
+  /* Read Dt from file */
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+  fileData = H5Dopen( file, "/Dt" );
+#else
+  fileData = H5Dopen2( file, "/Dt", H5P_DEFAULT );
+#endif
+  fileSpace = H5Dget_space( fileData );
 	   
-	H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dtLoadedFromFile );
+  H5Dread( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, H5P_DEFAULT, dtLoadedFromFile );
 	   
-	H5Sclose( fileSpace );
-	H5Dclose( fileData );
+  H5Sclose( fileSpace );
+  H5Dclose( fileData );
 
-	H5Fclose( file );
+  H5Fclose( file );
 	   
 #else	
-   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->restartTimestep );
+  Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->restartTimestep );
 	 
-	timeInfoFile = fopen( timeInfoFileName, "r" );
-	Journal_Firewall( NULL != timeInfoFile, errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
-		"filename \"%s\" (HD5 not enabled) - aborting.\n", __func__, timeInfoFileName );
+  timeInfoFile = fopen( timeInfoFileName, "r" );
+  Journal_Firewall( NULL != timeInfoFile, errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
+                    "filename \"%s\" (HD5 not enabled) - aborting.\n", __func__, timeInfoFileName );
 
-	/* set currentTime and Dt loaded from file */
-	fscanf( timeInfoFile, "%lg", &self->currentTime );
-	fscanf( timeInfoFile, "%lg", dtLoadedFromFile );
-	fclose( timeInfoFile );
+  /* set currentTime and Dt loaded from file */
+  fscanf( timeInfoFile, "%lg", &self->currentTime );
+  fscanf( timeInfoFile, "%lg", dtLoadedFromFile );
+  fclose( timeInfoFile );
 #endif
 	
-	Memory_Free( timeInfoFileName );
-   Memory_Free( timeInfoFileNamePart );
+  Memory_Free( timeInfoFileName );
+  Memory_Free( timeInfoFileNamePart );
 }
 		
 
 void _AbstractContext_SaveTimeInfo( void* _context ) {
-	AbstractContext*       self = (AbstractContext*)_context;	
-	FILE*                  timeInfoFile = NULL;
-	char*                  timeInfoFileName = NULL;
-   char*                  timeInfoFileNamePart = NULL;
-	Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
+  AbstractContext*       self = (AbstractContext*)_context;	
+  FILE*                  timeInfoFile = NULL;
+  char*                  timeInfoFileName = NULL;
+  char*                  timeInfoFileNamePart = NULL;
+  Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
 #ifdef WRITE_HDF5
-	hid_t                  file, fileSpace, fileData, props;
-	hsize_t                count;
-	double                 Dt;
+  hid_t                  file, fileSpace, fileData, props;
+  hsize_t                count;
+  double                 Dt;
 #endif 
 
-	/* Only the master process needs to write this file */
-	if ( self->rank == 0 ) {
-   timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
+  /* Only the master process needs to write this file */
+  if ( self->rank == 0 ) {
+    timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
 #ifdef WRITE_HDF5
-	timeInfoFile = NULL;
-   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->timeStep );
+    timeInfoFile = NULL;
+    Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->timeStep );
 	
-	/* Create parallel file property list. */
-	props = H5Pcreate( H5P_FILE_ACCESS );
+    /* Create parallel file property list. */
+    props = H5Pcreate( H5P_FILE_ACCESS );
 	
-	/* Open the HDF5 output file. */
-	file = H5Fcreate( timeInfoFileName, H5F_ACC_TRUNC, H5P_DEFAULT, props );
-	Journal_Firewall( 
-		file >= 0, 
-		errorStr,
-		"Error in %s for %s '%s' - Cannot create file %s.\n", 
-		__func__, 
-		self->type, 
-		self->name, 
-		timeInfoFileName );
+    /* Open the HDF5 output file. */
+    file = H5Fcreate( timeInfoFileName, H5F_ACC_TRUNC, H5P_DEFAULT, props );
+    Journal_Firewall( 
+                     file >= 0, 
+                     errorStr,
+                     "Error in %s for %s '%s' - Cannot create file %s.\n", 
+                     __func__, 
+                     self->type, 
+                     self->name, 
+                     timeInfoFileName );
 		
-	H5Pclose( props );
+    H5Pclose( props );
 
-	/* Dump currentTime */
-	count = 1;
-	fileSpace = H5Screate_simple( 1, &count, NULL );         
-	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	fileData = H5Dcreate( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
-	#else
-	fileData = H5Dcreate2( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace,
-	                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-	#endif
+    /* Dump currentTime */
+    count = 1;
+    fileSpace = H5Screate_simple( 1, &count, NULL );         
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+    fileData = H5Dcreate( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+#else
+    fileData = H5Dcreate2( file, "/currentTime", H5T_NATIVE_DOUBLE, fileSpace,
+                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+#endif
 	      
-	props = H5Pcreate( H5P_DATASET_XFER );
-	H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(self->currentTime) );
-	H5Pclose( props );
-	H5Dclose( fileData );
-	H5Sclose( fileSpace );
+    props = H5Pcreate( H5P_DATASET_XFER );
+    H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &(self->currentTime) );
+    H5Pclose( props );
+    H5Dclose( fileData );
+    H5Sclose( fileSpace );
 	
-	/* Dump Dt */
-	fileSpace = H5Screate_simple( 1, &count, NULL );         
-	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
-	#else
-	fileData = H5Dcreate2( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace,
-	                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-	#endif
+    /* Dump Dt */
+    fileSpace = H5Screate_simple( 1, &count, NULL );         
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+    fileData = H5Dcreate( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace, H5P_DEFAULT );
+#else
+    fileData = H5Dcreate2( file, "/Dt", H5T_NATIVE_DOUBLE, fileSpace,
+                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+#endif
 	      
-	props = H5Pcreate( H5P_DATASET_XFER );
-	Dt = AbstractContext_Dt( self );
-	H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &Dt );
-	H5Pclose( props );
-	H5Dclose( fileData );
-	H5Sclose( fileSpace );
+    props = H5Pcreate( H5P_DATASET_XFER );
+    Dt = AbstractContext_Dt( self );
+    H5Dwrite( fileData, H5T_NATIVE_DOUBLE, H5S_ALL, H5S_ALL, props, &Dt );
+    H5Pclose( props );
+    H5Dclose( fileData );
+    H5Sclose( fileSpace );
 	
-	/* Dump nproc */
-	fileSpace = H5Screate_simple( 1, &count, NULL );         
-	#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
-	fileData = H5Dcreate( file, "/nproc", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT );
-	#else
-	fileData = H5Dcreate2( file, "/nproc", H5T_NATIVE_INT, fileSpace,
-	                            H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-	#endif
+    /* Dump nproc */
+    fileSpace = H5Screate_simple( 1, &count, NULL );         
+#if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
+    fileData = H5Dcreate( file, "/nproc", H5T_NATIVE_INT, fileSpace, H5P_DEFAULT );
+#else
+    fileData = H5Dcreate2( file, "/nproc", H5T_NATIVE_INT, fileSpace,
+                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+#endif
 	      
-	props = H5Pcreate( H5P_DATASET_XFER );
-	H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, &(self->nproc) );
-	H5Pclose( props );
-	H5Dclose( fileData );
-	H5Sclose( fileSpace );
+    props = H5Pcreate( H5P_DATASET_XFER );
+    H5Dwrite( fileData, H5T_NATIVE_INT, H5S_ALL, H5S_ALL, props, &(self->nproc) );
+    H5Pclose( props );
+    H5Dclose( fileData );
+    H5Sclose( fileSpace );
 	
-	H5Fclose( file );
+    H5Fclose( file );
 	
 	
 #else	
-   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->timeStep );
+    Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->timeStep );
 	 
-	timeInfoFile = fopen( timeInfoFileName, "w" );
+    timeInfoFile = fopen( timeInfoFileName, "w" );
 
-	if ( NULL == timeInfoFile ) {
-		Journal_Printf( errorStr, "Error- in %s(), Couldn't create checkpoint time info file with "
-		"filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
-		exit(EXIT_FAILURE);
-	}
+    if ( NULL == timeInfoFile ) {
+      Journal_Printf( errorStr, "Error- in %s(), Couldn't create checkpoint time info file with "
+                      "filename \"%s\" - aborting.\n", __func__, timeInfoFileName );
+      exit(EXIT_FAILURE);
+    }
 
-	/* set currentTime and Dt loaded from file */
-	fprintf( timeInfoFile, "%lg ", self->currentTime );
-	fprintf( timeInfoFile, "%lg\n", AbstractContext_Dt( self ) );
-	fclose( timeInfoFile );
+    /* set currentTime and Dt loaded from file */
+    fprintf( timeInfoFile, "%lg ", self->currentTime );
+    fprintf( timeInfoFile, "%lg\n", AbstractContext_Dt( self ) );
+    fclose( timeInfoFile );
 #endif
 	
-	Memory_Free( timeInfoFileName );
-   Memory_Free( timeInfoFileNamePart );
-} 
+    Memory_Free( timeInfoFileName );
+    Memory_Free( timeInfoFileNamePart );
+  } 
 }
 
 
 Bool AbstractContext_CheckPointExists( void* context, Index timeStep ) {
   AbstractContext*       self = (AbstractContext*)context;	
-	char*                  timeInfoFileName = NULL;
-	char*                  timeInfoFileNamePart = NULL;   
-	struct stat            statInfo;
-	int                    statResult;
+  char*                  timeInfoFileName = NULL;
+  char*                  timeInfoFileNamePart = NULL;   
+  struct stat            statInfo;
+  int                    statResult;
 
-   timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
+  timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
 #ifdef WRITE_HDF5
-   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, timeStep );
+  Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, timeStep );
 #else	
-   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, timeStep );
+  Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, timeStep );
 #endif	
-	statResult = stat( timeInfoFileName, &statInfo );
+  statResult = stat( timeInfoFileName, &statInfo );
 
-	Memory_Free( timeInfoFileName );
-   Memory_Free( timeInfoFileNamePart );
+  Memory_Free( timeInfoFileName );
+  Memory_Free( timeInfoFileNamePart );
 
-	if ( 0 == statResult ) {
-		return True;
-	}
-	else {
-		return False;
-	}
+  if ( 0 == statResult ) {
+    return True;
+  }
+  else {
+    return False;
+  }
 }
 
 char* Context_GetCheckPointReadPrefixString( void* context ) {
