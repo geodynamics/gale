@@ -124,7 +124,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
   Bool                 saveCoords  = Dictionary_GetBool_WithDefault( context->dictionary, (Dictionary_Entry_Key)"saveCoordsWithFields", False  );
   Stream*              errorStream = Journal_Register( Error_Type, (Name)CURR_MODULE_NAME );
   char*                variableType = NULL;
-  char*                topologyType = NULL;
+  std::string          topologyType;
   unsigned             componentCount = LiveComponentRegister_GetCount(stgLiveComponentRegister);
   unsigned             compI;
   Stg_Component*       stgComp;
@@ -132,10 +132,14 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
   /** search for entire live component register for feMesh types  **/
   for( compI = 0 ; compI < componentCount ; compI++ ){
     stgComp = LiveComponentRegister_At( stgLiveComponentRegister, compI );
-    /* check that component is of type FeMesh, and that its element family is linear */
-    if(Stg_Class_IsInstance(stgComp,FeMesh_Type)
-       && (!strcmp(((FeMesh*)stgComp)->feElFamily,"linear")
-           || !strcmp(((FeMesh*)stgComp)->feElFamily,"quadratic"))) {
+    /* check that component is of type FeMesh, and that its element
+       family is supported */
+
+    std::string element_family(Stg_Class_IsInstance(stgComp,FeMesh_Type) ?
+                               ((FeMesh*)stgComp)->feElFamily : "");
+
+    if(element_family=="linear" || element_family=="linear-inner"
+       || element_family=="quadratic") {
       mesh   = (  Mesh*)stgComp;
       feMesh = (FeMesh*)stgComp;
 
@@ -149,30 +153,34 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
       else {
         /* determine the maximum number of nodes each element has */
         maxNodes = 0;
-        for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize(mesh); gElement_I++ ) {
+        for ( gElement_I = 0 ; gElement_I < FeMesh_GetElementGlobalSize(mesh);
+              gElement_I++ ) {
           unsigned numNodes;
           numNodes = FeMesh_GetElementNodeSize( mesh, gElement_I);
           if( maxNodes < numNodes ) maxNodes = numNodes;
         }
       }
       /** now write all the xdmf geometry info **/
-      /**----------------------- START GEOMETRY   ------------------------------------------------------------------------------------------------------------------- **/
-      if(nDims==2 && (maxNodes==4 || maxNodes==9)){
-        Stg_asprintf( &topologyType, "Quadrilateral" );
-      } else if(nDims==3 && (maxNodes==8 || maxNodes==27)) {
-        Stg_asprintf( &topologyType, "Hexahedron" );
-      } else {
-        Journal_DPrintf( errorStream, "\n\n Error: number of element nodes %u not supported by XDMF generator...\n should be 4 or 9 (2D quadrilateral) " 
-                         "or should be 8 or 27 (3D hexahedron). \n\n", maxNodes );
-        Stg_asprintf( &topologyType, "UNKNOWN_POSSIBLY_ERROR" );
-      }
-      /** first create the grid which is applicable to the checkpointed fevariables **/
+      /**----------------------- START GEOMETRY   --------------------------- **/
+      if(element_family=="linear" || element_family=="quadratic")
+        {
+          topologyType= (nDims==2) ? "Quadrilateral" : "Hexahedron";
+        }
+      else if(element_family=="linear-inner")
+        {
+          topologyType= (nDims==2) ? "Triangle" : "Hexahedron";
+        }
+      /** first create the grid which is applicable to the
+          checkpointed fevariables **/
       Journal_Printf( stream, "  <Grid Name=\"FEM_Grid_%s\">\n\n", feMesh->name);
       Journal_Printf( stream, "    <Time Value=\"%f\" />\n\n", context->currentTime );
-      /** now print out topology info, only quadrilateral elements are supported at the moment **/
+      /** now print out topology info **/
 
-      if(maxNodes==9 || maxNodes==27)
+      /* Quadratic elements */
+      if(!strcmp(((FeMesh*)stgComp)->feElFamily,"quadratic"))
         {
+          /* First separate each node of each element into its own
+             variable C0-C8 or C0-C26 */
           for(uint i=0;i<maxNodes;++i)
             {
               Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"C%u\">\n",
@@ -183,9 +191,10 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
                              elementGlobalSize, maxNodes, feMesh->name, context->timeStep );
               Journal_Printf(stream,"    </DataItem>\n");
             }
+          /* Print out the topology */
           int num_nodes=(maxNodes==9) ? 4 : 8;
           Journal_Printf(stream,"    <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n",
-                         topologyType,elementGlobalSize*num_nodes);
+                         topologyType.c_str(),elementGlobalSize*num_nodes);
           Journal_Printf(stream,"      <DataItem ItemType=\"Function\"  Dimensions=\"%u %u\" Function=\"JOIN(",
                          elementGlobalSize*num_nodes, num_nodes);
           for(int j=0;j<num_nodes-1;++j)
@@ -208,6 +217,8 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
               mapping[7][i]=first_mapping[i]+13;
             }
 
+          /* Print out the quadrilaterals made up of only some of the
+             nodes */
           for(int j=0;j<num_nodes;++j)
             {
               Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u %u\" Function=\"JOIN(",
@@ -227,19 +238,42 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
           Journal_Printf(stream,"      </DataItem>\n");
           Journal_Printf(stream,"      </Topology>\n\n" );
         }
+
+      /* Discontinuous linear elements */
+      else if(!strcmp(((FeMesh*)stgComp)->feElFamily,"linear-inner"))
+        {
+          if(nDims==2)
+            {
+              Journal_Printf(stream,"      <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType.c_str(), elementGlobalSize );
+              Journal_Printf(stream,"        <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+                             elementGlobalSize, maxNodes, feMesh->name,
+                             context->timeStep );
+              Journal_Printf(stream,"      </Topology>\n\n" );
+            }
+          else
+            {
+              abort();
+            }
+        }
+      /* Continuous linear elements */
       else
         {
-          Journal_Printf( stream, "         <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType, elementGlobalSize );
+          Journal_Printf( stream, "         <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType.c_str(), elementGlobalSize );
           Journal_Printf( stream, "            <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n", elementGlobalSize, maxNodes, feMesh->name, context->timeStep );
           Journal_Printf( stream, "         </Topology>\n\n" );
         }
       Journal_Printf( stream, "         <Geometry Type=\"XYZ\">\n" );
 
+
+      /* Print out coordinates of the vertices */
       Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );                              
-      if(         nDims == 2 ){
-        /** note that for 2d, we feed back a quasi 3d array, with the 3rd Dof zeroed.  so in effect we always work in 3d.
-            this is done because paraview in particular seems to do everything in 3d, and if you try and give it a 2d vector 
-            or array, it complains.... and hence the verbosity of the following 2d definitions**/
+      if(nDims==2){
+        /** note that for 2d, we feed back a quasi 3d array, with the
+            3rd Dof zeroed.  so in effect we always work in 3d.  this
+            is done because paraview in particular seems to do
+            everything in 3d, and if you try and give it a 2d vector
+            or array, it complains.... and hence the verbosity of the
+            following 2d definitions**/
         Journal_Printf( stream, "            <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", totalVerts );
         Journal_Printf( stream, "               <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XCoords\">\n", totalVerts );
         Journal_Printf( stream, "                  <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n", totalVerts );
@@ -257,24 +291,41 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
         Journal_DPrintf( errorStream, "\n\n Error: Mesh vertex location is not of dofCount 2 or 3.\n\n" );
       }
       Journal_Printf( stream, "         </Geometry>\n\n" );
-      /**----------------------- FINISH GEOMETRY  ------------------------------------------------------------------------------------------------------------------- **/
+      /**----------------------- FINISH GEOMETRY  --------------------------- **/
 
 
       /** now write FeVariable data **/   
-      for ( var_I = 0; var_I < context->fieldVariable_Register->objects->count; var_I++ ) {
-        fieldVar = FieldVariable_Register_GetByIndex( context->fieldVariable_Register, var_I );
+      for ( var_I = 0; var_I < context->fieldVariable_Register->objects->count;
+            var_I++ ) {
+        fieldVar =
+          FieldVariable_Register_GetByIndex(context->fieldVariable_Register,
+                                            var_I);
 
         if ( Stg_Class_IsInstance( fieldVar, FeVariable_Type ) ) {
           feVar = (FeVariable*)fieldVar;
-          if ( (feVar->isCheckpointedAndReloaded && (context->timeStep % context->checkpointEvery == 0))                                     || 
-               (feVar->isCheckpointedAndReloaded && (context->checkpointAtTimeInc && (context->currentTime >= context->nextCheckpointTime))) ||
-               (feVar->isSavedData               && (context->timeStep % context->saveDataEvery   == 0)) ){
+          if ( (feVar->isCheckpointedAndReloaded
+                && (context->timeStep % context->checkpointEvery == 0))
+               || (feVar->isCheckpointedAndReloaded
+                   && (context->checkpointAtTimeInc
+                       && (context->currentTime >= context->nextCheckpointTime)))
+               || (feVar->isSavedData
+                   && (context->timeStep % context->saveDataEvery   == 0)) ){
             FeMesh* feVarMesh = NULL;
-            /** check what type of generator was used to know where elementMesh is **/
-            if( Stg_Class_IsInstance( feVar->feMesh->generator, C0Generator_Type))        feVarMesh = (FeMesh*)(((C0Generator*)feVar->feMesh->generator)->elMesh);
-            if( Stg_Class_IsInstance( feVar->feMesh->generator, CartesianGenerator_Type)) feVarMesh = feVar->feMesh;
-            if( Stg_Class_IsInstance( feVar->feMesh->generator, MeshAdaptor_Type))        feVarMesh = feVar->feMesh;
-            /** make sure that the fevariable femesh is the same as that used above for the geometry definition, if so proceed **/
+            /** check what type of generator was used to know where
+                elementMesh is **/
+            if(Stg_Class_IsInstance(feVar->feMesh->generator,C0Generator_Type))
+              feVarMesh=
+                (FeMesh*)(((C0Generator*)feVar->feMesh->generator)->elMesh);
+            if(Stg_Class_IsInstance(feVar->feMesh->generator,
+                                    CartesianGenerator_Type)
+               || Stg_Class_IsInstance(feVar->feMesh->generator,MeshAdaptor_Type)
+               || Stg_Class_IsInstance(feVar->feMesh->generator,
+                                       InnerGenerator_Type))
+              feVarMesh = feVar->feMesh;
+
+            /** make sure that the fevariable femesh is the same as
+                that used above for the geometry definition, if so
+                proceed **/
             if( feVarMesh == feMesh ){
               char*   centering = NULL;
               Index  offset = 0;
@@ -282,12 +333,14 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
               Index  dofCountIndex;
               Index  dofAtEachNodeCount;
 
-              /**----------------------- START ATTRIBUTES ------------------------------------------------------------------------------------------------------------------- **/
-              /** if coordinates are being stored with feVariable, account for this **/
+              /**----------------------- START ATTRIBUTES ----------------- **/
+              /** if coordinates are being stored with feVariable,
+                  account for this **/
               if( saveCoords) offset = nDims; 
               /** all feVariables are currently stored as doubles **/
               Stg_asprintf( &variableType, "NumberType=\"Float\" Precision=\"8\"" );
-              /** determine whether feVariable data is cell centered (like Pressure), or on the nodes (like Velocity) **/
+              /** determine whether feVariable data is cell centered
+                  (like Pressure), or on the nodes (like Velocity) **/
               if(        meshSize == elementGlobalSize ){
                 Stg_asprintf( &centering, "Cell" );
               } else if( meshSize == totalVerts ) {
@@ -349,7 +402,6 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
       }
       Journal_Printf( stream, "   </Grid>\n\n" );
       if(variableType) Memory_Free( variableType );
-      if(topologyType) Memory_Free( topologyType );
     }
   }
 }
