@@ -62,13 +62,11 @@
 	typedef struct RegularTrilinear		 RegularTrilinear;
 	typedef struct RegularBilinear		 RegularBilinear;
 	typedef struct Biquadratic		 Biquadratic;
-	typedef struct P1			 P1;
 	typedef struct LinearTriangleElementType LinearTriangleElementType;
 	typedef struct FiniteElement_Element     FiniteElement_Element;
 	typedef struct FeMesh			 FeMesh;
 	typedef struct C0Generator		 C0Generator;
 	typedef struct C2Generator		 C2Generator;
-	typedef struct P1Generator		 P1Generator;
 	typedef struct Inner2DGenerator		 Inner2DGenerator;
 	typedef struct LinkedDofInfo             LinkedDofInfo;
 	typedef struct FeEquationNumber          FeEquationNumber;

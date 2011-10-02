@@ -90,9 +90,6 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
                                    (Stg_Component_DefaultConstructorFunction*)C0Generator_New  );
 	Stg_ComponentRegister_Add( componentRegister, C2Generator_Type, (Name)"0",
                                    (Stg_Component_DefaultConstructorFunction*)C2Generator_New  );
-/*
-	Stg_ComponentRegister_Add( componentRegister, P1Generator_Type, (Name)"0", P1Generator_New  );
-*/
 	Stg_ComponentRegister_Add( componentRegister, Inner2DGenerator_Type, (Name)"0", (Stg_Component_DefaultConstructorFunction*)Inner2DGenerator_New  );
 	Stg_ComponentRegister_Add( componentRegister, FieldTest_Type, (Name)"0", _FieldTest_DefaultNew  );
 	
@@ -104,7 +101,6 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	RegisterParent( TrilinearElementType_Type, ElementType_Type );
 	RegisterParent( Biquadratic_Type, ElementType_Type );
 	RegisterParent( Triquadratic_Type, ElementType_Type );
-	RegisterParent( P1_Type, ElementType_Type );
 	RegisterParent( RegularTrilinear_Type, TrilinearElementType_Type );
 	RegisterParent( ConstantElementType_Type, ElementType_Type );
 	RegisterParent( LinearTriangleElementType_Type, ElementType_Type );
@@ -115,9 +111,6 @@ Bool StgFEM_Discretisation_Init( int* argc, char** argv[] ) {
 	RegisterParent( FeMesh_Type, Mesh_Type );
 	RegisterParent( C0Generator_Type, MeshGenerator_Type );
 	RegisterParent( C2Generator_Type, CartesianGenerator_Type );
-/*
-	RegisterParent( P1Generator_Type, MeshGenerator_Type );
-*/
 	RegisterParent( Inner2DGenerator_Type, MeshGenerator_Type );
 	
 	RegisterParent( FeVariable_Type, FieldVariable_Type );

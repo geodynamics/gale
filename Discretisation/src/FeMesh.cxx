@@ -199,9 +199,6 @@ void _FeMesh_Build( void* feMesh, void* data ) {
 	else if( !strcmp( self->feElFamily, "constant" ) ) {
 		elType = (ElementType*)ConstantElementType_New( "" );
 	}
-	else if( !strcmp( self->feElFamily, "p1" ) ) {
-		elType = (ElementType*)P1_New( "" );
-	}
 	else
 		abort();
 	FeMesh_SetElementType( self, elType );
