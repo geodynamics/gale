@@ -110,6 +110,31 @@ void XDMFGenerator_GenerateAll( void* _context ) {
 
 }
 
+namespace {
+  void print_Pm1_corner(Stream* stream,
+                        const int &num_columns,
+                        const int &num_rows,
+                        const int &e,
+                        const std::string &mesh_name,
+                        const std::string &x,
+                        const std::string &y)
+  {
+    Journal_Printf(stream,"    <DataItem ItemType=\"Function\"  Dimensions=\"%u\" Function=\"JOIN(",
+                   num_rows*num_columns);
+    for(int i=0;i<num_columns-1;++i)
+      Journal_Printf(stream,"$%u; ",i);
+    Journal_Printf(stream,"$%u)\" Name=\"C%u%s\">\n",
+                   num_columns-1,e,(x+y).c_str());
+
+    for(int i=0;i<num_columns;++i)
+      {
+        Journal_Printf(stream,"      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C%u%s%u\"]</DataItem>\n",
+                       mesh_name.c_str(),e,x.c_str(),i);
+      }
+    Journal_Printf(stream,"    </DataItem>\n");
+  }
+}
+
 void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream ) {
   FieldVariable*       fieldVar = NULL;
   FeVariable*          feVar    = NULL;
@@ -177,7 +202,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
       /** now print out topology info **/
 
       /* Quadratic elements */
-      if(!strcmp(((FeMesh*)stgComp)->feElFamily,"quadratic"))
+      if(element_family=="quadratic")
         {
           /* First separate each node of each element into its own
              variable C0-C8 or C0-C26 */
@@ -240,15 +265,148 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
         }
 
       /* Discontinuous linear elements */
-      else if(!strcmp(((FeMesh*)stgComp)->feElFamily,"linear-inner"))
+      else if(element_family=="linear-inner")
         {
           if(nDims==2)
             {
-              Journal_Printf(stream,"      <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType.c_str(), elementGlobalSize );
-              Journal_Printf(stream,"        <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
-                             elementGlobalSize, maxNodes, feMesh->name,
+              Grid** grid=
+                (Grid** )ExtensionManager_Get
+                (mesh->info, mesh, 
+                 ExtensionManager_GetHandle(mesh->info, (Name)"elementGrid"));
+
+              unsigned *sizes=Grid_GetSizes(*grid);
+
+              /* Create C0, a set of the points of the first node in
+                 each element */
+              Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"C0\">\n",
+                             elementGlobalSize);
+              Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n",
+                             elementGlobalSize);
+              Journal_Printf(stream,"      <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u 3\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+                             elementGlobalSize, feMesh->name, context->timeStep);
+              Journal_Printf(stream,"    </DataItem>\n");
+
+              /* Create C0x, a set of the points of the first node in each
+                 element except for the elements on the right. */
+              /* First create a strips that go from the left to the
+                 right, stopping one element short of the edge. */
+              for(uint i=0;i<sizes[1];++i)
+                {
+                  Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"C0x%u\">\n",
+                                 sizes[0]-1,i);
+                  Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> %u 0 1 1 %u 1 </DataItem>\n",
+                                 i*sizes[0],sizes[0]-1);
+                  Journal_Printf(stream,"      <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u 3\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+                                 elementGlobalSize, feMesh->name, context->timeStep);
+                  Journal_Printf(stream,"    </DataItem>\n");
+                }
+
+              /* Now join the strips together to create C0x */
+              Journal_Printf(stream,"    <DataItem ItemType=\"Function\"  Dimensions=\"%u\" Function=\"JOIN(",
+                             (sizes[0]-1)*sizes[1]);
+              for(uint i=0;i<sizes[1]-1;++i)
+                Journal_Printf(stream,"$%u; ",i);
+              Journal_Printf(stream,"$%u)\" Name=\"C0x\">\n",
+                             sizes[1]-1);
+
+              for(uint i=0;i<sizes[1];++i)
+                {
+                  Journal_Printf(stream,"      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0x%u\"]</DataItem>\n",
+                                 feMesh->name,i);
+                }
+              Journal_Printf(stream,"    </DataItem>\n");
+
+              /* Create C0y0, a set of points of the first node in
+                 the elements in a strip on the left side. */
+              Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"C0y0\">\n",
+                             sizes[1]);
+              Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 %u 1 %u 1 </DataItem>\n",
+                             sizes[0],sizes[1]-1);
+              Journal_Printf(stream,"      <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u 3\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+                             elementGlobalSize, feMesh->name, context->timeStep);
+              Journal_Printf(stream,"    </DataItem>\n");
+
+
+              /* Use C0, C0x, and C0y0 to create all of the triangles */
+              int total_triangles=elementGlobalSize + 2*(elementGlobalSize-sizes[1])
+                + 2*(elementGlobalSize-sizes[1]-sizes[0]+1)
+                + elementGlobalSize-sizes[0]
+                + 2*(sizes[1]-1);
+              Journal_Printf(stream,"    <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n",
+                             topologyType.c_str(),
+                             total_triangles);
+              Journal_Printf(stream,"      <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0; $1; $2; $3; $4; $5; $6; $7)\">\n",
+                             total_triangles);
+              /* Triangles for the three points in the element */
+              Journal_Printf(stream,"        <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u 3\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+                             elementGlobalSize, feMesh->name,
                              context->timeStep );
-              Journal_Printf(stream,"      </Topology>\n\n" );
+              /* Triangle for nodes 1,2 in the left element and 0 in
+                 the right element.  The numbering for xdmf is really
+                 wacked.  In JOIN($0 +1, $0+2), the second value will
+                 actually be $0+3, because it will add 1 and use that
+                 as the current $0.  Very annoying. */
+              Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN(1 + $0, 1 + $0, 1 + $0)\">\n",
+                             elementGlobalSize-sizes[1]);
+              Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0x\"] </DataItem>\n",
+                             feMesh->name);
+              Journal_Printf(stream,"        </DataItem>\n" );
+
+              /* Triangle for nodes 2 in the left element and 0,2 in
+                 the right element.  */
+              Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN(2 + $0, 1 + $0, 2 + $0)\">\n",
+                             elementGlobalSize-sizes[1]);
+              Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0x\"] </DataItem>\n",
+                             feMesh->name);
+              Journal_Printf(stream,"        </DataItem>\n" );
+
+              /* Triangle for nodes 2 in the left element, 2 in the
+                 right element, and 1 in the top element. */
+              Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN(2 + $0, 3 + $0, %u + $0)\">\n",
+                             elementGlobalSize-sizes[1]-sizes[0]+1,3*sizes[0]-4);
+              Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0x\"] </DataItem>\n",
+                             feMesh->name);
+              Journal_Printf(stream,"        </DataItem>\n" );
+
+              /* Triangle for nodes 2 in the right element, 1 in the
+                 top element, and 0 in the top right element. */
+              Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN(5 + $0, %u + $0, 2 + $0)\">\n",
+                             elementGlobalSize-sizes[1]-sizes[0]+1,3*sizes[0]-5+1);
+              Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0x\"] </DataItem>\n",
+                             feMesh->name);
+              Journal_Printf(stream,"        </DataItem>\n" );
+
+              /* Triangle for nodes 2 in the left element and nodes
+                 0,1 in the top element. */
+              Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN(2 + $0, %u + $0, 1 + $0)\">\n",
+                             elementGlobalSize-sizes[0],3*sizes[0]-2);
+              Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0\"] </DataItem>\n",
+                             feMesh->name);
+              Journal_Printf(stream,"        </DataItem>\n" );
+
+              /* Triangle for the strip on the left side.  It is made
+                 up of nodes 0,2 in the bottom element and node 0 in
+                 the top element. */
+              Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN($0, 2 + $0, %u + $0)\">\n",
+                             sizes[1]-1,3*sizes[0]-2);
+              Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0y0\"] </DataItem>\n",
+                             feMesh->name);
+              Journal_Printf(stream,"        </DataItem>\n" );
+
+              /* Triangle for the strip on the right side.  It is made
+                 up of nodes 1,2 in the bottom element and node 1 in
+                 the top element. */
+              Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u 3\" Function=\"JOIN(%u + $0, 1 + $0, %u + $0)\">\n",
+                             sizes[1]-1,3*sizes[0]-2,3*sizes[0]-1);
+              Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C0y0\"] </DataItem>\n",
+                             feMesh->name);
+              Journal_Printf(stream,"        </DataItem>\n" );
+
+
+
+
+              Journal_Printf(stream,"      </DataItem>\n" );
+              Journal_Printf(stream,"    </Topology>\n\n" );
             }
           else
             {
@@ -414,7 +572,6 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
    Index           dofCountIndex;
    Index           swarmParticleLocalCount;
    Index           countindex;
-   Index           ii;
    Swarm*          currentSwarm;
    SwarmVariable*  swarmVar;
    char*           swarmVarName;
@@ -442,7 +599,7 @@ void _XDMFGenerator_WriteSwarmSchema( UnderworldContext* context, Stream* stream
                               Journal_Printf( stream, "      <Time Value=\"%f\" />\n\n", context->currentTime );
 
       Stg_asprintf( &filename_part, "" );
-      for (ii = 0 ; ii < context->nproc ; ++ii) {
+      for (int ii = 0 ; ii < context->nproc ; ++ii) {
 
          /** get the number of particles in each swarm from each process **/
          if (ii != MASTER        ) MPI_Recv( &swarmParticleLocalCount, 1, MPI_INT, ii, FINISHED_WRITING_TAG, context->communicator, &status );
