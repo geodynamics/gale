@@ -677,7 +677,7 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 	SNES							oldSnes = sle->nlSolver;
 
 	/* don't assume that a snes is being used for initial guess, check for this!!! */
-	if( oldSnes && context->timeStep == 1 && !sle->linearSolveInitGuess )
+	if( oldSnes && context->timeStep == 0 && !sle->linearSolveInitGuess )
 		SNESDestroy( oldSnes );
 
 	SNESCreate( sle->comm, &snes );

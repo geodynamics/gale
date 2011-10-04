@@ -21,7 +21,7 @@ void ContextSuite_Teardown( ContextSuiteData* data ) {
 }
 
 double ContextSuite_CalcDtFunc( FiniteElementContext* context) {
-	if ( context->timeStep == 1 ) {
+	if ( context->timeStep == 0 ) {
 		return 1.0;
 	}
 	else {
