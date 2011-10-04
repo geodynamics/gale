@@ -791,7 +791,7 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 		Journal_RPrintf( self->info, "until simulation time passes %g.\n", self->stopTime );
 	}
 	
-	self->timeStepSinceJobRestart = 1;
+	self->timeStepSinceJobRestart = 0;
 
 	/* Set timeStep to 0 if not restarting, so that incrementing timestep below affects both
 		regular and restart mode -- PatrickSunter - 18 June 2006 */
@@ -800,8 +800,6 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 		self->currentTime = self->startTime;
 	}
 	
-	self->timeStep++;
-
 	while( !self->gracefulQuit ) {
 		if ( ( True == self->loadFromCheckPoint ) &&
 			( self->timeStep == self->restartTimestep + 1 ) )
@@ -873,7 +871,7 @@ void _AbstractContext_Step( void* _context, double dt ) {
         enabled=Stream_IsEnable(self->info);
         Stream_Enable(self->info,True);
 	Journal_RPrintf( self->info, "TimeStep = %d, Time = %.6g\n",
-		self->timeStep-1, self->currentTime+dt );
+		self->timeStep, self->currentTime+dt );
         Stream_Enable(self->info,enabled);
 
 	if (self->loadFromCheckPoint) {
@@ -885,9 +883,15 @@ void _AbstractContext_Step( void* _context, double dt ) {
 	#endif
 
 	self->_setDt( self, dt );
+        /* Call updateClassK first, to advect and remesh.  Then solve
+           on the new mesh.  Do not advect etc. if this is the first
+           step. */
+        if(self->timeStep==0)
+          {
+            KeyCall( self, self->updateClassK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->updateClassK), self );
+          }
 	KeyCall( self, self->solveK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->solveK), self );
 	KeyCall( self, self->postSolveK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->postSolveK), self );	
-	KeyCall( self, self->updateClassK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->updateClassK), self );
 	KeyCall( self, self->syncK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->syncK), self );
 }
 
@@ -896,7 +900,6 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
   AbstractContext*       self = (AbstractContext*)_context;
   char*                  timeInfoFileName = NULL;
   char*                  timeInfoFileNamePart = NULL;
-  FILE*                  timeInfoFile;		
   Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
 
 #ifdef READ_HDF5
@@ -906,7 +909,6 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 	
   timeInfoFileNamePart = Context_GetCheckPointReadPrefixString( self );
 #ifdef WRITE_HDF5
-  timeInfoFile = NULL;
   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->restartTimestep );
 	 
   /* Open the file and data set. */
@@ -947,7 +949,7 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 #else	
   Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->restartTimestep );
 	 
-  timeInfoFile = fopen( timeInfoFileName, "r" );
+  FILE* timeInfoFile = fopen( timeInfoFileName, "r" );
   Journal_Firewall( NULL != timeInfoFile, errorStr, "Error- in %s(), Couldn't find checkpoint time info file with "
                     "filename \"%s\" (HD5 not enabled) - aborting.\n", __func__, timeInfoFileName );
 
@@ -964,7 +966,6 @@ void _AbstractContext_LoadTimeInfoFromCheckPoint( void* _context, Index timeStep
 
 void _AbstractContext_SaveTimeInfo( void* _context ) {
   AbstractContext*       self = (AbstractContext*)_context;	
-  FILE*                  timeInfoFile = NULL;
   char*                  timeInfoFileName = NULL;
   char*                  timeInfoFileNamePart = NULL;
   Stream*                errorStr = Journal_Register( Error_Type, (Name)self->type  );
@@ -978,7 +979,6 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
   if ( self->rank == 0 ) {
     timeInfoFileNamePart = Context_GetCheckPointWritePrefixString( self );
 #ifdef WRITE_HDF5
-    timeInfoFile = NULL;
     Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.h5", timeInfoFileNamePart, self->timeStep );
 	
     /* Create parallel file property list. */
@@ -1050,7 +1050,7 @@ void _AbstractContext_SaveTimeInfo( void* _context ) {
 #else	
     Stg_asprintf( &timeInfoFileName, "%stimeInfo.%.5u.dat", timeInfoFileNamePart, self->timeStep );
 	 
-    timeInfoFile = fopen( timeInfoFileName, "w" );
+    FILE* timeInfoFile = fopen( timeInfoFileName, "w" );
 
     if ( NULL == timeInfoFile ) {
       Journal_Printf( errorStr, "Error- in %s(), Couldn't create checkpoint time info file with "
