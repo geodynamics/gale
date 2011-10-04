@@ -38,7 +38,7 @@ void StGermain_Bouncer_UpdatePositions( DomainContext* context ) {
 	
 	blockGeom = (BlockGeometry*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"geometry" );
 
-	if ( context->timeStep == 1  ) {
+	if ( context->timeStep == 0  ) {
 		/* for each particle, set a random velocity */
 		for ( lParticle_I=0; lParticle_I < swarm->particleLocalCount; lParticle_I++ ) {
 			currParticle = (Particle*)Swarm_ParticleAt( swarm, lParticle_I );

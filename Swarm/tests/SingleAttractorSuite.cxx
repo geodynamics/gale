@@ -188,7 +188,7 @@ void SingleAttractorSuite_SingleAttractor( DomainContext* context ) {
 	Journal_Printf( stream, "Calculated attractor point is at (%f,%f,%f):\n", attractorPoint[0], attractorPoint[1], attractorPoint[2] );
 	
 	/* Now decide if we are attracting or repelling */
-	if ( ( ( (context->timeStep - 1) / explosionPeriod ) % 2 ) == 0 ) {
+	if ( ( ( context->timeStep / explosionPeriod ) % 2 ) == 0 ) {
 		Journal_Printf( stream, "Timestep %d - Implosive mode\n", context->timeStep );
 		movementSign = 1;
 	}

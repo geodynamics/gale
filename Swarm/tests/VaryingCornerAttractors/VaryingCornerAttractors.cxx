@@ -79,7 +79,7 @@ void StGermain_VaryingCornerAttractors_UpdatePositions( DomainContext* context )
 	cornerCoords[7][K_AXIS] = blockGeometry->max[K_AXIS];
 
 	/* calculate which corner */
-	modValue = (context->timeStep - 1) % (numCorners * cornerPeriod );
+	modValue = context->timeStep % (numCorners * cornerPeriod );
 	cornerIndex = modValue / cornerPeriod;
 	memcpy( attractorPoint, cornerCoords[cornerIndex], 3 * sizeof(double) );
 	Journal_Printf( stream, "Calculated attractor point is at (%f,%f,%f):\n", attractorPoint[0], attractorPoint[1], attractorPoint[2] );
@@ -87,7 +87,7 @@ void StGermain_VaryingCornerAttractors_UpdatePositions( DomainContext* context )
 	/* Can't really explode in this test as particles go out of box */
 	#if 0
 	/* Now decide if we are attracting or repelling */
-	if ( ( ( (context->timeStep - 1) / explosionPeriod ) % 2 ) == 0 ) {
+	if ( ( ( context->timeStep / explosionPeriod ) % 2 ) == 0 ) {
 		Journal_Printf( stream, "Timestep %d - Implosive mode\n", context->timeStep );
 		movementSign = 1;
 	}
