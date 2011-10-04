@@ -52,7 +52,7 @@
       <param name="elementType">linear-inner</param>
     </struct>
     <struct name="Pm1Mesh-generator">
-      <param name="Type">Inner2DGenerator</param>
+      <param name="Type">InnerGenerator</param>
       <param name="mesh">mesh-Pm1</param>
       <param name="elementMesh">mesh-Q2</param>
       <param name="dim">dim</param>
@@ -390,6 +390,7 @@
     <list name="systems">
       <struct>
         <param name="mesh">mesh-Q2</param>
+        <param name="innerMesh">mesh-Pm1</param>
         <param name="remesher">velocityRemesher</param>
         <param name="velocityField">VelocityField</param>
         <param name="wrapTop">True</param>
