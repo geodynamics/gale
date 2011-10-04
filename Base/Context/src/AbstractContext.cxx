@@ -496,7 +496,7 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	} 
 	self->stopTime = Dictionary_Entry_Value_AsDouble( dictEntryVal );
 
-	/* maxTimeSteps of 0 means no maximum applied */
+	/* maxTimeSteps of -1 means no maximum applied */
 	/* Note: these try for deprecated key "maxLoops" as well as new one "maxTimeSteps" - Main.PatrickSunter - 4 November 2004 */
 	dictEntryVal = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"maxLoops" );
 	if ( NULL == dictEntryVal  ) {
@@ -768,11 +768,11 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 	double             dt = 0;
 	double             dtLoadedFromFile = 0;
 	
-	if (self->maxTimeSteps) {
+	if (self->maxTimeSteps>=0) {
 		Journal_RPrintf( self->info, "Run until %u timeSteps have been run\n", self->maxTimeSteps );
 	}
 	if (self->finalTimeStep ) {
-		if (self->maxTimeSteps ) {
+		if (self->maxTimeSteps>=0) {
 			Journal_RPrintf( self->info, "or " );
 		}	
 		else {
@@ -782,7 +782,7 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 	}
 	
 	if (self->stopTime) {
-		if (self->maxTimeSteps || self->finalTimeStep ) {
+		if (self->maxTimeSteps>=0 || self->finalTimeStep ) {
 			Journal_RPrintf( self->info, "or " );
 		}	
 		else {
@@ -846,7 +846,7 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 			}
 		}	
 
-		if (self->maxTimeSteps && (self->timeStepSinceJobRestart >= self->maxTimeSteps)) break;
+		if (self->maxTimeSteps>=0 && (self->timeStepSinceJobRestart >= self->maxTimeSteps)) break;
 		if (self->finalTimeStep && (self->timeStep >= self->finalTimeStep)) break;
 		if (self->stopTime && (self->currentTime >= self->stopTime)) break; 
 
@@ -886,7 +886,7 @@ void _AbstractContext_Step( void* _context, double dt ) {
         /* Call updateClassK first, to advect and remesh.  Then solve
            on the new mesh.  Do not advect etc. if this is the first
            step. */
-        if(self->timeStep==0)
+        if(self->timeStep!=0)
           {
             KeyCall( self, self->updateClassK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->updateClassK), self );
           }
