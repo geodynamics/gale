@@ -115,10 +115,6 @@ void _C2Generator_Delete( void* meshGenerator ) {
 void _C2Generator_Print( void* meshGenerator, Stream* stream ) {
 	C2Generator*	self = (C2Generator*)meshGenerator;
 	
-	/* Set the Journal for printing informations */
-	Stream* meshGeneratorStream;
-	meshGeneratorStream = Journal_Register( InfoStream_Type, (Name)"C2GeneratorStream" );
-
 	assert( self  );
 
 	/* Print parent */

@@ -241,12 +241,10 @@ void _TrilinearInnerElType_SF_allNodes( void* elementType, const double localCoo
 	eta  = localCoord[1];
 	zeta = localCoord[2];	
 	
-	fac = 1.0/9.0;
-
-	evaluatedValues[0] = fac*( - 4.0*xi - 20.0*eta + 12.0*zeta + 3.0 );
-	evaluatedValues[1] = fac*(  16.0*xi - 64.0*eta + 60.0*zeta + 6.0 );
-	evaluatedValues[2] = fac*(            36.0*eta - 36.0*zeta       );
-	evaluatedValues[3] = fac*( -12.0*xi + 48.0*eta - 36.0*zeta       );
+	evaluatedValues[0] = -xi - eta/2 - zeta/4 + 0.125;
+	evaluatedValues[1] =  xi - eta/2 - zeta/4 + 0.125;
+	evaluatedValues[2] =       eta   - zeta/2 + 0.25;
+	evaluatedValues[3] =               zeta   + 0.5;
 }
 
 
@@ -261,22 +259,20 @@ void _TrilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const 
 	eta  = localCoord[1];
 	zeta = localCoord[2];	
 	
-	fac = 1.0/9.0;
-	                       
-	evaluatedDerivatives[0][0] = fac*( - 4.0 ); 
-	evaluatedDerivatives[0][1] = fac*(  16.0 ); 
-	evaluatedDerivatives[0][2] =         0.0  ; 
-	evaluatedDerivatives[0][3] = fac*( -12.0 ); 
+	evaluatedDerivatives[0][0] = -1;
+	evaluatedDerivatives[0][1] =  1;
+	evaluatedDerivatives[0][2] =  0;
+	evaluatedDerivatives[0][3] =  0;
 	                             
-	evaluatedDerivatives[1][0] = fac*( -20.0 );	
-	evaluatedDerivatives[1][1] = fac*( -64.0 );	
-	evaluatedDerivatives[1][2] =         4.0  ;	
-	evaluatedDerivatives[1][3] = fac*(  48.0 );	
+	evaluatedDerivatives[1][0] = -0.5;
+	evaluatedDerivatives[1][1] = -0.5;
+	evaluatedDerivatives[1][2] = 1;
+	evaluatedDerivatives[1][3] = 0;
 	                            
-	evaluatedDerivatives[2][0] = fac*(  12.0 );
-	evaluatedDerivatives[2][1] = fac*(  60.0 );
-	evaluatedDerivatives[2][2] =       - 4.0  ;
-	evaluatedDerivatives[2][3] =       - 4.0  ;
+	evaluatedDerivatives[2][0] = -0.25;
+	evaluatedDerivatives[2][1] = -0.25;
+        evaluatedDerivatives[2][2] = -0.5;
+	evaluatedDerivatives[2][3] = 1;
 }
 
 /* get rid of this function and just use the superclass (elementType) version, as for BilinearInner class?? */

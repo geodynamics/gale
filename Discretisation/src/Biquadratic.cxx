@@ -110,10 +110,6 @@ void _Biquadratic_Delete( void* elementType ) {
 void _Biquadratic_Print( void* elementType, Stream* stream ) {
 	Biquadratic* self = (Biquadratic*)elementType;
 	
-	/* Set the Journal for printing informations */
-	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"BiquadraticStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Biquadratic (ptr): (%p)\n", self );
 	_ElementType_Print( self, stream );
@@ -223,14 +219,11 @@ double Biquadratic_JacobianDeterminantSurface(
 	unsigned			face_I,
 	unsigned			norm )
 {
-	Biquadratic*	self = (Biquadratic*) elementType;
 	Mesh*				mesh = (Mesh*)_mesh;
 	unsigned			surfaceDim	= ( norm + 1 ) % 2;
 	double			x[3];
 	double			detJac;
 	unsigned			nodes[3];
-
-	self = (Biquadratic*) elementType;
 
 	ElementType_GetFaceNodes( elementType, mesh, element_I, face_I, 3, nodes );
 

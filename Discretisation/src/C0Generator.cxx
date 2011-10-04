@@ -105,10 +105,6 @@ void _C0Generator_Delete( void* generator ) {
 void _C0Generator_Print( void* generator, Stream* stream ) {
 	C0Generator*	self = (C0Generator*)generator;
 	
-	/* Set the Journal for printing informations */
-	Stream* generatorStream;
-	generatorStream = Journal_Register( InfoStream_Type, (Name)"C0GeneratorStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "C0Generator (ptr): (%p)\n", self );
 	_MeshGenerator_Print( self, stream );

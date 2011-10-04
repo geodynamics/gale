@@ -110,10 +110,6 @@ void _Triquadratic_Delete( void* elementType ) {
 void _Triquadratic_Print( void* elementType, Stream* stream ) {
 	Triquadratic*	self = (Triquadratic*)elementType;
 
-	/* Set the Journal for printing informations */
-	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"TriquadraticStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Triquadratic (ptr): (%p)\n", self );
 	_ElementType_Print( self, stream );

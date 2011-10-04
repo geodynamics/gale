@@ -107,10 +107,6 @@ void _RegularBilinear_Delete( void* elementType ) {
 void _RegularBilinear_Print( void* elementType, Stream* stream ) {
 	RegularBilinear*	self = (RegularBilinear*)elementType;
 	
-	/* Set the Journal for printing informations */
-	Stream* elementTypeStream;
-	elementTypeStream = Journal_Register( InfoStream_Type, (Name)"RegularBilinearStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "RegularBilinear (ptr): (%p)\n", self );
 	_BilinearElementType_Print( self, stream );
