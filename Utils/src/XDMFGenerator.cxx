@@ -193,7 +193,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
         }
       else if(element_family=="linear-inner")
         {
-          topologyType= (nDims==2) ? "Triangle" : "Hexahedron";
+          topologyType= (nDims==2) ? "Triangle" : "Tetrahedron";
         }
       /** first create the grid which is applicable to the
           checkpointed fevariables **/
@@ -402,7 +402,9 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
             }
           else
             {
-              abort();
+              Journal_Printf( stream, "    <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n", topologyType.c_str(), elementGlobalSize );
+              Journal_Printf( stream, "      <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n", elementGlobalSize, maxNodes, feMesh->name, context->timeStep );
+              Journal_Printf( stream, "    </Topology>\n\n" );
             }
         }
       /* Continuous linear elements */
