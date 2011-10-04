@@ -167,7 +167,7 @@ void Underworld_MovingMesh_Remesh( TimeIntegrator* timeIntegrator, MeshExtender*
 	dt = AbstractContext_Dt( self->context );
 	/* TODO: the if statement is here since we seem to be using last timestep's dt to update. Is this correct?
 	 PatrickSunter - 5 June 2006 */
-	if ( self->context->timeStep > 1 ) {
+	if ( self->context->timeStep > 0 ) {
 		Journal_Firewall( 
 			dt > 0.0,
 			Journal_Register( Error_Type, (Name)Underworld_MovingMesh_Type  ), 
