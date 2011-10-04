@@ -65,11 +65,11 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 	
 	Journal_Printf( context->info, "** Running in visualOnly mode**\n" );
 
-	if (context->maxTimeSteps) {
+	if (context->maxTimeSteps>=0) {
 		Journal_Printf( context->info, "Visualise timestep data until %u timeSteps have been run\n", context->maxTimeSteps );
 	}
 	if (context->finalTimeStep ) {
-		if (context->maxTimeSteps ) {
+		if (context->maxTimeSteps>=0 ) {
 			Journal_Printf( context->info, "or " );
 		}	
 		else {
@@ -79,7 +79,7 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 	}
 	
 	if (context->stopTime) {
-		if (context->maxTimeSteps || context->finalTimeStep ) {
+		if (context->maxTimeSteps>=0 || context->finalTimeStep ) {
 			Journal_Printf( context->info, "or " );
 		}	
 		else {
@@ -88,7 +88,7 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 		Journal_Printf( context->info, "until simulation time passes %g.\n", context->stopTime );
 	}
 	
-	context->timeStepSinceJobRestart = 1;
+	context->timeStepSinceJobRestart = 0;
 
 	if ( False == context->loadFromCheckPoint ) { 
 		context->timeStep = 0;
@@ -107,8 +107,6 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 		}	
 	}
 
-	context->timeStep++;
-	context->restartTimestep++;
 	Dictionary_Set( context->dictionary, (Dictionary_Entry_Key)"restartTimestep", Dictionary_Entry_Value_FromUnsignedInt( context->restartTimestep ) );
 
 	while (1 ) {
@@ -185,7 +183,7 @@ void lucPlugin_VisualOnlyRun( Context* _context ) {
 			}	
 		}
 
-		if (context->maxTimeSteps && (context->timeStepSinceJobRestart >= context->maxTimeSteps)) break;
+		if (context->maxTimeSteps>=0 && (context->timeStepSinceJobRestart >= context->maxTimeSteps)) break;
 		if (context->finalTimeStep && (context->timeStep >= context->finalTimeStep)) break;
 		if (context->stopTime && (context->currentTime >= context->stopTime)) break; 
 		context->timeStep++;
