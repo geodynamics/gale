@@ -150,6 +150,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 			/* Read contents. */
 			meshName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"mesh"  );
+                        char *innerMeshName=Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"innerMesh"  );
 			remesherName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"remesher"  );
 
 			if( strcmp( remesherName, "" ) )
@@ -166,6 +167,7 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapBottom", False  );
 			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapLeft", False  );
 			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)meshName, Mesh, True, data  );
+			sys->inner_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)innerMeshName, Mesh, True, data  );
 			/* This line is currently not working, have to manually set the velocity field name.
 				This should be fixed once this plugin has been converted to a component. */
 			/*sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)velFieldName, FieldVariable, True, data  );*/
@@ -1022,6 +1024,12 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     Mesh_DeformationUpdate( sys->mesh );
     for( var_i = 0; var_i < sys->nFields; var_i++ )
       FeVariable_SyncShadowValues( sys->fields[var_i] );
+
+    /* Reset the coordinates of the inner, discontinuous mesh */
+
+    if(sys->inner_mesh!=NULL)
+      InnerGenerator_SetCoordinates((InnerGenerator*)(sys->inner_mesh->generator),
+                                    (FeMesh*)(sys->inner_mesh));
   }
 }
 

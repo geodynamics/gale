@@ -36,6 +36,7 @@
 
 	struct EulerDeform_System {
 		Mesh*		mesh;
+		Mesh*		inner_mesh;
 		double*		verts;
 	        FeVariable*     dispField;
 		Remesher*	remesher;
