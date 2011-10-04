@@ -102,7 +102,7 @@ void VTKOutput( void* _context ) {
      we are outputing after a solve, but before advection.  So
      timeStep-1 makes more sense in terms of when the simulation looks
      like this. */
-  if((context->timeStep-1) % context->dumpEvery != 0)
+  if(context->timeStep % context->dumpEvery != 0)
     return;
 	
 
@@ -134,14 +134,14 @@ void VTKOutput( void* _context ) {
                               (dictionary,"defaultDiffusivity",1.0),
                               Dictionary_GetInt_WithDefault
                               (dictionary,"particleStepping",1),
-                              context->outputPath, context->timeStep-1,
+                              context->outputPath, context->timeStep,
                               context->dim,context->rank,context->nproc);
         }
     }
   if(Dictionary_GetBool_WithDefault(dictionary,"VTKOutput_Fields",
                                     True))
     VTKOutput_fields(context,context->rank,context->nproc,
-                     context->timeStep-1);
+                     context->timeStep);
 }
 
 void VTKOutput_particles(Swarm* swarm,
@@ -588,7 +588,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
     fieldVar = FieldVariable_Register_GetByIndex( self->fieldVariable_Register,
                                                   var_I );
     if (Stg_Class_IsInstance( fieldVar, FeVariable_Type )
-        && ((FeVariable*)fieldVar)->name!=std::string("PressureField") ) {
+        && ((FeVariable*)fieldVar)->feMesh->feElFamily!=std::string("linear-inner")) {
       FeVariable* feVar;
       Dof_Index          dofAtEachNodeCount;
       int *low, *up;
