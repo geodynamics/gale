@@ -103,10 +103,6 @@ void _InnerGenerator_Delete( void* generator ) {
 void _InnerGenerator_Print( void* generator, Stream* stream ) {
 	InnerGenerator*	self = (InnerGenerator*)generator;
 	
-	/* Set the Journal for printing informations */
-	Stream* generatorStream;
-	generatorStream = Journal_Register( InfoStream_Type, (Name)"InnerGeneratorStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "InnerGenerator (ptr): (%p)\n", self );
 	_MeshGenerator_Print( self, stream );
@@ -195,7 +191,8 @@ void InnerGenerator_BuildTopology( InnerGenerator* self, FeMesh* mesh ) {
 	int		nLocals, *locals;
 	int		nRemotes, *remotes;
 	unsigned	global;
-	unsigned	e_i, l_i, r_i;
+	unsigned	e_i;
+        int             l_i, r_i;
 
 	assert( self );
 	assert( mesh );
@@ -299,72 +296,86 @@ void InnerGenerator_BuildTopology( InnerGenerator* self, FeMesh* mesh ) {
 	IGraph_InvertIncidence( topo, MT_VERTEX, nDims );
 }
 
+void InnerGenerator_SetCoordinates( InnerGenerator* self, FeMesh* mesh );
+
 void InnerGenerator_BuildGeometry( InnerGenerator* self, FeMesh* mesh ) {
-	Mesh*		elMesh;
-	double		localCrds[3][2] = {{-0.5, -0.5}, 
-					   {0.5, -0.5}, 
-					   {0, 0.5}};
-	double		globalCrd[2];
-	double		*vert;
-	unsigned	nDims;
-	unsigned	nDomainEls;
-	unsigned	e_i;
+  assert( self );
+  assert( mesh );
 
-	assert( self );
-	assert( mesh );
+  Mesh *elMesh = self->elMesh;
+  unsigned nDims = Mesh_GetDimSize( elMesh );
+  unsigned nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
 
-	elMesh = self->elMesh;
-	nDims = Mesh_GetDimSize( elMesh );
-	nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
-
-	if( nDims == 2 ) {
-		mesh->verts = AllocArray2D( double, nDomainEls * 3, nDims );
-		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-			unsigned elInd = e_i * 3;
-
-			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[0], globalCrd );
-			vert = Mesh_GetVertex( mesh, elInd );
-			memcpy( vert, globalCrd, nDims * sizeof(double) );
-
-			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[1], globalCrd );
-			vert = Mesh_GetVertex( mesh, elInd + 1 );
-			memcpy( vert, globalCrd, nDims * sizeof(double) );
-
-			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[2], globalCrd );
-			vert = Mesh_GetVertex( mesh, elInd + 2 );
-			memcpy( vert, globalCrd, nDims * sizeof(double) );
-		}
-	}
-
-	else if( nDims == 3 ) {
-		double localCrds3D[4][3] = { {-0.5, -0.5, -0.5},
-		                             {0.25, 0.25, 0.25},
-		                             {0.5, -0.25, -0.5},
-		                             {-0.25, 0.5, 0.5} };
-		double globalCrd3D[3];
-
-		mesh->verts = AllocArray2D( double, nDomainEls * 4, nDims );
-		for( e_i = 0; e_i < nDomainEls; e_i++ ) {
-			unsigned elInd = e_i * 4;
-
-			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[0], globalCrd3D );
-			vert = Mesh_GetVertex( mesh, elInd );
-			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
-
-			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[1], globalCrd3D );
-			vert = Mesh_GetVertex( mesh, elInd + 1 );
-			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
-
-			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[2], globalCrd3D );
-			vert = Mesh_GetVertex( mesh, elInd + 2 );
-			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
-
-			FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[3], globalCrd3D );
-			vert = Mesh_GetVertex( mesh, elInd + 3 );
-			memcpy( vert, globalCrd3D, nDims * sizeof(double) );
-		}
-	}
+  if( nDims == 2 ) {
+    mesh->verts = AllocArray2D( double, nDomainEls * 3, nDims );
+  }
+  else if( nDims == 3 ) {
+    mesh->verts = AllocArray2D( double, nDomainEls * 4, nDims );
+  }
+  InnerGenerator_SetCoordinates(self, mesh);
 }
+
+void InnerGenerator_SetCoordinates( InnerGenerator* self, FeMesh* mesh ) {
+  assert( self );
+  assert( mesh );
+
+  Mesh *elMesh = self->elMesh;
+  unsigned nDims = Mesh_GetDimSize( elMesh );
+  unsigned nDomainEls = Mesh_GetDomainSize( elMesh, (MeshTopology_Dim)nDims );
+  double *vert;
+
+  if( nDims == 2 ) {
+    double localCrds[3][2] = {{-0.5, -0.5}, 
+                              {0.5, -0.5}, 
+                              {0, 0.5}};
+    double globalCrd[2];
+    for(unsigned e_i = 0; e_i < nDomainEls; e_i++ ) {
+      unsigned elInd = e_i * 3;
+
+      FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[0], globalCrd );
+      vert = Mesh_GetVertex( mesh, elInd );
+      memcpy( vert, globalCrd, nDims * sizeof(double) );
+
+      FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[1], globalCrd );
+      vert = Mesh_GetVertex( mesh, elInd + 1 );
+      memcpy( vert, globalCrd, nDims * sizeof(double) );
+
+      FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds[2], globalCrd );
+      vert = Mesh_GetVertex( mesh, elInd + 2 );
+      memcpy( vert, globalCrd, nDims * sizeof(double) );
+    }
+  }
+
+  else if( nDims == 3 ) {
+    double localCrds3D[4][3] = { {-0.5, -0.5, -0.5},
+                                 {0.5, -0.5, -0.5},
+                                 {0.0, 0.5, -0.5},
+                                 {0.0, 0.0, 0.5} };
+    double globalCrd3D[3];
+
+    for(unsigned e_i = 0; e_i < nDomainEls; e_i++ ) {
+      unsigned elInd = e_i * 4;
+
+      FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[0], globalCrd3D );
+      vert = Mesh_GetVertex( mesh, elInd );
+      memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+
+      FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[1], globalCrd3D );
+      vert = Mesh_GetVertex( mesh, elInd + 1 );
+      memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+
+      FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[2], globalCrd3D );
+      vert = Mesh_GetVertex( mesh, elInd + 2 );
+      memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+
+      FeMesh_CoordLocalToGlobal( elMesh, e_i, localCrds3D[3], globalCrd3D );
+      vert = Mesh_GetVertex( mesh, elInd + 3 );
+      memcpy( vert, globalCrd3D, nDims * sizeof(double) );
+    }
+  }
+
+}
+
 
 void InnerGenerator_BuildElementTypes( InnerGenerator* self, FeMesh* mesh ) {
 	unsigned		nDomainEls;

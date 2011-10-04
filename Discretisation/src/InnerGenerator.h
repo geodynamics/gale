@@ -98,6 +98,7 @@
 	*/
 
 	void InnerGenerator_SetElementMesh( void* generator, void* mesh );
+        void InnerGenerator_SetCoordinates( InnerGenerator* self, FeMesh* mesh );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
