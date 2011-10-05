@@ -48,8 +48,6 @@
 
 	void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx );
 
-	void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, double** newCrds );
-
 	void EulerDeform_WrapTopSurface( EulerDeform_System* sys, double** oldCrds );
 
 	void EulerDeform_WrapBottomSurface( EulerDeform_System* sys, double** oldCrds );

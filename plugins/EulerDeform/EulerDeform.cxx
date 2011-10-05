@@ -139,7 +139,6 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 		for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
 			EulerDeform_System*		sys = edCtx->systems + sys_i;
 			Dictionary*					sysDict;
-			Dictionary_Entry_Value*	varLst;
 			char*							meshName;
 			char*							remesherName;
 			char*							name;
@@ -275,31 +274,6 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
                           sys->x_left_coord =
                             Dictionary_GetDouble( uwCtx->dictionary, "minX");
                           
-			/* Read the list of variables to interpolate. */
-			varLst = Dictionary_Entry_Value_GetMember( Dictionary_Entry_Value_GetElement( sysLst, sys_i  ), "fields" );
-
-			if( varLst ) {
-				unsigned	var_i;
-
-				sys->nFields = Dictionary_Entry_Value_GetCount( varLst );
-				sys->fields = Memory_Alloc_Array( FieldVariable*, sys->nFields, "EulerDeform->systems[].fields" );
-				sys->vars = Memory_Alloc_Array( Variable*, sys->nFields, "EulerDeform->systemsp[].vars" );
-
-				for( var_i = 0; var_i <sys->nFields; var_i++ ) {
-					Dictionary*	varDict;
-					char*			varName;
-
-					/* Get the dictionary for this field tuple. */
-					varDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( varLst, var_i ) );
-					assert( varDict );
-
-					/* Get the field and its variable. */
-					varName = Dictionary_GetString( varDict, (Dictionary_Entry_Key)"field"  );
-					sys->fields[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)varName, FieldVariable, True, data  ); 
-					varName = Dictionary_GetString( varDict, (Dictionary_Entry_Key)"variable"  );
-					sys->vars[var_i] = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)varName, Variable, True, data ); 
-				}
-			}
 		}
 	}
 
@@ -872,7 +846,7 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     double**		newCrds;
     unsigned		nDomainNodes;
     unsigned		nDims;
-    unsigned		var_i, n_i, dof_i;
+    unsigned		n_i, dof_i;
     Grid *grid;
     grid =
       *(Grid**)ExtensionManager_Get(sys->mesh->info, sys->mesh, 
@@ -967,6 +941,12 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     if( sys->wrapBottom )
       EulerDeform_WrapSurface( sys, sys->mesh->verts, 0 );
 
+    /* Float the top left and right corners if needed. */
+    if(sys->floatLeftTop)
+      EulerDeform_FloatLeftTop(sys,grid,sys->mesh->verts);
+    if(sys->floatRightTop)
+      EulerDeform_FloatRightTop(sys,grid,sys->mesh->verts);
+
     /* Store old coordinates. */
     nDomainNodes = FeMesh_GetNodeDomainSize( sys->mesh );
     oldCrds = AllocArray2D( double, nDomainNodes, nDims );
@@ -980,19 +960,6 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     /* Swap old coordinates back in temporarily. */
     newCrds = sys->mesh->verts;
     sys->mesh->verts = oldCrds;
-
-    /* Interpolate the variables. */
-    for( var_i = 0; var_i < sys->nFields; var_i++ )
-      EulerDeform_InterpVar( sys->fields[var_i],
-                             NULL/*sys->vars[var_i]*/, sys->mesh, newCrds );
-
-    /* Float the top left and right corners if needed.  We do this
-       after interpolating, because these points almost certainly are
-       outside of the domain, and so can not be interpolated to. */
-    if(sys->floatLeftTop)
-      EulerDeform_FloatLeftTop(sys,grid,newCrds);
-    if(sys->floatRightTop)
-      EulerDeform_FloatRightTop(sys,grid,newCrds);
 
     /* Create an artificial displacement field from the nodal
      * displacements between newCrds and oldCrds.  This displacement
@@ -1022,8 +989,6 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     /* Re-sync with new coordinates. */
     Mesh_Sync( sys->mesh );
     Mesh_DeformationUpdate( sys->mesh );
-    for( var_i = 0; var_i < sys->nFields; var_i++ )
-      FeVariable_SyncShadowValues( sys->fields[var_i] );
 
     /* Reset the coordinates of the inner, discontinuous mesh */
 

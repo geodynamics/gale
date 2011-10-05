@@ -42,8 +42,6 @@
 		Remesher*	remesher;
 		int             interval;
 		FieldVariable*	velField;
-		unsigned	nFields;
-		FieldVariable**	fields;
 		Variable**	vars;
 		Bool		wrapTop;
 		Bool		wrapBottom;
