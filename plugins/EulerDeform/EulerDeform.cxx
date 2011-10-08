@@ -149,7 +149,10 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 
 			/* Read contents. */
 			meshName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"mesh"  );
+			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)meshName, Mesh, True, data  );
                         char *innerMeshName=Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"innerMesh"  );
+                        if(strcmp( innerMeshName, "" ) )
+                          sys->inner_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)innerMeshName, Mesh, True, data  );
 			remesherName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"remesher"  );
 
 			if( strcmp( remesherName, "" ) )
@@ -165,8 +168,6 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapTop", False  );
 			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapBottom", False  );
 			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapLeft", False  );
-			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)meshName, Mesh, True, data  );
-			sys->inner_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)innerMeshName, Mesh, True, data  );
 			/* This line is currently not working, have to manually set the velocity field name.
 				This should be fixed once this plugin has been converted to a component. */
 			/*sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)velFieldName, FieldVariable, True, data  );*/
