@@ -9,10 +9,6 @@
       <param name="Context">context</param>
     </struct>
     <struct>
-      <param name="Type">Underworld_VTKOutput</param>
-      <param name="Context">context</param>
-    </struct>
-    <struct>
       <param name="Type">StgFEM_StandardConditionFunctions</param>
       <param name="Context">context</param>
     </struct>
@@ -436,7 +432,6 @@
     <struct name="swarmOutput">
       <param name="Type">TracerOutput</param>
       <param name="Swarm">passiveTracerSwarm</param>
-      <param name="PressureField">PressureField</param>
       <list name="Fields">
         <param>PressureField</param>
         <param>StrainRateInvariantField</param>
@@ -452,7 +447,6 @@
   <param name="timeIntegratorOrder">1</param>
   <param name="maxTimeSteps">100</param>
   <param name="outputEvery">1</param>
-  <param name="dumpEvery">1</param>
   <param name="outputPath">./output</param>
   <param name="dim">2</param>
   <param name="shadowDepth">1</param>

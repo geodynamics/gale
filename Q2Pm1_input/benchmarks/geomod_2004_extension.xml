@@ -446,7 +446,6 @@
   <param name="timeIntegratorOrder">1</param>
   <param name="maxTimeSteps">5000</param>
   <param name="outputEvery">1</param>
-  <param name="dumpEvery">1</param>
   <param name="outputPath">./output.extension</param>
   <param name="dim">2</param>
   <param name="shadowDepth">1</param>

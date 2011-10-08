@@ -9,10 +9,6 @@
       <param name="Context">context</param>
     </struct>
     <struct>
-      <param name="Type">Underworld_VTKOutput</param>
-      <param name="Context">context</param>
-    </struct>
-    <struct>
       <param name="Type">StgFEM_StandardConditionFunctions</param>
       <param name="Context">context</param>
     </struct>
@@ -392,7 +388,6 @@
   <param name="timeIntegratorOrder">1</param>
   <param name="maxTimeSteps">10</param>
   <param name="outputEvery">1</param>
-  <param name="dumpEvery">1</param>
   <param name="outputPath">./output</param>
   <param name="dim">2</param>
   <param name="shadowDepth">1</param>
@@ -461,10 +456,4 @@
   </struct>
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
-
-  <param name="journal.info">True</param>
-  <param name="journal.debug">True</param>
-  <param name="journal-level.info">2</param>
-  <param name="journal-level.debug">2</param>
-
 </StGermainData>

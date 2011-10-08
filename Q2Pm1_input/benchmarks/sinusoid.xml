@@ -108,29 +108,14 @@
       <param name="IC">velocityICs</param>
       <param name="LinkedDofInfo">velocityLinkedDofs</param>
     </struct>
-    <struct name="VelocityMagnitudeField">
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">Magnitude</param>
-      <param name="FeVariable">VelocityField</param>
-    </struct>
     <struct name="VelocityGradientsField">
       <param name="Type">OperatorFeVariable</param>
       <param name="Operator">Gradient</param>
       <param name="FeVariable">VelocityField</param>
     </struct>
-    <struct name="VelocityGradientsInvariantField">
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TensorInvariant</param>
-      <param name="FeVariable">VelocityGradientsField</param>
-    </struct>
     <struct name="StrainRateField">
       <param name="Type">OperatorFeVariable</param>
       <param name="Operator">TensorSymmetricPart</param>
-      <param name="FeVariable">VelocityGradientsField</param>
-    </struct>
-    <struct name="VorticityField">
-      <param name="Type">OperatorFeVariable</param>
-      <param name="Operator">TensorAntisymmetricPart</param>
       <param name="FeVariable">VelocityGradientsField</param>
     </struct>
     <struct name="StrainRateInvariantField">
@@ -410,7 +395,6 @@
   <param name="checkpointEvery">1</param>
   <param name="maxTimeSteps">50</param>
   <param name="outputEvery">1</param>
-  <param name="dumpEvery">1</param>
   <param name="outputPath">./output.sinusoid</param>
   <param name="dim">2</param>
   <param name="shadowDepth">1</param>
