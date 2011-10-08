@@ -124,7 +124,7 @@ Walter Landry and Luke Hodkinson
 \begin_inset Newline newline
 \end_inset
 
-Version 1.6.2
+Version 2.0.0
 \end_layout
 
 \begin_layout Date
@@ -884,187 +884,69 @@ Numerical Solution
 \end_layout
 
 \begin_layout Subsubsection
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Artificial-Compressibility"
-
-\end_inset
-
-Artificial Compressibility
+Finite Elements
 \end_layout
 
 \begin_layout Standard
-In Gale, the velocity and pressure are represented by linear (Q1) finite
- elements (formally, this is called a Q1-Q1 scheme).
- Normally, this formulation is unstable.
- To stabilize it, we follow Dohrmann & Bochev 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Stable Stokes"
-
+Gale can use a few different types of finite elements to represent the solution.
+ The recommended elements are quadratic (
+\begin_inset Formula $Q_{2}$
 \end_inset
 
- 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Fast Solvers"
-
+) elements for the velocity and discontinuous linear (
+\begin_inset Formula $P_{-1}$
 \end_inset
 
- and add a compressibility term to the divergence equation
+) elements for the pressure.
+ These elements are mathematically well behaved and have been used in other
+ computational codes with success.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-v_{i,i}+Cp=d,\label{eq:stabilized}
-\end{equation}
-
+If, for some reason, you wish use a different element type, Gale also supports
+ continuous linear (
+\begin_inset Formula $Q_{1}$
 \end_inset
 
- where
+) element and piecewise constant (
+\begin_inset Formula $P_{0}$
+\end_inset
+
+) elements.
+ One formulation common in many solid earth modelling codes is to use 
+\begin_inset Formula $Q_{1}$
+\end_inset
+
+ elements for the velocity and 
+\begin_inset Formula $P_{0}$
+\end_inset
+
+ elements for the pressure.
+ This formulation gives rise to a checkerboard instability.
+ While this instability is not always fatal, dealing with it can be difficult
+ and error prone.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Formula 
-\[
-\begin{array}{ccc}
-C & \equiv & \frac{1}{\nu}\left(M-D\right)\\
-M & \equiv & \int_{\Omega_{e}}\psi(x)\psi^{T}(x)d\Omega_{e}\\
-D & \equiv & \int_{\Omega_{e}}d\Omega_{e}
-\end{array},
-\]
-
+Previous versions of Gale did not support 
+\begin_inset Formula $Q_{2}$
 \end_inset
 
- 
-\begin_inset Formula $\Omega_{e}$
+ or 
+\begin_inset Formula $P_{-1}$
 \end_inset
 
- is the finite element, and 
-\begin_inset Formula $\psi(x)$
+ elements, so the recommendation was to use 
+\begin_inset Formula $Q_{1}$
 \end_inset
 
- is its basis function.
- That is, we add a compressibility that is scaled by the viscosity and proportio
-nal to the mass matrix and the area.
- So as we increase resolution, both of these terms scale as the area of
- the element and go to zero.
-\end_layout
-
-\begin_layout Standard
-Prior versions of Gale used constant elements for the pressure (a Q1-P0
- scheme).
- That scheme admits solutions that have an arbitrarily sized checkerboard
- pressure term.
- For simple viscous problems, the pressure is not used any further than
- getting the velocity solution, which the checkerboard term does not affect.
- However, with a yielding rheology, pressure plays a critical role in determinin
-g when materials yield.
- We can moderate this checkerboard instability by averaging the pressure
- at the nodes of the elements.
- In practice, this does not solve all of the problems.
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Q1-P0"
-
-\end_inset
-
- shows a simple subduction model with the old Q1-P0 scheme and averaged
- pressures.
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Q1-Q1"
-
-\end_inset
-
- shows the new Q1-Q1 scheme.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Q1P0.png
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Q1-P0"
-
-\end_inset
-
-Pressure for a subduction model using Q1-P0 elements and averaged pressures.
- Notice that, even when averaging the pressure, there is an even-odd artifact
- centered on the bottom.
- 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Q1Q1.png
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Q1-Q1"
-
-\end_inset
-
-Strain rate invariant for a subduction model using Q1-Q1 elements 
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-These instabilities in the old Q1-P0 scheme also slowed down convergence,
- while the new Q1-Q1 scheme is dramatically faster.
+ elements for both the velocity and pressure.
+ This formulation has its own instability that is fixed by adding an artificial
+ compressibility.
+ In principle, this artificial compressibility should be small and get smaller
+ as resolution increases.
+ In practice, for realistic geologic problems, the artificial compressibility
+ would be far too large and dramatically alter the dynamics.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1078,28 +960,25 @@ Scaling
 \end_layout
 
 \begin_layout Standard
-The new scheme is not without its downsides.
- First of all, the new code does not scale the physical quantities as well
- as the old code.
- In particular, note that the units for Equations 
+One thing to note is that Equations 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "eq:body force"
+reference "eq:simple momentum conservation"
 
 \end_inset
 
  and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "eq:stabilized"
+reference "eq:continuity"
 
 \end_inset
 
- are different.
+ have different units.
  Equation 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "eq:stabilized"
+reference "eq:continuity"
 
 \end_inset
 
@@ -1199,155 +1078,6 @@ A
 \end_inset
 
 .
-\end_layout
-
-\begin_layout Subsubsection
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Hydrostatic-Pressure"
-
-\end_inset
-
-Hydrostatic Pressure
-\end_layout
-
-\begin_layout Standard
-Ideally, the compressibility term should be applied to the dynamic pressure,
- not the hydrostatic pressure.
- This is not a problem in simple sandbox simulations, where the dynamic
- pressure is about the same size as the hydrostatic pressure.
- However, in geological models, the hydrostatic pressure is much, much larger
- than the dynamic pressure.
- This means that the compressibility term is far too large, leading to excessive
- compressibility.
- As Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Collapsing_compressible"
-
-\end_inset
-
- shows, this can completely alter the dynamics.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/collapsing_compressible.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Collapsing_compressible"
-
-\end_inset
-
-Strain rate invariant and velocity arrows for a geologic model without hydrostat
-ic correction.
- The compressibility is so large on the bottom that the whole region falls
- down, dominating the dynamics.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-To fix this, you can subtract out the hydrostatic term.
- You can write Equation 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:body force"
-
-\end_inset
-
- as
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\tau_{ij,j}-p_{0,i}-\delta p_{,i}=f_{0i}+\delta f_{i},\label{eq:hydrostatic}
-\end{equation}
-
-\end_inset
-
- where 
-\begin_inset Formula $p_{0}$
-\end_inset
-
- is the hydrostatic pressure, and 
-\begin_inset Formula $f_{0}$
-\end_inset
-
- is the background buoyancy force that leads to a hydrostatic pressure.
- Since 
-\begin_inset Formula $p_{0}$
-\end_inset
-
- and 
-\begin_inset Formula $f_{0}$
-\end_inset
-
- are constructed to be hydrostatic, they cancel each other.
- You can then rewrite Equations 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:body force"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:divergence"
-
-\end_inset
-
- as
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{equation}
-\begin{array}{ccc}
-\tau_{ij,j}-\delta p_{,i} & = & \delta f_{i}\\
-v_{i,i}+C\delta p & = & d
-\end{array}.\label{eq:complete numerical stokes}
-\end{equation}
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Note that if you are simulating a simple viscous problem in a box, you never
- even use the complete pressure.
- In the general case such as with a yielding rheology, the viscosity may
- depend on the overall pressure.
 \end_layout
 
 \begin_layout Subsubsection
@@ -1960,7 +1690,7 @@ Gale works on a variety of computational platforms and has been tested on
 \end_layout
 
 \begin_layout Itemize
-Mac OS X 10.4.6 and 10.6.0
+Mac OS X 10.4.6, 10.6.0, and 10.7.0
 \end_layout
 
 \begin_layout Itemize
@@ -1968,7 +1698,7 @@ Windows Vista (32 and 64 bit)
 \end_layout
 
 \begin_layout Itemize
-Debian stable (AMD64)
+Debian testing (AMD64)
 \end_layout
 
 \begin_layout Itemize
@@ -1977,10 +1707,6 @@ Ubuntu Hardy Heron (x86 and AMD64)
 
 \begin_layout Itemize
 RedHat Enterprise Linux 3 (EM64T)
-\end_layout
-
-\begin_layout Itemize
-Rocks 4.1 (Opteron)
 \end_layout
 
 \begin_layout Subsection
@@ -2004,6 +1730,10 @@ PETSc 3.0 (not 3.1!)
 libxml2
 \end_layout
 
+\begin_layout Itemize
+HDF5
+\end_layout
+
 \begin_layout Standard
 You must also have python 2.2.1 or greater installed.
  If you do not already have MPI, then in many cases PETSc can install a
@@ -2013,7 +1743,8 @@ You must also have python 2.2.1 or greater installed.
 \end_layout
 
 \begin_layout Standard
-For checkpointing, you will also need HDF5.
+HDF5 is not strictly required, but checkpointing and visualization will
+ not work without it.
 \end_layout
 
 \begin_layout Subsection
@@ -2299,7 +2030,7 @@ If you downloaded binaries for your platform, you can run the Gale executable
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_2 input/cookbook/yielding.xml
+./Gale-2_0_0 input/cookbook/yielding.xml
 \end_layout
 
 \begin_layout Standard
@@ -2311,39 +2042,43 @@ TimeStep = 0, Time = 0
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 1, Time = 0.010764
+TimeStep = 1, Time = 0.0107467
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 2, Time = 0.0214745
+TimeStep = 2, Time = 0.021442
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 3, Time = 0.0321333
+TimeStep = 3, Time = 0.0320895
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 4, Time = 0.0427393
+TimeStep = 4, Time = 0.0426866
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 5, Time = 0.0532923
+TimeStep = 5, Time = 0.0532321
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 6, Time = 0.0637925
+TimeStep = 6, Time = 0.0637259
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 7, Time = 0.0742399
+TimeStep = 7, Time = 0.0741676
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 8, Time = 0.0846353
+TimeStep = 8, Time = 0.0845553
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 9, Time = 0.0949793
+TimeStep = 9, Time = 0.0948918
+\end_layout
+
+\begin_layout LyX-Code
+TimeStep = 10, Time = 0.105179
 \end_layout
 
 \begin_layout Standard
@@ -2369,7 +2104,7 @@ Error: File input/cookbook/foo.xml doesn't exist, not readable, or not valid.
 Due to quirks in some implementations of MPI, you may have to specify the
  complete path to the input file (e.g., 
 \family typewriter
-./Gale-1_6_2 /home/juser/gale/input/cookbook/yielding.xml
+./Gale-2_0_0 /home/juser/gale/input/cookbook/yielding.xml
 \family default
 ).
 \end_layout
@@ -2653,7 +2388,7 @@ One solution is to use a direct solver instead of GMRES.
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_2  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
+./Gale-2_0_0  input/cookbook/yielding.xml -pc_type lu -ksp_type preonly
 \end_layout
 
 \begin_layout Standard
@@ -2682,7 +2417,7 @@ Once that is done, enabling it is again just appending a few arguments to
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_2  input/cookbook/yielding.xml -pc_factor_mat_solver_package mumps
+./Gale-2_0_0  input/cookbook/yielding.xml -pc_factor_mat_solver_package mumps
  
 \backslash
 
@@ -2829,7 +2564,7 @@ You can also change the default values of the input file without modifying
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-1_6_2  input/cookbook/yielding.xml --maxTimeSteps=20
+./Gale-2_0_0  input/cookbook/yielding.xml --maxTimeSteps=20
 \end_layout
 
 \begin_layout Standard
@@ -2840,7 +2575,7 @@ You can append any number of modified parameters in one unbroken line (here
 \begin_layout LyX-Code
 
 \size small
-./Gale-1_6_2  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
+./Gale-2_0_0  input/cookbook/yielding.xml --maxTimeSteps=20 --dim=3 --elementResI=
 64 
 \begin_inset Newline newline
 \end_inset
@@ -2960,28 +2695,9 @@ reference "cha:Output-File-Format"
 \end_layout
 
 \begin_layout Standard
-The default setting is to create VTK files every 10 time steps.
- To change the frequency for creating VTK files, you need to change the
- parameter 
-\family typewriter
-dumpEvery
-\family default
-.
- For example, if you modify the line with 
-\family typewriter
-dumpEvery
-\family default
- to
-\end_layout
-
-\begin_layout LyX-Code
-<param name="dumpEvery">25</param>
-\end_layout
-
-\begin_layout Standard
-then the VTK files will only be created every 25 time steps.
- Similarly, to change the frequency of checkpoints, you need to change the
- parameter 
+XDMF visualization files are created at the same time as checkpoints.
+ So to change the frequency at which Gale outputs XDMF files, you can change
+ the parameter 
 \family typewriter
 checkpointEvery
 \family default
@@ -2993,7 +2709,7 @@ checkpointEvery
 
 \color none
 There are a number of different options for visualizing the data.
- The easiest way is to use the VTK files.
+ The easiest way is to use the XDMF files.
  These files are in a standard, self-describing file format that can be
  easily visualized with several different visualization programs, e.g., ParaView
  
@@ -3007,18 +2723,7 @@ paraview.org
 
 \end_inset
 
-, MayaVI 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-mayavi.sf.net
-\end_layout
-
-\end_inset
-
-, and Visit 
+ and Visit 
 \begin_inset Flex URL
 status collapsed
 
@@ -3039,7 +2744,7 @@ Another option is to use the scripts in the
 \family typewriter
 tools/
 \family default
- directory to convert the VTK files into CSV format.
+ directory to convert the XDMF files into CSV format.
  Then the data can be easily manipulated with standard tools like Python
  or Matlab.
 \end_layout
@@ -3125,7 +2830,7 @@ A file dialog screen will appear.
  Navigate to the output directory and select 
 \family typewriter
 \color none
-fields.00009.pvts
+fields.00010.pvts
 \family default
 .
  Then click the green ``Apply
@@ -3304,7 +3009,7 @@ eye
 
  next to 
 \family typewriter
-fields.00009.pvts
+fields.00010.pvts
 \family default
 .
 \end_layout
@@ -3350,7 +3055,7 @@ click the ``eye
  again, then click on the text 
 \family typewriter
 \color inherit
-fields.00009.pvts
+fields.00010.pvts
 \family default
 \color none
 .
@@ -3463,7 +3168,7 @@ Now you can look at the particles.
  Starting over, open 
 \family typewriter
 \color none
-picIntegrationPoints.00009.pvtu
+picIntegrationPoints.00010.pvtu
 \family default
  and click on the green ``Apply'' button.
 \end_layout
@@ -3551,7 +3256,7 @@ input/cookbook/viscous_extension3D.xml
 \family default
  and open 
 \family typewriter
-fields.00009.ptvs
+fields.00010.ptvs
 \family default
 .
  Paraview will display an outline of the 3D volume.
@@ -3719,119 +3424,6 @@ status open
 \end_layout
 
 \end_deeper
-\begin_layout Subsection
-Visualizing Movies with Paraview
-\end_layout
-
-\begin_layout Standard
-To create a movie, with Paraview, you need to create a special 
-\family typewriter
-pvd
-\family default
- file that stitches all of the individual frames together.
- You can do this with the utility 
-\family typewriter
-tools/generate_pvd
-\family default
-.
- You generally invoke it as
-\end_layout
-
-\begin_layout LyX-Code
-generate_pvd NAME TYPE START END STEP
-\end_layout
-
-\begin_layout Standard
-where 
-\family typewriter
-NAME
-\family default
- is usually either 
-\begin_inset Quotes sld
-\end_inset
-
-fields
-\begin_inset Quotes srd
-\end_inset
-
- or 
-\begin_inset Quotes sld
-\end_inset
-
-picIntegrationPoints
-\begin_inset Quotes srd
-\end_inset
-
-, depending on whether you want to animate the fields or the particles.
- If you create your own swarm of particles, then they will have their own
- VTK files, and you would use that name with 
-\family typewriter
-generate_pvd
-\family default
-.
- 
-\end_layout
-
-\begin_layout Standard
-
-\family typewriter
-TYPE
-\family default
- is either '
-\family typewriter
-u
-\family default
-' for unstructured (particles), or '
-\family typewriter
-s
-\family default
-' for unstructured (fields).
- START is the time of the first time step, END is the last step, and STEP
- is the step size between successive frames.
- So the command
-\end_layout
-
-\begin_layout LyX-Code
-generate_pvd picIntegrationPoints u 0 100 10
-\end_layout
-
-\begin_layout Standard
-will generate 
-\family typewriter
-picIntegrationPoints.pvd
-\family default
-.
- That file starts at t=0 and includes every 10'th step up to and including
- 100.
- So to animate the post yielding strain in 
-\family typewriter
-input/viscous_extension3D.xml
-\family default
-, you would run, from the top directory,
-\end_layout
-
-\begin_layout LyX-Code
-generate_pvd fields s 0 9
-\end_layout
-
-\begin_layout Standard
-Loading up 
-\family typewriter
-fields.pvd
-\family default
- in Paraview gives you access to the movie buttons
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Graphics
-	filename images/Paraview_movie_controls.png
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Subsection
 Generating CSV files
 \end_layout
@@ -4376,31 +3968,9 @@ You can now run this example, and the output will go into the directory
 output
 \family default
 .
- If you want to run in 3D, you only need to change the line after
+ 
 \end_layout
 
-\begin_deeper
-\begin_layout LyX-Code
-<param name="outputPath">./output.template</param> 
-\end_layout
-
-\begin_layout Standard
-from
-\end_layout
-
-\begin_layout LyX-Code
-<param name="dim">2</param>
-\end_layout
-
-\begin_layout Standard
-to
-\end_layout
-
-\begin_layout LyX-Code
-<param name="dim">3</param>
-\end_layout
-
-\end_deeper
 \begin_layout Standard
 You can compare your result with the worked example in the file 
 \family typewriter
@@ -4603,29 +4173,7 @@ Strain rate invariant and velocity of viscous material in extension
 \end_layout
 
 \begin_layout Standard
-The structure in the strain rate invariant arises from the artificial compressib
-ility (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Artificial-Compressibility"
 
-\end_inset
-
-).
- The magnitude of this structure is small, so you can ignore it for now.
- Later, in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Hydrostatic-Term"
-
-\end_inset
-
-, you will remove it by adding a 
-\family typewriter
-HydrostaticTerm
-\family default
-.
- 
 \end_layout
 
 \begin_layout Section
@@ -4781,7 +4329,7 @@ Specify the x-velocity equation by adding the variable
 
 \begin_deeper
 \begin_layout LyX-Code
-<param name="Equation1">step(0.5-x)</param>
+<param name="Equation1">step(x-1)
 \end_layout
 
 \begin_layout Standard
@@ -4989,7 +4537,7 @@ Specify the particulars of the file by adding the variables
 
 \begin_deeper
 \begin_layout LyX-Code
-<param name="File1_Name">velocities</param>
+<param name="File1_Name">input/cookbook/velocities</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5298,15 +4846,15 @@ after the lines
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="resolutionX">10</param>
+  <param name="resolutionX">20</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="resolutionY">10</param>
+  <param name="resolutionY">20</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="resolutionZ">10</param>
+  <param name="resolutionZ">20</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5591,15 +5139,15 @@ after the lines
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="resolutionX">10</param>
+  <param name="resolutionX">20</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="resolutionY">10</param>
+  <param name="resolutionY">20</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="resolutionZ">10</param>
+  <param name="resolutionZ">20</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -5984,11 +5532,11 @@ SurfaceAdaptor
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
+  <param name="mesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="sourceGenerator">linearMesh-generator</param>
+  <param name="sourceGenerator">Q2Mesh-generator</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6017,6 +5565,100 @@ SurfaceAdaptor
 
 \begin_layout LyX-Code
 </struct>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Replace the current 
+\family typewriter
+boxShape
+\family default
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+<struct name="boxShape">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">Box</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="startX">minX</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="endX">maxX</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="startY">minY</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="endY">maxY</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="startZ">minZ</param>
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="endZ">maxZ</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+with a 
+\family typewriter
+backgroundShape
+\family default
+.
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="backgroundShape">
+\end_layout
+
+\begin_layout LyX-Code
+  <param name="Type">Everywhere</param>
+\end_layout
+
+\begin_layout LyX-Code
+</struct>
+\end_layout
+
+\begin_layout Standard
+Also, in the 
+\family typewriter
+viscous
+\family default
+ component, change 
+\family typewriter
+boxShape
+\family default
+ to 
+\family typewriter
+backgroundShape
+\family default
+.
+ This is needed because the deformed top will go beyond the boundary of
+ the original 
+\family typewriter
+boxShape
+\family default
+.
+ An 
+\family typewriter
+Everywhere
+\family default
+ shape covers everywhere.
+ 
 \end_layout
 
 \end_deeper
@@ -6175,11 +5817,11 @@ SurfaceAdaptor
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
+  <param name="mesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="sourceGenerator">linearMesh-generator</param>
+  <param name="sourceGenerator">Q2Mesh-generator</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6237,19 +5879,30 @@ with
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Equation1">r=hypot(x,y+3); step(r-3.15)*step(3.35-r)*(y+3)/r</param
->
+  <param name="Equation1">r=hypot(x,y+3), step(3.35-r)*(y+3)</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Equation2">r=hypot(x,y+3); step(r-3.15)*step(3.35-r)*x/r</param>
+  <param name="Equation2">r=hypot(x,y+3), -step(3.35-r)*x</param>
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Equation3">Equation1</param>
+
 \end_layout
 
 \end_deeper
+\begin_layout Enumerate
+In the boundary conditions, replace the one occurrence of 
+\family typewriter
+Equation3
+\family default
+ with 
+\family typewriter
+Equation1
+\family default
+.
+\end_layout
+
 \begin_layout Enumerate
 Add parameters for the bottom surface shape
 \end_layout
@@ -6273,6 +5926,60 @@ Add parameters for the bottom surface shape
 
 \begin_layout LyX-Code
   <param name="CylinderMaxX">0.960468635615</param>
+\end_layout
+
+\end_deeper
+\begin_layout Enumerate
+Ensure that the height of the incoming material remains fixed by adding
+\end_layout
+
+\begin_deeper
+\begin_layout LyX-Code
+  <param name="staticLeftTop">True</param>
+\end_layout
+
+\begin_layout Standard
+in the 
+\family typewriter
+EulerDeform
+\family default
+ struct, right after
+\end_layout
+
+\begin_layout LyX-Code
+<struct name="EulerDeform">
+\end_layout
+
+\begin_layout LyX-Code
+  <list name="systems">
+\end_layout
+
+\begin_layout LyX-Code
+    <struct>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="mesh">mesh-Q2</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="innerMesh">mesh-Pm1</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="remesher">velocityRemesher</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="velocityField">VelocityField</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="wrapTop">True</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="staticLeft">True</param>
 \end_layout
 
 \end_deeper
@@ -6467,7 +6174,7 @@ Add the components
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="CellLayout">elementCellLayout</param>
+  <param name="CellLayout">cellLayout</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6475,11 +6182,7 @@ Add the components
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="FiniteElement_Mesh">linearMesh</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeMesh">mesh-linear</param>
+  <param name="FeMesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6492,6 +6195,10 @@ Add the components
 
 \begin_layout LyX-Code
   </list>
+\end_layout
+
+\begin_layout LyX-Code
+ <param name="EscapedRoutine">escapedRoutine</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -6535,10 +6242,6 @@ Add the components
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="PressureField">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
   <list name="Fields">
 \end_layout
 
@@ -6556,6 +6259,10 @@ Add the components
 
 \begin_layout LyX-Code
 </struct>
+\end_layout
+
+\begin_layout LyX-Code
+
 \end_layout
 
 \end_deeper
@@ -6610,10 +6317,6 @@ sideways false
 status open
 
 \begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
 \align center
 \begin_inset Graphics
 	filename images/tracers.eps
@@ -6636,10 +6339,6 @@ Particle tracks of tracers
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Plain Layout
 
 \end_layout
 
@@ -7932,10 +7631,18 @@ This makes the sphere more expansive, conductive, and radioactive.
 
 \end_deeper
 \begin_layout Enumerate
-Modify the buoyancy force term by adding the temperature field after
+Modify the buoyancy force term by adding the temperature field
 \end_layout
 
 \begin_deeper
+\begin_layout LyX-Code
+<param name="TemperatureField">TemperatureField</param>
+\end_layout
+
+\begin_layout Standard
+after the lines
+\end_layout
+
 \begin_layout LyX-Code
 <struct name="buoyancyForceTerm">
 \end_layout
@@ -7946,10 +7653,6 @@ Modify the buoyancy force term by adding the temperature field after
 
 \begin_layout LyX-Code
   <param name="ForceVector">mom_force</param>
-\end_layout
-
-\begin_layout Standard
-the line
 \end_layout
 
 \begin_layout LyX-Code
@@ -9221,15 +8924,11 @@ plugins
 components
 \family default
  structure.
- For example, the following lines will enable the 
+ For example, the following line will enable the 
 \family typewriter
 EulerDeform
 \family default
- and 
-\family typewriter
-VTKOutput
-\family default
- plugins
+ plugin
 \end_layout
 
 \begin_layout LyX-Code
@@ -9238,10 +8937,6 @@ VTKOutput
 
 \begin_layout LyX-Code
   <param>Underworld_EulerDeform</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param>Underworld_VTKOutput</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -9294,7 +8989,11 @@ EulerDeform
 \end_layout
 
 \begin_layout LyX-Code
-      <param name="mesh">mesh-linear</param>
+      <param name="mesh">mesh-Q2</param>
+\end_layout
+
+\begin_layout LyX-Code
+      <param name="innerMesh">mesh-Pm1</param> 
 \end_layout
 
 \begin_layout LyX-Code
@@ -9310,46 +9009,6 @@ EulerDeform
 \end_layout
 
 \begin_layout LyX-Code
-      <list name="fields">
-\end_layout
-
-\begin_layout LyX-Code
-        <struct>
-\end_layout
-
-\begin_layout LyX-Code
-          <param name="field">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-          <param name="variable">velocity</param>
-\end_layout
-
-\begin_layout LyX-Code
-        </struct>
-\end_layout
-
-\begin_layout LyX-Code
-        <struct> 
-\end_layout
-
-\begin_layout LyX-Code
-          <param name="field">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-          <param name="variable">pressure</param>
-\end_layout
-
-\begin_layout LyX-Code
-        </struct>
-\end_layout
-
-\begin_layout LyX-Code
-      </list>
-\end_layout
-
-\begin_layout LyX-Code
     </struct>
 \end_layout
 
@@ -9359,28 +9018,6 @@ EulerDeform
 
 \begin_layout LyX-Code
 </struct>
-\end_layout
-
-\begin_layout Standard
-This commands Gale to interpolate both the pressure and velocity field onto
- the new mesh.
- This interpolation can sometimes go awry.
- Often, this is because something else is going wrong.
- For example, if your velocity solution is bad and you get large velocities,
- then the mesh can turn itself inside out.
- This, in turn, will cause 
-\family typewriter
-EulerDeform
-\family default
- to fail.
- If you are getting spurious problems with interpolation, then you can turn
- off this interpolation by removing these two fields from 
-\family typewriter
-EulerDeform
-\family default
-.
- It may slightly affect the speed of your solution, since Gale uses those
- pressure and velocity fields as a starting guess for the next time step.
 \end_layout
 
 \begin_layout Standard
@@ -10270,17 +9907,6 @@ maxTimeSteps The number of time steps to take in the simulation.
 \end_layout
 
 \begin_layout Description
-dumpEvery How often to write VTK output (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:.vtk-Files-(Visualization)"
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Description
 checkPointEvery How often to write the checkpoint files (see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -10442,1395 +10068,12 @@ Gale is built on top of StGermain, which is a very general framework for
  For example, you must tell StGermain that you want to set up a regular
  mesh and solve a finite element problem on it.
  This means you have to include a number of components in every input file.
- These components are
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="mesh-linear">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">FeMesh</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="elementType">linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="linearMesh-generator">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">CartesianGenerator</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="dim">dim</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="shadowDepth">shadowDepth</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="size">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>elementResI</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>elementResJ</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>elementResK</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="minCoord">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>minX</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>minY</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>minZ</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="maxCoord">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>maxX</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>maxY</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>maxZ</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="velocity">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">MeshVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Rank">Vector</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="DataType">Double</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="VectorComponentCount">dim</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="names">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>vx</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>vy</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>vz</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="velocityBCs">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">CompositeVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Data">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="velocityICs">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">CompositeVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Data">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="velocityDofLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">DofLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="BaseVariableCount">dim</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="BaseVariables">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>vx</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>vy</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>vz</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="VelocityField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">FeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FEMesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="DofLayout">velocityDofLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="BC">velocityBCs</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="IC">velocityICs</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="LinkedDofInfo">velocityLinkedDofs</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="VelocityMagnitudeField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">Magnitude</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="VelocityGradientsField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">Gradient</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="VelocityGradientsInvariantField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">TensorInvariant</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityGradientsField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="VelocityXXField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">TakeFirstComponent</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="VelocityYYField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">TakeSecondComponent</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="StrainRateField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">TensorSymmetricPart</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityGradientsField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="VorticityField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">TensorAntisymmetricPart</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityGradientsField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="StrainRateInvariantField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">OperatorFeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Operator">SymmetricTensor_Invariant</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">StrainRateField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="pressure">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">MeshVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Rank">Scalar</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="DataType">Double</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="pressureDofLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">DofLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="BaseVariables">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>pressure</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="PressureField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">FeVariable</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FEMesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="DofLayout">pressureDofLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="LinkedDofInfo">pressureLinkedDofs</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="StressField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StressField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StrainRateField">StrainRateField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Context">context</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ConstitutiveMatrix">constitutiveMatrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="IC">stressICs</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct> 
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="ViscosityField">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">ViscosityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Context">context</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ConstitutiveMatrix">constitutiveMatrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct> 
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="cellLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">SingleCellLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="particleLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">GaussParticleLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="gaussSwarm">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">IntegrationPointsSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="CellLayout">cellLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ParticleLayout">particleLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeMesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="TimeIntegrator">timeIntegrator</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="IntegrationPointMapper">gaussMapper</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="gaussMapper">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">GaussMapper</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="IntegrationPointsSwarm">gaussSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="MaterialPointsSwarm">gaussMaterialSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="backgroundLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">BackgroundParticleLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="gaussMaterialSwarm">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">MaterialPointsSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="CellLayout">cellLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ParticleLayout">backgroundLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeMesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="timeIntegrator">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">TimeIntegrator</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="order">1</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="simultaneous">t</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Context">context</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="elementCellLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">ElementCellLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="weights">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">PCDVC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="resolutionX">10</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="resolutionY">10</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="resolutionZ">10</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="lowerT">0.6</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="upperT">25</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="maxDeletions">3</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="maxSplits">3</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="MaterialPointsSwarm">materialSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="localLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">MappedParticleLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="picIntegrationPoints">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">IntegrationPointsSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="CellLayout">elementCellLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ParticleLayout">localLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeMesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="WeightsCalculator">weights</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="TimeIntegrator">timeIntegrator</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="IntegrationPointMapper">mapper</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="mapper">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">CoincidentMapper</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="IntegrationPointsSwarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="MaterialPointsSwarm">materialSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="materialSwarmParticleLayout">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">MeshParticleLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="cellParticleCount">particlesPerCell</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="materialSwarm">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">MaterialPointsSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="CellLayout">elementCellLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ParticleLayout">materialSwarmParticleLayout</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeMesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="SplittingRoutine">splittingRoutine</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RemovalRoutine">removalRoutine</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="EscapedRoutine">escapedRoutine</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="materialSwarmAdvector">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">SwarmAdvector</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">materialSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="TimeIntegrator">timeIntegrator</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="VelocityField">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="PeriodicBCsManager">periodicBCsManager</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="allowFallbackToFirstOrder">True</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="splittingRoutine">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">ReseedSplitting</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="idealParticleCount">particlesPerCell</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="solutionVelocity">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">SolutionVector</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="solutionPressure">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">SolutionVector</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="mom_force">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">ForceVector</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ExtraInfo">context</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="cont_force">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">ForceVector</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeVariable">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ExtraInfo">context</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="k_matrix">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StiffnessMatrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RowVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ColumnVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RHS">mom_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="allowZeroElementContributions">False</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="constitutiveMatrix">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">ConstitutiveMatrixCartesian</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StiffnessMatrix">k_matrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="g_matrix">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StiffnessMatrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RowVariable">VelocityField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ColumnVariable">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RHS">cont_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="allowZeroElementContributions">False</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="gradientStiffnessMatrixTerm">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">GradientStiffnessMatrixTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">gaussSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StiffnessMatrix">g_matrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="preconditioner">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StiffnessMatrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RowVariable">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ColumnVariable">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RHS">cont_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="allowZeroElementContributions">True</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="preconditionerTerm">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">UzawaPreconditionerTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StiffnessMatrix">preconditioner</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="uzawa">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">Stokes_SLE_UzawaSolver</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Preconditioner">preconditioner</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="tolerance">1.0e-5</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="maxIterations">5000</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="stokesEqn">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">Stokes_SLE</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="SLE_Solver">uzawa</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Context">context</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StressTensorMatrix">k_matrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="GradientMatrix">g_matrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="DivergenceMatrix"></param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="CompressibilityMatrix">c_matrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="VelocityVector">solutionVelocity</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="PressureVector">solutionPressure</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ForceVector">mom_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ContinuityForceVector">cont_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="killNonConvergent">false</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="nonLinearMaxIterations">nonLinearMaxIterations</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="nonLinearTolerance">nonLinearTolerance</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="makeConvergenceFile">false</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="c_matrix">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StiffnessMatrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RowVariable">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ColumnVariable">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="RHS">cont_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="allowZeroElementContributions">True</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="mixedStabiliser">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">MixedStabiliserTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">gaussSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="picSwarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="storeVisc">storeViscosity</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="StiffnessMatrix">c_matrix</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="background">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">Everywhere</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="escapedRoutine">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">EscapedRoutine</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="idealParticleCount">0</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="velocityRemesher">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StripRemesher</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="meshType">regular</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <list name="dim">
-\end_layout
-
-\begin_layout LyX-Code
-    <param>true</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>true</param>
-\end_layout
-
-\begin_layout LyX-Code
-    <param>true</param>
-\end_layout
-
-\begin_layout LyX-Code
-  </list>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="storeViscosity">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StoreVisc</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="MaterialPointsSwarm">materialSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="storeStress">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StoreStress</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="MaterialPointsSwarm">materialSwarm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
-For almost all simulations, you will not need to change these components.
+ These components are listed in the sample input file 
+\family typewriter
+input/cookbook/template.xml
+\family default
+.
+ For almost all simulations, you will not need to change these components.
 \end_layout
 
 \begin_layout Section
@@ -11874,7 +10117,7 @@ To configure Gale to use and evolve the temperature, you need to add the
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
+  <param name="mesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11890,7 +10133,7 @@ To configure Gale to use and evolve the temperature, you need to add the
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Data">mesh-linear</param>
+  <param name="Data">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11906,7 +10149,7 @@ To configure Gale to use and evolve the temperature, you need to add the
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Data">mesh-linear</param>
+  <param name="Data">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11922,7 +10165,7 @@ To configure Gale to use and evolve the temperature, you need to add the
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
+  <param name="mesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -11950,7 +10193,7 @@ To configure Gale to use and evolve the temperature, you need to add the
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="FEMesh">mesh-linear</param>
+  <param name="FEMesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -12180,6 +10423,10 @@ after the lines
 
 \begin_layout LyX-Code
 <list name="FieldVariablesToCheckpoint">
+\end_layout
+
+\begin_layout LyX-Code
+  <param>StrainRateInvariant</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -16032,18 +14279,6 @@ frictionCoefficient
 
 \begin_layout Standard
 Finally, DruckerPrager requires a pressure.
- If you are using 
-\family typewriter
-HydrostaticTerm
-\family default
- (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:HydrostaticTerm"
-
-\end_inset
-
-), you have to remember to give it that as well.
 \end_layout
 
 \begin_layout Standard
@@ -16057,7 +14292,7 @@ reference "sec:HydrostaticTerm"
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="18" columns="2">
+<lyxtabular version="3" rows="17" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -16087,26 +14322,6 @@ Defaults
 
 \begin_layout Plain Layout
 PressureField
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-none
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-HydrostaticTerm
 \end_layout
 
 \end_inset
@@ -17306,122 +15521,6 @@ Gaussian
 \end_layout
 
 \begin_layout Standard
-The type can also be 
-\family typewriter
-HydrostaticTerm
-\family default
-.
- If you are using a 
-\family typewriter
-HydrostaticTerm
-\family default
- component (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:HydrostaticTerm"
-
-\end_inset
-
-), then you need a 
-\family typewriter
-StressBC
-\family default
- component on the top to act as a restoring force when the surface of the
- material dips below equilibrium.
- So it would be something like
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="stressBCTop">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StressBC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ForceVector">mom_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">top</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="y_type">HydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="y_value">hydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
-If the bottom boundary can move (that is, you have not set 
-\family typewriter
-StaticBottom
-\family default
- in 
-\family typewriter
-EulerDeform
-\family default
- and 
-\begin_inset Formula $v_{y}\neq0$
-\end_inset
-
-), and the material outside the simulation is different from inside, then
- you must also set a StressBC on the bottom.
- For this, you must also set 
-\family typewriter
-bottomDensity
-\family default
-, giving something like
-\end_layout
-
-\begin_layout LyX-Code
-<struct name="stressBCTop">
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">StressBC</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="ForceVector">mom_force</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Swarm">picIntegrationPoints</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="wall">bottom</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="y_type">HydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="y_value">hydrostaticTerm</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="bottomDensity">3000</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
 Note that you must not have a separate 
 \family typewriter
 StressBC
@@ -17572,7 +15671,7 @@ SurfaceAdaptor
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
+  <param name="mesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -17661,7 +15760,7 @@ bottom
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="mesh">mesh-linear</param>
+  <param name="mesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -18996,181 +17095,6 @@ AllNodesVC
 \end_layout
 
 \begin_layout Section
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:HydrostaticTerm"
-
-\end_inset
-
-HydrostaticTerm
-\end_layout
-
-\begin_layout Standard
-This term subtracts out the hydrostatic part of the pressure as described
- in Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Hydrostatic-Pressure"
-
-\end_inset
-
-.
- You give it the equations for the density and pressure.
- Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Standard-Condition-Functions"
-
-\end_inset
-
- has complete details on how to enter those equations.
- As an example, consider the case where the material has a density of 5,
- going from the bottom to a height of 13, with a gravity of 10.
- The 
-\family typewriter
-densityEquation
-\family default
- would then be
-\end_layout
-
-\begin_layout LyX-Code
-step(13-y)*5
-\end_layout
-
-\begin_layout Standard
-and the 
-\family typewriter
-pressureEquation
-\family default
- would be the integral of that, multiplied by the gravity
-\end_layout
-
-\begin_layout LyX-Code
-step(13-y)*5*step(13-y)*10
-\end_layout
-
-\begin_layout Standard
-If you have temperature and thermal expansity in your problem, remember
- to put those effects in.
- So if the temperature is a linear gradient from 0 at the top to 1 at the
- bottom, and your thermal expansity is 
-\begin_inset Formula $10^{-5}$
-\end_inset
-
-, then the 
-\family typewriter
-densityEquation
-\family default
- would be
-\end_layout
-
-\begin_layout LyX-Code
-step(13-y)*5*(1-(10^(-5))*(13-y)/13)
-\end_layout
-
-\begin_layout Standard
-and the 
-\family typewriter
-pressureEquation
-\family default
- would be the integral of this multiplied by gravity, with the boundary
- condition that the pressure is 0 at the surface
-\end_layout
-
-\begin_layout LyX-Code
-step(13-y)*5*((13-y) - (10^(-5))*((13-y)^2)/26)*10
-\end_layout
-
-\begin_layout Standard
-The integral for the pressure, in particular, may become very tricky.
- If your setup defies simple analytic treatments, it may be ok to use simpler,
- approximate density and temperature.
- However, it is 
-\series bold
-\color red
-critical
-\series default
-\color inherit
- that the pressure is always the integral of the density.
- Otherwise, you will get wrong results.
- 
-\end_layout
-
-\begin_layout Standard
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="3" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Defaults
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-densityEquation
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-pressureEquation
-\end_layout
-
-\end_inset
-</cell>
-<cell multicolumn="1" alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
 Buoyancy Forces
 \begin_inset CommandInset label
 LatexCommand label
@@ -19271,18 +17195,6 @@ picIntegrationPoints
 \end_layout
 
 \begin_layout Standard
-If you have defined a 
-\family typewriter
-HydrostaticTerm
-\family default
- (Section ), then you need to pass it in to the 
-\family typewriter
-BuoyancyForceTerm
-\family default
- for it to take effect.
-\end_layout
-
-\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
 
@@ -19293,7 +17205,7 @@ BuoyancyForceTerm
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="7" columns="2">
+<lyxtabular version="3" rows="6" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -19417,26 +17329,6 @@ none
 \end_inset
 </cell>
 </row>
-<row>
-<cell alignment="center" valignment="top" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-HydrostaticTerm
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-none
-\end_layout
-
-\end_inset
-</cell>
-</row>
 </lyxtabular>
 
 \end_inset
@@ -19512,18 +17404,6 @@ Swarm
  is always 
 \family typewriter
 picIntegrationPoints
-\family default
-.
-\end_layout
-
-\begin_layout Standard
-Note that this component does not take a 
-\family typewriter
-HydrostaticTerm
-\family default
-, so you can not use this component if you are using 
-\family typewriter
-HydrostaticTerm
 \family default
 .
 \end_layout
@@ -19703,7 +17583,7 @@ Swarm picIntegrationPoints
 \end_layout
 
 \begin_layout Description
-GeometryMesh mesh-linear
+GeometryMesh mesh-Q2
 \end_layout
 
 \begin_layout Standard
@@ -21233,7 +19113,7 @@ Then add some components to set up the mesh and time integration
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="Type"> ParticleMovementHandler </param>
+  <param name="Type">ParticleMovementHandler</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -21249,7 +19129,7 @@ Then add some components to set up the mesh and time integration
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="CellLayout">elementCellLayout</param>
+  <param name="CellLayout">cellLayout</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -21257,11 +19137,7 @@ Then add some components to set up the mesh and time integration
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="FiniteElement_Mesh">linearMesh</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="FeMesh">mesh-linear</param>
+  <param name="FeMesh">mesh-Q2</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -21323,15 +19199,11 @@ Finally, add a swarmOutput component to output values of various fields
 \end_layout
 
 \begin_layout LyX-Code
-  <param name="PressureField">PressureField</param>
-\end_layout
-
-\begin_layout LyX-Code
   <list name="Fields">
 \end_layout
 
 \begin_layout LyX-Code
-    <param>VelocityMagnitudeField</param>
+    <param>PressureField</param>
 \end_layout
 
 \begin_layout LyX-Code
@@ -21347,13 +19219,7 @@ Finally, add a swarmOutput component to output values of various fields
 \end_layout
 
 \begin_layout Standard
-Note that to output the pressure correctly with hydrostatic corrections,
- you must use the 
-\family typewriter
-PressureField
-\family default
- variable slot.
- All other fields are output by adding them to the 
+All fields are output by adding them to the 
 \family typewriter
 Fields
 \family default
@@ -21435,75 +19301,10 @@ name "cha:Output-File-Format"
 \end_layout
 
 \begin_layout Standard
-Gale outputs two types of files: VTK files for data analysis and visualization,
- and checkpointing files for restarting a run.
-\end_layout
-
-\begin_layout Section
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:.vtk-Files-(Visualization)"
-
-\end_inset
-
-VTK Files: 
-\family typewriter
-.vts, .pvts, .vtu, and .pvtu
-\family default
- (Visualization)
-\end_layout
-
-\begin_layout Standard
-These files are output by the 
-\family typewriter
-Underworld_VTKOutput
-\family default
- plugin.
- The 
-\family typewriter
-.vts
-\family default
- and 
-\family typewriter
-.pvts
-\family default
- files contain information about quantities on the grid, and the 
-\family typewriter
-.vtu
-\family default
- and 
-\family typewriter
-.pvtu
-\family default
- contain information about quantities on the particles.
- Every processor outputs its own 
-\family typewriter
-.vts
-\family default
- and 
-\family typewriter
-.vtu 
-\family default
-file, and the 
-\family typewriter
-.pvts
-\family default
- and 
-\family typewriter
-.pvtu
-\family default
- are small files that have information on how to stitch them all together.
- Ordinarily, you would only open the 
-\family typewriter
-.pvts
-\family default
- and 
-\family typewriter
-.pvtu
-\family default
- files.
- These files are in a format understood by a wide variety of visualization
- programs, such as ParaView 
+Gale outputs two types of files: HDF5 checkpointing files for restarting
+ a run, and XDMF files which use those checkpoint files for visualization.
+ XDMF files are understood by a wide variety of visualization programs,
+ such as ParaView 
 \begin_inset Flex URL
 status collapsed
 
@@ -21514,19 +19315,7 @@ paraview.org
 
 \end_inset
 
- (recommended) or MayaVi 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-mayavi.sf.net
-\end_layout
-
-\end_inset
-
-.
- VisIt 
+ or VisIt 
 \begin_inset Flex URL
 status collapsed
 
@@ -21537,138 +19326,7 @@ www.llnl.gov/visit
 
 \end_inset
 
- can understand the raw 
-\family typewriter
-.vts
-\family default
- and 
-\family typewriter
-.vtu
-\family default
- files, but not the 
-\family typewriter
-.pvtu
-\family default
- and 
-\family typewriter
-.pvts
-\family default
- files.
- So VisIt is mostly useful for visualizing serial runs.
-\end_layout
-
-\begin_layout Standard
-The 
-\family typewriter
-Underworld_VTKOutput
-\family default
- plugin is activated by adding the lines
-\end_layout
-
-\begin_layout LyX-Code
-<struct>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Type">Underworld_VTKOutput</param>
-\end_layout
-
-\begin_layout LyX-Code
-  <param name="Context">context</param>
-\end_layout
-
-\begin_layout LyX-Code
-</struct>
-\end_layout
-
-\begin_layout Standard
-to the list of plugins.
- This line is already in the example input files.
-\end_layout
-
-\begin_layout Standard
-The particle files can get quite large.
- Many times, you do not need to see every single particle.
- You can configure Gale to only output every Nth particle by setting 
-\family typewriter
-particleStepping
-\family default
- to N.
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Tabular
-<lyxtabular version="3" rows="2" columns="2">
-<features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Defaults
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-particleStepping
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-1
-\end_layout
-
-\end_inset
-</cell>
-</row>
-</lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Checkpoint Files"
-
-\end_inset
-
-
-\family typewriter
-Checkpoint
-\family default
- Files: .h5, .dat and .xmf
-\end_layout
-
-\begin_layout Standard
-These files are mostly useful for checkpointing.
- They are in a machine dependent format and have the bare minimum needed
- to restart the run.
+.
 \end_layout
 
 \begin_layout Chapter
