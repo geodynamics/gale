@@ -191,7 +191,8 @@ void _TracerOutput_Build( void* swarmOutput, void* data ) {
   int i;
   TracerOutput*	self = (TracerOutput*) swarmOutput;
 
-  Stg_Component_Build( self->pressureField, data, False );
+  if(self->pressureField)
+    Stg_Component_Build( self->pressureField, data, False );
   for(i=0;i<self->num_fields;++i)
     Stg_Component_Build( self->fields[i], data, False );
 
@@ -201,7 +202,8 @@ void _TracerOutput_Initialise( void* swarmOutput, void* data ) {
   int i;
   TracerOutput*	self = (TracerOutput*) swarmOutput;
 
-  Stg_Component_Initialise( self->pressureField, data, False );
+  if(self->pressureField)
+    Stg_Component_Initialise( self->pressureField, data, False );
   for(i=0;i<self->num_fields;++i)
     Stg_Component_Initialise( self->fields[i], data, False );
 	
@@ -216,7 +218,8 @@ void _TracerOutput_Destroy( void* swarmOutput, void* data ) {
   int i;
   TracerOutput*	self = (TracerOutput*)swarmOutput;
 
-  Stg_Component_Destroy( self->pressureField, data, False );
+  if(self->pressureField)
+    Stg_Component_Destroy( self->pressureField, data, False );
   for(i=0;i<self->num_fields;++i)
     Stg_Component_Destroy( self->fields[i], data, False );
 	
@@ -262,12 +265,14 @@ void _TracerOutput_PrintData( void* swarmOutput, Stream* stream,
 
   _SwarmOutput_PrintData( self, stream, lParticle_I, context );
 
-  FieldVariable_InterpolateValueAt(self->pressureField,coord,&pressure );
-  if(hydrostaticTerm){
-    pressure+=HydrostaticTerm_Pressure(hydrostaticTerm,coord);
-  }
-  SwarmOutput_PrintValue( self, stream, pressure );
-
+  if(self->pressureField)
+    {
+      FieldVariable_InterpolateValueAt(self->pressureField,coord,&pressure );
+      if(hydrostaticTerm){
+        pressure+=HydrostaticTerm_Pressure(hydrostaticTerm,coord);
+      }
+      SwarmOutput_PrintValue( self, stream, pressure );
+    }
   for(i=0;i<self->num_fields;++i)
     {
       FieldVariable_InterpolateValueAt(self->fields[i],coord,&field);
