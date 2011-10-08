@@ -1373,7 +1373,6 @@ void Memory_Print_Type_Name_Func( Type type, Name name )
 {
 	MemoryField* typeField;
 	MemoryField* nameField;
-	MemoryPointer* memPtr;
 	MemoryPointer_Print_Type_Name_Func_Helper_Arg arguments;
 	
 	
@@ -1386,7 +1385,6 @@ void Memory_Print_Type_Name_Func( Type type, Name name )
 	
 	Stream_Indent( stgMemory->infoStream );
 	
-	memPtr = NULL;
 	arguments.printOptions = (MemoryPointerColumn)(
 				MEMORYPOINTER_PTR |
 				MEMORYPOINTER_FILE |
@@ -1418,7 +1416,6 @@ void Memory_Print_File_Function( char* fileName, char* funcName )
 {
 	MemoryField* fileField;
 	MemoryField* funcField;
-	MemoryPointer* memPtr;
 	MemoryPointer_Print_File_Func_Helper_Arg arguments;
 	
 	fileField = MemoryField_Register( stgMemory->files, fileName );
@@ -1432,7 +1429,6 @@ void Memory_Print_File_Function( char* fileName, char* funcName )
 	
 	Stream_Indent( stgMemory->infoStream );
 	
-	memPtr = NULL;
 	arguments.printOptions = (MemoryPointerColumn)(
 				MEMORYPOINTER_PTR |
 				MEMORYPOINTER_TYPE |

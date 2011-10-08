@@ -124,16 +124,12 @@ void BTree_Init( BTree *self )
 
 void BTree_LeftRotate( BTree *tree, BTreeNode *x ) 
 {
- 
-	BTreeNode *root;
 	BTreeNode *y;
 	 
 	assert( tree );
 	assert( x );
 	
 	y = x->right;
-	root = tree->root;
- 
  
 	if (x == NIL){
 	}
@@ -169,15 +165,12 @@ void BTree_LeftRotate( BTree *tree, BTreeNode *x )
  
 void BTree_RightRotate( BTree *tree, BTreeNode *x ) {
  
-	BTreeNode *root;
 	BTreeNode *y;
 	
 	assert( tree );
 	assert( x );
 	
 	y = x->left;
-	root = tree->root;
- 
  
 	if( x == NIL ){
 	}

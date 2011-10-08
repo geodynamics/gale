@@ -100,10 +100,6 @@ void _List_Delete( void* list ) {
 void _List_Print( void* list, Stream* stream ) {
 	List*	self = (List*)list;
 	
-	/* Set the Journal for printing informations */
-	Stream* listStream;
-	listStream = Journal_Register( InfoStream_Type, "ListStream" );
-
 	/* Print parent */
 	Journal_Printf( stream, "List (ptr): (%p)\n", self );
 	_Stg_Class_Print( self, stream );

@@ -807,7 +807,7 @@ void* ExtensionManager_Malloc( void* extension, Index count ) {
 
 	/*Index obj_I;*/
 	/*Index ext_I;*/
-	void* curObj;
+	// void* curObj;
 
 	if ( ExtensionManager_OfExisting( self ) ) {
 		return NULL;
@@ -817,7 +817,7 @@ void* ExtensionManager_Malloc( void* extension, Index count ) {
 	memset( result, 0, ExtensionManager_GetFinalSize( self ) * count );
 
 	if ( ExtensionManager_GetFinalSize( self ) > 0 ) {
-		curObj = result;
+		// curObj = result;
 		/*
 		for ( obj_I = 0; obj_I < count; ++obj_I ) {
 			HashTable* objHt = HashTable_New( NULL, NULL, NULL, HASHTABLE_POINTER_KEY );

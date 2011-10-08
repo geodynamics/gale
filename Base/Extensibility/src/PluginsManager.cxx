@@ -153,12 +153,9 @@ void PluginsManager_RemoveAllFromComponentRegister( void* pluginsManager ) {
 }
 
 Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value* modulesVal, unsigned int entry_I, Name contextName ) {
-	PluginsManager*			self;
 	Dictionary_Entry_Value*	pluginDEV = Dictionary_Entry_Value_GetElement( modulesVal, entry_I );
 	Dictionary*					pluginDict;
 	Name							componentName;
-
-	self = (PluginsManager*)pluginsManager;
 
 	pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
 	if( !pluginDict )
@@ -173,12 +170,9 @@ Bool _PluginsManager_CheckContext( void* pluginsManager, Dictionary_Entry_Value*
 }
 
 Name _PluginsManager_GetModuleName( void* pluginsManager, Dictionary_Entry_Value* moduleVal, unsigned int entry_I ) {
-	PluginsManager*			self;
 	Dictionary_Entry_Value*	pluginDEV = Dictionary_Entry_Value_GetElement( moduleVal, entry_I );
 	Dictionary*					pluginDict = Dictionary_Entry_Value_AsDictionary( pluginDEV );
 	Name							pluginName = Dictionary_GetString( pluginDict, "Type" );
-
-	self = (PluginsManager*)pluginsManager;
 
 	return pluginName;	
 }

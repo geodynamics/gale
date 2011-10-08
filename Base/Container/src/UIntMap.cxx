@@ -105,10 +105,6 @@ void _UIntMap_Delete( void* generator ) {
 void _UIntMap_Print( void* generator, Stream* stream ) {
 	UIntMap*	self = (UIntMap*)generator;
 	
-	/* Set the Journal for printing informations */
-	Stream* generatorStream;
-	generatorStream = Journal_Register( InfoStream_Type, "UIntMapStream" );
-
 	/* Print parent */
 	Journal_Printf( stream, "UIntMap (ptr): (%p)\n", self );
 	_Stg_Class_Print( self, stream );

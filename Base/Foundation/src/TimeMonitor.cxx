@@ -115,7 +115,7 @@ double Stg_TimeMonitor_End( Stg_TimeMonitor* tm, TimeMonitorData* tmData ) {
 		tmData->aveProcDt = tmData->dt;
 	}
 	else {
-		double   sumdt;
+		// double   sumdt;
 
 		/*
 		MPI_Reduce( &tmData->dt, &tmData->maxProcDt, 1, MPI_DOUBLE, MPI_MAX, 0, tm->comm );
@@ -127,7 +127,7 @@ double Stg_TimeMonitor_End( Stg_TimeMonitor* tm, TimeMonitorData* tmData ) {
 		 * that ALL procs will call end(). This is currently not the case with Stg_Component_Initialise()
 		 * phase as some procs will have more/less variables to call Initialise() on via Variable_Condition
 		 * due to decomposition and Wall boundary conditions */
-		sumdt = tmData->dt * nProc;
+		// sumdt = tmData->dt * nProc;
 		tmData->maxProcDt = tmData->dt;
 		tmData->minProcDt = tmData->dt;
 		tmData->aveProcDt = (double)tmData->dt;

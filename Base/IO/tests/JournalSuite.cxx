@@ -285,12 +285,9 @@ void JournalSuite_TestPrintChildStreams( JournalSuiteData* data ) {
 
 void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
    Dictionary* testDict = Dictionary_New();
-   Stream*     infoTest1;
    Stream*     infoTest2;
    Stream*     debugTest1;
-   Stream*     debugTest2;
    Stream*     dumpTest1;
-   Stream*     dumpTest2;
    Stream*     newTest1;
    Stream*     newTest2;
    Stream*     fileTest1;
@@ -300,12 +297,9 @@ void JournalSuite_TestReadFromDictionary( JournalSuiteData* data ) {
    Name testNewTypeFilename1 = "./testJournal-out1.txt";
    Name testNewTypeFilename2 = "./testJournal-out2.txt";
 
-   infoTest1 = Journal_Register( Info_Type, (Name)"test1"  );
    infoTest2 = Journal_Register( Info_Type, (Name)"test2"  );
    debugTest1 = Journal_Register( Debug_Type, (Name)"test1"  );
-   debugTest2 = Journal_Register( Debug_Type, (Name)"test2"  );
    dumpTest1 = Journal_Register( Dump_Type, (Name)"test1"  );
-   dumpTest2 = Journal_Register( Dump_Type, (Name)"test2"  );
 
    Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.debug.test1", Dictionary_Entry_Value_FromBool(  True ) );
    Dictionary_Add( testDict, (Dictionary_Entry_Key)"journal.dump.test1", Dictionary_Entry_Value_FromBool(  True ) );

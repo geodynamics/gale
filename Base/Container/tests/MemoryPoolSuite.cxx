@@ -154,7 +154,6 @@ void MemoryPoolSuite_TestDeallocation( MemoryPoolSuiteData* data ) {
 void MemoryPoolSuite_TestIllegalDeallocation( MemoryPoolSuiteData* data ) {
    Plane*      p = NULL;
    int         i = 0;
-   Bool        passed = False;
    int         objCounter = 0;
    int*        junkRefs[CACHE_SIZE];
    int         testData[CACHE_SIZE];
@@ -166,7 +165,6 @@ void MemoryPoolSuite_TestIllegalDeallocation( MemoryPoolSuiteData* data ) {
       data->planeRefs[i] = p;
    }
 
-   passed = True;
    for( i=0; i<CACHE_SIZE; i++ ){
       junkRefs[i] = &testData[i];
    }

@@ -115,13 +115,12 @@ void stgMainBuildAndInitialise( Stg_ComponentFactory* cf ) {
 
 Stg_ComponentFactory* stgMainInitFromXML( char* xmlInputFilename, MPI_Comm communicator, void* _context ) {
    Dictionary*       		dictionary = NULL;
-   Bool              		result;
    XML_IO_Handler*   		ioHandler;
    Stg_ComponentFactory*	cf;
 
    dictionary = Dictionary_New();
    ioHandler = XML_IO_Handler_New();
-   result = IO_Handler_ReadAllFromFile( ioHandler, xmlInputFilename, dictionary );
+   IO_Handler_ReadAllFromFile( ioHandler, xmlInputFilename, dictionary );
    /* In case the user has put any journal configuration in the XML, read here */
    Journal_ReadFromDictionary( dictionary );
 

@@ -162,16 +162,12 @@ void Journal_ReadFromDictionary( Dictionary* dictionary )
 	
 	char* operation;
 				
-	Bool valid;
-	
 	/* Iterate through the whole dictionary, checking for journal related commands */
 	for ( index = 0; index < dictionary->count; ++index )
 	{
 		/* Check to see if it is a journal operation by searching for the JOURNAL_KEY. */
 		if ( (0 == strncasecmp( dictionary->entryPtr[index]->key, JOURNAL_KEY, strlen(JOURNAL_KEY))) )
 		{
-			valid = True;
-
 			/* Make copy to tokenise so original contents will not be destroyed */
 			keyCopy = StG_Strdup( dictionary->entryPtr[index]->key );
 			

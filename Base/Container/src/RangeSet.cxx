@@ -104,10 +104,6 @@ void _RangeSet_Delete( void* rangeSet ) {
 void _RangeSet_Print( void* rangeSet, Stream* stream ) {
 	RangeSet*	self = (RangeSet*)rangeSet;
 	
-	/* Set the Journal for printing informations */
-	Stream* rangeSetStream;
-	rangeSetStream = Journal_Register( InfoStream_Type, "RangeSetStream" );
-
 	/* Print parent */
 	Journal_Printf( stream, "RangeSet (ptr): (%p)\n", self );
 	_Stg_Class_Print( self, stream );
