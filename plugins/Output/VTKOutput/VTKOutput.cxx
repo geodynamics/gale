@@ -98,11 +98,9 @@ void VTKOutput( void* _context ) {
   UnderworldContext* context = (UnderworldContext*)_context;
   Dictionary* dictionary = context->dictionary;
 
-  /* Only dump if at the right time step.  We use timeStep-1, because
-     we are outputing after a solve, but before advection.  So
-     timeStep-1 makes more sense in terms of when the simulation looks
-     like this. */
-  if(context->timeStep % context->dumpEvery != 0)
+  /* Only dump if at the right time step. */
+  if(context->dumpEvery != 0
+     && context->timeStep % context->dumpEvery != 0)
     return;
 	
 
