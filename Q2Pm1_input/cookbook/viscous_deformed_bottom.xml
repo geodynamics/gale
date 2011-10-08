@@ -445,11 +445,6 @@
             <param name="type">func</param>
             <param name="value">Equation1</param>
           </struct>
-          <struct>
-            <param name="name">vy</param>
-            <param name="type">func</param>
-            <param name="value">Equation2</param>
-          </struct>
         </list>
       </struct>
       <struct>
@@ -468,14 +463,14 @@
         <param name="wall">bottom</param>
         <list name="variables">
           <struct>
-            <param name="name">vx</param>
-            <param name="type">func</param>
-            <param name="value">Equation1</param>
-          </struct>
-          <struct>
             <param name="name">vy</param>
             <param name="type">func</param>
             <param name="value">Equation2</param>
+          </struct>
+          <struct>
+            <param name="name">vx</param>
+            <param name="type">func</param>
+            <param name="value">Equation1</param>
           </struct>
         </list>
       </struct>

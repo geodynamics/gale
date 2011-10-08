@@ -463,5 +463,4 @@
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
   <param name="Equation1">step(x-1)</param>
-  <param name="linearTolerance">1.0e-10</param>
 </StGermainData>
