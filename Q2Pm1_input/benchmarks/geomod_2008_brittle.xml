@@ -489,9 +489,9 @@
   </struct>
 
   <list name="FieldVariablesToCheckpoint">
+    <param>StrainRateInvariantField</param>
     <param>VelocityField</param>
     <param>PressureField</param>
-    <param>StrainRateInvariantField</param>
   </list>
   <param name="checkpointEvery">1</param>
   <param name="timeIntegratorOrder">1</param>

@@ -432,6 +432,7 @@
   </struct>
 
   <list name="FieldVariablesToCheckpoint">
+    <param>StrainRateInvariantField</param>
     <param>VelocityField</param>
     <param>PressureField</param>
   </list>
