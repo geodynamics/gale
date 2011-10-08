@@ -65,7 +65,6 @@ typedef struct {
 void Underworld_DensityChange_Check( UnderworldContext* context ) {
 	/* Function runs each timestep to check if centroid is at certain height */
 
-	double volume;
 	double centroid[3];
 	static int densityChangeIsDone = 0;
 
@@ -77,7 +76,7 @@ void Underworld_DensityChange_Check( UnderworldContext* context ) {
 	Underworld_DensityChange* self = (Underworld_DensityChange*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_DensityChange_Type  );
 
 	/* get centroid coordinate */
-	volume = Material_Volume( self->material, (IntegrationPointsSwarm*)self->swarm, centroid );
+	Material_Volume( self->material, (IntegrationPointsSwarm*)self->swarm, centroid );
 
 	/* test if centroid height (y-coord) is >= input height
 	 * 	Note following code is only run once */
@@ -96,7 +95,6 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 	BuoyancyForceTerm_MaterialExt* materialExt = NULL;;
 	Stream* stream = Journal_Register( Info_Type, (Name)"cows" );
 	Name   materialName = NULL;
-	int materialIndex;
 
 	/* Get self (the plugin) */
 	Underworld_DensityChange* self = (Underworld_DensityChange* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)Underworld_DensityChange_Type  ); 
@@ -120,7 +118,7 @@ void Underworld_DensityChange_Setup( UnderworldContext* context ) {
 
 	/* check if material index exists */
 	if( self->material==NULL ) {
-		printf("Error\nCounld find the material with index %d\n", materialIndex ); exit(0);
+		printf("Error\nCounld find the material with name %s\n", materialName ); exit(0);
 	}
 	materialExt = (BuoyancyForceTerm_MaterialExt*)ExtensionManager_Get( self->material->extensionMgr, self->material, bft->materialExtHandle );
 	Journal_RPrintf( stream, "Will change %s's density at height %g from %g to %g\n", 

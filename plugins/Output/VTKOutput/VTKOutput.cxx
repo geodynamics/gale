@@ -149,7 +149,7 @@ void VTKOutput_particles(Swarm* swarm,
                          int stepping, char *outputPath,
                          const int timeStep, int dim, int myRank, int nprocs) {
   double *coord;
-  int iteration, i;
+  int iteration;
   Particle_Index          num_particles = swarm->particleLocalCount;
   Particle_Index          lParticle_I;
   
@@ -222,8 +222,6 @@ void VTKOutput_particles(Swarm* swarm,
         int currently_yielding;
         Material_Index material_index;
         SymmetricTensor stress;
-        BuoyancyForceTerm_MaterialExt*   materialExt;
-        Material *extension_info;
         XYZ normal;
         
         if(Stg_Class_IsInstance(swarm,IntegrationPointsSwarm_Type))
@@ -445,7 +443,7 @@ void VTKOutput_particles(Swarm* swarm,
           fprintf(fp,"      </CellData>\n");
           fprintf(fp,"      <Cells>\n");
           fprintf(fp,"        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n");
-          for(i=0;i<(num_particles-1)/stepping+1;++i)
+          for(uint i=0;i<(num_particles-1)/stepping+1;++i)
             fprintf(fp,"%d ",i);
           fprintf(fp,"\n        </DataArray>\n");
           fprintf(fp,"        <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n");
@@ -464,7 +462,7 @@ void VTKOutput_particles(Swarm* swarm,
   if(myRank==0)
     {
       fprintf(pfp,"        </PPointData>\n");
-      for(i=0;i<nprocs;++i)
+      for(int i=0;i<nprocs;++i)
         fprintf(pfp,"    <Piece Source=\"%s.%d.%05d.vtu\"/>\n",
                 swarm->name,i,timeStep);
       fprintf(pfp,"  </PUnstructuredGrid>\n\
@@ -476,7 +474,7 @@ void VTKOutput_particles(Swarm* swarm,
 /* Print out the coordinates of the mesh. */
 
 void VTKOutput_print_coords(FILE *fp, FeMesh *feMesh, Grid *grid, int nDims,
-                            int lower[3], int upper[3]) {
+                            uint lower[3], uint upper[3]) {
   IJK ijk;
 
   fprintf(fp,"      <Points>\n");
@@ -507,7 +505,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
   Index var_I;
   int header_printed=0;
   int nDims, i;
-  int lower[3], upper[3];
+  uint lower[3], upper[3];
 
   HydrostaticTerm *hydrostaticTerm;
   char* field_filename;
@@ -518,7 +516,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
 
   /* We need to save the grids to map between 1D and 3D indices for
      the values. */
-  Grid *elGrid, *vertGrid;
+  Grid *vertGrid;
 
   hydrostaticTerm =
     (HydrostaticTerm*)LiveComponentRegister_Get(self->CF->LCRegister,
@@ -591,8 +589,6 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
         && ((FeVariable*)fieldVar)->feMesh->feElFamily!=std::string("linear-inner")) {
       FeVariable* feVar;
       Dof_Index          dofAtEachNodeCount;
-      int *low, *up;
-      Grid *grid;
       IJK ijk;
 
       feVar=(FeVariable*)fieldVar;
@@ -609,7 +605,6 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
           if(!strcmp(gen->type,"SurfaceAdaptor"))
             gen=(CartesianGenerator *)((SurfaceAdaptor *)(gen))->generator;
 
-          elGrid=gen->elGrid;
           vertGrid=gen->vertGrid;
           nDims=gen->nDims;
 
@@ -749,9 +744,8 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
                     {
                       double p;
                       /* First add the trace of the stress */
-                      int stress_I;
 
-                      for(stress_I = 0;
+                      for(uint stress_I = 0;
                           stress_I<self->fieldVariable_Register->objects->count;
                           stress_I++ ) {
                         FieldVariable* stressVar;
