@@ -306,12 +306,9 @@ Bool ModulesManager_LoadModule( void* modulesManager, Name moduleName ) {
 	
 	Stream* stream;
 	Stream* debug;
-	Stream* error;
-
     
 	stream =  Journal_Register( Info_Type, self->type );
 	debug =  Journal_Register( Debug_Type, self->type );
-	error =  Journal_Register( Error_Type, self->type );
 
 	if ( Stg_ObjectList_Get( self->modules, moduleName ) != NULL ) {
 		Journal_Printf( debug, "Module %s already loaded\n", moduleName );

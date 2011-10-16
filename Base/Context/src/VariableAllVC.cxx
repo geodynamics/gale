@@ -69,7 +69,7 @@ VariableCondition* VariableAllVC_Factory(
 VariableAllVC*	VariableAllVC_New(
 	Name									name,
 	AbstractContext*					context,
-	char*									_dictionaryEntryName, 
+	const char*									_dictionaryEntryName, 
 	Variable_Register*				variable_Register, 
 	ConditionFunction_Register*	conFunc_Register,
 	Dictionary*							dictionary,

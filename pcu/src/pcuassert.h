@@ -28,7 +28,7 @@
 
 extern int pcu_jump_ready;
 extern jmp_buf pcu_jump_env;
-extern char* pcu_assert_cur;
+extern const char* pcu_assert_cur;
 
 #define pcu_assert( expr )                                      \
    (pcu_jump_ready ?                                            \

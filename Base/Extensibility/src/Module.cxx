@@ -114,20 +114,16 @@ void _Module_Init(
 	char*                           fileName = NULL;
 	char*                           fullPathName = NULL;
 
-	Stream*                         stream;
-	Stream*                         debug;
-	Stream*                         error;
-
 #ifndef NOSHARED
 	int                             fullPathLength = 0;
 	int                             length;
 	Index                           dir_i;
+	
+	Stream *stream =  Journal_Register( Info_Type, self->type );
+	Stream *error =  Journal_Register( Error_Type, self->type );
 #endif
 	
-	stream =  Journal_Register( Info_Type, self->type );
-	debug =  Journal_Register( Debug_Type, self->type );
-	error =  Journal_Register( Error_Type, self->type );
-	
+	Stream *debug =  Journal_Register( Debug_Type, self->type );
 	self->MangleName = MangleName;
 	
 	
