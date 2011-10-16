@@ -189,7 +189,6 @@ void* _LineParticleLayout_Copy( const void* particleLayout, void* dest, Bool dee
 
 void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFactory *cf, void* data ){
 	LineParticleLayout*     self                    = (LineParticleLayout*) particleLayout;
-	Particle_Index          totalInitialParticles;
 	Dimension_Index         dim;
 	Coord*                  vertexList;
 	Index                   vertexCount;
@@ -229,8 +228,6 @@ void _LineParticleLayout_AssignFromXML( void* particleLayout, Stg_ComponentFacto
 		Journal_PrintfL( stream, 2, "(%0.3g, %0.3g, %0.3g)\n", coord[ I_AXIS ], coord[ J_AXIS ], coord[ K_AXIS ] );
 	}
 	Stream_UnIndent( stream );
-
-	totalInitialParticles = Stg_ComponentFactory_GetUnsignedInt( cf, self->name, (Dictionary_Entry_Key)"totalInitialParticles", 2  );
 
 	_LineParticleLayout_Init( self, dim, vertexCount, vertexList );
 

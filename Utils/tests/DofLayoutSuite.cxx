@@ -72,11 +72,11 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		DofLayout*				destDof;
 		Variable_Register*	variableRegister;
 		Variable*				var[6];
-		char*						varName[] = {"x", "y", "z", "vx", "vy", "vz"};
+		const char* varName[] = {"x", "y", "z", "vx", "vy", "vz"};
 		Index						ii, dof_I, var_I;
 		Index						arraySize = 27;
 		double*					varArrays[6];
-		int						counts[27];
+		uint					counts[27];
 
 		Stream_RedirectFile( stream, "testBasic.dat" );
 
@@ -238,7 +238,7 @@ void DofLayoutSuite_TestRemap( DofLayoutSuiteData* data ) {
 		double*					dummyPtr = &dummyVar;
 		Variable_Register*	variableRegister;
 		Variable*				var[6];
-		char*						varName[] = {"x", "y", "z", "vx", "vy", "vz"};
+		const char* varName[] = {"x", "y", "z", "vx", "vy", "vz"};
 		Index						i, j;
 		Index						arraySize = 1;
 		IndexMap*				map;
@@ -307,7 +307,7 @@ void DofLayoutSuite_TestSaveAndLoad( DofLayoutSuiteData* data ) {
 		DofLayout*				dof;
 		Variable_Register*	variableRegister;
 		Variable*				var[6];
-		char*						varName[] = {"x", "y", "z", "vx", "vy", "vz"};
+		const char* varName[] = {"x", "y", "z", "vx", "vy", "vz"};
 		Index						ii, var_I;
 		Index						arraySize = 27;
 		double*					varArrays[6];

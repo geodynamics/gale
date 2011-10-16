@@ -565,7 +565,9 @@ void DofLayout_AddAllFromVariableArray( void* dofLayout, Variable_Index variable
 }
 
 
-void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, unsigned rank ) {
+void DofLayout_SaveAllVariablesToFiles( void* dofLayout,
+                                        const char* prefixString,
+                                        unsigned rank ) {
 	DofLayout*  self = (DofLayout*) dofLayout;
 	Index       ownedVar_I, var_I;
 	Variable*   variable = NULL;
@@ -597,7 +599,7 @@ void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, uns
 }
 
 
-void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, unsigned rank ) {
+void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, const char* prefixString, unsigned rank ) {
 	DofLayout*  self = (DofLayout*) dofLayout;
 	Index       ownedVar_I, var_I;
 	Variable*   variable = NULL;

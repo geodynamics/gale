@@ -209,7 +209,6 @@ void _TriGaussParticleLayout_InitialiseParticlesOfCell( void* triGaussParticleLa
 	int dim;
 	static double weight[20];
 	static double xi[20][3];
-	static int beenHere = 0;
 	int d;
 	
 	dim = self->dim;
@@ -261,8 +260,6 @@ void _TriGaussParticleLayout_InitialiseParticlesOfCell( void* triGaussParticleLa
 		}
 		
 		integrationPoint->weight = weight[cParticle_I];
-		
-		beenHere = 1;
 	}	
 	
 	

@@ -753,7 +753,6 @@ void ParticleMovementHandler_FillRemainingHolesInLocalParticlesArray( ParticleCo
 	Index			currLeavingParticleArrayEntry = 0;
 	Index			highestLeavingParticleArrayEntry;
 	Index			leavingParticlesUnfilledCount = 0;
-	Particle_Index		highestLeavingParticleIndex;
 	Particle_Index		candidateParticleToMove;
 	Bool			finishedFlag = False;
 	Bool			mergedArrayCreated = False;
@@ -814,7 +813,6 @@ void ParticleMovementHandler_FillRemainingHolesInLocalParticlesArray( ParticleCo
 		 */
 
 		candidateParticleToMove = self->swarm->particleLocalCount-1;
-		highestLeavingParticleIndex = leavingParticlesArray[highestLeavingParticleArrayEntry];
 		Journal_DPrintfL( self->debug, 3, "Searching for highest particle that hasn't also moved:\n" );
 		Stream_Indent( self->debug );	
 
@@ -836,7 +834,6 @@ void ParticleMovementHandler_FillRemainingHolesInLocalParticlesArray( ParticleCo
 				candidateParticleToMove );
 
 			highestLeavingParticleArrayEntry--;
-			highestLeavingParticleIndex = leavingParticlesArray[highestLeavingParticleArrayEntry];
 			leavingParticlesUnfilledCount--;
 			self->swarm->particleLocalCount--;
 			candidateParticleToMove--;

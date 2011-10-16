@@ -648,7 +648,7 @@ Variable* Variable_NewFromOld( Variable* oldVariable, Name name, Bool copyValues
 
 	self = Variable_New(  
 		name,
-		self->context,
+		oldVariable->context,
 		1,
 		dataOffsets,
 		oldVariable->dataTypes,

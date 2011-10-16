@@ -466,7 +466,6 @@ void _TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate(
 	Variable*       variable       = self->variable;
 	Index           component_I; 
 	Index           componentCount = *variable->dataTypeCounts;
-	Bool            successFlag = False;
 
 	/* First, go back to initial positions, so we can re-calculate the time derivative there */
 	for ( component_I = 0 ; component_I < componentCount ; component_I++ ) {
@@ -477,7 +476,7 @@ void _TimeIntegrand_RewindToStartAndApplyFirstOrderUpdate(
 	/* Now recalculate time deriv at start positions, then do a full dt first order update from
 	 * there */
 	TimeIntegrator_SetTime( self->timeIntegrator, startTime );
-	successFlag = TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
+	TimeIntegrand_CalculateTimeDeriv( self, array_I, timeDeriv );
 	for ( component_I = 0 ; component_I < componentCount ; component_I++ ) 
 		arrayDataPtr[ component_I ] = startData[ component_I ] + dt * timeDeriv[ component_I ];
 	TimeIntegrand_Intermediate( self, array_I );

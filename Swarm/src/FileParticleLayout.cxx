@@ -221,7 +221,6 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
    hid_t                group_id, attrib_id;
    Index                ii;
    int                  nParticles;
-   herr_t               status;
 #else
    MPI_File             mpiFile;
    int                  openResult;
@@ -269,7 +268,7 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
               self->type,
               self->name,
               filenameTemp );
-      status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
+      H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
       H5Aclose(attrib_id);
       H5Gclose(group_id);
 
@@ -343,7 +342,6 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
    Index                  ii, jj, kk;
    hid_t                  group_id, attrib_id;
    int                    nParticles;
-   herr_t                 status;
      
    /* Allocate space to store arrays of dataspaces */   
    assert( swarm->swarmVariable_Register );  
@@ -383,7 +381,7 @@ void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm
          group_id  = H5Gopen2(file[ii-1], "/", H5P_DEFAULT);
          attrib_id = H5Aopen(group_id, "Swarm Particle Count", H5P_DEFAULT);
       #endif
-      status = H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
+      H5Aread(attrib_id, H5T_NATIVE_INT, &nParticles);
 
       H5Aclose(attrib_id);
       H5Gclose(group_id);
@@ -478,8 +476,6 @@ void _FileParticleLayout_InitialiseParticle(
 {
    FileParticleLayout*	self = (FileParticleLayout*)particleLayout;
    Swarm*					swarm = (Swarm*)_swarm;
-   int						result;
-   SizeT             particleSize; 
 
 #ifdef READ_HDF5
    SwarmVariable*    swarmVar;
@@ -487,8 +483,6 @@ void _FileParticleLayout_InitialiseParticle(
    Index             ii;
    hid_t             memSpace; 
 
-	result = 0;
-	particleSize = 0;
    /* find out which file particle is contained within */
    for( ii = 1 ; ii <= self->checkpointfiles ; ii++ ){
       if( newParticle_I < self->lastParticleIndex[ii-1]) break;
@@ -550,8 +544,8 @@ void _FileParticleLayout_InitialiseParticle(
    }
       
 #else
-  	particleSize = swarm->particleExtensionMgr->finalSize;
-	result = fread( particle, particleSize, 1, self->file );
+   SizeT particleSize = swarm->particleExtensionMgr->finalSize;
+   int result = fread( particle, particleSize, 1, self->file );
 
    Journal_Firewall( 
       result == 1,

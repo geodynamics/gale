@@ -597,7 +597,6 @@ void Delaunay_BuildTriangleIndices( Delaunay *delaunay )
 	int i = 0, triCount;
 	QuadEdgeRef e = 0, eStart = 0, eOnext = 0, eLnext = 0;
 	QuadEdge *edges = NULL;
-	Site *sites = NULL;
 	int maxEdges = 0;
 	unsigned int **triIndices = NULL;
 	int **edgeToTriangle = NULL;
@@ -641,7 +640,6 @@ void Delaunay_BuildTriangleIndices( Delaunay *delaunay )
 	triIndices = delaunay->triangleIndices;
 	
 	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
-	sites = delaunay->sites;
 	maxEdges = delaunay->qp->numElements;
 		
 	for (i = 0; i < maxEdges; i++) {
@@ -746,13 +744,11 @@ void Delaunay_BuildVoronoiVertices( Delaunay *delaunay )
 	QuadEdgeRef e = 0, eStart = 0, eOnext = 0, eLnext = 0;
 	VoronoiVertex *new_voronoi_site = NULL;
 	QuadEdge *edges = NULL;
-	Site *sites = NULL;
 	int maxEdges = 0;
 
 	assert( delaunay );
 	
 	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
-	sites = delaunay->sites;
 	maxEdges = delaunay->qp->numElements;
 		
 	for (i = 0; i < maxEdges; i++) {
@@ -810,7 +806,6 @@ void Delaunay_FindNeighbours( Delaunay *delaunay )
 	Site *src, *dst;
 	VoronoiVertex *vsrc, *vdst;
 	float dist = 0.0f, diffx = 0.0f, diffy = 0.0f, voronoiAreaResult = 0.0;
-	Site *sites = NULL;
 	QuadEdge *edges = NULL;
 	unsigned int *numNeighbours;
 	int *hull;
@@ -821,7 +816,6 @@ void Delaunay_FindNeighbours( Delaunay *delaunay )
 	assert( delaunay );
 
 	attr = delaunay->attributes;
-	sites = delaunay->sites;
 	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
 	maxEdges = delaunay->qp->numElements;
 	numSites = delaunay->numSites;

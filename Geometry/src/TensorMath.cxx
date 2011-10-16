@@ -725,11 +725,11 @@ void SymmetricTensor_CalcAllEigenvectors2D( SymmetricTensor tensor, Eigenvector*
 
 /** Calculates an eigenvector for a given 3D SymmetricTensor */
 Bool SymmetricTensor_CalcEigenvector3D( SymmetricTensor tensor, Eigenvector* eigenvector ) {
-	double A, B, C, d, e, f;
+	double
+ A, B, d, e, f;
 
 	A = tensor[ST3D_00] - eigenvector->eigenvalue;
 	B = tensor[ST3D_11] - eigenvector->eigenvalue;
-	C = tensor[ST3D_22] - eigenvector->eigenvalue;
 	d = tensor[ST3D_01];
 	e = tensor[ST3D_02];
 	f = tensor[ST3D_12];

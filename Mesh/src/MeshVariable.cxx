@@ -114,10 +114,6 @@ void _MeshVariable_Delete( void* meshVariable ) {
 void _MeshVariable_Print( void* meshVariable, Stream* stream ) {
 	MeshVariable*	self = (MeshVariable*)meshVariable;
 	
-	/* Set the Journal for printing informations */
-	Stream* meshVariableStream;
-	meshVariableStream = Journal_Register( InfoStream_Type, (Name)"MeshVariableStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "MeshVariable (ptr): (%p)\n", self );
 	_Variable_Print( self, stream );

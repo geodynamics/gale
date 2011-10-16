@@ -581,7 +581,6 @@ IndexSet* RegularMeshUtils_CreateGlobalTopRightFrontSet( void* _mesh ) {
 
 IndexSet* RegularMeshUtils_CreateGlobalBottomLeftBackSet( void* _mesh ) {
 	Mesh*		mesh = (Mesh*)_mesh;
-	Grid*		grid;
 	unsigned	nNodes;
 	IndexSet*	set;
 	int nDims;
@@ -590,9 +589,6 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomLeftBackSet( void* _mesh ) {
 
 	assert( mesh );
 	assert( Mesh_GetDimSize( mesh ) >= 2 );
-
-	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					      ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" ) );
 
         nDims = Mesh_GetDimSize( mesh  );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
@@ -1049,13 +1045,11 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomLeftSet( void* _mesh ) {
 	unsigned	nNodes;
 	IndexSet*	set;
 	IJK		ijk;
-	int nDims;
 	unsigned	n_i;
 
 	assert( mesh );
 	assert( Mesh_GetDimSize( mesh ) >= 2 );
 
-        nDims = Mesh_GetDimSize( mesh );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 
@@ -1074,7 +1068,6 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomRightSet( void* _mesh ) {
 	IndexSet*	set;
 	IJK		ijk;
 	Grid*	grid;
-	int nDims;
 	unsigned	n_i;
 
 	assert( mesh );
@@ -1083,7 +1076,6 @@ IndexSet* RegularMeshUtils_CreateGlobalBottomRightSet( void* _mesh ) {
 	grid = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
 					      ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" ) );
 
-        nDims = Mesh_GetDimSize( mesh  );
 	nNodes = Mesh_GetDomainSize( mesh, MT_VERTEX );
 	set = IndexSet_New( nNodes );
 

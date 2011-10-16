@@ -100,7 +100,6 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 	Dictionary*						dictionary;
 	Dictionary_Entry_Value*		particlePositionsList;
 	Dictionary_Entry_Value*		particlePositionEntry;
-	Dimension_Index				dim;
 	ManualParticleLayout*		particleLayout;
 	int								procToWatch = data->nProcs > 1 ? 1 : 0;
 	Stream*							stream;
@@ -151,7 +150,7 @@ void ManualParticleLayoutSuite_TestManualParticle( ManualParticleLayoutSuiteData
 		particleLayout = ManualParticleLayout_New( "manualParticleLayout", NULL, GlobalCoordSystem, False,
          0, 0.0, dictionary );
 	
-		swarm = Swarm_New( "manualParticleSwarm", NULL, elementCellLayout, particleLayout, dim, sizeof(Particle),
+		swarm = Swarm_New( "manualParticleSwarm", NULL, elementCellLayout, particleLayout, nDims, sizeof(Particle),
 			extensionMgr_Register, NULL, data->comm, NULL );
 	
 		/* Build the swarm */

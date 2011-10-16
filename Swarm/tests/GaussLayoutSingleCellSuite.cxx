@@ -66,9 +66,6 @@ void GaussLayoutSingleCellSuite_Teardown( GaussLayoutSingleCellSuiteData* data )
 
 void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
 	unsigned							nDims;
-	unsigned							gaussParticles[3];
-	double							minCrds[3];
-	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
 	GaussParticleLayout*			gaussParticleLayout;
 	SingleCellLayout*				singleCellLayout;
@@ -87,9 +84,6 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 		Stream_RedirectFile( stream, "1ParticlePerDim_3D.dat" );
 
 		nDims = 3;
-		gaussParticles[0] = 2; gaussParticles[1] = 1; gaussParticles[2] = 3;
-		minCrds[0] = 0.0; minCrds[1] = 0.0; minCrds[2] = 0.0;
-		maxCrds[0] = 300.0; maxCrds[1] = 12.0; maxCrds[2] = 300.0;
 	
 		extensionMgr_Register = ExtensionManager_Register_New();
 
@@ -130,9 +124,6 @@ void GaussLayoutSingleCellSuite_Test1ParticlePerDim_3D( GaussLayoutSingleCellSui
 
 void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
 	unsigned							nDims;
-	unsigned							gaussParticles[3];
-	double							minCrds[3];
-	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
 	GaussParticleLayout*			gaussParticleLayout;
 	SingleCellLayout*				singleCellLayout;
@@ -151,10 +142,6 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		Stream_RedirectFile( stream, "2ParticlesPerDim_3D.dat" );
 
 		nDims = 3;
-		gaussParticles[0] = 2; gaussParticles[1] = 1; gaussParticles[2] = 3;
-		minCrds[0] = 0.0; minCrds[1] = 0.0; minCrds[2] = 0.0;
-		maxCrds[0] = 300.0; maxCrds[1] = 12.0; maxCrds[2] = 300.0;
-	
 		extensionMgr_Register = ExtensionManager_Register_New();
 
 		/* Configure the element-cell-layout */
@@ -194,9 +181,6 @@ void GaussLayoutSingleCellSuite_Test2ParticlesPerDim_3D( GaussLayoutSingleCellSu
 
 void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSuiteData* data ) {
 	unsigned							nDims;
-	unsigned							gaussParticles[3];
-	double							minCrds[3];
-	double							maxCrds[3];
 	ExtensionManager_Register*	extensionMgr_Register;
 	GaussParticleLayout*			gaussParticleLayout;
 	SingleCellLayout*				singleCellLayout;
@@ -215,10 +199,6 @@ void GaussLayoutSingleCellSuite_Test3ParticlesPerDim_3D( GaussLayoutSingleCellSu
 		Stream_RedirectFile( stream, "3ParticlesPerDim_3D.dat" );
 
 		nDims = 3;
-		gaussParticles[0] = 2; gaussParticles[1] = 1; gaussParticles[2] = 3;
-		minCrds[0] = 0.0; minCrds[1] = 0.0; minCrds[2] = 0.0;
-		maxCrds[0] = 300.0; maxCrds[1] = 12.0; maxCrds[2] = 300.0;
-	
 		extensionMgr_Register = ExtensionManager_Register_New();
 
 		/* Configure the element-cell-layout */

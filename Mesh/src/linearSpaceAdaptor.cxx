@@ -125,10 +125,6 @@ void _LinearSpaceAdaptor_Delete( void* adaptor ) {
 void _LinearSpaceAdaptor_Print( void* adaptor, Stream* stream ) {
 	LinearSpaceAdaptor*	self = (LinearSpaceAdaptor*)adaptor;
 	
-	/* Set the Journal for printing informations */
-	Stream* adaptorStream;
-	adaptorStream = Journal_Register( InfoStream_Type, (Name)"LinearSpaceAdaptorStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "LinearSpaceAdaptor (ptr): (%p)\n", self );
 	_MeshAdaptor_Print( self, stream );

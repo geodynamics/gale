@@ -104,10 +104,6 @@ void _Grid_Delete( void* grid ) {
 void _Grid_Print( void* grid, Stream* stream ) {
 	Grid*	self = (Grid*)grid;
 
-	/* Set the Journal for printing informations */
-	Stream* gridStream;
-	gridStream = Journal_Register( InfoStream_Type, (Name)"GridStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Grid (ptr): (%p)\n", self );
 	_Stg_Class_Print( self, stream );

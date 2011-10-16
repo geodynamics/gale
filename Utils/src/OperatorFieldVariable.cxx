@@ -291,10 +291,9 @@ InterpolationResult OperatorFieldVariable_BinaryInterpolationFunc( void* fieldVa
 	double                 fieldValue0[ MAX_FIELD_COMPONENTS ]; 
 	double                 fieldValue1[ MAX_FIELD_COMPONENTS ]; 
 	InterpolationResult    result0;
-	InterpolationResult    result1;
 
 	result0 = field0->_interpolateValueAt( field0, coord, fieldValue0 );
-	result1 = field1->_interpolateValueAt( field1, coord, fieldValue1 );
+	field1->_interpolateValueAt( field1, coord, fieldValue1 );
 
 	Operator_CarryOutBinaryOperation( self->_operator, fieldValue0, fieldValue1, value ); 
 

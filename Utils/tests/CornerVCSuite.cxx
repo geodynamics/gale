@@ -101,15 +101,15 @@ void CornerVCSuite_TestCornerVC( CornerVCSuiteData* data ) {
 	double								minCrds[3] = {0.0, 0.0, 0.0};
 	double								maxCrds[3] = {1.0, 1.0, 1.0};
 	double*								array[7];
-	char*									vcKey[] = { "CornerVC_BottomLeftFront", "CornerVC_BottomRightFront",
-															"CornerVC_TopLeftFront", "CornerVC_TopRightFront",
-															"CornerVC_BottomLeftBack", "CornerVC_BottomRightBack",
-															"CornerVC_TopLeftBack", "CornerVC_TopRightBack" };
-	char*									vcKeyName[] = { "CornerVC_BottomLeftFrontName", "CornerVC_BottomRightFrontName",
-															"CornerVC_TopLeftFrontName", "CornerVC_TopRightFrontName",
-															"CornerVC_BottomLeftBackName", "CornerVC_BottomRightBackName",
-															"CornerVC_TopLeftBackName", "CornerVC_TopRightBackName" };
-	char*									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
+	const char* vcKey[] = { "CornerVC_BottomLeftFront", "CornerVC_BottomRightFront",
+                                "CornerVC_TopLeftFront", "CornerVC_TopRightFront",
+                                "CornerVC_BottomLeftBack", "CornerVC_BottomRightBack",
+                                "CornerVC_TopLeftBack", "CornerVC_TopRightBack" };
+	const char*vcKeyName[] = { "CornerVC_BottomLeftFrontName", "CornerVC_BottomRightFrontName",
+                                   "CornerVC_TopLeftFrontName", "CornerVC_TopRightFrontName",
+                                   "CornerVC_BottomLeftBackName", "CornerVC_BottomRightBackName",
+                                   "CornerVC_TopLeftBackName", "CornerVC_TopRightBackName" };
+	const char* varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
 	char									input_file[PCU_PATH_MAX];
 	char									expected_file[PCU_PATH_MAX];
 	Mesh*									mesh;

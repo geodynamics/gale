@@ -92,10 +92,6 @@ void _MeshGenerator_Delete( void* meshGenerator ) {
 void _MeshGenerator_Print( void* meshGenerator, Stream* stream ) {
 	MeshGenerator*	self = (MeshGenerator*)meshGenerator;
 	
-	/* Set the Journal for printing informations */
-	Stream* meshGeneratorStream;
-	meshGeneratorStream = Journal_Register( InfoStream_Type, (Name)"MeshGeneratorStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "MeshGenerator (ptr): (%p)\n", self );
 	_Stg_Component_Print( self, stream );

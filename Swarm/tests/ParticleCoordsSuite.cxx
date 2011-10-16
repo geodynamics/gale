@@ -69,7 +69,6 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 	Variable_Register*			variable_Register;
 	Swarm*							swarm;
 	Stream*							stream;
-	Dictionary*						dictionary;
 	DomainContext*					context;
 	int								procToWatch = data->nProcs > 1 ? 1 : 0;
 	char								input_file[PCU_PATH_MAX];
@@ -87,7 +86,6 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 		cf = stgMainInitFromXML( input_file, data->comm, NULL );
 		stgMainBuildAndInitialise( cf );
 		context = (DomainContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
-		dictionary = context->dictionary;
 
 		swarm = (Swarm* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"swarm" );
 		pcu_check_true( swarm );

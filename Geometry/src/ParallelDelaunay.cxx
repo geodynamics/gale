@@ -517,12 +517,10 @@ void ParallelDelaunay_RetriangulateAfterMerge( ParallelDelaunay *pd, Direction d
 		Site *result = NULL;
 		ParallelDelaunay *self = pd;
 		int i = 0;
-		int numProcs;
 		int numSites;
 		int count;
 		int offset;
 
-		numProcs = self->numProcs;
 		numSites = self->numSites;
 		offset = 0;
 		for( i=0; i<self->rank; i++ ){
@@ -577,9 +575,7 @@ void ParallelDelaunay_BuildTriangleIndices( ParallelDelaunay *pd )
 	int i = 0, triCount;
 	QuadEdgeRef e = 0, eStart = 0, eOnext = 0, eLnext = 0;
 	QuadEdge *edges = NULL;
-	Site *sites = NULL;
 	int maxEdges = 0;
-	int rank = 0;
 	int pass = 0;
 	unsigned int **triIndices = NULL;
 	Delaunay *delaunay = NULL;
@@ -599,8 +595,6 @@ void ParallelDelaunay_BuildTriangleIndices( ParallelDelaunay *pd )
 	triIndices = delaunay->triangleIndices;
 	
 	edges = (QuadEdge*)delaunay->qp->chunks[0].memory;
-	sites = delaunay->sites;
-	rank = pd->rank;
 	maxEdges = delaunay->qp->numElements;
 		
 	for (i = 0; i < maxEdges; i++) {

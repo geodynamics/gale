@@ -203,10 +203,10 @@
 	void DofLayout_AddAllFromVariableArray( void* dofLayout, Variable_Index variableCount, Variable** variableArray ) ;
 
 	/** Saves all variables used by this dofLayout to files */
-	void DofLayout_SaveAllVariablesToFiles( void* dofLayout, char* prefixString, unsigned rank );
+	void DofLayout_SaveAllVariablesToFiles( void* dofLayout, const char* prefixString, unsigned rank );
 
 	/** Saves all variables used by this dofLayout to files */
-	void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, char* prefixString, unsigned rank );
+	void DofLayout_LoadAllVariablesFromFiles( void* dofLayout, const char* prefixString, unsigned rank );
 
 #endif /* __StgDomain_Utils_DofLayout_h__ */
 
