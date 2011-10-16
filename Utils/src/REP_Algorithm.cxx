@@ -459,7 +459,7 @@ void _REP_Algorithm_AssembleElement( REP_Algorithm* self, int lElement_I, double
 	ElementType*            elementType;
 	IntegrationPoint*       particle;
  	double globalCoord[3], detJac;
-	int cell_I, cellParticleCount, nodesPerEl, cParticle_I;
+	int cell_I, cellParticleCount, cParticle_I;
 	/* Only need one */
 	int dim = self->repFieldList[0]->dim;
 	int field_I;
@@ -469,7 +469,6 @@ void _REP_Algorithm_AssembleElement( REP_Algorithm* self, int lElement_I, double
 
 	/* Get the number of nodes per element */
 	FeMesh_GetElementNodes( mesh, lElement_I, self->incArray );
-	nodesPerEl = IArray_GetSize( self->incArray );
 
 	/* Get number of particles per element */
 	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );

@@ -426,14 +426,14 @@ void _Pouliquen_etal_HasYielded(
 	double                    oneOnI;
 	Pouliquen_etal_Particle*         particleExt;
 	double                    mu;
-	double                    strainWeakeningRatio;
+	// double                    strainWeakeningRatio;
 	/*double                    mu_2_afterSoftening =	self->mu_2_afterSoftening;
 	double                    mu_s_afterSoftening =	self->mu_s_afterSoftening;*/
 	double                    effective_mu_s;
 	double                    effective_mu_2;
 	double                    pressure;
 
-	strainWeakeningRatio = StrainWeakening_CalcRatio( self->strainWeakening, materialPoint );
+	// strainWeakeningRatio = StrainWeakening_CalcRatio( self->strainWeakening, materialPoint );
 
 	particleExt = (Pouliquen_etal_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
 

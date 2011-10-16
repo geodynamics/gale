@@ -169,7 +169,6 @@ void _Orthotropic_ModifyConstitutiveMatrix(
 	Orthotropic*	                self = (Orthotropic*) rheology;
 	Dimension_Index                   dim  = swarm->dim;
 
-	int i,j;
 	double**   C  = constitutiveMatrix->matrixData;
 	double n1,n2,n3;
 	double m1,m2,m3;
@@ -187,8 +186,8 @@ void _Orthotropic_ModifyConstitutiveMatrix(
 	n1 = self->n[0];
 	n2 = self->n[1];
 
-	for(i=0;i<dim*(dim+1)/2;i++){
-	      for(j=0;j<dim*(dim+1)/2;j++){
+	for(uint i=0;i<dim*(dim+1)/2;i++){
+	      for(uint j=0;j<dim*(dim+1)/2;j++){
 		    C[i][j] = 0.0;
 	      }
 	}

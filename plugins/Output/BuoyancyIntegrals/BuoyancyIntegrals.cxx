@@ -273,7 +273,6 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	Cell_Index cell_I;
 	double velocity[3], global_coord[3];
 	FeMesh* mesh;
-	Element_LocalIndex e;
 	
 	double i_T, i_v, i_y, i_vT; /* interpolated quantity */
 	double sum_T, sum_vT, sum_yT; /* integral sum */
@@ -342,7 +341,7 @@ void perform_integrals( UnderworldContext *context, double *B, double *w_bar, do
 	n_elements = FeMesh_GetElementLocalSize( mesh  );
 	//	printf("n_elements = %d \n", n_elements );
 	
-	for( e=0; e<n_elements; e++ ) {
+	for(int e=0; e<n_elements; e++ ) {
 		cell_I = CellLayout_MapElementIdToCellId( gaussSwarm->cellLayout, e );
 		elementType = FeMesh_GetElementType( mesh, e );
 		
@@ -418,7 +417,6 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 {
 	Underworld_BuoyancyIntegrals_CTX *ctx;
 	double global_coord[3];
-	InterpolationResult result;
 	double T;
 	FeVariable* temperatureField;
 
@@ -439,7 +437,7 @@ void eval_temperature( UnderworldContext *context, double y_b, double *temp_b )
 		global_coord[1] = y_b;
 	}
 
-	result = FieldVariable_InterpolateValueAt( temperatureField, global_coord, &T );
+	FieldVariable_InterpolateValueAt( temperatureField, global_coord, &T );
 	MPI_Allreduce ( &T, temp_b, 1, MPI_DOUBLE, MPI_MAX, context->communicator );
 
 }

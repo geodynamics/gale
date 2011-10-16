@@ -158,7 +158,6 @@ void* _DivergenceForce_DefaultNew( Name name ) {
 
 void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	DivergenceForce*          self             = (DivergenceForce*)forceTerm;
-	Dictionary*		dict;
         Stg_Shape* domainShape=NULL;
         FeMesh* geometryMesh=NULL;
         StressBC_Entry force;
@@ -167,7 +166,6 @@ void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
 
-	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, self->name ) );
 	domainShape =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "DomainShape", Stg_Shape,  True, data  ) ;
         type = Stg_ComponentFactory_GetString( cf, self->name, "force_type", "");
 
@@ -290,6 +288,8 @@ void _DivergenceForce_AssembleElement( void* forceTerm,
                elementNodes[eNode_I],0,self->context,&force);
             break;
           }
+
+        // This needs to be properly integrated.
         elForceVec[ eNode_I] += force*factor;
       }
   }

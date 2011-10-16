@@ -371,16 +371,15 @@ void _RecoveredFeVariable_AssembleAtParticle(
 		memcpy( pMatrix[dof_I], pVec, order*sizeof(double) );
 
 		if( self->recoverStrain ) {
-			Index ii;
 			if( !constitutiveMatrix ) {
         /* if no consitutive matrix make it up - assume viscosity = 1 */
-				for( ii = 0 ; ii < dofThatExist; ii++ ) { memset( tmpC[ii], 0, dofThatExist*sizeof(double)); }
+				for(int ii = 0 ; ii < dofThatExist; ii++ ) { memset( tmpC[ii], 0, dofThatExist*sizeof(double)); }
 				if (dim == 2) { tmpC[0][0] = tmpC[1][1] = tmpC[2][2] = 1; } 
         else { tmpC[0][0] = tmpC[1][1] = tmpC[2][2] = tmpC[3][3] = tmpC[4][4] = tmpC[5][5] = 1; }
 
 			} else {
 				/* copy constitutive matrix */
-				for(ii = 0 ; ii < dofThatExist ; ii++)
+				for(int ii = 0 ; ii < dofThatExist ; ii++)
 					memcpy( tmpC[ii], constitutiveMatrix->matrixData[ii], dofThatExist*sizeof(double) ); 
 			}
       if( dim == 2 ){
@@ -521,7 +520,7 @@ void _RecoveredFeVariable_CalcFi3D( RecoveredFeVariable* self, double** GNx, dou
 }
 
 void _RecoveredFeVariable_PutElIntoProc( RecoveredFeVariable* self, int lElement_I, double*** elHi_Mat, double** elFi_Mat ) {
-	int keyH, keyF, dof_I, row_I, order_I;
+	int keyF, dof_I, row_I, order_I;
 	int dim, dofThatExist, order, nodesPerEl, rowsInH;
 	double* ptrH = self->elementRep_H;
 	double* ptrF = self->elementRep_F;
@@ -533,7 +532,6 @@ void _RecoveredFeVariable_PutElIntoProc( RecoveredFeVariable* self, int lElement
 	rowsInH = nodesPerEl * dim;
 	
 	for( dof_I = 0 ; dof_I < dofThatExist ; dof_I++ ) {  
-		keyH = (lElement_I*dofThatExist*rowsInH*order) + (dof_I*rowsInH*order);
 		keyF = (lElement_I*dofThatExist*rowsInH) + (dof_I*rowsInH);
 		for( row_I = 0 ; row_I < rowsInH ; row_I++ ) {
 			ptrF[ keyF + row_I ] =+ elFi_Mat[dof_I][row_I];
@@ -576,9 +574,8 @@ void RecoveredFeVariable_CommunicateHF( RecoveredFeVariable* self ) {
 }
 
 void RecoveredFeVariable_SetupWorkSpace( RecoveredFeVariable* self ) {
-	int dofThatExist, order, nodesPerEl, nodesInPatch, rowsInH;
+	int dofThatExist, order, nodesInPatch, rowsInH;
 
-	nodesPerEl = self->nodesPerEl;
 	dofThatExist = self->fieldComponentCount;
 	order = self->orderOfInterpolation;
 	nodesInPatch = self->nodesInPatch;
@@ -621,9 +618,8 @@ void RecoveredFeVariable_SolvePatch( RecoveredFeVariable* self, int pNodeID, int
 	double **el_H = self->tmpEl_H;
 	double *el_F = self->tmpEl_F;
 	double *ptrH, *ptrF;
-  double coeff[50];
+        double coeff[50];
 	IArray *inc;
-	double *coord;
 	int dim, dofThatExist, order, nodesPerEl, rowsInElH, rowsInPatchH, row, elID;
 	int dof_I, el_I, node_I, nodeID, indexOfEntry, order_I;
 	int *nodeList;
@@ -642,8 +638,6 @@ void RecoveredFeVariable_SolvePatch( RecoveredFeVariable* self, int pNodeID, int
 
 	/* use the inc on the FeVariable */
 	inc = self->inc;
-
-	coord = Mesh_GetVertex( self->feMesh , pNodeID );
 
 	for( dof_I = 0 ; dof_I < dofThatExist ; dof_I++ ) {
 			ZeroMatrix( self->patch_H[dof_I], rowsInPatchH, order );

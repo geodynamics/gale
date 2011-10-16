@@ -183,7 +183,7 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	Element_LocalIndex  lElement_I;
 	Node_LocalIndex    	nodeAtElementBottom;
 	Node_LocalIndex    	nodeAtElementTop;
-	int                 elementNodeCount, *elementNodes;
+	int                 *elementNodes;
 	double              elementBottomHeight;
 	double              elementTopHeight;
 	double              detJac;
@@ -211,7 +211,6 @@ double Underworld_BoundaryLayers_InternalTemperature( UnderworldContext* context
 	for ( lElement_I = 0 ; lElement_I < FeMesh_GetElementLocalSize( mesh ) ; lElement_I++ ) {
 		elementType         = FeMesh_GetElementType( mesh, lElement_I );
 		FeMesh_GetElementNodes( mesh, lElement_I, incArray );
-		elementNodeCount = IArray_GetSize( incArray );
 		elementNodes = IArray_GetPtr( incArray );
 
 		nodeAtElementBottom = elementNodes[ 0 ] ;

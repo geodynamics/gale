@@ -227,7 +227,7 @@ void _SPR_StrainRate_AssemblePatch( SPR_StrainRate* self, int node_I, double** A
 	FeMesh*				feMesh = (FeMesh*)rawField->feMesh;
 	Index					dofThatExist = rawField->fieldComponentCount;
 	Index					nbrEl_I, nbrElementID, nbrElCount;
-	Index					count_i, count_j, dof_I;
+	Index					dof_I;
 	double				center[3] = {0.0,0.0,0.0};
 	int					orderOfInterpolation = self->orderOfInterpolation;
 	IArray*				inc = self->inc; 
@@ -263,13 +263,13 @@ void _SPR_StrainRate_AssemblePatch( SPR_StrainRate* self, int node_I, double** A
 
  	/* Construct A Matrix (Geometric based) and b Vectors (tensor based) */
 	for( nbrEl_I = 0 ; nbrEl_I < nbrElCount ; nbrEl_I++ ) {
-		for( count_i = 0 ; count_i < orderOfInterpolation ; count_i++ ) {
-			for( count_j = 0; count_j < orderOfInterpolation ; count_j++ ) {
+		for(int count_i = 0 ; count_i < orderOfInterpolation ; count_i++ ) {
+			for(int count_j = 0; count_j < orderOfInterpolation ; count_j++ ) {
 				AMatrix[count_i][count_j] += ( pVec[nbrEl_I][count_i] * pVec[nbrEl_I][count_j] );
 			}
 		}
 		for(dof_I = 0 ; dof_I < dofThatExist ; dof_I++ ) {
-			for( count_i = 0 ; count_i < orderOfInterpolation ; count_i++ ) {
+			for(int count_i = 0 ; count_i < orderOfInterpolation ; count_i++ ) {
 				bVector[dof_I][ count_i ] += (scp_eps[nbrEl_I][dof_I] * pVec[nbrEl_I][count_i]);
 			}
  		}

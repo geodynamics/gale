@@ -141,8 +141,8 @@ void _BaseRecoveryFeVar_AssignFromXML( void* _self, Stg_ComponentFactory* cf, vo
 void _BaseRecoveryFeVar_Build( void* _self, void* data ) {
   BaseRecoveryFeVar* self = (BaseRecoveryFeVar*) _self;
 	Sync*	               sync;
-	int                  componentsCount = 0;
-	int                  variable_I, node_I;
+	uint                  componentsCount = 0;
+	uint                  variable_I;
 	int                  *nodeDomainCountPtr = NULL;
 	char                 **variableName, *tmpName;
 	Variable*            dataVariable;
@@ -194,7 +194,7 @@ void _BaseRecoveryFeVar_Build( void* _self, void* data ) {
 			variable->arrayPtrPtr = &dataVariable->arrayPtr;
 
 			/* Assign variable to each node */
-			for( node_I = 0; node_I < *nodeDomainCountPtr; node_I++ ) {
+			for( int node_I = 0; node_I < *nodeDomainCountPtr; node_I++ ) {
 				DofLayout_AddDof_ByVarName( self->dofLayout, variableName[variable_I], node_I );
 			}
 			/* Free Name */
@@ -352,7 +352,6 @@ void _BaseRecoveryFeVar_GetValueInElementWithStdInterpolation( void* feVariable,
 void _BaseRecoveryFeVar_GetValueInElementWithCoeffInterpolation( void* feVariable, Element_Index lEl_I, double* xi, double* value ) {
 	BaseRecoveryFeVar* self = (BaseRecoveryFeVar*) feVariable;
 	FeMesh*              mesh = self->feMesh;
-	IArray*              inc  = self->inc;
 	double               globalCoord[3];
 	double               coeff[50]; 
 	int order, dof_I, dofThatExist;
@@ -382,7 +381,7 @@ double _BaseRecoveryFeVar_ApplyCoeff( BaseRecoveryFeVar* self, double* coeff, do
 	return value;
 }
 
-void BaseUtils_Add2LmStruct( LmStruct* lmStruct, Index nodeID ) {
+void BaseUtils_Add2LmStruct( LmStruct* lmStruct, int nodeID ) {
 	int count_I;
 	for( count_I = 0 ; count_I < lmStruct->numberOfNodes ; count_I++ ) {
 		/* To prevent duplication in the list*/
@@ -409,22 +408,21 @@ void BaseUtils_PopulateBoundaryNodesInfo( FeMesh* mesh, BoundaryNodesInfo* bninf
  *  		if so, set onBoundary = true 
  * 
  */
-	Node_Index              dNodes_I, tmpNodeID, tmpNode_I;
-	Element_Index           nbrElementID, nbrElement_I;
-	int                     nEls, *els;
-	int                     nNodes, *nodes;
+	Node_Index              tmpNodeID, tmpNode_I;
+	Element_Index           nbrElementID;
+        int                     *els;
+	uint                    nNodes;
 	LmStruct                list;
 	Sync*                   sync;
-	int                     domainNodes;
-	int                     nLocalNodes;
+	uint                    nLocalNodes;
 	int                     nVerts;
-  const int               *verts;
+        const int               *verts;
 	IArray*			            inc[2];
 
 	sync = Mesh_GetSync( mesh, MT_VERTEX );
 	IGraph_GetBoundaryElements( mesh->topo, MT_VERTEX, &nVerts, &verts );
 	nLocalNodes = FeMesh_GetNodeLocalSize( mesh );
-	domainNodes = FeMesh_GetNodeDomainSize( mesh );
+	int domainNodes = FeMesh_GetNodeDomainSize( mesh );
 
 	assert( nVerts <= domainNodes );
 
@@ -434,14 +432,14 @@ void BaseUtils_PopulateBoundaryNodesInfo( FeMesh* mesh, BoundaryNodesInfo* bninf
    * numOfPatches2use = 0
    * patchNodes list = [-1,-1,-1,....,-1]
    * */
-	for( dNodes_I = 0 ; dNodes_I < domainNodes ; dNodes_I++ ) {
+	for( int dNodes_I = 0 ; dNodes_I < domainNodes ; dNodes_I++ ) {
 		bninfo[dNodes_I].onMeshBoundary = False;
 		bninfo[dNodes_I].numOfPatches2use = 0;
 		memset( bninfo[dNodes_I].patchNodes, -1, sizeof(int)*REP_MAXNODESPERPATCH );
 	}
 
 	/* First flag boundary nodes */
-	for( dNodes_I = 0 ; dNodes_I < nVerts ; dNodes_I++ )
+	for( int dNodes_I = 0 ; dNodes_I < nVerts ; dNodes_I++ )
 	       bninfo[verts[dNodes_I]].onMeshBoundary = True;
 
 	/* Update all other procs. */
@@ -462,7 +460,7 @@ void BaseUtils_PopulateBoundaryNodesInfo( FeMesh* mesh, BoundaryNodesInfo* bninf
 	 */
 	inc[0] = IArray_New();
 	inc[1] = IArray_New();
-	for( dNodes_I = 0 ; dNodes_I < FeMesh_GetNodeDomainSize( mesh ) ; dNodes_I++ ) {
+	for( uint dNodes_I = 0 ; dNodes_I < FeMesh_GetNodeDomainSize( mesh ) ; dNodes_I++ ) {
 		if( !bninfo[dNodes_I].onMeshBoundary ) 
 			continue;
 
@@ -470,15 +468,15 @@ void BaseUtils_PopulateBoundaryNodesInfo( FeMesh* mesh, BoundaryNodesInfo* bninf
 				
 		/* Go through all neighbour elements */
 		FeMesh_GetNodeElements( mesh, dNodes_I, inc[0] );
-		nEls = IArray_GetSize( inc[0] );
+		int nEls = IArray_GetSize( inc[0] );
 		els = IArray_GetPtr( inc[0] );
 
-		for( nbrElement_I = 0 ; nbrElement_I < nEls ; nbrElement_I++) {
+		for(int nbrElement_I = 0; nbrElement_I < nEls; nbrElement_I++) {
 			nbrElementID = els[nbrElement_I];
 			/* Go through nodes on elements and see if they're valid patchs */
 			FeMesh_GetElementNodes( mesh, nbrElementID, inc[1] );
 			nNodes = IArray_GetSize( inc[1] );
-			nodes = IArray_GetPtr( inc[1] );
+			int *nodes = IArray_GetPtr( inc[1] );
 
 			for( tmpNode_I = 0 ; tmpNode_I < nNodes ; tmpNode_I++ ) {
 				tmpNodeID = nodes[tmpNode_I];

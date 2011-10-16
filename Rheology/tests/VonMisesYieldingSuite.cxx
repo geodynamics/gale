@@ -129,7 +129,6 @@ void Underworld_testVonMisesYielding_Check_Sync( FiniteElementContext* context )
 
 void VonMisesYieldingSuite_VonMises2D( VonMisesYieldingSuiteData* data ) {
 	UnderworldContext* context;
-	Dictionary*					dictionary;
 	YieldRheology*          yieldRheology;
 	Stg_ComponentFactory*	cf;
 	char							expected_file[PCU_PATH_MAX];
@@ -139,7 +138,6 @@ void VonMisesYieldingSuite_VonMises2D( VonMisesYieldingSuiteData* data ) {
 	pcu_filename_input( "testVonMisesYieldCriterion.xml", xml_input );
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
 	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context" );
-	dictionary = context->dictionary;
 
 	stgMainBuildAndInitialise( cf  );
 

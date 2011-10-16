@@ -60,7 +60,6 @@
 #include <assert.h>
 #include <string.h>
 #include <time.h>
-#include <limits>
 
 /* Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
 const Type ConstitutiveMatrixCartesian_Type = "ConstitutiveMatrixCartesian";
@@ -304,12 +303,12 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
        OneToManyRef *ref;
        double **matrixData;
-       uint ii, jj, kk;
+       uint jj, kk;
 
        matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
        memset(matrixData[0], 0, self->columnSize*self->rowSize*sizeof(double));
        ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
-       for(ii = 0; ii < ref->numParticles; ii++) {
+       for(int ii = 0; ii < ref->numParticles; ii++) {
          /* Assemble this material point. */
          ConstitutiveMatrix_AssembleMaterialPoint(
                                                   constitutiveMatrix, lElement_I,
@@ -326,30 +325,13 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
        Memory_Free(matrixData);
      }
      else if(nearestNeighbor) {
-       /* This does a search over all of the particles in the swarm in
-          the element to find the one that is closest to the gauss
-          point.  There may be more efficient ways of doing this, but
-          this works for now. */
        IntegrationPointsSwarm* NNswarm=
          ((NearestNeighborMapper*)((IntegrationPointsSwarm*)self->integrationSwarm)->mapper)->swarm;
        int NNcell_I            = CellLayout_MapElementIdToCellId( NNswarm->cellLayout, lElement_I );
-       int NNcellParticleCount = NNswarm->cellParticleCountTbl[ NNcell_I ];
-
-       Journal_Firewall( NNcellParticleCount != 0, Journal_Register( Error_Type, (Name)ConstitutiveMatrix_Type  ),
-         "In func %s: NNcellParticleCount is 0.\n", __func__ );
-
-       double min_dist(std::numeric_limits<double>::max());
-       int nearest_particle(-1);
-
-       for ( int NNcParticle_I = 0 ; NNcParticle_I < NNcellParticleCount ; NNcParticle_I++ ) {
-         IntegrationPoint* NNparticle = (IntegrationPoint*)Swarm_ParticleInCellAt( NNswarm, NNcell_I, NNcParticle_I );
-         double dist=StGermain_DistanceBetweenPoints(particle->xi,NNparticle->xi,dim);
-         if(dist<min_dist)
-           {
-             nearest_particle=NNcParticle_I;
-             min_dist=dist;
-           }
-       }
+       int nearest_particle=
+         NearestNeighbor_FindNeighbor(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper,
+                                      lElement_I,NNcell_I,particle->xi,dim);
+                                      
        IntegrationPoint* NNparticle = (IntegrationPoint*)Swarm_ParticleInCellAt( NNswarm, NNcell_I, nearest_particle );
        ConstitutiveMatrix_Assemble(constitutiveMatrix, lElement_I,
                                    NNswarm->cellParticleTbl[NNcell_I][nearest_particle], NNparticle,
@@ -739,9 +721,7 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
 
    IntegrationPointsSwarm* swarm = (IntegrationPointsSwarm*)self->integrationSwarm;
    MaterialPointsSwarm **materialSwarms, *materialSwarm;
-   MaterialPoint particle;
    int materialSwarmCount;
-   double *cMatrix = NULL;
 
    if( beenHere ) return;
 
@@ -756,10 +736,10 @@ void ConstitutiveMatrixCartesian_SetupParticleStorage( ConstitutiveMatrixCartesi
    /* add extension to material swarm */
    self->storedConstHandle = ExtensionManager_Add( materialSwarm->particleExtensionMgr, (Name)self->type, self->rowSize * self->columnSize * sizeof(double)  );
 
-   cMatrix = (double*)ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
 
 #if 0
    /*This isn't needed so I've disabled it, 2Dec09, JG*/
+   double *cMatrix = (double*)ExtensionManager_Get( materialSwarm->particleExtensionMgr, &particle, self->storedConstHandle );
    if( self->dim == 2 ) {
       /* TODO: clean up this vector logic. The only reson there's an if is because
       *        * of the list of names the must be given as the final arguments to this function.  */

@@ -188,23 +188,21 @@ void _TracerOutput_AssignFromXML( void* swarmOutput,
 }
 
 void _TracerOutput_Build( void* swarmOutput, void* data ) {
-  int i;
   TracerOutput*	self = (TracerOutput*) swarmOutput;
 
   if(self->pressureField)
     Stg_Component_Build( self->pressureField, data, False );
-  for(i=0;i<self->num_fields;++i)
+  for(uint i=0;i<self->num_fields;++i)
     Stg_Component_Build( self->fields[i], data, False );
 
   _SwarmOutput_Build( self, data );
 }
 void _TracerOutput_Initialise( void* swarmOutput, void* data ) {
-  int i;
   TracerOutput*	self = (TracerOutput*) swarmOutput;
 
   if(self->pressureField)
     Stg_Component_Initialise( self->pressureField, data, False );
-  for(i=0;i<self->num_fields;++i)
+  for(uint i=0;i<self->num_fields;++i)
     Stg_Component_Initialise( self->fields[i], data, False );
 	
   _SwarmOutput_Initialise( self, data );
@@ -215,12 +213,11 @@ void _TracerOutput_Execute( void* swarmOutput, void* data ) {
   _SwarmOutput_Execute( self, data );
 }
 void _TracerOutput_Destroy( void* swarmOutput, void* data ) {
-  int i;
   TracerOutput*	self = (TracerOutput*)swarmOutput;
 
   if(self->pressureField)
     Stg_Component_Destroy( self->pressureField, data, False );
-  for(i=0;i<self->num_fields;++i)
+  for(uint i=0;i<self->num_fields;++i)
     Stg_Component_Destroy( self->fields[i], data, False );
 	
   _SwarmOutput_Destroy( self, data );
@@ -228,7 +225,6 @@ void _TracerOutput_Destroy( void* swarmOutput, void* data ) {
 
 void _TracerOutput_PrintHeader( void* swarmOutput, Stream* stream,
                                 Particle_Index lParticle_I, void* context ){
-  int i;
   char name[32];
   TracerOutput*	self = (TracerOutput*)swarmOutput;
 	
@@ -236,7 +232,7 @@ void _TracerOutput_PrintHeader( void* swarmOutput, Stream* stream,
   _SwarmOutput_PrintHeader( self, stream, lParticle_I, context );
 	
   SwarmOutput_PrintString( self, stream, "Pressure" );
-  for(i=0;i<self->num_fields;++i)
+  for(uint i=0;i<self->num_fields;++i)
     {
       sprintf(name,"Field%d",i);
       SwarmOutput_PrintString( self, stream, name );
@@ -253,7 +249,6 @@ void _TracerOutput_PrintData( void* swarmOutput, Stream* stream,
   double* coord = particle->coord;
   HydrostaticTerm *hydrostaticTerm;
   double pressure, field;
-  int i;
 
   hydrostaticTerm =
     (HydrostaticTerm*)LiveComponentRegister_Get(fe_context->CF->LCRegister,
@@ -273,7 +268,7 @@ void _TracerOutput_PrintData( void* swarmOutput, Stream* stream,
       }
       SwarmOutput_PrintValue( self, stream, pressure );
     }
-  for(i=0;i<self->num_fields;++i)
+  for(uint i=0;i<self->num_fields;++i)
     {
       FieldVariable_InterpolateValueAt(self->fields[i],coord,&field);
       SwarmOutput_PrintValue( self, stream, field );

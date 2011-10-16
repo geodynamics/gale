@@ -948,7 +948,6 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	double                           averagedGlobalMaxStrainIncrement = 0.0;
 
 	double                           oneOverGlobalMaxSlipRate;
-	double                           oneOverGlobalMaxStrainIncrement;
 	double                           postFailureWeakeningIncrement;
 	
 	
@@ -1036,7 +1035,6 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 	
 	/* Let's simply assume that twice the mean is a good place to truncate these values */
 	oneOverGlobalMaxSlipRate = 1.0 / averagedGlobalMaxSlipRate;
-	oneOverGlobalMaxStrainIncrement = 1.0 / averagedGlobalMaxStrainIncrement;
 	
 	for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
 		materialPoint = (GlobalParticle*) Swarm_ParticleAt( strainWeakening->swarm, lParticle_I );
@@ -1138,7 +1136,7 @@ void _FaultingMoresiMuhlhaus2006_UpdateDrawParameters( void* rheology ) {
 		opacity    = (slipRate/globalMaxSlipRate);
 		
 		if (opacity > 0.90)
-			opacity = 1.0;/* this condition is to make sure we have enough planes that will be clearly seen. */ /*
+                opacity = 1.0; // this condition is to make sure we have enough planes that will be clearly seen.
 
 		Variable_SetValueFloat( self->brightness->variable, lParticle_I, brightness );
 		Variable_SetValueFloat( self->opacity->variable,    lParticle_I, opacity );

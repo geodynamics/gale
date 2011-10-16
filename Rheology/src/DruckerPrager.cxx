@@ -352,18 +352,11 @@ double _DruckerPrager_GetYieldCriterion(
 {
 	DruckerPrager*                    self             = (DruckerPrager*) druckerPrager;
         Dimension_Index                   dim = constitutiveMatrix->dim;
-	double                            cohesion;
-	double                            cohesionAfterSoftening;
-	double                            frictionCoefficient;
-	double                            frictionCoefficientAfterSoftening;
 	double                            minimumYieldStress;
-	double                            minimumViscosity;
-	double                            maxStrainRate;
 	double                            effectiveCohesion;
 	double                            effectiveFrictionCoefficient;
 	double                            frictionalStrength;
 	double                            pressure;
-	DruckerPrager_Particle*           particleExt;
         Cell_Index                        cell_I;
         Coord                             coord;
         Element_GlobalIndex	          element_gI = 0;
@@ -373,16 +366,8 @@ double _DruckerPrager_GetYieldCriterion(
         double                            factor;
 	
 	/* Get Parameters From Rheology */
-	cohesion                           = self->cohesion;
-	cohesionAfterSoftening             = self->cohesionAfterSoftening;
-	frictionCoefficient                = self->frictionCoefficient;
-	frictionCoefficientAfterSoftening  = self->frictionCoefficientAfterSoftening;
 	minimumYieldStress                 = self->minimumYieldStress;
-	minimumViscosity                   = self->minimumViscosity;
-	maxStrainRate                      = self->maxStrainRate;
 	
-	particleExt = (DruckerPrager_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, materialPoint, self->particleExtHandle );
-
         if( self->pressureField )
           FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &pressure );
         else {
@@ -582,7 +567,6 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 
 	double                           oneOverGlobalMaxStrainIncrement;
 	double                           postFailureWeakeningIncrement;
-   int ierr; /* mpi error code */
 
 	/* Note : this function defines some drawing parameters (brightness, opacity, diameter) as
 	 * functions of the strain weakening - this needs to be improved since most of the parameters
@@ -620,9 +604,9 @@ void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
 		}
 	}
 	
-	ierr = MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
-	ierr = MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	ierr = MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
+	MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
 	
 	if(globalFailed == 0) 
 		return;

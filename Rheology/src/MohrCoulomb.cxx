@@ -383,7 +383,6 @@ void _MohrCoulomb_StoreCurrentParameters(
 	Dimension_Index	dim = constitutiveMatrix->dim;
 	Eigenvector			evectors[3];
 	double				trace;
-	int					i;
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );
 	if( !self->swarmStrainRate ) {
@@ -398,7 +397,7 @@ void _MohrCoulomb_StoreCurrentParameters(
 	/* Subtract the trace (which should be zero anyway).  We can
 		use TensorMapST3D even for 2D, because it is the same for
 		the xx and yy components */
-	for(i=0;i<dim;++i)
+	for(uint i=0;i<dim;++i)
 		self->currentStrainRate[TensorMapST3D[i][i]]-=trace/dim;
 
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, self->currentStrainRate, self->currentStress );

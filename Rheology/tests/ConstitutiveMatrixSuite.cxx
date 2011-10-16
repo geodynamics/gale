@@ -84,7 +84,6 @@ void testConstitutiveMatrix( FiniteElementContext* context ) {
 
 
 void ConstitutiveMatrixSuite_CartesianMatrix2D( ConstitutiveMatrixSuiteData* data ) {
-	Dictionary*					dictionary;
 	UnderworldContext*		context;
 	Stg_ComponentFactory*	cf;
 	char							expected_file[PCU_PATH_MAX], output_file[PCU_PATH_MAX];
@@ -99,7 +98,6 @@ void ConstitutiveMatrixSuite_CartesianMatrix2D( ConstitutiveMatrixSuiteData* dat
 	cf = stgMainInitFromXML( xml_input, MPI_COMM_WORLD, NULL );
 	context = (UnderworldContext*)LiveComponentRegister_Get( cf->LCRegister, (Name)"context"  );
 	data->context = context;
-	dictionary = context->dictionary;
 
 	/* replace the Execute EP with the function to test the ConstitutiveMatrix */
 	ContextEP_ReplaceAll( context, AbstractContext_EP_Execute, testConstitutiveMatrix );

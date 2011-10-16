@@ -149,7 +149,6 @@ void _MixedStabiliserTerm_AssembleElement( void* _self,
    ElementType* elementType;
    IntegrationPointsSwarm* swarm;
    IntegrationPoint* integrationPoint;
-   double geometric_factor;
    double** localElStiffMat;
    int ii, jj, kk;
    double sumVisc = 0.0, visc;

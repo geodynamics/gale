@@ -175,7 +175,7 @@ void _RheologyMaterial_Init(
          Rheology_Register_Add( self->rheology_Register, rheologyList[ rheology_I ] );
    }
 
-	/*	self->debug = Journal_Register( Debug_Type, (Name)self->type ); /* TODO make child of Underworld_Debug */
+	/*	self->debug = Journal_Register( Debug_Type, (Name)self->type ); // TODO make child of Underworld_Debug */
 }
 
 

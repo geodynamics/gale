@@ -134,7 +134,6 @@ void ByerleeYieldingSuite_Check_Sync( FiniteElementContext* context ) {
 
 void ByerleeYieldingSuite_TestByerlee2D( ByerleeYieldingSuiteData* data ) {
 	UnderworldContext*		context;
-	Dictionary*					dictionary;
 	YieldRheology*          yieldRheology;
 	Stg_ComponentFactory*	cf;
 	char							expected_file[PCU_PATH_MAX];
@@ -147,8 +146,6 @@ void ByerleeYieldingSuite_TestByerlee2D( ByerleeYieldingSuiteData* data ) {
 	Stream_Enable( context->info, False );
 	Stream_Enable( context->debug, False );
 	Stream_Enable( context->verbose, False );
-	dictionary = context->dictionary;
-
 	stgMainBuildAndInitialise( cf );
 
 	/* get pointer to the mesh */

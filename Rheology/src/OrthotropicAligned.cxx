@@ -143,7 +143,6 @@ void _OrthotropicAligned_ModifyConstitutiveMatrix(
         /*	double                          isotropicViscosity = ConstitutiveMatrix_GetIsotropicViscosity( constitutiveMatrix ); */
         /*	double                          deltaViscosity; */
         /*	XYZ                             normal; */
-	int i,j;
 	double**   D  = constitutiveMatrix->matrixData;
         /*	static int flag = 0; */
         /*	deltaViscosity = isotropicViscosity * (1.0 - self->viscosityRatio); */
@@ -151,11 +150,11 @@ void _OrthotropicAligned_ModifyConstitutiveMatrix(
 
         /*	ConstitutiveMatrix_SetSecondViscosity( constitutiveMatrix, deltaViscosity, normal ); */
 	
-        /*	if(!flag){/* if not visited modify matrix else no need to update *\/ */
+        /*	if(!flag){ // if not visited modify matrix else no need to update */
         /* Snark dies if I only allow this to be called once.. */
 	/* ahh need to allow it to be called once for every particle */
-	   for(i=0;i<dim*(dim+1)/2;i++){
-	      for(j=0;j<dim*(dim+1)/2;j++){
+	   for(uint i=0;i<dim*(dim+1)/2;i++){
+	      for(uint j=0;j<dim*(dim+1)/2;j++){
 		 D[i][j] = 0.0;
 	      }
 	   }

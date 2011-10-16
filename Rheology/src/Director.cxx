@@ -343,7 +343,6 @@ void _Director_Initialise( void* director, void* data ) {
 			  and check first is material is defined as random.*/
 			Material_Index	materialsCount = Materials_Register_GetCount( self->materialPointsSwarm->materials_Register);
 			XYZ*				materialDirectionVectors;
-			int				material_I;
 			Material*		material;
 			Bool*				randomInitialDirections;
 			int*				randomInitialDirectionSeeds;
@@ -356,7 +355,7 @@ void _Director_Initialise( void* director, void* data ) {
 			"randomInitialDirections");
 
 			/* Loop over materials and get material properties from dictionary */
-			for ( material_I = 0 ; material_I < materialsCount ; material_I++ ) {
+			for (uint material_I = 0 ; material_I < materialsCount ; material_I++ ) {
 				material = Materials_Register_GetByIndex( 
 						self->materialPointsSwarm->materials_Register, 
 						material_I );
@@ -386,7 +385,7 @@ void _Director_Initialise( void* director, void* data ) {
 			
 			/* If material is random, set the local srand, 
 			locate all random particles, and set their director */
-			for (material_I = 0; material_I < materialsCount; material_I++) {
+			for (uint material_I = 0; material_I < materialsCount; material_I++) {
 				if (randomInitialDirections[material_I] == True) {
 					Particle_Index	gParticle_I;
 					unsigned	approxGlobalParticleCount = particleLocalCount * self->materialPointsSwarm->nProc;
@@ -429,7 +428,7 @@ void _Director_Initialise( void* director, void* data ) {
 		    /* For each non-random particle, set the initial direction */
 			for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 				/* Initialise the norm of each director */
-				material_I = MaterialPointsSwarm_GetMaterialIndexAt(
+				uint material_I = MaterialPointsSwarm_GetMaterialIndexAt(
 						self->materialPointsSwarm, 
 						lParticle_I );
 				if (randomInitialDirections[material_I] == False) {
@@ -474,7 +473,6 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 	MaterialPointsSwarm*     materialPointsSwarm = self->materialPointsSwarm;
 	TensorArray              velGrad;
 	double*                  normal;
-	Element_LocalIndex       lElement_I;
 	MaterialPoint*           materialPoint = (MaterialPoint*) Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
 	Director_ParticleExt*    particleExt;
 	InterpolationResult      result;
@@ -491,8 +489,6 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 
 	normal     = particleExt->director;
 
-	lElement_I = materialPoint->owningCell;
-	
 	result = FieldVariable_InterpolateValueAt( self->velGradField, materialPoint->coord, velGrad );
 	/* if in debug mode, perform some tests */
 #ifdef DEBUG

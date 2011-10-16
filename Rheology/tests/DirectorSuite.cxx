@@ -56,7 +56,6 @@ void _Director_Intermediate_Replace( void* director, Index lParticle_I ) {}
 void test( UnderworldContext* context ) {
 	Director*			director = (Director*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"director" );
 	Particle_Index		lParticle_I;
-	GlobalParticle*	particle;
 	double				time = context->currentTime + context->dt;
 	Swarm*				swarm	= (Swarm* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)"materialSwarm" );
 	XYZ					normal;
@@ -65,16 +64,14 @@ void test( UnderworldContext* context ) {
    double				angleDirector;
 	double				gError;
 	int					particleGlobalCount;
-   int ierr;
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
-		particle = (GlobalParticle* )Swarm_ParticleAt( swarm, lParticle_I );
 		SwarmVariable_ValueAt( director->directorSwarmVariable, lParticle_I, normal );
       angleDirector = atan(-normal[1]/normal[0]);
 		error += fabs( angleDirector - angle );
 	}
-	ierr = MPI_Allreduce( &error, &gError, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	ierr = MPI_Allreduce( &swarm->particleLocalCount, &particleGlobalCount, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( &error, &gError, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( &swarm->particleLocalCount, &particleGlobalCount, 1, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
 
 	//error /= (double) swarm->particleLocalCount;
 	//pcu_check_true( error < TOLERANCE );
@@ -86,7 +83,6 @@ void testRandom( UnderworldContext* context ) {
 	AlignmentSwarmVariable* alignment = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"alignment"  );
 	Director*               director;
 	Particle_Index          lParticle_I;
-	GlobalParticle*         particle;
 	Swarm*                  swarm;
 	XYZ                     normal;
 	int                     ii;
@@ -102,13 +98,11 @@ void testRandom( UnderworldContext* context ) {
 	int                     circleAngleUpperBound;
 	double						gCircleAngleAverage;
 	int                     gCircleAngleCounts[36] 	= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-   int ierr;
 
 	swarm = alignment->swarm;
 	director = alignment->director;
 
 	for ( lParticle_I = 0 ; lParticle_I < swarm->particleLocalCount ; lParticle_I++ ) {
-		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, lParticle_I );
 		SwarmVariable_ValueAt( director->directorSwarmVariable, lParticle_I, normal );
 		/* Calculate dot product between normal and (0,1), then get an angle */
 
@@ -123,10 +117,10 @@ void testRandom( UnderworldContext* context ) {
 		}
 		circleAngleCounts[ (int)(circleAngle+0.5) / 10 ] += 1;
 	}
-	ierr = MPI_Allreduce( circleAngleCounts, gCircleAngleCounts, 36, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( circleAngleCounts, gCircleAngleCounts, 36, MPI_INT, MPI_SUM, MPI_COMM_WORLD );
 
 	circleAngleAverage = (double)swarm->particleLocalCount / 36;
-	ierr = MPI_Allreduce( &circleAngleAverage, &gCircleAngleAverage, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
+	MPI_Allreduce( &circleAngleAverage, &gCircleAngleAverage, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
 
 	/*NB. This definition is determined based on a set no. of particlesPerCell. Currently this value is = 20 */
 	#define TheoreticalStandardDeviation 13.64
@@ -161,12 +155,10 @@ void testRandom( UnderworldContext* context ) {
 
 void testPerMaterial( UnderworldContext* context ) {
 	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"alignment" );
-	Materials_Register*     materials_Register     = context->materials_Register;
 	Director*               director;
 	Particle_Index          lParticle_I;
 	Swarm*                  swarm;
 	XYZ                     testVector;
-	Material_Index          materialsCount;
 	int                     material_I;
 	XYZ*                    matDirectionVectors;
 	double                  angle;
@@ -174,7 +166,6 @@ void testPerMaterial( UnderworldContext* context ) {
 	
 	swarm = alignment->swarm;
 	director = alignment->director;
-	materialsCount = Materials_Register_GetCount( materials_Register );
 	
 	/*  construct test for testDirectorPerMaterial.xml  */
 	/* assume a direction for each material and check that */
@@ -209,12 +200,10 @@ void testPerMaterial( UnderworldContext* context ) {
 
 void testPerMaterial2( UnderworldContext* context ) {
 	AlignmentSwarmVariable* alignment              = (AlignmentSwarmVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"alignment" );
-	Materials_Register*     materials_Register     = context->materials_Register;
 	Director*               director;
 	Particle_Index          lParticle_I;
 	Swarm*                  swarm;
 	XYZ                     testVector;
-	Material_Index          materialsCount;
 	int                     material_I;
 	XYZ*                    matDirectionVectors;
 	double                  angle;
@@ -222,7 +211,6 @@ void testPerMaterial2( UnderworldContext* context ) {
 	
 	swarm = alignment->swarm;
 	director = alignment->director;
-	materialsCount = Materials_Register_GetCount( materials_Register );
 	
 	matDirectionVectors = Memory_Alloc_Array(XYZ, DIR_TEST_NUM_MAT, "materialDirectionVectors");
 
