@@ -22,7 +22,7 @@ typedef struct {
 
 const Type NonNewtonianShearSolution_Type = "NonNewtonianShearSolution";
 
-void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* velocity ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                       height;
 	double			     min[3], max[3];
@@ -35,7 +35,7 @@ void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, FeVaria
 	velocity[ J_AXIS ] = 0.0;
 }
 
-void NonNewtonianShearSolution_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void NonNewtonianShearSolution_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* strainRate ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                       height;
 	double			     min[3], max[3];
@@ -49,7 +49,7 @@ void NonNewtonianShearSolution_StrainRateFunction( void* analyticSolution, FeVar
 	strainRate[ 2 ] = 0.5 * self->velocityTopOfBox / height;
 }
 
-void NonNewtonianShearSolution_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
+void NonNewtonianShearSolution_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* stress ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                         eta;
 	double                         height;
@@ -73,7 +73,7 @@ void NonNewtonianShearSolution_StressFunction( void* analyticSolution, FeVariabl
 }
 
 
-void NonNewtonianShearSolution_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscosity ) {
+void NonNewtonianShearSolution_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* viscosity ) {
 	NonNewtonianShearSolution*     self = (NonNewtonianShearSolution*)analyticSolution;
 	double                         eta0;
 	double                         height;
@@ -94,7 +94,7 @@ void NonNewtonianShearSolution_UpdateVelocityBC( NonNewtonianShearSolution* self
 	self->velocityTopOfBox += context->dt;
 }
 
-void NonNewtonianShearSolution_VelocityBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void NonNewtonianShearSolution_VelocityBC(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	         context       = (FiniteElementContext*)_context;
 	NonNewtonianShearSolution*   self          = (NonNewtonianShearSolution*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)NonNewtonianShearSolution_Type );
 	double*                          result        = (double* ) _result;

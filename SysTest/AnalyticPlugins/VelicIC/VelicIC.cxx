@@ -51,13 +51,12 @@ const Type Underworld_VelicIC_Type = "Underworld_VelicIC";
 #define SMALL 1.0e-5
 
 /* Works with SolA */
-void Underworld_VelicIC_Sinusoidal( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Underworld_VelicIC_Sinusoidal(const double *coord, void* _context, void* _result ) {
 	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh             = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  x; 
 	double                  y;
 	double                  kx;
@@ -68,8 +67,6 @@ void Underworld_VelicIC_Sinusoidal( Node_LocalIndex node_lI, Variable_Index var_
 	double                  Lx;
 	double			min[3], max[3];
 	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( feMesh, node_lI );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
 
 	/* Make sure that the box has right dimensions */
@@ -94,13 +91,12 @@ void Underworld_VelicIC_Sinusoidal( Node_LocalIndex node_lI, Variable_Index var_
 }
 
 /* Works with SolB */
-void Underworld_VelicIC_Hyperbolic( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Underworld_VelicIC_Hyperbolic(const double *coord, void* _context, void* _result ) {
 	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh             = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  x; 
 	double                  y;
 	double                  km; /*  for y-direction */
@@ -111,8 +107,6 @@ void Underworld_VelicIC_Hyperbolic( Node_LocalIndex node_lI, Variable_Index var_
 	double                  sigma;
 	double			min[3], max[3];
 	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( feMesh, node_lI );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
 
 	/* Make sure that the box has right dimensions */
@@ -137,11 +131,8 @@ void Underworld_VelicIC_Hyperbolic( Node_LocalIndex node_lI, Variable_Index var_
 
 
 void _Underworld_VelicIC_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	AbstractContext*        context;
 	ConditionFunction*      condFunc;
 
-	context = (AbstractContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data  ); 
-	
 	condFunc = ConditionFunction_New( Underworld_VelicIC_Sinusoidal, (Name)"VelicIC_Sinusoidal" );
 	ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	condFunc = ConditionFunction_New( Underworld_VelicIC_Hyperbolic, (Name)"VelicIC_Hyperbolic" );

@@ -45,7 +45,7 @@
 
 const Type Velic_solJ_Type = "Underworld_Velic_solJ";
 
-void Velic_solJ_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void Velic_solJ_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure ) {
 	Velic_solJ* self = (Velic_solJ*) analyticSolution;
 	
 	_Velic_solJ( coord, self->sigmaB, self->sigmaA, self->etaB, self->etaA, self->dxB, self->dxA,
@@ -53,7 +53,7 @@ void Velic_solJ_PressureFunction( void* analyticSolution, FeVariable* analyticFe
 	       	       NULL, pressure, NULL, NULL );
 }
 
-void Velic_solJ_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void Velic_solJ_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity ) {
 	Velic_solJ* self = (Velic_solJ*) analyticSolution;
 	
 	_Velic_solJ( coord, self->sigmaB, self->sigmaA, self->etaB, self->etaA, self->dxB, self->dxA,
@@ -61,7 +61,7 @@ void Velic_solJ_VelocityFunction( void* analyticSolution, FeVariable* analyticFe
 	       	       velocity, NULL, NULL, NULL );
 }
 
-void Velic_solJ_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
+void Velic_solJ_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress ) {
 	Velic_solJ* self = (Velic_solJ*) analyticSolution;
 	
 	_Velic_solJ( coord, self->sigmaB, self->sigmaA, self->etaB, self->etaA, self->dxB, self->dxA,
@@ -70,7 +70,7 @@ void Velic_solJ_StressFunction( void* analyticSolution, FeVariable* analyticFeVa
 }
 
 
-void Velic_solJ_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void Velic_solJ_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate ) {
 	Velic_solJ* self = (Velic_solJ*) analyticSolution;
 	
 	_Velic_solJ( coord, self->sigmaB, self->sigmaA, self->etaB, self->etaA, self->dxB, self->dxA,

@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void _Velic_solIA( 
-		double pos[],
+		const double pos[],
 		double _sigma, double _B, 
 		double _dx, double _x_0,
 		double vel[], double* presssure, 
@@ -43,7 +43,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solIA( 
-		double pos[],
+		const double pos[],
 		double _sigma, double _B, /* density, viscosity parameter */
 		double _dx, double _x_0, /* width of dense column, centre of dense column */
 		double vel[], double* presssure, 

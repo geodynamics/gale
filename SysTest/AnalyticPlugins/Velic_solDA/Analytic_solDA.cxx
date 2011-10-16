@@ -45,21 +45,21 @@
 
 const Type Velic_solDA_Type = "Underworld_Velic_solDA";
 
-void Velic_solDA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void Velic_solDA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure ) {
 	Velic_solDA* self = (Velic_solDA*) analyticSolution;
 	
 	_Velic_solDA( coord, self->sigma, self->etaA, self->etaB, self->zc, self->dx, self->x0,
 		       	NULL, pressure, NULL, NULL );
 }
 
-void Velic_solDA_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void Velic_solDA_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity ) {
 	Velic_solDA* self = (Velic_solDA*) analyticSolution;
 	
 	_Velic_solDA( coord, self->sigma, self->etaA, self->etaB, self->zc, self->dx, self->x0,
 		       	velocity, NULL, NULL, NULL );
 }
 
-void Velic_solDA_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
+void Velic_solDA_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress ) {
 	Velic_solDA* self = (Velic_solDA*) analyticSolution;
 	
 	_Velic_solDA( coord, self->sigma, self->etaA, self->etaB, self->zc, self->dx, self->x0,
@@ -67,7 +67,7 @@ void Velic_solDA_StressFunction( void* analyticSolution, FeVariable* analyticFeV
 }
 
 
-void Velic_solDA_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void Velic_solDA_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate ) {
 	Velic_solDA* self = (Velic_solDA*) analyticSolution;
 	
 	_Velic_solDA( coord, self->sigma, self->etaA, self->etaB, self->zc, self->dx, self->x0,

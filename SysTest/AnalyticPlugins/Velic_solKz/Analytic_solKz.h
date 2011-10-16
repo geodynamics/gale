@@ -57,13 +57,13 @@
 	void* _Velic_solKz_DefaultNew( Name name );
 	void _Velic_solKz_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solKz_Init( Velic_solKz* self, double sigma, double km, double B, int n );
-	void Velic_solKz_PressureFunction( void* analyticSolution, double* coord, double* pressure );
-	void Velic_solKz_VelocityFunction( void* analyticSolution, double* coord, double* velocity );
-	void Velic_solKz_StressFunction( void* analyticSolution, double* coord, double* stress );
-	void Velic_solKz_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate );
+	void Velic_solKz_PressureFunction( void* analyticSolution, const double *coord, double* pressure );
+	void Velic_solKz_VelocityFunction( void* analyticSolution, const double *coord, double* velocity );
+	void Velic_solKz_StressFunction( void* analyticSolution, const double *coord, double* stress );
+	void Velic_solKz_StrainRateFunction( void* analyticSolution, const double *coord, double* strainRate );
 
 	void _Velic_solKz( 
-		double pos[],
+		const double pos[],
 		double _sigma, /* density */
 		double _km, int _n, /* wavelength in z, wavenumber in x */
 		double _B, /* viscosity parameter */

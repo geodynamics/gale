@@ -17,10 +17,10 @@
 	} Underworld_solA;
 
 
-	void Underworld_solA_PressureFunction( void* analyticSolution, double* coord, double* pressure );
-	void Underworld_solA_VelocityFunction( void* analyticSolution, double* coord, double* velocity );
-	void Underworld_solA_StressFunction( void* analyticSolution, double* coord, double* stress );
-	void Underworld_solA_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate );
+	void Underworld_solA_PressureFunction( void* analyticSolution, const double* coord, double* pressure );
+	void Underworld_solA_VelocityFunction( void* analyticSolution, const double* coord, double* velocity );
+	void Underworld_solA_StressFunction( void* analyticSolution, const double* coord, double* stress );
+	void Underworld_solA_StrainRateFunction( void* analyticSolution, const double* coord, double* strainRate );
 
 	void _Velic_solA( double* pos, 
 		double sigma, double Z, int n, double km,

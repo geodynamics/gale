@@ -5,7 +5,7 @@
 
 
 void _Velic_solDA( 
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _eta_A, double _eta_B, 
 		double _z_c, double _dx, double _x_0,
@@ -48,7 +48,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solDA(		
-		double pos[],
+		const double pos[],
 		double _sigma, /* density */
 		double _eta_A, double _eta_B, /* viscosity A, viscosity B */ 
 		double _z_c, double _dx, double _x_0, /* viscosity jump location, width of dense column, centre of dense column */

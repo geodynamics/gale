@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 
-void _Velic_solB( double* pos,
+void _Velic_solB( const double* pos,
 		double sigma, double Z, int n, double km,
 		double* velocity, double* pressure, double* Tstress, double* strainRate );
 
@@ -36,13 +36,13 @@ int main() {
 }
 #endif
 
-void _Velic_solB( double* pos,
+void _Velic_solB( const double* pos,
 		double sigma, double Z, int n, double km,
 		double* velocity, double* pressure, double* Tstress, double* strainRate ) {
 
    double u1,u2,u3,u4,pp,txx;
    double _C1,_C2,_C3,_C4;
-   double sum1,sum2,sum3,sum4,sum5,sum6,sum7,mag,x,z;
+   double sum1,sum2,sum3,sum4,sum5,sum6,sum7,x,z;
    double kn;
    double ss,ss_z,ss_zz,ss_zzz,e_zz,e_xx,e_xz;
    double t1,t2,t3,t4,t5,t6,t7,t8,t9,t10;
@@ -157,7 +157,7 @@ void _Velic_solB( double* pos,
 	 /* density/temp */
 	 sum7 += -sigma*sinh(km*z)*cos(kn*x);
 
-	 mag=sqrt(sum1*sum1+sum2*sum2);
+	 // double mag=sqrt(sum1*sum1+sum2*sum2);
 	// printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7,e_zz,e_xx,e_xz,ss);	    
 	 if ( velocity != NULL ) {
 		 velocity[0] = sum2;

@@ -7,7 +7,7 @@
 #define FOURIER_TERMS 150
 
 void _Velic_solC( 
-		double pos[], 
+		const double pos[], 
 		double sigma, double eta, double x_c,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
@@ -46,7 +46,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solC( 
-		double pos[],									/* coordinates */
+		const double pos[],									/* coordinates */
 		double _sigma, double _eta, double _x_c,		/* problem dependant inputs: density, viscosity, width of dense column */
 		double vel[], double* presssure, 				/* output: velocity, pressure */
 		double total_stress[], double strain_rate[] ) 	/* ouput: total stresss, strain rate */ 

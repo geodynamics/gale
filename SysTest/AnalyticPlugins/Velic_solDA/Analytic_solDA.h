@@ -23,13 +23,13 @@
 	void _Velic_solDA_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solDA_Init( Velic_solDA* self, double sigma, double etaA, double etaB, double zc, double dx, double x0 );
 
-	void Velic_solDA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );
-	void Velic_solDA_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity );
-	void Velic_solDA_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress );
-	void Velic_solDA_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate );
+	void Velic_solDA_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure );
+	void Velic_solDA_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity );
+	void Velic_solDA_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress );
+	void Velic_solDA_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate );
 
 	void _Velic_solDA(		
-		double pos[],
+		const double pos[],
 		double _sigma, /* density */
 		double _eta_A, double _eta_B, /* viscosity A, viscosity B */ 
 		double _z_c, double _dx, double _x_0, /* viscosity jump location, width of dense column, centre of dense column */

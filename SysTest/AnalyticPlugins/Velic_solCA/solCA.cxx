@@ -7,7 +7,7 @@
 
 
 void _Velic_solCA( 
-		double pos[], 
+		const double pos[], 
 		double _sigma, double _eta, double _dx, double _x_0,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
@@ -46,7 +46,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solCA(
-		double pos[], 
+		const double pos[], 
 		double _sigma, double _eta, 	/* Input parameters: density, viscosity */
 		double _dx, double _x_0, 		/* Input parameters: width of the dense column, centre of the dense column */
 		double vel[], double* presssure, 

@@ -21,13 +21,13 @@
 	void _Velic_solI_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solI_Init( Velic_solI* self, double sigma, double B, double xc );
 
-	void Velic_solI_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );
-	void Velic_solI_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity );
-	void Velic_solI_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress );
-	void Velic_solI_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate );
+	void Velic_solI_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure );
+	void Velic_solI_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity );
+	void Velic_solI_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress );
+	void Velic_solI_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate );
 
 	void _Velic_solI( 
-		double pos[],
+		const double pos[],
 		double _sigma, /* density */
 		double _B, double _x_c, /* viscosity parameter, width of dense column */
 		double vel[], double* presssure, 

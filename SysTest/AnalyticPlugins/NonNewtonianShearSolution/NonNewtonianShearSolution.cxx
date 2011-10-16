@@ -24,7 +24,7 @@ const Type NonNewtonianShearSolution_Type = "NonNewtonianShearSolution";
 
 double NonNewtonianShearSolution_Dt( FiniteElementContext* context ) { return 0.01; }
 
-void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, const double* coord, double* velocity ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                       height;
 	double			     min[3], max[3];
@@ -37,7 +37,7 @@ void NonNewtonianShearSolution_VelocityFunction( void* analyticSolution, double*
 	velocity[ J_AXIS ] = 0.0;
 }
 
-void NonNewtonianShearSolution_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate ) {
+void NonNewtonianShearSolution_StrainRateFunction( void* analyticSolution, const double* coord, double* strainRate ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                       height;
 	double			     min[3], max[3];
@@ -51,7 +51,7 @@ void NonNewtonianShearSolution_StrainRateFunction( void* analyticSolution, doubl
 	strainRate[ 2 ] = 0.5 * self->velocityTopOfBox / height;
 }
 
-void NonNewtonianShearSolution_StressFunction( void* analyticSolution, double* coord, double* stress ) {
+void NonNewtonianShearSolution_StressFunction( void* analyticSolution, const double* coord, double* stress ) {
 	NonNewtonianShearSolution*   self = (NonNewtonianShearSolution*)analyticSolution;
 	double                         eta;
 	double                         height;
@@ -75,7 +75,7 @@ void NonNewtonianShearSolution_StressFunction( void* analyticSolution, double* c
 }
 
 
-void NonNewtonianShearSolution_ViscosityFunction( void* analyticSolution, double* coord, double* viscosity ) {
+void NonNewtonianShearSolution_ViscosityFunction( void* analyticSolution, const double* coord, double* viscosity ) {
 	NonNewtonianShearSolution*     self = (NonNewtonianShearSolution*)analyticSolution;
 	double                         eta0;
 	double                         height;
@@ -96,7 +96,7 @@ void NonNewtonianShearSolution_UpdateVelocityBC( NonNewtonianShearSolution* self
 	self->velocityTopOfBox += context->dt;
 }
 
-void NonNewtonianShearSolution_VelocityBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void NonNewtonianShearSolution_VelocityBC(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext*		context       = (FiniteElementContext*)_context;
 	NonNewtonianShearSolution*	self          = (NonNewtonianShearSolution*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)NonNewtonianShearSolution_Type );
 	double*				result        = (double* ) _result;

@@ -49,32 +49,32 @@
 
 const Type Velic_solKz_Type = "Underworld_Velic_solKz";
 
-void Velic_solKz_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+void Velic_solKz_PressureFunction( void* analyticSolution, const double *coord, double* pressure ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
 	
 	_Velic_solKz( coord, self->sigma, self->km, self->n, self->B, NULL, pressure, NULL, NULL );
 }
 
-void Velic_solKz_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+void Velic_solKz_VelocityFunction( void* analyticSolution, const double *coord, double* velocity ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
 	
 	_Velic_solKz( coord, self->sigma, self->km, self->n, self->B, velocity, NULL, NULL, NULL );
 }
 
-void Velic_solKz_StressFunction( void* analyticSolution, double* coord, double* stress ) {
+void Velic_solKz_StressFunction( void* analyticSolution, const double *coord, double* stress ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
 	
 	_Velic_solKz( coord, self->sigma, self->km, self->n, self->B, NULL, NULL, stress, NULL );
 }
 
 
-void Velic_solKz_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate ) {
+void Velic_solKz_StrainRateFunction( void* analyticSolution, const double *coord, double* strainRate ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
 	
 	_Velic_solKz( coord, self->sigma, self->km, self->n, self->B, NULL, NULL, NULL, strainRate );
 }
 
-void Velic_solKz_ViscosityFunction( void* analyticSolution, double* coord, double* viscosity ) {
+void Velic_solKz_ViscosityFunction( void* analyticSolution, const double *coord, double* viscosity ) {
 	Velic_solKz* self = (Velic_solKz*) analyticSolution;
 	
 	*viscosity = exp( 2.0 * self->B * coord[ J_AXIS ] );

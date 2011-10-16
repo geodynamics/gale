@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void _Velic_solHAy( 
-		double pos[],
+		const double pos[],
 		double _sigma, double _eta,
 		double _dx, double _dy,
 		double _x_0, double _y_0,
@@ -42,7 +42,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solHAy( 
-		double pos[],
+		const double pos[],
 		double _sigma, double _eta,
 		double _dx, double _dy,
 		double _x_0, double _y_0,

@@ -26,13 +26,13 @@
 	void _Velic_solJ_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solJ_Init( Velic_solJ* self, double sigmaA, double sigmaB, double etaB, double etaA, double dxB, double dxA, double x0B, double x0A, double zc );
 
-	void Velic_solJ_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );
-	void Velic_solJ_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity );
-	void Velic_solJ_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress );
-	void Velic_solJ_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate );
+	void Velic_solJ_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure );
+	void Velic_solJ_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity );
+	void Velic_solJ_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress );
+	void Velic_solJ_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate );
 
 	void _Velic_solJ( 
-		double pos[],
+		const double pos[],
 		double _sigma_B ,double _sigma_A, /* density B, density A */
 		double _eta_B   ,double _eta_A  , /* viscosity B, viscosity A */
 		double _dx_B    ,double _dx_A   , /* width of the upper dense block, width of the lower dense block */

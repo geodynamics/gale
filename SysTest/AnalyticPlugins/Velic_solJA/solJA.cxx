@@ -5,7 +5,7 @@
 
 
 void _Velic_solJA( 
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _eta_A, double _eta_B,
 		double _dx,
@@ -50,7 +50,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solJA( 
-		double pos[],
+		const double pos[],
 		double _sigma, /* density */
 		double _eta_A, double _eta_B, /* viscosity A, viscosity B */
 		double _dx, /* width of upper dense block */

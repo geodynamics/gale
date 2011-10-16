@@ -65,7 +65,7 @@ typedef struct {
 
 
 
-void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Underworld_LinearShapeIC(const double *coord, void* _context, void* _result ) {
 
   UnderworldContext*       context            = (UnderworldContext*)_context;
 
@@ -75,7 +75,6 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
   double*                  result             = (double* ) _result;
   Stg_Shape*               shape;
   Name                     shapeName;
-  double*                  coord;
   Dictionary_Entry_Value*  shapeSpecs;	
   Index                    numSpecs = 0;
   Index	                   shapeSpec_I;
@@ -117,10 +116,7 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 		      Journal_Register( Error_Type, (Name)Underworld_ShapeFemIC_Type  ), 
 		      "Shape %s not found.\n", shapeName );
 
-    /* Find coordinate of node */
-    coord = Mesh_GetVertex( theMesh, node_lI );
-
-    if( Stg_Shape_IsCoordInside( shape, coord ) ) {
+    if(Stg_Shape_IsCoordInside(shape, coord) ) {
 
       setup = Dictionary_GetInt_WithDefault( shapeSpecDict, (Dictionary_Entry_Key)"setup", STD );
 
@@ -232,25 +228,16 @@ void Underworld_LinearShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 }
 
 
-void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Underworld_SimpleShapeIC(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context    = (UnderworldContext*)_context;
 	Dictionary* dictionary = context->dictionary;
-	MeshVariable* meshVar    = NULL;
-	FeMesh* mesh       = NULL;
 	double* result     = (double*) _result;
 	Stg_Shape* shape;
 	Name shapeName;
-	double* coord;
-
-	meshVar = (MeshVariable*)Variable_Register_GetByIndex( context->variable_Register, var_I );
-	mesh = (FeMesh*)meshVar->mesh; assert( mesh != NULL );
 
 	shapeName = Dictionary_GetString( dictionary, (Dictionary_Entry_Key)"ShapeFemIC" );
 	shape = (Stg_Shape* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)shapeName );
 	assert( shape  );
-
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	if ( Stg_Shape_IsCoordInside( shape, coord ) ) 
 		*result = 1.0;
@@ -258,21 +245,16 @@ void Underworld_SimpleShapeIC( Node_LocalIndex node_lI, Variable_Index var_I, vo
 		*result = 0.0;
 }
 
-void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Underworld_GaussianIC(const double *coord, void* _context, void* _result ) {
 	UnderworldContext*      context            = (UnderworldContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-  FeVariable*    tempField   = (FeVariable*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)"TemperatureField" );
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double* ) _result;
 	Stg_Shape*              shape;
 	Name                    shapeName;
-	double*                 coord;
 	double                  disVec[3];
 	double                  amplitude, width;
 	double                  rSq;
 	
-	mesh       = tempField->feMesh;
-
 	amplitude = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianIC-Amplitude", 1.0  );
 	width = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianIC-Width", 1e-2  );
 
@@ -283,8 +265,6 @@ void Underworld_GaussianIC( Node_LocalIndex node_lI, Variable_Index var_I, void*
 			Journal_Register( Error_Type, (Name)Underworld_ShapeFemIC_Type  ),
 			"Error in %s: You're applying the GaussianIC to a shape of type %s, which can't be done."
 			" It can only work on Sphere\' or \'Cylinder\' shapes\n", __func__,  shape->type );
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	if( !strcmp(shape->type, "Sphere") ) {
 		_Sphere_DistanceFromCenterAxis( shape, coord, disVec );

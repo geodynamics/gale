@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void _Velic_solHA( 
-		double pos[],
+		const double pos[],
 		double _sigma, double _eta,
 		double _dx, double _dy,
 		double _x_0, double _y_0,
@@ -53,7 +53,7 @@ of in one corner.
 **********************************/
 
 void _Velic_solHA( 
-		double pos[],
+		const double pos[],
 		double _sigma, double _eta,
 		double _dx, double _dy,
 		double _x_0, double _y_0,
@@ -61,7 +61,7 @@ void _Velic_solHA(
 		double total_stress[], double strain_rate[] )
 {
 	double Z,u1,u2,u3,u4,u5,u6;
-	double sum1,sum2,sum3,sum4,sum5,sum6,mag,sum7,sum8,sum9,sum10,sum11,x,y,z;
+	double sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,sum11,x,y,z;
 	double sigma,dx,dy,x0,y0;
 	double del_rho;
 	int n,m;
@@ -189,7 +189,7 @@ void _Velic_solHA(
 		}/* n */
 	}/* m */
 	
-	mag=sqrt(sum1*sum1+sum2*sum2+sum3*sum3);
+	// double mag=sqrt(sum1*sum1+sum2*sum2+sum3*sum3);
 	
 	//printf("%0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g %0.7g\n",x,y,sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,mag,sum11);
 	

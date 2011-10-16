@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void _Velic_solL( 
-		double pos[],
+		const double pos[],
 		double _sigma_B, double _sigma_A,
 		double _eta,
 		double vel[], double* presssure, 
@@ -45,7 +45,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solL( 
-		double pos[],
+		const double pos[],
 		double _sigma_B, double _sigma_A, /* density B, density A */
 		double _eta, /* viscosity */
 		double vel[], double* presssure, 

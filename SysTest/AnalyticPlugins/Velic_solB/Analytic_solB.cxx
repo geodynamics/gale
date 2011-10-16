@@ -45,26 +45,26 @@
 
 const Type Underworld_solB_Type = "Underworld_Velic_solB";
 
-void Underworld_solB_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+void Underworld_solB_PressureFunction( void* analyticSolution, const double* coord, double* pressure ) {
 	Underworld_solB* self = (Underworld_solB*) analyticSolution;
 	
 	_Velic_solB( coord, self->sigma, self->Z, self->n, self->km, NULL, pressure, NULL, NULL );
 }
 
-void Underworld_solB_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+void Underworld_solB_VelocityFunction( void* analyticSolution, const double* coord, double* velocity ) {
 	Underworld_solB* self = (Underworld_solB*) analyticSolution;
 	
 	_Velic_solB( coord, self->sigma, self->Z, self->n, self->km, velocity, NULL, NULL, NULL );
 }
 
-void Underworld_solB_StressFunction( void* analyticSolution, double* coord, double* stress ) {
+void Underworld_solB_StressFunction( void* analyticSolution, const double* coord, double* stress ) {
 	Underworld_solB* self = (Underworld_solB*) analyticSolution;
 	
 	_Velic_solB( coord, self->sigma, self->Z, self->n, self->km, NULL, NULL, stress, NULL );
 }
 
 
-void Underworld_solB_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate ) {
+void Underworld_solB_StrainRateFunction( void* analyticSolution, const double* coord, double* strainRate ) {
 	Underworld_solB* self = (Underworld_solB*) analyticSolution;
 	
 	_Velic_solB( coord, self->sigma, self->Z, self->n, self->km, NULL, NULL, NULL, strainRate );

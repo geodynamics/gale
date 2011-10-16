@@ -16,13 +16,13 @@
 	void _Underworld_solCx_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Underworld_solCx_Init( Velic_solCx* self, double etaA, double etaB, double xc, int n );
 
-	void Velic_solCx_PressureFunction( void* analyticSolution, double* coord, double* pressure );
-	void Velic_solCx_VelocityFunction( void* analyticSolution, double* coord, double* velocity );
-	void Velic_solCx_StressFunction( void* analyticSolution, double* coord, double* stress );
-	void Velic_solCx_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate );
+	void Velic_solCx_PressureFunction( void* analyticSolution, const double* coord, double* pressure );
+	void Velic_solCx_VelocityFunction( void* analyticSolution, const double* coord, double* velocity );
+	void Velic_solCx_StressFunction( void* analyticSolution, const double* coord, double* stress );
+	void Velic_solCx_StrainRateFunction( void* analyticSolution, const double* coord, double* strainRate );
 
 	void _Velic_solCx(
-		double pos[], 
+		const double pos[], 
 		double _eta_A, double _eta_B, 	/* Input parameters: density, viscosity A, viscosity B */
 		double _x_c, int _n, 			/* Input parameters: viscosity jump location, wavenumber in x */
 		double vel[], double* presssure, 

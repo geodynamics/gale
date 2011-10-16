@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void _Velic_solKx( 
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _m, int _n, 
 		double _B,
@@ -48,7 +48,7 @@ int main( int argc, char **argv )
 
 /* this solution matches the stream function values in Zhong's paper for the few given viscosity constrasts */
 void _Velic_solKx( 
-		double pos[],
+		const double pos[],
 		double _sigma, /* density */
 		double _m, int _n, /* wavelength in z, wavenumber in x */
 		double _B, /* viscosity parameter */

@@ -5,7 +5,7 @@
 
 
 void _Velic_solG( 
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _eta_A, double _eta_B, 
 		double _dx, double _x_0, double _z_c,
@@ -47,7 +47,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solG(
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _eta_A, double _eta_B, 
 		double _dx, double _x_0, double _z_c,

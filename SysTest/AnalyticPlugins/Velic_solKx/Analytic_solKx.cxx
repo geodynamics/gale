@@ -51,32 +51,32 @@
 
 const Type Velic_solKx_Type = "Underworld_Velic_solKx";
 
-void Velic_solKx_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* viscosity ) {
+void Velic_solKx_ViscosityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* viscosity ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
 	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, NULL, NULL, viscosity );
 }
 
-void Velic_solKx_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void Velic_solKx_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
 	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, pressure, NULL, NULL, NULL );
 }
 
-void Velic_solKx_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void Velic_solKx_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
 	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, velocity, NULL, NULL, NULL, NULL );
 }
 
-void Velic_solKx_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
+void Velic_solKx_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
 	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, stress, NULL, NULL );
 }
 
 
-void Velic_solKx_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void Velic_solKx_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate ) {
 	Velic_solKx* self = (Velic_solKx*) analyticSolution;
 	
 	_Velic_solKx( coord, self->sigma, self->_m, self->n, self->B, NULL, NULL, NULL, strainRate, NULL );

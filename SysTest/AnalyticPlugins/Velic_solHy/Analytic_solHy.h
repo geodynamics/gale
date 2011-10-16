@@ -22,9 +22,9 @@
 	void _Velic_solHy_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Velic_solHy_Init( Velic_solHy* self, double etaA, double etaB, double xc, int n );
 
-	void Velic_solHy_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );
-	void Velic_solHy_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity );
-	void Velic_solHy_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress );
-	void Velic_solHy_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate );
+	void Velic_solHy_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure );
+	void Velic_solHy_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity );
+	void Velic_solHy_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress );
+	void Velic_solHy_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate );
 
 #endif

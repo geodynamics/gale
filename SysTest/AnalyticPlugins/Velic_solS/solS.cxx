@@ -4,7 +4,7 @@
 
 
 void _Velic_solS( 
-		double pos[],
+		const double pos[],
 		int _n, double _eta,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
@@ -42,7 +42,7 @@ int main( int argc, char **argv )
 */
 
 void _Velic_solS( 
-		double pos[],						/* coordinates */
+		const double pos[],						/* coordinates */
 		int _n, double _eta,				/* wavenumber in x, viscosity */
 		double vel[], double* presssure, 				/* output: velocity, pressure */
 		double total_stress[], double strain_rate[] ) 	/* ouput: total stresss, strain rate */ 

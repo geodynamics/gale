@@ -45,26 +45,26 @@
 
 const Type Velic_solHy_Type = "Underworld_Velic_solHy";
 
-void Velic_solHy_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void Velic_solHy_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure ) {
 	Velic_solHy* self = (Velic_solHy*) analyticSolution;
 	
 	_Velic_solHy( coord, self->etaA, self->etaB, self->xc, self->n, NULL, pressure, NULL, NULL );
 }
 
-void Velic_solHy_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void Velic_solHy_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity ) {
 	Velic_solHy* self = (Velic_solHy*) analyticSolution;
 	
 	_Velic_solHy( coord, self->etaA, self->etaB, self->xc, self->n, velocity, NULL, NULL, NULL );
 }
 
-void Velic_solHy_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress ) {
+void Velic_solHy_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress ) {
 	Velic_solHy* self = (Velic_solHy*) analyticSolution;
 	
 	_Velic_solHy( coord, self->etaA, self->etaB, self->xc, self->n, NULL, NULL, stress, NULL );
 }
 
 
-void Velic_solHy_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void Velic_solHy_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate ) {
 	Velic_solHy* self = (Velic_solHy*) analyticSolution;
 	
 	_Velic_solHy( coord, self->etaA, self->etaB, self->xc, self->n, NULL, NULL, NULL, strainRate );

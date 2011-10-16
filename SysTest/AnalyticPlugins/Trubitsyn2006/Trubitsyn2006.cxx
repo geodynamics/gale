@@ -84,34 +84,34 @@ double Trubitsyn_GDeriv( double x, double x0, double a ) {
 	return 2.0 * a * pow( exp( a * ( x - x0 ) ) + exp( -a * ( x - x0 ) ), -2.0 );
 }
 
-void _Trubitsyn2006_ViscosityFunc_Isoviscous( void* analyticSolution, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Isoviscous( void* analyticSolution, const double* coord, double* eta ) {
 	*eta = 1.0;
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Isoviscous( void* analyticSolution, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Isoviscous( void* analyticSolution, const double* coord, double* viscDeriv ) {
 	viscDeriv[0] = 0.0;
 	viscDeriv[1] = 0.0;
 }
-void _Trubitsyn2006_ViscosityFunc_Model1( void* analyticSolution, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Model1( void* analyticSolution, const double* coord, double* eta ) {
 	*eta = 1.0 + 100.0 * coord[ I_AXIS ] * coord[ J_AXIS ];
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Model1( void* analyticSolution, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Model1( void* analyticSolution, const double* coord, double* viscDeriv ) {
 	viscDeriv[0] = 100.0 * coord[ J_AXIS ];
 	viscDeriv[1] = 100.0 * coord[ I_AXIS ];
 }
-void _Trubitsyn2006_ViscosityFunc_Model2( void* analyticSolution, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Model2( void* analyticSolution, const double* coord, double* eta ) {
 //	*eta = 999.0 * ( 1.0 - Trubitsyn_G( coord[ I_AXIS ], 0.5, 50 ) ) + 1;
 	*eta = ( coord[ I_AXIS ] <= 0.5 ? 1000.0 : 1 );
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Model2( void* analyticSolution, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Model2( void* analyticSolution, const double* coord, double* viscDeriv ) {
 //	viscDeriv[0] = -999.0 * Trubitsyn_GDeriv( coord[ I_AXIS ], 0.5, 50 );
 	viscDeriv[0] = 0.0;
 	viscDeriv[1] = 0.0;
 }
-void _Trubitsyn2006_ViscosityFunc_Model3( void* analyticSolution, double* coord, double* eta ) {
+void _Trubitsyn2006_ViscosityFunc_Model3( void* analyticSolution, const double* coord, double* eta ) {
 	//*eta = 999.0 * ( 1.0 - Trubitsyn_G( coord[ J_AXIS ], 0.5, 50 ) ) + 1;
 	*eta = ( coord[ J_AXIS ] <= 0.5 ? 1000.0 : 1 );
 }
-void _Trubitsyn2006_ViscosityDerivativeFunc_Model3( void* analyticSolution, double* coord, double* viscDeriv ) {
+void _Trubitsyn2006_ViscosityDerivativeFunc_Model3( void* analyticSolution, const double* coord, double* viscDeriv ) {
 	viscDeriv[0] = 0.0;
 	viscDeriv[1] = 0.0;
 //	viscDeriv[1] = -999.0 * Trubitsyn_GDeriv( coord[ J_AXIS ], 0.5, 50 );
@@ -128,7 +128,7 @@ double Trubitsyn2006_V0( void* analyticSolution ) {
 }
 
 
-void _Trubitsyn2006_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+void _Trubitsyn2006_VelocityFunction( void* analyticSolution, const double* coord, double* velocity ) {
 	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
 	double                 v0                 = Trubitsyn2006_V0( self );
 	double                 x; 
@@ -143,13 +143,13 @@ void _Trubitsyn2006_VelocityFunction( void* analyticSolution, double* coord, dou
 	velocity[ I_AXIS ] = - v0 * cos( M_PI * y ) * sin( M_PI * x );         /* Equation 32 */
 }
 
-void _Trubitsyn2006_ViscosityFunction( void* analyticSolution, double* coord, double* viscosity ) {
+void _Trubitsyn2006_ViscosityFunction( void* analyticSolution, const double* coord, double* viscosity ) {
 	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
 
 	self->viscosityFunc( self, coord, viscosity );
 }
 
-void _Trubitsyn2006_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+void _Trubitsyn2006_PressureFunction( void* analyticSolution, const double* coord, double* pressure ) {
 	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
 	double                 T0                 = self->T0;
 	double                 Ra                 = self->Ra;
@@ -176,7 +176,7 @@ void _Trubitsyn2006_PressureFunction( void* analyticSolution, double* coord, dou
 	//printf("pressure from v0 = %g\n\n", *pressure );
 }
 
-void _Trubitsyn2006_StreamFunction( void* analyticSolution, double* coord, double* psi ) {
+void _Trubitsyn2006_StreamFunction( void* analyticSolution, const double* coord, double* psi ) {
 	Trubitsyn2006*         self               = (Trubitsyn2006*)analyticSolution;
 	double                 v0                 = Trubitsyn2006_V0( self );
 	double                 x; 
@@ -190,12 +190,11 @@ void _Trubitsyn2006_StreamFunction( void* analyticSolution, double* coord, doubl
 	*psi = - v0 / M_PI * sin( M_PI * y ) * sin( M_PI * x ) ;                                          /* Equation 40 */
 }
 
-void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Trubitsyn2006_TemperatureIC(const double *coord, void* _context, void* _result ) {
 	DomainContext*         context            = (DomainContext*)_context;
 	FeVariable*            temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*                mesh               = temperatureField->feMesh;
 	double*                temperature        = (double*) _result;
-	double*                coord;
 	double                 x; 
 	double                 y;
 	Trubitsyn2006*         self               = Stg_ComponentFactory_ConstructByName( context->CF, (Name)Trubitsyn2006_Type, Trubitsyn2006, True, context );
@@ -207,8 +206,6 @@ void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I,
 	double                 d_eta_dy;
 	XYZ                    viscDeriv;
 	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	x = coord[ I_AXIS ] - min[ I_AXIS ];
 	y = coord[ J_AXIS ] - min[ J_AXIS ];
@@ -224,16 +221,10 @@ void Trubitsyn2006_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I,
 
 }
 
-void Trubitsyn2006_PressureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Trubitsyn2006_PressureIC(const double *coord, void* _context, void* _result ) {
 	DomainContext*         context            = (DomainContext*)_context;
-	FeVariable*            PressureField      = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
-	FeMesh*                mesh               = PressureField->feMesh;
 	double*                pressure           = (double*) _result;
-	double*                coord;
 	Trubitsyn2006* self = Stg_ComponentFactory_ConstructByName( context->CF, (Name)Trubitsyn2006_Type, Trubitsyn2006, True, context  );
-	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 	
 	_Trubitsyn2006_PressureFunction( self,  coord,  pressure );
 }

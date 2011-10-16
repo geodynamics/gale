@@ -16,43 +16,27 @@ double dt( void* class, PICelleratorContext* context ) {
 	return Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"dt", 0.01  );
 }
 
-void MovingMeshTestVelBCs_IncreasingWithY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void MovingMeshTestVelBCs_IncreasingWithY(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*     		mesh               = NULL;
 	double*                 result             = (double*) _result;
 	double			min[3], max[3];
-	double*                 coord;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-
-	/* Find coordinate of node */
 	Mesh_GetGlobalCoordRange( mesh, min, max );
-	coord = Mesh_GetVertex( mesh, node_lI );
 	
 	*result = ( coord[J_AXIS] - min[J_AXIS] ) / ( max[J_AXIS] - min[J_AXIS] );
 }
 
 
-void MovingMeshTestVelBCs_ToCentreY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void MovingMeshTestVelBCs_ToCentreY(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh* 		mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  toCentreJ_Max = 0;
 	double                  boxHeight = 0;
 	double                  centreInJ = 0;
 	double                  coordJ_RelativeToCentreJ = 0;
 	double			min[3], max[3];
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-
-	/* Find coordinate of node */
 	Mesh_GetGlobalCoordRange( mesh, min, max );
-	coord = Mesh_GetVertex( mesh, node_lI );
 	
 	boxHeight = max[J_AXIS] - min[J_AXIS];
 	centreInJ = ( max[J_AXIS] + min[J_AXIS] ) / 2;

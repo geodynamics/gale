@@ -63,13 +63,13 @@
 	void _Underworld_solS_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 	void _Underworld_solS_Init( Underworld_solS* self, double eta, int _n );
 
-	void Underworld_solS_PressureFunction( void* analyticSolution, double* coord, double* pressure );
-	void Underworld_solS_VelocityFunction( void* analyticSolution, double* coord, double* velocity );
-	void Underworld_solS_StressFunction( void* analyticSolution, double* coord, double* stress );
-	void Underworld_solS_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate );
+	void Underworld_solS_PressureFunction( void* analyticSolution, const double *coord, double* pressure );
+	void Underworld_solS_VelocityFunction( void* analyticSolution, const double *coord, double* velocity );
+	void Underworld_solS_StressFunction( void* analyticSolution, const double *coord, double* stress );
+	void Underworld_solS_StrainRateFunction( void* analyticSolution, const double *coord, double* strainRate );
 
 	void _Velic_solS( 
-		double pos[],
+		const double pos[],
 		int _n, double _eta,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );

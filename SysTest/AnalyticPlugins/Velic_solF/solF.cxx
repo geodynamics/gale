@@ -5,7 +5,7 @@
 
 
 void _Velic_solF( 
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _eta_A, double _eta_B, 
 		double _x_c, double _z_c,
@@ -49,7 +49,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solF(
-		double pos[],
+		const double pos[],
 		double _sigma, /* density */
 		double _eta_A, double _eta_B, /* viscosity A, viscosity B */ 
 		double _x_c, double _z_c, /* width of dense block, bottom of dense block */

@@ -16,12 +16,12 @@
 		int n;
 	} Underworld_solB;
 
-	void Underworld_solB_PressureFunction( void* analyticSolution, double* coord, double* pressure );
-	void Underworld_solB_VelocityFunction( void* analyticSolution, double* coord, double* velocity );
-	void Underworld_solB_StressFunction( void* analyticSolution, double* coord, double* stress );
-	void Underworld_solB_StrainRateFunction( void* analyticSolution, double* coord, double* strainRate );
+	void Underworld_solB_PressureFunction( void* analyticSolution, const double* coord, double* pressure );
+	void Underworld_solB_VelocityFunction( void* analyticSolution, const double* coord, double* velocity );
+	void Underworld_solB_StressFunction( void* analyticSolution, const double* coord, double* stress );
+	void Underworld_solB_StrainRateFunction( void* analyticSolution, const double* coord, double* strainRate );
 
-	void _Velic_solB( double* pos, 
+	void _Velic_solB( const double* pos, 
 		double sigma, double Z, int n, double km,
 		double* velocity, double* pressure, double* Tstress, double* strainRate );
 

@@ -19,13 +19,13 @@
 	void _Velic_solC_Init( Velic_solC* self, double sigma, double eta, double x_c );
 	void _Velic_solC_AssignFromXML( void* analyticSolution, Stg_ComponentFactory* cf, void* data );
 
-	void Velic_solC_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure );
-	void Velic_solC_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity );
-	void Velic_solC_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* stress );
-	void Velic_solC_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate );
+	void Velic_solC_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* pressure );
+	void Velic_solC_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* velocity );
+	void Velic_solC_StressFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* stress );
+	void Velic_solC_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double *coord, double* strainRate );
 
 	void _Velic_solC( 
-		double pos[], 
+		const double pos[], 
 		double sigma, double eta, double x_c,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );

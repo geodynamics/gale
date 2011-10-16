@@ -4,7 +4,7 @@
 #include <assert.h>
 
 void _Velic_solJ( 
-		double pos[],
+		const double pos[],
 		double _sigma_B, double _sigma_A,
 		double _eta_B, double _eta_A, 
 		double _dx_B, double _dx_A,
@@ -50,7 +50,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solJ( 
-		double pos[],
+		const double pos[],
 		double _sigma_B ,double _sigma_A, /* density B, density A */
 		double _eta_B   ,double _eta_A  , /* viscosity B, viscosity A */
 		double _dx_B    ,double _dx_A   , /* width of the upper dense block, width of the lower dense block */

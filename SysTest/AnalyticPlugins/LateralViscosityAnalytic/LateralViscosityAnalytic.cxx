@@ -69,7 +69,7 @@ typedef struct {
  *  Shijie Zhong. Analytic solutions for Stokes' flow with lateral variations in viscosity. Geophys. J. Int., 124:18-28, 1996.
  *  All equations refer to this paper */
 
-void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void LateralViscosityAnalytic_TemperatureIC(const double *coord, void* _context, void* _result ) {
 	DomainContext*  	context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh* 		mesh               = temperatureField->feMesh;
@@ -85,9 +85,6 @@ void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_I
 	Coord			min, max;
 	double                  L;
 	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
-
 	/* Make sure that the box has right dimensions */
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	assert( ( max[ J_AXIS ] - min[ J_AXIS ] - 1.0 ) < SMALL );
@@ -105,7 +102,7 @@ void LateralViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_I
 	*result = sin( ky * y ) * cos( kx * x  );
 }
 
-void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+void _LateralViscosityAnalytic_VelocityFunction( void* analyticSolution, const double *coord, double* velocity ) {
 	LateralViscosityAnalytic*         self               = (LateralViscosityAnalytic*)analyticSolution;
 	FeMesh*			mesh = self->elementMesh;
 	Coord			min, max;

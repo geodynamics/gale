@@ -7,7 +7,7 @@
 
 
 void _Velic_solCx( 
-		double pos[], 
+		const double pos[], 
 		double _eta_A, double _eta_B, 
 		double _x_c, int _n,
 		double vel[], double* presssure, 
@@ -48,14 +48,14 @@ int main( int argc, char **argv )
 */
 
 void _Velic_solCx(
-		double pos[], 
+		const double pos[], 
 		double _eta_A, double _eta_B, 	/* Input parameters: density, viscosity A, viscosity B */
 		double _x_c, int _n, 			/* Input parameters: viscosity jump location, wavenumber in x */
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] )
 {
 	double Z,u1,u2,u3,u4,u5,u6,ZA,ZB;
-	double sum1,sum2,sum3,sum4,sum5,sum6,mag,x,z,xc;
+	double sum1,sum2,sum3,sum4,sum5,sum6,x,z,xc;
 	double _C1A,_C2A,_C3A,_C4A,_C1B,_C2B,_C3B,_C4B,_C1,_C2,_C3,_C4;
 	int n,nx;
 	
@@ -2296,7 +2296,7 @@ void _Velic_solCx(
 	sum4 += u4;
 	
 	
-	mag=sqrt(sum1*sum1+sum2*sum2);
+	// double mag=sqrt(sum1*sum1+sum2*sum2);
 	/*printf("%0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f %0.7f\n",x,z,sum1,sum2,sum3,sum4,sum5,sum6,mag);*/
 	
 	

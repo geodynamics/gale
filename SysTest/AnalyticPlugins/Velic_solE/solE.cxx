@@ -5,7 +5,7 @@
 
 
 void _Velic_solE( 
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _eta_A, double _eta_B, 
 		double _z_c, double _km, int _n,
@@ -48,7 +48,7 @@ int main( int argc, char **argv )
 
 
 void _Velic_solE(
-		double pos[],
+		const double pos[],
 		double _sigma,
 		double _eta_A, double _eta_B, 
 		double _z_c, double _km, int _n,

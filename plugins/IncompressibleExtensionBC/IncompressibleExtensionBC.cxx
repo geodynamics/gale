@@ -169,14 +169,14 @@ double GetBottomWallVelocity( UnderworldContext* context ) {
 	return V_d;
 }
 
-void IncompressibleExtensionBC_RightCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_RightCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
 	*result = GetRightWallVelocity( context );
 }
 
-void IncompressibleExtensionBC_RightShearCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_RightShearCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
@@ -184,14 +184,14 @@ void IncompressibleExtensionBC_RightShearCondition( Node_LocalIndex node_lI, Var
 }
 
 
-void IncompressibleExtensionBC_LeftCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_LeftCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
 	*result = GetLeftWallVelocity( context );
 }
 
-void IncompressibleExtensionBC_LeftShearCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_LeftShearCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
@@ -199,27 +199,27 @@ void IncompressibleExtensionBC_LeftShearCondition( Node_LocalIndex node_lI, Vari
 }
 
 
-void IncompressibleExtensionBC_BackCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_BackCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
 	*result = GetBackWallVelocity( context );
 }
-void IncompressibleExtensionBC_FrontCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_FrontCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
 	*result = GetFrontWallVelocity( context );
 }
 
-void IncompressibleExtensionBC_TopCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_TopCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
 	*result = GetTopWallVelocity( context );
 }
 
-void IncompressibleExtensionBC_BottomCondition( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void IncompressibleExtensionBC_BottomCondition(const double *coord, void* _context, void* _result ) {
 	UnderworldContext* context = (UnderworldContext*) _context;
 	double*            result  = (double*) _result;
 
