@@ -170,10 +170,6 @@ void _MultigridSolver_Delete( void* matrixSolver ) {
 void _MultigridSolver_Print( void* matrixSolver, Stream* stream ) {
 	MultigridSolver*	self = (MultigridSolver*)matrixSolver;
 	
-	/* Set the Journal for printing informations */
-	Stream* matrixSolverStream;
-	matrixSolverStream = Journal_Register( InfoStream_Type, (Name)"MultigridSolverStream"  );
-
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 
 	/* Print parent */
@@ -764,10 +760,8 @@ void MultigridSolver_RestrictMatrix( MultigridSolver* self, MultigridSolver_Leve
 	PetscInt dummy;
 #endif
 
-	PetscScalar	fillRatio;
 	MatInfo		mInfo;
 	PetscInt	nRowsA, nRowsC;
-	PetscScalar	nzA, nzP, nzC;
 
 	assert( self );
 	assert( level );
@@ -786,17 +780,16 @@ void MultigridSolver_RestrictMatrix( MultigridSolver* self, MultigridSolver_Leve
 #else
 		MatGetSize( srcMat, &nRowsA, &dummy );
 #endif
-		nzA = mInfo.nz_used;
+                // PetscScalar nzA = mInfo.nz_used;
 		MatGetInfo( level->R, MAT_GLOBAL_SUM, &mInfo );
 #if( PETSC_VERSION_MAJOR <= 2 )
 		nRowsC = mInfo.columns_global;
 #else
 		MatGetSize( level->R, &dummy, &nRowsC );
 #endif
-		nzP = mInfo.nz_used;
-
-		nzC = ( nRowsC / nRowsA ) * nzA;
-		fillRatio = nzC / ( nzA + nzP );
+                // PetscScalar nzP = mInfo.nz_used;
+                // PetscScalar nzC = ( nRowsC / nRowsA ) * nzA;
+		// PetscScalar fillRatio = nzC / ( nzA + nzP );
 
 		/* this function doesn't exist! */
 		//MatPAPt( srcMat, level->R, MAT_REUSE_MATRIX, fillRatio, dstMatrix );
@@ -1123,43 +1116,46 @@ MGSolver_PETScData* MultigridSolver_CreateSmoother( MultigridSolver* self, Mat m
 }
 
 MGSolver_PETScData* MultigridSolver_CreateCoarseSolver( MultigridSolver* self, Mat matrix ) {
-	//MatrixSolver*	coarseSolver;
-	MGSolver_PETScData* courseSolver;
-	unsigned	nProcs;
-	PC		pc;
 
-	MPI_Comm_size( self->mgData->comm, (int*)&nProcs );
+  abort();
+  return (MGSolver_PETScData*)NULL;
+	// //MatrixSolver*	coarseSolver;
+	// MGSolver_PETScData* courseSolver;
+	// unsigned	nProcs;
+	// PC		pc;
 
-	/*
-	coarseSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
-	PETScMatrixSolver_SetKSPType( coarseSolver, 
-				      PETScMatrixSolver_KSPType_PreOnly );
-	if( nProcs == 1 ) {
-		PETScMatrixSolver_SetPCType( coarseSolver, 
-					     PETScMatrixSolver_PCType_LU );
-	}
-	else {
-		PETScMatrixSolver_SetPCType( coarseSolver, 
-					     PETScMatrixSolver_PCType_RedundantLU );
-	}
-	MatrixSolver_SetMatrix( coarseSolver, matrix );
-	*/
-	KSPCreate( MPI_COMM_WORLD, &courseSolver->ksp );
-	KSPSetType( courseSolver->ksp, KSPPREONLY );
-	KSPGetPC( courseSolver->ksp, &pc );
-	if( nProcs == 1 )
-		PCSetType( pc, PCLU );
-	else {
-		PCSetType( pc, PCREDUNDANT );
-		PCRedundantGetPC( pc, &pc );
-		PCSetType( pc, PCLU );
-	}
-	if( courseSolver->matrix != PETSC_NULL )
-		MatDestroy( courseSolver->matrix );
-	courseSolver->matrix = matrix;
-	KSPSetOperators( courseSolver->ksp, matrix, matrix, DIFFERENT_NONZERO_PATTERN );
+	// MPI_Comm_size( self->mgData->comm, (int*)&nProcs );
 
-	return courseSolver;
+	// /*
+	// coarseSolver = (MatrixSolver*)PETScMatrixSolver_New( "" );
+	// PETScMatrixSolver_SetKSPType( coarseSolver, 
+	// 			      PETScMatrixSolver_KSPType_PreOnly );
+	// if( nProcs == 1 ) {
+	// 	PETScMatrixSolver_SetPCType( coarseSolver, 
+	// 				     PETScMatrixSolver_PCType_LU );
+	// }
+	// else {
+	// 	PETScMatrixSolver_SetPCType( coarseSolver, 
+	// 				     PETScMatrixSolver_PCType_RedundantLU );
+	// }
+	// MatrixSolver_SetMatrix( coarseSolver, matrix );
+	// */
+	// KSPCreate( MPI_COMM_WORLD, &courseSolver->ksp );
+	// KSPSetType( courseSolver->ksp, KSPPREONLY );
+	// KSPGetPC( courseSolver->ksp, &pc );
+	// if( nProcs == 1 )
+	// 	PCSetType( pc, PCLU );
+	// else {
+	// 	PCSetType( pc, PCREDUNDANT );
+	// 	PCRedundantGetPC( pc, &pc );
+	// 	PCSetType( pc, PCLU );
+	// }
+	// if( courseSolver->matrix != PETSC_NULL )
+	// 	MatDestroy( courseSolver->matrix );
+	// courseSolver->matrix = matrix;
+	// KSPSetOperators( courseSolver->ksp, matrix, matrix, DIFFERENT_NONZERO_PATTERN );
+
+	// return courseSolver;
 }
 
 void MultigridSolver_Destruct( MultigridSolver* self ) {
