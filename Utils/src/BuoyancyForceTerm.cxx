@@ -457,9 +457,31 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
                                                          coord);
                   }
 
+                /* Handle case where we are using gauss swarms with
+                   NearestNeighborMapper instead of a material
+                   swarm */
+                IntegrationPointsSwarm* NNswarm(swarm);
+                IntegrationPoint* NNparticle(particle);
+                  
+                if(Stg_Class_IsInstance(swarm->mapper,NearestNeighborMapper_Type))
+                  {
+                    NNswarm=((NearestNeighborMapper*)(swarm->mapper))->swarm;
+                    int NNcell_I=
+                      CellLayout_MapElementIdToCellId(NNswarm->cellLayout,
+                                                      lElement_I);
+                    int nearest_particle=
+                      NearestNeighbor_FindNeighbor(swarm->mapper,lElement_I,
+                                                   NNcell_I,particle->xi,dim);
+                    NNparticle=
+                      (IntegrationPoint*)Swarm_ParticleInCellAt(NNswarm,
+                                                                NNcell_I,
+                                                                nearest_particle);
+                  }
+
+                /* Get density and alpha */
                 uint material_index=
-                  IntegrationPointMapper_GetMaterialIndexOn(swarm->mapper,
-                                                            particle);
+                  IntegrationPointMapper_GetMaterialIndexOn(NNswarm->mapper,
+                                                            NNparticle);
                 Journal_Firewall(material_index<densities.size()
                                  && material_index<alphas.size(),
                                  Journal_MyStream(Error_Type,self),
@@ -475,13 +497,14 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
                     d.SetExpr(density_equation);
                     density=d.Eval();
 
-                    Journal_Printf(Journal_MyStream(Info_Type,self),"Density Equation T=%g p=%g density=%g\n",
+                    Journal_Printf(Journal_MyStream(Info_Type,self),
+                                   "Density Equation T=%g p=%g density=%g\n",
                                     temperature,pressure,density);
                   }
                 else
                   {
                     density = IntegrationPointMapper_GetDoubleFromMaterial
-                      (swarm->mapper, particle, self->materialExtHandle,
+                      (NNswarm->mapper, NNparticle, self->materialExtHandle,
                        offsetof(BuoyancyForceTerm_MaterialExt, density));
                   }
 
@@ -494,18 +517,20 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
                     d.SetVarFactory(BuoyancyForceTerm_AddVariable, &d);
                     d.SetExpr(alpha_equation);
                     alpha=d.Eval();
-                    Journal_PrintfL(Journal_MyStream(Debug_Type,self),3,"Alpha Equation T=%g p=%g alpha=%g\n",
+                    Journal_PrintfL(Journal_MyStream(Debug_Type,self),3,
+                                    "Alpha Equation T=%g p=%g alpha=%g\n",
                                     temperature,pressure,alpha);
                   }
                 else
                   {
                     alpha = IntegrationPointMapper_GetDoubleFromMaterial
-                      (swarm->mapper, particle, self->materialExtHandle,
+                      (NNswarm->mapper, NNparticle, self->materialExtHandle,
                        offsetof(BuoyancyForceTerm_MaterialExt, alpha));
                   }
 
 		/* Calculate Force */
-		gravity = BuoyancyForceTerm_CalcGravity( self, (Swarm*)swarm, lElement_I, particle );
+		gravity = BuoyancyForceTerm_CalcGravity(self,(Swarm*)NNswarm,
+                                                        lElement_I,NNparticle);
                 force=gravity*(density*(1.0-alpha*temperature)
                                - background_density);
 		factor = detJac * particle->weight * adjustFactor * force;
@@ -518,6 +543,7 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 			}
 			else {
 				elForceVec[ eNode_I * nodeDofCount + J_AXIS ] += -1.0 * factor * Ni[ eNode_I ] ;
+
 			}
 		}
 	}
