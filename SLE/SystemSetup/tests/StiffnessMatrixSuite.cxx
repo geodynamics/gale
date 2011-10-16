@@ -40,7 +40,6 @@ FeVariable* buildFeVar() {
    XML_IO_Handler*					ioHandler;
    FieldVariable_Register*			fieldReg;
    FeVariable*							feVar;
-   int									n_i;
 
    MPI_Comm_size( MPI_COMM_WORLD, &nRanks );
    sizes[0] = nRanks * 2;
@@ -92,7 +91,7 @@ FeVariable* buildFeVar() {
    feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, bcs, NULL, NULL, 2, True, 
 		False, False, fieldReg );
 
-   for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
+   for(uint n_i=0; n_i<Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0); n_i++) {
       /*const double pi=acos(-1.0);*/
       double* pos = Mesh_GetVertex( feMesh, n_i );
 

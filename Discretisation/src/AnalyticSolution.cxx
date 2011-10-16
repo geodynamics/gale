@@ -579,13 +579,12 @@ FeVariable* AnalyticSolution_CreateAnalyticSymmetricTensorField( void* analyticS
   FeVariable*				analyticVectorField;
   OperatorFeVariable*	analyticVectorInvField;
   char					*tmpName, *tmpName2;
-  DofLayout*				dofLayout;
 
   analyticVectorField = AnalyticSolution_CreateAnalyticField( self, vectorField );
 
   /* Create new dof layout */
   tmpName = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Analytic-DofLayout"  );
-  dofLayout = DofLayout_New( tmpName, self->context, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
+  DofLayout_New( tmpName, self->context, self->context->variable_Register, Mesh_GetDomainSize( analyticVectorField->feMesh, MT_VERTEX ), NULL );
 
   /* Create Invariant Field */
   tmpName2 = Stg_Object_AppendSuffix( analyticVectorField, (Name)"Invariant"  );

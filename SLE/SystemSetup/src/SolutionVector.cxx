@@ -264,7 +264,6 @@ void SolutionVector_ApplyBCsToVariables( void* solutionVector, void* data ) {
 
 /* from the depreciated Vector class */
 void _SolutionVector_VectorView( Vec v, Stream* stream ) {
-	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;
 
@@ -272,7 +271,7 @@ void _SolutionVector_VectorView( Vec v, Stream* stream ) {
 	VecGetArray( v, &array );
 
 	Journal_Printf( stream, "%p = [", v );
-	for( entry_i = 0; entry_i < size; entry_i++ ) 
+	for(int entry_i = 0; entry_i < size; entry_i++ ) 
 		Journal_Printf( stream, "\t%u: \t %.12g\n", entry_i, array[entry_i] );
 	Journal_Printf( stream, "];\n" );
 

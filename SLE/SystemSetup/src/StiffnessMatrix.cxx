@@ -650,7 +650,7 @@ void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
 	Node_Index		uniqueRelatedColNodes_AllocCount = 0;
 	Node_Index		uniqueRelatedColNode_I = 0;
 	Dof_Index		currNodeDof_I = 0;
-	Dof_EquationNumber	currDofMatrixRow = 0;
+	uint            	currDofMatrixRow = 0;
 	unsigned		nNodeInc, *nodeInc;
 
 	Journal_DPrintfL( self->debug, 3, "In %s - for row local node %d\n", __func__, rowNode_lI );
@@ -702,7 +702,7 @@ void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
 
 				for ( currNodeDof_I = 0; currNodeDof_I < self->rowVariable->dofLayout->dofCounts[rowNode_lI]; currNodeDof_I++) {
 					if ( -1 != rowEqNum->destinationArray[rowNode_lI][currNodeDof_I] ) {
-						currDofMatrixRow = *(int*)STreeMap_Map(
+						currDofMatrixRow = *(uint*)STreeMap_Map(
 							rowEqNum->ownedMap,
 							rowEqNum->destinationArray[rowNode_lI] + currNodeDof_I );
 
@@ -936,7 +936,6 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 		for ( feVar_I = 0; feVar_I < numFeVars; feVar_I++ ) {
 			FeEquationNumber* 		feEqNum = feVars[feVar_I]->eqNum;
 			DofLayout*			dofLayout = feVars[feVar_I]->dofLayout;
-			Dof_Index			dofCountLastNode;
 			unsigned			nDofsThisEl;
 			unsigned			n_i;
 
@@ -950,13 +949,13 @@ void StiffnessMatrix_GlobalAssembly_General( void* stiffnessMatrix, Bool bcRemov
 			elementLM[feVar_I] = FeEquationNumber_BuildOneElementLocationMatrix( feEqNum, element_lI );
 
 			/* work out number of dofs at the node, based on LM */
-			dofCountLastNode = dofLayout->dofCounts[nodeIdsThisEl[nodeCountThisEl-1]];
 			nDofsThisEl = dofLayout->dofCounts[nodeIdsThisEl[0]];
 			for( n_i = 1; n_i < nodeCountThisEl; n_i++ )
 				nDofsThisEl += dofLayout->dofCounts[nodeIdsThisEl[n_i]];
 			*totalDofsThisElement[feVar_I] = nDofsThisEl;
 /*
- *totalDofsThisElement[feVar_I] = &elementLM[feVar_I][nodeCountThisEl-1][dofCountLastNode-1]
+			Dof_Index dofCountLastNode = dofLayout->dofCounts[nodeIdsThisEl[nodeCountThisEl-1]];
+                        *totalDofsThisElement[feVar_I] = &elementLM[feVar_I][nodeCountThisEl-1][dofCountLastNode-1]
  - &elementLM[feVar_I][0][0] + 1;
 */
 
@@ -1464,13 +1463,11 @@ void _StiffMatAss( struct StiffMatAss_Log *log, void* stiffnessMatrix, Bool remo
         unsigned                        nRowEls;
         unsigned                        nRowNodes, *rowNodes;
         unsigned                        nColNodes, *colNodes;
-        unsigned                        maxDofs, maxRCDofs, nDofs, nRowDofs, nColDofs;
+        unsigned                        maxDofs, nDofs, nRowDofs, nColDofs;
         double**                        elStiffMat;
 /*         Mat                             matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
 	Mat                             matrix = self->matrix;
         unsigned                        e_i, n_i;
-
-        int c_dof, r_dof;
 
         assert( self && Stg_CheckType( self, StiffnessMatrix ) );
 
@@ -1508,18 +1505,15 @@ void _StiffMatAss( struct StiffMatAss_Log *log, void* stiffnessMatrix, Bool remo
                 nRowDofs = 0;
                 for( n_i = 0; n_i < nRowNodes; n_i++ ) {
                         nRowDofs += rowDofs->dofCounts[rowNodes[n_i]];
-                        r_dof = rowDofs->dofCounts[rowNodes[n_i]];
                 }
                 nColDofs = 0;
                 for( n_i = 0; n_i < nColNodes; n_i++ ) {
                         nColDofs += colDofs->dofCounts[colNodes[n_i]];
-                        c_dof = colDofs->dofCounts[colNodes[n_i]];
                 }
                 nDofs = nRowDofs * nColDofs;
                 self->nRowDofs = nRowDofs;
                 self->nColDofs = nColDofs;
                 if( nDofs > maxDofs ) {
-                        maxRCDofs = (nRowDofs > nColDofs) ? nRowDofs : nColDofs;
                         elStiffMat = ReallocArray2D( elStiffMat, double, nRowDofs, nColDofs );
 
                         maxDofs = nDofs;
@@ -1581,17 +1575,15 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
         double*                         bcVals;
 /* 	Mat				matrix		= ( self->useShellMatrix ) ? self->shellMatrix->matrix : self->matrix; */
 	Mat                             matrix = self->matrix;
-	Vec				vector, transVector;
+	Vec				vector;
         unsigned                        e_i, n_i;
 
         unsigned bc_cnt = 0;
         int *row_index_to_keep, *col_index_to_keep;
         int n_rows, n_cols;
-        int same_variables;
-        int c_dof, r_dof;
+        int c_dof;
         double *rhs;
-	int has_col_bc, has_row_bc;
-	int eq_num;
+	int has_col_bc;
 
         assert( self && Stg_CheckType( self, StiffnessMatrix ) );
 
@@ -1611,7 +1603,6 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
 
         //matrix = self->matrix;
         vector = self->rhs ? self->rhs->vector : NULL;
-        transVector = self->transRHS ? self->transRHS->vector : NULL;
         elStiffMat = NULL;
         bcVals = NULL;
         maxDofs = 0;
@@ -1620,9 +1611,7 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
 	row_index_to_keep = NULL;
 	rhs = NULL;
 
-        same_variables = 0;
         if( rowMesh == colMesh ) {
-                same_variables = 1;
 //                printf("Detected same variables in assembly VECTOR_CORRECTIONS\n");
         }
 
@@ -1645,7 +1634,6 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
                 nRowDofs = 0;
                 for( n_i = 0; n_i < nRowNodes; n_i++ ) {
                         nRowDofs += rowDofs->dofCounts[rowNodes[n_i]];
-                        r_dof = rowDofs->dofCounts[rowNodes[n_i]];
                 }
                 nColDofs = 0;
                 for( n_i = 0; n_i < nColNodes; n_i++ ) {
@@ -1671,11 +1659,9 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
 
                 /* check for presence of bc's */
                 n_rows = n_cols = 0;
-                has_row_bc = has_col_bc = 0;
 
                        
 		for( n_i=0; n_i<nColDofs; n_i++ ) {
-			eq_num = colEqNum->locationMatrix[e_i][0][n_i];
 			if( colEqNum->locationMatrix[e_i][0][n_i] < 0 ) {
 				col_index_to_keep[ n_cols ] = n_i;
 				n_cols++;
@@ -1686,7 +1672,6 @@ void _StiffMatAss_vector_corrections(  struct StiffMatAss_Log *log, void *stiffn
 			if( rowEqNum->locationMatrix[e_i][0][n_i] >= 0 ) {
 				row_index_to_keep[ n_rows ] = n_i;
 				n_rows++;
-				has_row_bc = 1;
 			}
 		}
 
@@ -1796,11 +1781,9 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
 	unsigned bc_cnt = 0;
 	int *row_index_to_keep, *col_index_to_keep;
 	int n_rows, n_cols;
-	int same_variables;
-	int c_dof, r_dof;
+	int r_dof;
 	double *rhs;
 	int has_col_bc, has_row_bc;
-	int eq_num;
 
 	assert( self && Stg_CheckType( self, StiffnessMatrix ) );
 	StiffMatAssLog_Init( log, "OPERATOR_WITH_BC_CORRECTIONS_FROM_OP_TRANS" );
@@ -1828,9 +1811,7 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
 	rhs = NULL;
 
 
-  	same_variables = 0;
   	if( rowMesh == colMesh ) {
-  		same_variables = 1;
 		// printf("Detected same variables in assembly VECTOR CORRECTIONS FROM TRANSPOSE \n");
 	}
 	assert( transVector ); /* If we are in this function than transVector must be valid */ 
@@ -1857,7 +1838,6 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
                 nColDofs = 0;
                 for( n_i = 0; n_i < nColNodes; n_i++ ) {
                         nColDofs += colDofs->dofCounts[colNodes[n_i]];
-                        c_dof = colDofs->dofCounts[colNodes[n_i]];
                 }
                 nDofs = nRowDofs * nColDofs;
                 self->nRowDofs = nRowDofs;
@@ -1882,7 +1862,6 @@ void _StiffMatAss_vector_corrections_from_transpose( struct StiffMatAss_Log *log
 
 		/* cause this is the transpose function, we make corrections on the bc's if there are applied to the row variable */
                 for( n_i=0; n_i<nColDofs; n_i++ ) {
-			eq_num = colEqNum->locationMatrix[e_i][0][n_i];
                         if( colEqNum->locationMatrix[e_i][0][n_i] >= 0 ) {
 				col_index_to_keep[ n_cols ] = n_i;
                                 n_cols++;
@@ -2054,7 +2033,8 @@ void __StiffnessMatrix_NewAssemble( void* stiffnessMatrix, Bool removeBCs, void*
         int nRowNodeDofs, nColNodeDofs;
         int rowInd, colInd;
         double bc;
-	unsigned			e_i, n_i, dof_i, n_j, dof_j;
+	unsigned			e_i, n_i, n_j;
+        int dof_i, dof_j;
 
 	assert( self && Stg_CheckType( self, StiffnessMatrix ) );
 
@@ -2406,7 +2386,7 @@ void _StiffnessMatrix_UpdateBC_CorrectionTables(
 			/* Can only use 'elementLM' if FeEquationNumber has been told to remove BCs.  Otherwise
 			   we'll need to determine if the VariableCondition has a value specified for this 
 			   node/dof. - Luke */
-			if( elementLM[node_elLocalI][dof_nodeLocalI] != (unsigned)-1 ) {
+			if( elementLM[node_elLocalI][dof_nodeLocalI] != -1 ) {
 				unsigned	lEqNum;
 
 				lEqNum = *(int*)STreeMap_Map( eqNum->ownedMap,
@@ -2472,9 +2452,9 @@ void _StiffnessMatrix_CorrectForceVectorWithOneElementsBoundaryConditions(
 		Mesh			*rowMesh, *colMesh;
 		FeEquationNumber	*rowEqNum, *colEqNum;
 		DofLayout		*rowDofs, *colDofs;
-		unsigned		nRowElNodes, *rowElNodes, nColElNodes, *colElNodes;
+		unsigned		nRowElNodes, *rowElNodes, nColElNodes;
 		unsigned		nRowDofs, nColDofs;
-		unsigned		dofI, dofJ, elIndI, elIndJ;
+		unsigned		elIndI, elIndJ;
 		double			bcValue;
 		unsigned		n_i, n_j, d_i, d_j;
 
@@ -2489,38 +2469,37 @@ void _StiffnessMatrix_CorrectForceVectorWithOneElementsBoundaryConditions(
 		rowElNodes = (unsigned*)IArray_GetPtr( self->rowInc );
 		Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), elementInd, MT_VERTEX, self->colInc );
 		nColElNodes = IArray_GetSize( self->colInc );
-		colElNodes = (unsigned*)IArray_GetPtr( self->colInc );
 		nRowDofs = rowDofs->dofCounts[0];
 		nColDofs = colDofs->dofCounts[0];
 
 		for( n_i = 0; n_i < nColElNodes; n_i++ ) {
-			for( d_i = 0; d_i < nColDofs; d_i++ ) {
-				dofI = colEqNum->locationMatrix[elementInd][n_i][d_i];
-				if( dofI == -1 )
-					continue;
+                  for( d_i = 0; d_i < nColDofs; d_i++ ) {
+                    int dofI = colEqNum->locationMatrix[elementInd][n_i][d_i];
+                    if( dofI == -1 )
+                      continue;
 
-				elIndI = n_i * nColDofs + d_i;
-				for( n_j = 0; n_j < nRowElNodes; n_j++ ) {
-					for( d_j = 0; d_j < nRowDofs; d_j++ ) {
-						dofJ = rowEqNum->locationMatrix[elementInd][n_j][d_j];
-						if( dofJ != -1 )
-							continue;
-
-						elIndJ = n_j * nRowDofs + d_j;
-						bcValue = DofLayout_GetValueDouble( rowDofs, rowElNodes[n_j], d_j );
-						h2Add[elIndI] -= elStiffMatToAdd[elIndJ][elIndI] * bcValue;
-					}
-				}
-			}
+                    elIndI = n_i * nColDofs + d_i;
+                    for( n_j = 0; n_j < nRowElNodes; n_j++ ) {
+                      for( d_j = 0; d_j < nRowDofs; d_j++ ) {
+                        int dofJ = rowEqNum->locationMatrix[elementInd][n_j][d_j];
+                        if( dofJ != -1 )
+                          continue;
+                                          
+                        elIndJ = n_j * nRowDofs + d_j;
+                        bcValue = DofLayout_GetValueDouble( rowDofs, rowElNodes[n_j], d_j );
+                        h2Add[elIndI] -= elStiffMatToAdd[elIndJ][elIndI] * bcValue;
+                      }
+                    }
+                  }
 		}
 	}
 	else {
 		Mesh			*rowMesh, *colMesh;
 		FeEquationNumber	*rowEqNum, *colEqNum;
 		DofLayout		*rowDofs, *colDofs;
-		unsigned		nRowElNodes, *rowElNodes, nColElNodes, *colElNodes;
+		unsigned		nRowElNodes, nColElNodes, *colElNodes;
 		unsigned		nRowDofs, nColDofs;
-		unsigned		dofI, dofJ, elIndI, elIndJ;
+		unsigned		elIndI, elIndJ;
 		double			bcValue;
 		unsigned		n_i, n_j, d_i, d_j;
 
@@ -2532,7 +2511,6 @@ void _StiffnessMatrix_CorrectForceVectorWithOneElementsBoundaryConditions(
 		colDofs = colEqNum->dofLayout;
 		Mesh_GetIncidence( rowMesh, Mesh_GetDimSize( rowMesh ), elementInd, MT_VERTEX, self->rowInc );
 		nRowElNodes = IArray_GetSize( self->rowInc );
-		rowElNodes = (unsigned*)IArray_GetPtr( self->rowInc );
 		Mesh_GetIncidence( colMesh, Mesh_GetDimSize( colMesh ), elementInd, MT_VERTEX, self->colInc );
 		nColElNodes = IArray_GetSize( self->colInc );
 		colElNodes = (unsigned*)IArray_GetPtr( self->colInc );
@@ -2541,14 +2519,14 @@ void _StiffnessMatrix_CorrectForceVectorWithOneElementsBoundaryConditions(
 
 		for( n_i = 0; n_i < nRowElNodes; n_i++ ) {
 			for( d_i = 0; d_i < nRowDofs; d_i++ ) {
-				dofI = rowEqNum->locationMatrix[elementInd][n_i][d_i];
+				int dofI = rowEqNum->locationMatrix[elementInd][n_i][d_i];
 				if( dofI == -1 )
 					continue;
 
 				elIndI = n_i * nRowDofs + d_i;
 				for( n_j = 0; n_j < nColElNodes; n_j++ ) {
 					for( d_j = 0; d_j < nColDofs; d_j++ ) {
-						dofJ = colEqNum->locationMatrix[elementInd][n_j][d_j];
+						int dofJ = colEqNum->locationMatrix[elementInd][n_j][d_j];
 						if( dofJ != -1 )
 							continue;
 
@@ -2768,7 +2746,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	FeMesh *rowMesh, *colMesh;
 	FeEquationNumber *rowEqNum, *colEqNum;
 	DofLayout *rowDofs, *colDofs;
-	int nRowEqs, nColEqs;
+	int nRowEqs;
 	int nColNodes, *colNodes;
 	int nNodeEls, *nodeEls;
 	int *nDiagNonZeros, *nOffDiagNonZeros;
@@ -2776,8 +2754,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	int netNonZeros;
 	STree *candColEqs;
 	int e_i;
-	int n_i, dof_i;
-	int n_j, dof_j;
+	int n_j;
 
 	assert( self && Stg_CheckType( self, StiffnessMatrix ) );
 	assert( self->rowVariable );
@@ -2795,7 +2772,6 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	rowEqNum = rowVar->eqNum;
 	colEqNum = colVar->eqNum;
 	nRowEqs = rowEqNum->localEqNumsOwnedCount;
-	nColEqs = colEqNum->localEqNumsOwnedCount;
 	rowDofs = rowVar->dofLayout;
 	colDofs = colVar->dofLayout;
 
@@ -2808,8 +2784,8 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	memset( nOffDiagNonZeros, 0, nRowEqs * sizeof(int) );
 	netNonZeros = 0;
 
-	for( n_i = 0; n_i < FeMesh_GetNodeLocalSize( rowMesh ); n_i++ ) {
-		for( dof_i = 0; dof_i < rowDofs->dofCounts[n_i]; dof_i++ ) {
+	for(uint n_i = 0; n_i < FeMesh_GetNodeLocalSize( rowMesh ); n_i++ ) {
+		for(uint dof_i = 0; dof_i < rowDofs->dofCounts[n_i]; dof_i++ ) {
 			rowEq = rowEqNum->destinationArray[n_i][dof_i];
 
 			if( rowEq == -1 ) continue;
@@ -2828,7 +2804,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 				colNodes = IArray_GetPtr( self->colInc );
 
 				for( n_j = 0; n_j < nColNodes; n_j++ ) {
-					for( dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
+					for(uint dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
 						colEq = colEqNum->destinationArray[colNodes[n_j]][dof_j];
 
 						if( colEq == -1 ) continue;

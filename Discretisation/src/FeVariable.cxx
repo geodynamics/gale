@@ -1938,7 +1938,6 @@ void FeVariable_ImportExportInfo_Delete( void* ptr ) {
 void FeVariable_SaveToFile( void* feVariable, Name filename, Bool saveCoords ) {
 	FeVariable*       self = (FeVariable*)feVariable;
 	Node_LocalIndex   lNode_I;
-	Node_GlobalIndex  gNode_I;
 	double*           coord;
 	Dof_Index         dof_I;
 	Dof_Index         dofAtEachNodeCount;
@@ -1961,7 +1960,7 @@ void FeVariable_SaveToFile( void* feVariable, Name filename, Bool saveCoords ) {
    FILE*             outputFile;
 #endif 
 
-	lNode_I = 0; gNode_I = 0;
+	lNode_I = 0;
 
 	MPI_Comm_size( comm, (int*)&nProcs );
 	MPI_Comm_rank( comm, (int*)&myRank );
@@ -2194,11 +2193,9 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
 	FILE*              inputFile;
 #endif
 	double             variableVal;
-	Processor_Index    proc_I;
 	MPI_Comm	          comm = Comm_GetMPIComm( Mesh_GetCommTopology( self->feMesh, MT_VERTEX ) );
 	unsigned		       rank;
 	unsigned		       nRanks;
-	int                nDims;
 	Bool               savedCoords = False;
 	Stream*            errorStr = Journal_Register( Error_Type, (Name)self->type  );
    MeshGenerator*    theGenerator;
@@ -2211,7 +2208,6 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
    double*                 buf; 
    FeCheckpointFileVersion ver;
    hid_t                   attrib_id, group_id;
-   herr_t                  status;   
 #else
    unsigned          uTemp;  
    double            temp[3];  
@@ -2225,8 +2221,6 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
 	MPI_Comm_size( comm, (int*)&nRanks );
 	
 	dofAtEachNodeCount = self->fieldComponentCount;
-	proc_I = 0;
-	nDims = 0;
 	
 #ifdef READ_HDF5	
    
@@ -2250,14 +2244,14 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
       ver = FeCHECKPOINT_V1;
    else {
       int checkVer;
-      int ndims;
-      int res[self->dim];
+      uint ndims;
+      uint res[self->dim];
       Grid**     grid;
       unsigned*  sizes;
 
       /** check for known checkpointing version type */
 
-      status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
+      H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
       H5Aclose(attrib_id);
       if(checkVer == 2)
          ver = FeCHECKPOINT_V2;
@@ -2274,7 +2268,7 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
       #else
          attrib_id = H5Aopen(group_id, "dimensions", H5P_DEFAULT);
       #endif
-      status = H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
+      H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
       H5Aclose(attrib_id);      
       Journal_Firewall( (ndims == self->dim), errorStr,
          "\n\nError in %s for %s '%s'\n"
@@ -2296,7 +2290,7 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
          #else
             attrib_id = H5Aopen(group_id, "mesh resolution", H5P_DEFAULT);
          #endif
-         status = H5Aread(attrib_id, H5T_NATIVE_INT, &res);
+         H5Aread(attrib_id, H5T_NATIVE_INT, &res);
          H5Aclose(attrib_id);
    
          grid   = (Grid**) Mesh_GetExtension( self->feMesh, Grid*, "elementGrid" );	
@@ -2411,7 +2405,7 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
 
 	/** This loop used to stop 2 processors trying to open the file at the same time, which
 	  * seems to cause problems */
-	for ( proc_I = 0; proc_I < nRanks; proc_I++ ) {
+	for (Processor_Index proc_I = 0; proc_I < nRanks; proc_I++ ) {
 		MPI_Barrier( comm );
 		if ( proc_I == rank ) {
 			/** Do the following since in parallel on some systems, the file
@@ -2489,10 +2483,9 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, N
    hid_t									file, fileData;
    unsigned								totalNodes, ii;
    hid_t									attrib_id, group_id;
-   herr_t								status;
    int									res[3];
    int									checkVer;
-   int									ndims;
+   uint									ndims;
 	double								crdMin[3], crdMax[3];
 	double*								value;
 	unsigned								nDomainVerts;
@@ -2518,7 +2511,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, N
 
    /** check for known checkpointing version type */
 
-   status = H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
+   H5Aread(attrib_id, H5T_NATIVE_INT, &checkVer);
    H5Aclose(attrib_id);
    if(checkVer != 2)
       Journal_Firewall( (0), errorStr, "\n\nError in %s for %s '%s'\n" "Unknown checkpoint version (%u) for checkpoint file (%s).\n", __func__,
@@ -2531,7 +2524,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, N
    #else
       attrib_id = H5Aopen(group_id, "dimensions", H5P_DEFAULT);
    #endif
-   status = H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
+   H5Aread(attrib_id, H5T_NATIVE_INT, &ndims);
    H5Aclose(attrib_id);      
    Journal_Firewall( (ndims == self->dim), errorStr,
       "\n\nError in %s for %s '%s'\n"
@@ -2546,7 +2539,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, N
    #else
       attrib_id = H5Aopen(group_id, "mesh resolution", H5P_DEFAULT);
    #endif
-   status = H5Aread(attrib_id, H5T_NATIVE_INT, &res);
+   H5Aread(attrib_id, H5T_NATIVE_INT, &res);
    H5Aclose(attrib_id);
 
    /** Read in minimum coord. */

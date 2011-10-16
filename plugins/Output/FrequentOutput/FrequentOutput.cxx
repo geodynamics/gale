@@ -128,7 +128,7 @@ Index StgFEM_FrequentOutput_Register( PluginsManager* pluginsManager ) {
 	return PluginsManager_Submit( pluginsManager, StgFEM_FrequentOutput_Type, (Name)"0", _StgFEM_FrequentOutput_DefaultNew  );
 }
 
-void StgFEM_FrequentOutput_PrintString( void* _context, char* string ) {
+void StgFEM_FrequentOutput_PrintString( void* _context, const char* string ) {
 	AbstractContext*                   context = (AbstractContext*) _context;
 	Stream*                            stream;
 
@@ -145,11 +145,8 @@ void StgFEM_FrequentOutput_PrintString( void* _context, char* string ) {
 void StgFEM_FrequentOutput_PrintDouble( void* _context, double value ) {
 	AbstractContext*                   context = (AbstractContext*) _context;
 	char*                              formatString;
-	Stream*                            stream;
 
 	StgFEM_FrequentOutput* self = (StgFEM_FrequentOutput*)LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_FrequentOutput_Type  );
-
-	stream     = self->stream;
 
 	/* Create format String */
 	Stg_asprintf( &formatString, "%%%d.%dg", self->columnWidth, self->decimalLength );

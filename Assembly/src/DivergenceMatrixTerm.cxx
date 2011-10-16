@@ -178,7 +178,6 @@ void _DivergenceMatrixTerm_AssembleElement(
    Particle_InCellIndex		cParticle_I, cellParticleCount;
    Node_ElementLocalIndex	nodesPerEl_row;
    Node_ElementLocalIndex	nodesPerEl_col;	
-   Dof_Index					totalDofsThisElement_row, totalDofsThisElement_col;
 	
    Dof_Index					dofPerNode_row, dofPerNode_col;
    Index							row, col; /* Indices into the stiffness matrix */
@@ -204,22 +203,19 @@ void _DivergenceMatrixTerm_AssembleElement(
    dofPerNode_row = dim;	/* velocity */
    dofPerNode_col = 1;	/* pressure */
 	
-   totalDofsThisElement_row = nodesPerEl_row * dofPerNode_row;
-   totalDofsThisElement_col = nodesPerEl_col * dofPerNode_col;
-	
-	if( nodesPerEl_row > self->max_nElNodes ) {
-		/* reallocate */
-		self->GNx = ReallocArray2D( self->GNx, double, dim, nodesPerEl_row );
-		self->max_nElNodes = nodesPerEl_row;
-	}
-	GNx_row = self->GNx;
+   if( nodesPerEl_row > self->max_nElNodes ) {
+     /* reallocate */
+     self->GNx = ReallocArray2D( self->GNx, double, dim, nodesPerEl_row );
+     self->max_nElNodes = nodesPerEl_row;
+   }
+   GNx_row = self->GNx;
 
-	if( nodesPerEl_col > self->max_nElNodes_col ) {
-   /* allocate */
-		self->Ni_col = ReallocArray( self->Ni_col, double, nodesPerEl_col );
-		self->max_nElNodes_col = nodesPerEl_col;
-	}
-	Ni_col = self->Ni_col;
+   if( nodesPerEl_col > self->max_nElNodes_col ) {
+     /* allocate */
+     self->Ni_col = ReallocArray( self->Ni_col, double, nodesPerEl_col );
+     self->max_nElNodes_col = nodesPerEl_col;
+   }
+   Ni_col = self->Ni_col;
 	
    cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
    cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];

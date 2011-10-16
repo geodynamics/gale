@@ -240,7 +240,6 @@ void _AdvDiffMulticorrector_Solve( void* solver, void* _sle ) {
 void ViewPETScVector( Vec vec, Stream* stream ) {
 	PetscInt	size;
 	PetscScalar*	array;
-	unsigned	entry_i;
 
 	if( !stream )
 		stream = Journal_Register( Info_Type, (Name)"tmp"  );
@@ -248,7 +247,7 @@ void ViewPETScVector( Vec vec, Stream* stream ) {
 	VecGetLocalSize( vec, &size );
 	VecGetArray( vec, &array );
 	
-	for( entry_i = 0; entry_i < size; entry_i++ )
+	for(int entry_i = 0; entry_i < size; entry_i++ )
 		Journal_Printf( stream, "\t%u: \t %.12g\n", entry_i, array[entry_i] );
 
 	VecRestoreArray( vec, &array );

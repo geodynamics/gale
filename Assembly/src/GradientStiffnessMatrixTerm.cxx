@@ -176,7 +176,6 @@ void _GradientStiffnessMatrixTerm_AssembleElement(
 	Particle_InCellIndex                cParticle_I, cellParticleCount;
 	Node_ElementLocalIndex              nodesPerEl_row;
 	Node_ElementLocalIndex              nodesPerEl_col;	
-	Dof_Index                           totalDofsThisElement_row, totalDofsThisElement_col;
 	
 	Dof_Index                           dofPerNode_row, dofPerNode_col;
 	Index                               row, col; /* Indices into the stiffness matrix */
@@ -201,9 +200,6 @@ void _GradientStiffnessMatrixTerm_AssembleElement(
 		
 	dofPerNode_row = dim;	/* velocity */
 	dofPerNode_col = 1;	/* pressure */
-	
-	totalDofsThisElement_row = nodesPerEl_row * dofPerNode_row;
-	totalDofsThisElement_col = nodesPerEl_col * dofPerNode_col;
 	
 	if( nodesPerEl_row > self->max_nElNodes ) {
 		/* reallocate */

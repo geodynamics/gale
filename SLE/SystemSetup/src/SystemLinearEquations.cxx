@@ -862,7 +862,8 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 			//END OF NONLINEAR ITERATION LOOP!!!
 			
 			/* add the outer loop iterations to the total outer iterations */
-			solver->totalnumnonlinearits = solver->totalnumnonlinearits++;
+			solver->totalnumnonlinearits = solver->totalnumnonlinearits;
+			solver->totalnumnonlinearits++;
 			/*get wall time for end of outer loop*/
 			solver->nonlinearitsendtime = MPI_Wtime();
 			/* add time to total time inner its: */
@@ -1157,7 +1158,7 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   PetscErrorCode ierr;
   SNESConvergedReason snes_reason;
  
-  PetscReal snes_norm;
+  // PetscReal snes_norm;
   PetscInt snes_iter;
 
   PetscReal snes_ttol, snes_rtol, snes_abstol, snes_xtol;
@@ -1204,14 +1205,14 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
 
 
   snes_iter = 0;
-  snes_norm = 0;
+  // snes_norm = 0;
   //SLEComputeFunction( sle, stg_X, stg_F, _context );
   SLEComputeFunction( sle, X, F, _context );
   ierr = VecNorm(F, NORM_2, &fnorm);CHKERRV(ierr); /* fnorm <- ||F||  */
   fnorm0 = fnorm;
   if( PetscIsInfOrNanReal(fnorm) ) SETERRABORT( self->comm,PETSC_ERR_FP,"Infinite or not-a-number generated in norm");
 
-  snes_norm = fnorm;
+  // snes_norm = fnorm;
   if(monitor_flg==PETSC_TRUE) {
   /*  SLE_SNESMonitor(sle,0,fnorm); */
   /*  SLE_SNESMonitor2(sle,0,fnorm0,fnorm, norm_X, norm_X ); */
@@ -1245,7 +1246,7 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
 
     /* Monitor convergence */
     snes_iter = i+1;
-    snes_norm = fnorm;
+    // snes_norm = fnorm;
     if (monitor_flg==PETSC_TRUE) {
     /*  SLE_SNESMonitor(sle,snes_iter,snes_norm); */
     /*  SLE_SNESMonitor2(sle,snes_iter,fnorm0,fnorm, pnorm, norm_X ); */

@@ -53,7 +53,8 @@
 	Index StgFEM_FrequentOutput_Register( PluginsManager* pluginsManager );
 
 	/** Utility Functions */
-	void StgFEM_FrequentOutput_PrintString( void* _context, char* string ) ;
+	void StgFEM_FrequentOutput_PrintString( void* _context,
+                                                const char* string);
 	void StgFEM_FrequentOutput_PrintDouble( void* _context, double value ) ;
 
 	#define StgFEM_FrequentOutput_PrintValue( context, value ) \

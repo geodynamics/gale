@@ -45,21 +45,21 @@ typedef struct {
 
 FeEquationNumber* buildEqNum() {
    CartesianGenerator*	gen;
-   FeMesh*					feMesh;
-   DofLayout*				dofs;
+   FeMesh*			feMesh;
+   DofLayout*			dofs;
    FeEquationNumber*		eqNum;
    Variable_Register*	varReg;
-   Variable*				vars[2];
-   int						maxDecomp[3] = {0, 1, 1};
-   int						sizes[3];
-   double					minCrd[3];
-   double					maxCrd[3];
-   SizeT						dataOffs = 1;
+   Variable*			vars[2];
+   int				maxDecomp[3] = {0, 1, 1};
+   int				sizes[3];
+   double			minCrd[3];
+   double			maxCrd[3];
+   SizeT			dataOffs = 1;
    Variable_DataType		dataType = Variable_DataType_Double;
-   int						nDataTypes = 1;
-   char*						dataNames = "nothing";
+   int				nDataTypes = 1;
+   const char*			dataNames = "nothing";
    static SizeT			structSize = sizeof(double);
-   static int				arraySize;
+   static int			arraySize;
    static void*			arrayPtrs[2];
    int						nRanks;
 
@@ -119,7 +119,7 @@ FeEquationNumber* buildEqNumBCs() {
    SizeT									dataOffs = 1;
    Variable_DataType					dataType = Variable_DataType_Double;
    int									nDataTypes = 1;
-   char*									dataNames = "nothing";
+   const char*						dataNames = "nothing";
    static SizeT						structSize = sizeof(double);
    static int							arraySize;
    static void*						arrayPtrs[2];
@@ -189,13 +189,14 @@ void FeEquationNumberSuite_Teardown( FeEquationNumberSuiteData* data ) {
 }
 
 void FeEquationNumberSuite_TestLocal( FeEquationNumberSuiteData* data ) {
-   FeEquationNumber*	eqNum;
-   FeMesh*				feMesh;
-   int					eqNumsPerProc;
-   int					curEqNum;
-   int					nDofs;
-   int					rank;
-   int					n_i, dof_i;
+   FeEquationNumber* eqNum;
+   FeMesh* feMesh;
+   int eqNumsPerProc;
+   int curEqNum;
+   int nDofs;
+   int rank;
+   uint n_i;
+   int dof_i;
 
    eqNum = buildEqNum();
    pcu_check_true( eqNum );
@@ -208,7 +209,7 @@ void FeEquationNumberSuite_TestLocal( FeEquationNumberSuiteData* data ) {
       curEqNum -= (eqNumsPerProc / 3) * (rank - 1);
    curEqNum *= 2;
 
-   for( n_i = 0; n_i < Mesh_GetLocalSize( feMesh, MT_VERTEX ); n_i++ ) {
+   for(n_i = 0; n_i < Mesh_GetLocalSize( feMesh, MT_VERTEX ); n_i++ ) {
       nDofs = eqNum->dofLayout->dofCounts[n_i];
       for( dof_i = 0; dof_i < nDofs; dof_i++ ) {
 	 if( eqNum->destinationArray[n_i][dof_i] != curEqNum++ )
@@ -263,7 +264,7 @@ void FeEquationNumberSuite_TestShadow( FeEquationNumberSuiteData* data ) {
       else
 	 curEqNum += 2;
    }
-   pcu_check_true( n_i == Mesh_GetDomainSize( feMesh, (MeshTopology_Dim)0 ) );
+   pcu_check_true( n_i == nDomainNodes );
 
    FreeObject( eqNum );
 }

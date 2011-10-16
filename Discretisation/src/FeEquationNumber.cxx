@@ -1810,9 +1810,7 @@ Index FeEquationNumber_CalculateActiveEqCountAtNode(
 void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber ) {
    FeEquationNumber*	self = (FeEquationNumber*)feEquationNumber;
    FeMesh*			feMesh;
-   unsigned		nDims;
    unsigned		nDomainEls;
-   unsigned		nLocalNodes;
    unsigned*		nNodalDofs;
    unsigned		nElNodes;
    unsigned*		elNodes;
@@ -1834,9 +1832,7 @@ void FeEquationNumber_BuildLocationMatrix( void* feEquationNumber ) {
 
    /* Shortcuts. */
    feMesh = self->feMesh;
-   nDims = Mesh_GetDimSize( feMesh );
    nDomainEls = FeMesh_GetElementDomainSize( feMesh );
-   nLocalNodes = FeMesh_GetNodeLocalSize( feMesh );
    nNodalDofs = self->dofLayout->dofCounts;
    dstArray = self->destinationArray;
 
@@ -1925,7 +1921,6 @@ void FeEquationNumber_BuildLocationMatrix( FeEquationNumber* self ) {
 Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEquationNumber, Element_LocalIndex lElement_I ) {
    FeEquationNumber* self = (FeEquationNumber*)feEquationNumber;
    /* Node_DomainIndex elLocalNode_I; */
-   Node_DomainIndex numNodesThisElement, *elInc;
    Dof_EquationNumber** localLocationMatrix = NULL;
    FeMesh* feMesh = self->feMesh;
    /* Dof_Index numDofsThisNode = 0; */
@@ -1933,8 +1928,6 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
 
    inc = IArray_New();
    FeMesh_GetElementNodes( feMesh, lElement_I, inc );
-   numNodesThisElement = IArray_GetSize( inc );
-   elInc = (Node_DomainIndex*)IArray_GetPtr( inc );
 
    /* HACK: Make sure global element location matrix is built. */
    if( !self->locationMatrixBuilt )
@@ -1951,6 +1944,7 @@ Dof_EquationNumber** FeEquationNumber_BuildOneElementLocationMatrix( void* feEqu
    else {
       Dof_Index* numDofsEachNode = NULL;
 
+      Node_DomainIndex numNodesThisElement = IArray_GetSize( inc );
       /* allocate memory for local LM to return */
       numDofsEachNode = Memory_Alloc_Array_Unnamed( Dof_Index, numNodesThisElement );
 
@@ -2341,7 +2335,6 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    Comm*		comm;
    MPI_Comm		mpiComm;
    unsigned		rank, nProcs;
-   unsigned		nDims;
    unsigned		nDomainNodes;
    unsigned		nLocalNodes;
    unsigned*		nNodalDofs;
@@ -2385,7 +2378,6 @@ void FeEquationNumber_BuildWithTopology( FeEquationNumber* self ) {
    mpiComm = Comm_GetMPIComm( comm );
    MPI_Comm_size( mpiComm, (int*)&nProcs );
    MPI_Comm_rank( mpiComm, (int*)&rank );
-   nDims = Mesh_GetDimSize( feMesh );
    nDomainNodes = FeMesh_GetNodeDomainSize( feMesh );
    self->nDomainEls = FeMesh_GetElementDomainSize( feMesh );
    nLocalNodes = FeMesh_GetNodeLocalSize( feMesh );
@@ -2656,9 +2648,8 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    int nPeriodicInds[3];
    int *periodicInds[3];
    int inds[3];
-   Bool usePeriodic;
    int *tmpArray, nLocalEqNums;
-   int lastOwnedEqNum, ind;
+   int ind;
    STree *doneSet;
    int ii, jj, kk;
 
@@ -2685,10 +2676,8 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
    /* Fill destination array with initial values, setting dirichlet BCs as we go. */
    for( ii = 0; ii < nLocals; ii++ ) {
      Grid_Lift( vGrid, locals[ii], (unsigned*)inds );
-      usePeriodic = False;
       for( jj = 0; jj < nDims; jj++ ) {
         if( periodic[jj] && (inds[jj] == 0 || inds[jj] == (int)(vGrid->sizes[jj] - 1)) ) {
-            usePeriodic = True;
 	    break;
 	 }
       }
@@ -2789,7 +2778,6 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
 	 nLocalEqNums++;
       }
    }
-   lastOwnedEqNum = -1; /* Don't need this anymore. */
    FreeArray( tmpArray );
    NewClass_Delete( doneSet );
 

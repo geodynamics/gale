@@ -53,12 +53,9 @@
 const Type StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type = "StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve";
 
 void StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_PrintTimeInfo( AbstractContext* context ) {
-	StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve*	self;
 	Stokes_SLE*	sle  = (Stokes_SLE*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"stokesEqn");
 	SLE_Solver*	solver = (SLE_Solver* ) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"uzawa");
 
-	self = (StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve* )LiveComponentRegister_Get( context->CF->LCRegister, (Name)StgFEM_CPUTimeAndNumberOfIterationsForInnerAndOuterSolve_Type  );
-	
 	/* Print Current Average InnerIteration Time Taken */
 	StgFEM_FrequentOutput_PrintValue( context, solver->avgtimeinnerits);
 	/* Print Current Average OuterIteration Time Taken */

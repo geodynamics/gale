@@ -50,7 +50,7 @@
 		__StiffnessMatrixTerm \
 		/* Virtual info */ \
 		/* DivergenceMatrixTerm info */ \
-		int		max_nElNodes_col; \
+		uint		max_nElNodes_col; \
 		double	*Ni_col; 
 
 	struct DivergenceMatrixTerm { __DivergenceMatrixTerm };

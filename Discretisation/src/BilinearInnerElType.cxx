@@ -216,11 +216,6 @@ void _BilinearInnerElType_SF_allNodes( void* elementType, const double localCoor
 void _BilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const double localCoord[],
 		double** const evaluatedDerivatives ) 
 {		
-	double xi, eta;
-	
-	xi  = localCoord[0];
-	eta = localCoord[1];
-
 	evaluatedDerivatives[0][0] = - 1.0;
 	evaluatedDerivatives[0][1] = 1.0;
 	evaluatedDerivatives[0][2] = 0.0;

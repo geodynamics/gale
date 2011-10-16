@@ -112,10 +112,6 @@ void _MGOpGenerator_Delete( void* mgOpGenerator ) {
 void _MGOpGenerator_Print( void* mgOpGenerator, Stream* stream ) {
 	MGOpGenerator*	self = (MGOpGenerator*)mgOpGenerator;
 	
-	/* Set the Journal for printing informations */
-	Stream* mgOpGeneratorStream;
-	mgOpGeneratorStream = Journal_Register( InfoStream_Type, (Name)"MGOpGeneratorStream"  );
-
 	assert( self && Stg_CheckType( self, MGOpGenerator ) );
 
 	/* Print parent */

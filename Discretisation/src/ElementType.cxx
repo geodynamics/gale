@@ -149,10 +149,7 @@ void ElementType_EvaluateShapeFunctionLocalDerivsAt( void* elementType, const do
 double _ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, unsigned element_I, const double localCoord[], 
 						unsigned face_I, unsigned norm ) 
 {
-	ElementType*	self;
 	Stream*			error = Journal_Register( ErrorStream_Type, (Name)ElementType_Type );
-
-	self = (ElementType* ) elementType;
 
 	Journal_Printf( error, "Error: the jacobian for this element type cannot be evaluated on the element surface" );
 	Journal_Printf( error, "(perhaps because the nodes are defined internally for the element).\n" );
@@ -171,10 +168,6 @@ double ElementType_JacobianDeterminantSurface( void* elementType, void* mesh, un
 #define EPS 1.0E-6
 
 int _ElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
-	ElementType* self;
-
-	self = (ElementType*)elementType;
-
 	memset( normal, 0, sizeof(double) * dim );
 
 	if( xi[J_AXIS] < -1.0 + EPS ) {
@@ -247,7 +240,7 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	double              shapeFunc;
 	double*       	    nodeCoord;
 	double**            GNi = self->GNi;
-	unsigned	    nInc, *inc;
+	unsigned	    *inc;
 	Dimension_Index     dim             = Mesh_GetDimSize( mesh );
 
 	/* This function uses a Newton-Raphson iterative method to find the local coordinate from the global coordinate 
@@ -270,7 +263,6 @@ void _ElementType_ConvertGlobalCoordToElLocal(
 	 * */
 
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), element, MT_VERTEX, self->inc );
-	nInc = IArray_GetSize( self->inc );
 	inc = (unsigned*)IArray_GetPtr( (self->inc) );
 
 	/* Initial guess for element local coordinate is in the centre of the element - ( 0.0, 0.0, 0.0 ) */
@@ -358,26 +350,20 @@ void ElementType_ShapeFunctionsGlobalDerivs(
 	double				*nodeCoord;
 	
 	double jac[3][3];
-	int rows;		/* max dimensions */
-	int cols;		/* max nodes per el */
 	double** GNi; 
 	int n, i, j;
 	double globalSF_DerivVal;
 	int dx, dxi;
 	double tmp, D = 0.0;
 	double cof[3][3];	/* cofactors */
-	unsigned nInc, *inc;
+	unsigned *inc;
 	Index nodesPerEl;
 
-	rows=Mesh_GetDimSize( mesh );
-	cols=self->nodeCount;	
-	
 	GNi = self->GNi;
 
 	nodesPerEl = self->nodeCount;
 
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, self->inc );
-	nInc = IArray_GetSize( self->inc );
 	inc = (unsigned*)IArray_GetPtr((self->inc) );
 	
 	/*
@@ -505,10 +491,9 @@ void ElementType_Jacobian_AxisIndependent(
 	double**     GNi;
 	Node_Index   nodesPerEl  = self->nodeCount;
 	Node_Index   node_I;
-	unsigned	nInc, *inc;
+	unsigned     *inc;
 
 	Mesh_GetIncidence( mesh, Mesh_GetDimSize( mesh ), elId, MT_VERTEX, self->inc );
-	nInc = IArray_GetSize( self->inc );
 	inc = (unsigned*)IArray_GetPtr((self->inc) );
 	
 	/* If GNi isn't passed in - then evaluate them for you */

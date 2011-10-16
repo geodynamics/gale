@@ -125,13 +125,9 @@ void _Assembler_Delete( void* assembler ) {
 
 void _Assembler_Print( void* assembler, Stream* stream ) {
 	Assembler*	self = (Assembler*)assembler;
-	Stream* 	assemblerStream;
 
 	assert( self && Stg_CheckType( self, Assembler ) );
 	
-	/* Set the Journal for printing informations */
-	assemblerStream = Journal_Register( InfoStream_Type, (Name)"AssemblerStream"  );
-
 	/* Print parent */
 	Journal_Printf( stream, "Assembler (ptr): (%p)\n", self );
 	_Stg_Class_Print( self, stream );

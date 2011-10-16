@@ -214,10 +214,6 @@ void FeVariable_SaveNodalValuesToFile_SpecRidge2D( void* _feVariable, Name prefi
 
 
 void _StgFEM_FeVariable_ImportExport_SpecRidge2D_AssignFromXML( void* componment, Stg_ComponentFactory* cf, void* data ) {
-	AbstractContext* context;
-
-	context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
-	
 }
 
 void* _StgFEM_FeVariable_ImportExport_SpecRidge2D_DefaultNew( Name name ) {

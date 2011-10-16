@@ -115,10 +115,6 @@ void _SROpGenerator_Delete( void* srOpGenerator ) {
 void _SROpGenerator_Print( void* srOpGenerator, Stream* stream ) {
 	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
 	
-	/* Set the Journal for printing informations */
-	Stream* srOpGeneratorStream;
-	srOpGeneratorStream = Journal_Register( InfoStream_Type, (Name)"SROpGeneratorStream"  );
-
 	assert( self && Stg_CheckType( self, SROpGenerator ) );
 
 	/* Print parent */
@@ -364,7 +360,7 @@ void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
 
 		topNode = self->topMaps[level][n_i];
 		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
-			if( self->fineEqNum->destinationArray[topNode][dof_i] != (unsigned)-1 )
+			if( self->fineEqNum->destinationArray[topNode][dof_i] != -1 )
 				dstArray[n_i][dof_i] = curEqNum++;
 			else
 				dstArray[n_i][dof_i] = (unsigned)-1;
@@ -401,7 +397,7 @@ void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
 	for( n_i = nLocalNodes; n_i < nDomainNodes; n_i++ ) {
 		topNode = self->topMaps[level][n_i];
 		for( dof_i = 0; dof_i < nNodalDofs[n_i]; dof_i++ ) {
-			if( self->fineEqNum->destinationArray[topNode][dof_i] != (unsigned)-1 )
+			if( self->fineEqNum->destinationArray[topNode][dof_i] != -1 )
 				dstArray[n_i][dof_i] = tuples[n_i * maxDofs + dof_i];
 			else
 				dstArray[n_i][dof_i] = -1;
@@ -421,7 +417,7 @@ void SROpGenerator_GenLevelEqNums( SROpGenerator* self, unsigned level ) {
 void SROpGenerator_GenOps( SROpGenerator* self, Mat* pOps, Mat* rOps ) {
 	unsigned	nLevels;
 	//Matrix		*fineMat, *P;
-	Mat		fineMat, P;
+	Mat		P;
 	unsigned	nRows, nCols;
 	unsigned	l_i;
 	/* unsigned	nProcs; */
@@ -429,8 +425,8 @@ void SROpGenerator_GenOps( SROpGenerator* self, Mat* pOps, Mat* rOps ) {
 	assert( self && Stg_CheckType( self, SROpGenerator ) );
 	assert( pOps && rOps );
 
-	//fineMat = MatrixSolver_GetMatrix( self->solver );
-	fineMat = self->solver->matrix;
+	//Mat fineMat = MatrixSolver_GetMatrix( self->solver );
+	// Mat fineMat = self->solver->matrix;
 	nLevels = self->nLevels;
 
 	for( l_i = nLevels - 1; l_i > 0; l_i-- ) {
@@ -475,7 +471,7 @@ void SROpGenerator_GenLevelOp( SROpGenerator* self, unsigned level, Mat P ) {
 	unsigned	ind;
 	unsigned	nInc, *inc;
 	unsigned	maxInc;
-	unsigned	fTopNode, cTopNode;
+	unsigned	fTopNode;
 	unsigned	fEqNum, cEqNum;
 	double		*localCoord, *basis;
 	IArray		*incArray;
@@ -524,7 +520,6 @@ void SROpGenerator_GenLevelOp( SROpGenerator* self, unsigned level, Mat P ) {
 			nInc = IArray_GetSize( incArray );
 			inc = (unsigned*)IArray_GetPtr( incArray );
 			for( inc_i = 0; inc_i < nInc; inc_i++ ) {
-				cTopNode = self->topMaps[level - 1][inc[inc_i]];
 				cEqNum = self->eqNums[level - 1][inc[inc_i]][dof_i];
 				if( cEqNum != (unsigned)-1 && !Num_Approx( basis[inc_i], 0.0 ) )
 					//Matrix_InsertEntries( P, 1, &fEqNum, 1, &cEqNum, basis + inc_i );
@@ -684,9 +679,6 @@ PetscErrorCode _VecGetOwnershipRanges( Vec X, PetscInt **_ranges )
   VecScatter scat;
   PetscInt *ranges,i;
   PetscScalar *v;
-  double t0;
-
-  t0 = MPI_Wtime();
 
   PetscObjectGetComm( (PetscObject)X, &comm );
   MPI_Comm_size( comm, &nproc );
@@ -753,7 +745,7 @@ Efficiency alert!!
 Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    FeMesh *mesh;
    int nDims, nDofsPerNode;
-   int sideSizes[2][3];
+   uint sideSizes[2][3];
    int inds[2][3], offsInds[3], nOffs[3];
    int nGlobalNodes[2];
    int nGlobalEqs[2];
@@ -766,8 +758,6 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    Mat P;
    //PETScMatrix *mat;
    Mat mat;
-   int ii, jj, kk;
-   PetscInt o_nz, d_nz;
    PetscInt *o_nnz, *d_nnz;
    PetscInt sr,er, sc,ec, row_idx;
    Vec vec_o_nnz, vec_d_nnz;
@@ -782,19 +772,20 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    nDims = Mesh_GetDimSize( mesh );
 
    /* crude estimate of number of nonzeros in the on-off diagonal portitions of the matrix */
-   o_nz = d_nz = 0;
-   if( nDims == 2 ) {
-	o_nz = d_nz = 4;
-   }
-   if( nDims==3 ) {
-	o_nz = d_nz = 8;
-   }
+   // PetscInt o_nz, d_nz;
+   // o_nz = d_nz = 0;
+   // if( nDims == 2 ) {
+   //      o_nz = d_nz = 4;
+   // }
+   // if( nDims==3 ) {
+   //      o_nz = d_nz = 8;
+   // }
 
    nDofsPerNode = self->fineVar->dofLayout->dofCounts[0]; /* ASSUME */
    elGrid = *Mesh_GetExtension( mesh, Grid**, "elementGrid" );
    vertGrid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    nGlobalNodes[0] = nGlobalNodes[1] = 1;
-   for( ii = 0; ii < nDims; ii++ ) {
+   for( int ii = 0; ii < nDims; ii++ ) {
       sideSizes[1][ii] = elGrid->sizes[ii];
       sideSizes[0][ii] = elGrid->sizes[ii] / 2;
       if( sideSizes[0][ii] * 2 != elGrid->sizes[ii] ) {
@@ -861,13 +852,13 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    VecDuplicate( vec_d_nnz, &vec_o_nnz );
 
    /* Loop over fine nodes. */
-   for( ii = 0; ii < Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 ); ii++ ) {
+   for(uint ii = 0; ii < Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 ); ii++ ) {
       nodeInd = Mesh_DomainToGlobal( mesh, (MeshTopology_Dim)0, ii );
       Grid_Lift( vertGrid, nodeInd, (unsigned*)(inds[1]) );
 
       /* An odd grid index means we need to interpolate from surrounding
          coarse nodes in the current dimension. */
-      for( jj = 0; jj < nDims; jj++ ) {
+      for(int jj = 0; jj < nDims; jj++ ) {
          /* Store the offsets we need to consider. */
          nOffs[jj] = (inds[1][jj] & 1) ? 2 : 1;
       }
@@ -875,9 +866,9 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
       /* 'Multiply' the offsets to build the set of nodes we need to
          interpolate from. */
       Grid_SetSizes( offsGrid, (unsigned*)nOffs );
-      for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+      for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
          Grid_Lift( offsGrid, jj, (unsigned*)offsInds );
-         for( kk = 0; kk < nDims; kk++ )
+         for(int kk = 0; kk < nDims; kk++ )
             inds[0][kk] = (inds[1][kk] >> 1) + offsInds[kk];
 
          /* Store the coarse global node number. */
@@ -886,7 +877,7 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
 
       /* Insert this row into the operator matrix. */
       nEntries = offsGrid->nPoints;
-      for( kk = 0; kk < nDofsPerNode; kk++ ) {
+      for(int kk = 0; kk < nDofsPerNode; kk++ ) {
          /* Skip the entire thing if it's a BC. */
          if( self->fineVar->eqNum->destinationArray[ii][kk] == -1 )
             continue;
@@ -904,7 +895,7 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
          }
 
 
-         for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+         for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
             indices[jj] = nodes[jj] * nDofsPerNode + kk;
           //  printf( "[%d]: (owner=%d): row=%d : c_index=%d \n", rank, proc_owner, row_idx, indices[jj] );
 	    if( (row_idx>=rranges[proc_owner]) && (row_idx<rranges[proc_owner+1]) ) {          
@@ -943,13 +934,13 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    VecAssemblyEnd( vec_o_nnz );
 
    VecGetArray( vec_d_nnz, &v );
-   for( kk=0; kk<(er-sr); kk++ ) {
+   for(int kk=0; kk<(er-sr); kk++ ) {
       d_nnz[kk] = (PetscInt)v[kk];
    }
    VecRestoreArray( vec_d_nnz, &v );
 
    VecGetArray( vec_o_nnz, &v );
-   for( kk=0; kk<(er-sr); kk++ ) {
+   for(int kk=0; kk<(er-sr); kk++ ) {
       o_nnz[kk] = (PetscInt)v[kk];
    }
    VecRestoreArray( vec_o_nnz, &v );
@@ -968,7 +959,7 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    }
 
    /* Loop over fine nodes. */
-   for( ii = 0; ii < Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 ); ii++ ) {
+   for(uint ii = 0; ii < Mesh_GetLocalSize( mesh, (MeshTopology_Dim)0 ); ii++ ) {
 //      if( ii%5000 == 0 ) {
 //        PetscPrintf( PETSC_COMM_WORLD, "Done %d of %d \n", ii, Mesh_GetLocalSize( mesh, 0 ) );
 //      }
@@ -977,7 +968,7 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
 
       /* An odd grid index means we need to interpolate from surrounding
          coarse nodes in the current dimension. */
-      for( jj = 0; jj < nDims; jj++ ) {
+      for(int jj = 0; jj < nDims; jj++ ) {
          /* Store the offsets we need to consider. */
          nOffs[jj] = (inds[1][jj] & 1) ? 2 : 1;
       }
@@ -985,9 +976,9 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
       /* 'Multiply' the offsets to build the set of nodes we need to
          interpolate from. */
       Grid_SetSizes( offsGrid, (unsigned*)nOffs );
-      for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+      for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
          Grid_Lift( offsGrid, jj, (unsigned*)offsInds );
-         for( kk = 0; kk < nDims; kk++ )
+         for(int kk = 0; kk < nDims; kk++ )
             inds[0][kk] = (inds[1][kk] >> 1) + offsInds[kk];
 
          /* Store the coarse global node number. */
@@ -997,12 +988,12 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
       /* Insert this row into the operator matrix. */
       dfrac = 1.0 / (double)offsGrid->nPoints;
       nEntries = offsGrid->nPoints;
-      for( kk = 0; kk < nDofsPerNode; kk++ ) {
+      for(int kk = 0; kk < nDofsPerNode; kk++ ) {
          /* Skip the entire thing if it's a BC. */
          if( self->fineVar->eqNum->destinationArray[ii][kk] == -1 )
             continue;
 
-         for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+         for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
             indices[jj] = nodes[jj] * nDofsPerNode + kk;
             values[jj] = dfrac;
          }
@@ -1057,12 +1048,12 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
 Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    FeMesh *mesh;
    int nDims, nDofsPerNode, rowDof;
-   int sideSizes[2][3];
+   uint sideSizes[2][3];
    int inds[2][3], offsInds[3], nOffs[3];
    int nGlobalNodes[2];
    int nGlobalEqs[2];
    int eqRangeBegin, eqRangeEnd;
-   Grid *vertGrid, *elGrid, *grid[2], *offsGrid;
+   Grid *elGrid, *grid[2], *offsGrid;
    int nodes[8];
    int ifrac, nodeInd;
    double dfrac;
@@ -1071,8 +1062,6 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    Mat P;
    //PETScMatrix *mat;
    Mat mat; 
-   int ii, jj, kk;
-   PetscInt o_nz, d_nz;
    PetscInt *o_nnz, *d_nnz;
    PetscInt sr,er, sc,ec, row_idx;
    Vec vec_o_nnz, vec_d_nnz;
@@ -1083,7 +1072,7 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
 
    /* Calculate depth fraction. */
    ifrac = 1;
-   for( ii = 0; ii < self->nLevels - level - 1; ii++ )
+   for(uint ii = 0; ii < self->nLevels - level - 1; ii++ )
       ifrac *= 2;
 
    /* Calculate level side lengths. */
@@ -1091,19 +1080,19 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    nDims = Mesh_GetDimSize( mesh );
 
    /* crude estimate of number of nonzeros in the on-off diagonal portitions of the matrix */
-   o_nz = d_nz = 0;
-   if( nDims==2 ) {
-      o_nz = d_nz = 4;
-   }
-   if( nDims==3 ) {
-        o_nz = d_nz = 8;
-   }
+   // PetscInt o_nz, d_nz;
+   // o_nz = d_nz = 0;
+   // if( nDims==2 ) {
+   //    o_nz = d_nz = 4;
+   // }
+   // if( nDims==3 ) {
+   //      o_nz = d_nz = 8;
+   // }
 
    nDofsPerNode = self->fineVar->dofLayout->dofCounts[0]; /* ASSUME */
    elGrid = *Mesh_GetExtension( mesh, Grid**, "elementGrid" );
-   vertGrid = *Mesh_GetExtension( mesh, Grid**, "vertexGrid" );
    nGlobalNodes[0] = nGlobalNodes[1] = 1;
-   for( ii = 0; ii < nDims; ii++ ) {
+   for(int ii = 0; ii < nDims; ii++ ) {
       sideSizes[1][ii] = elGrid->sizes[ii] / ifrac;
       sideSizes[0][ii] = elGrid->sizes[ii] / (ifrac * 2);
       if( sideSizes[1][ii] * ifrac != elGrid->sizes[ii] || 
@@ -1177,7 +1166,7 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
 
 
    /* Loop over the finer of the two levels. */
-   for( ii = eqRangeBegin; ii < eqRangeEnd; ii++ ) {
+   for(int ii = eqRangeBegin; ii < eqRangeEnd; ii++ ) {
       /* Convert the global equation number to the global node index. */
       nodeInd = ii / nDofsPerNode;
       rowDof = ii - nodeInd * nDofsPerNode;
@@ -1185,7 +1174,7 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
 
       /* An odd grid index means we need to interpolate from surrounding
          coarse nodes in the current dimension. */
-      for( jj = 0; jj < nDims; jj++ ) {
+      for(int jj = 0; jj < nDims; jj++ ) {
          /* Store the offsets we need to consider. */
          nOffs[jj] = (inds[1][jj] & 1) ? 2 : 1;
       }
@@ -1193,9 +1182,9 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
       /* 'Multiply' the offsets to build the set of nodes we need to
          interpolate from. */
       Grid_SetSizes( offsGrid, (unsigned*)(nOffs) );
-      for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+      for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
         Grid_Lift( offsGrid, jj, (unsigned*)(offsInds) );
-         for( kk = 0; kk < nDims; kk++ )
+         for(int kk = 0; kk < nDims; kk++ )
             inds[0][kk] = (inds[1][kk] >> 1) + offsInds[kk];
 
          /* Store the coarse global node number. */
@@ -1226,7 +1215,7 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
       }
 */
 
-      for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+      for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
          indices[jj] = nodes[jj] * nDofsPerNode + rowDof;
 //         printf("ridx=%d,cidx=%d : owner:%d rrange [%d-%d] : crange [%d-%d] \n", row_idx, indices[jj], proc_owner, row_ranges[proc_owner],row_ranges[proc_owner+1], col_ranges[proc_owner], col_ranges[proc_owner+1] );
          if( (row_idx>=row_ranges[proc_owner]) && (row_idx<row_ranges[proc_owner+1]) ) {
@@ -1248,13 +1237,13 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    VecAssemblyEnd( vec_o_nnz );
 
    VecGetArray( vec_d_nnz, &v );
-   for( kk=0; kk<(er-sr); kk++ ) {
+   for(int kk=0; kk<(er-sr); kk++ ) {
       d_nnz[kk] = (PetscInt)v[kk];
    }
    VecRestoreArray( vec_d_nnz, &v );
 
    VecGetArray( vec_o_nnz, &v );
-   for( kk=0; kk<(er-sr); kk++ ) {
+   for(int kk=0; kk<(er-sr); kk++ ) {
       o_nnz[kk] = (PetscInt)v[kk];
    }
    VecRestoreArray( vec_o_nnz, &v );
@@ -1269,7 +1258,7 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
 
 
    /* Loop over the finer of the two levels. */
-   for( ii = eqRangeBegin; ii < eqRangeEnd; ii++ ) {
+   for(int ii = eqRangeBegin; ii < eqRangeEnd; ii++ ) {
       /* Convert the global equation number to the global node index. */
       nodeInd = ii / nDofsPerNode;
       rowDof = ii - nodeInd * nDofsPerNode;
@@ -1277,7 +1266,7 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
 
       /* An odd grid index means we need to interpolate from surrounding
          coarse nodes in the current dimension. */
-      for( jj = 0; jj < nDims; jj++ ) {
+      for(int jj = 0; jj < nDims; jj++ ) {
          /* Store the offsets we need to consider. */
          nOffs[jj] = (inds[1][jj] & 1) ? 2 : 1;
       }
@@ -1285,9 +1274,9 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
       /* 'Multiply' the offsets to build the set of nodes we need to
          interpolate from. */
       Grid_SetSizes( offsGrid, (unsigned*)(nOffs) );
-      for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+      for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
         Grid_Lift( offsGrid, jj, (unsigned*)(offsInds) );
-         for( kk = 0; kk < nDims; kk++ )
+         for(int kk = 0; kk < nDims; kk++ )
             inds[0][kk] = (inds[1][kk] >> 1) + offsInds[kk];
 
          /* Store the coarse global node number. */
@@ -1297,7 +1286,7 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
       /* Insert this row into the operator matrix. */
       dfrac = 1.0 / (double)offsGrid->nPoints;
       nEntries = offsGrid->nPoints;
-      for( jj = 0; jj < offsGrid->nPoints; jj++ ) {
+      for(uint jj = 0; jj < offsGrid->nPoints; jj++ ) {
          indices[jj] = nodes[jj] * nDofsPerNode + rowDof;
          values[jj] = dfrac;
       }

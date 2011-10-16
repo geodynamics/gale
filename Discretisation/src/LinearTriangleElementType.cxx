@@ -175,36 +175,29 @@ void _LinearTriangleElementType_Destroy( void* elementType, void *data ){
 
 */
 void _LinearTriangleElementType_SF_allNodes( void* elementType, const double localCoord[], double* const evaluatedValues) {
-	double xi, eta, zeta;
+  double xi, eta;
 	
-	xi   = localCoord[0];
-	eta  = localCoord[1];
-	zeta = localCoord[2];	
+  xi   = localCoord[0];
+  eta  = localCoord[1];
 	
-	evaluatedValues[0] = 1.0 - xi - eta;
-	evaluatedValues[1] = xi;
-	evaluatedValues[2] = eta;	
+  evaluatedValues[0] = 1.0 - xi - eta;
+  evaluatedValues[1] = xi;
+  evaluatedValues[2] = eta;	
 }
 
 
 void _LinearTriangleElementType_SF_allLocalDerivs_allNodes( void* elementType, const double localCoord[],
 		double** const evaluatedDerivatives )
 {		
-	double xi, eta, zeta;
+  /* derivatives wrt xi */
+  evaluatedDerivatives[0][0] = -1.0;
+  evaluatedDerivatives[0][1] =  1.0;
+  evaluatedDerivatives[0][2] =  0.0;
 	
-	xi   = localCoord[0];
-	eta  = localCoord[1];
-	zeta = localCoord[2];	
-		
-	/* derivatives wrt xi */
-	evaluatedDerivatives[0][0] = -1.0;
-	evaluatedDerivatives[0][1] =  1.0;
-	evaluatedDerivatives[0][2] =  0.0;
-	
-	/* derivatives wrt eta */	
-	evaluatedDerivatives[1][0] = - 1.0;
-	evaluatedDerivatives[1][1] =   0.0;
-	evaluatedDerivatives[1][2] =   1.0;
+  /* derivatives wrt eta */	
+  evaluatedDerivatives[1][0] = - 1.0;
+  evaluatedDerivatives[1][1] =   0.0;
+  evaluatedDerivatives[1][2] =   1.0;
 }
 
 int _LinearTriangularElementType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* norm ) {

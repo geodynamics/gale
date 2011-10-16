@@ -304,7 +304,6 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 	FILE*			expected_fp;
 	char*			expectedFilename;
 	int			num_time_steps;
-	int			dof_i, dim_i;
 	int			expected_i 	= 0;
 
 	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
@@ -360,18 +359,18 @@ void _FieldTest_Initialise( void* fieldTest, void* data ) {
 		while ( !feof( expected_fp ) ) {
 			fscanf( expected_fp, "%lf ", &self->expected[expected_i].time );
 			
-			for( dim_i = 0; dim_i < self->context->dim; dim_i++ )
+			for( uint dim_i = 0; dim_i < self->context->dim; dim_i++ )
 				fscanf( expected_fp, "%lf ", &self->expected[expected_i].place[dim_i] );
 
-			for( dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
+			for( uint dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
 				fscanf( expected_fp, "%lf ", &self->expected[expected_i].value[dof_i] );
 
 			fscanf( expected_fp, "%lf ", &self->tolerance[expected_i].time );
 			
-			for( dim_i = 0; dim_i < self->context->dim; dim_i++ )
+			for( uint dim_i = 0; dim_i < self->context->dim; dim_i++ )
 				fscanf( expected_fp, "%lf ", &self->tolerance[expected_i].place[dim_i] );
 
-			for( dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
+			for( uint dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
 				fscanf( expected_fp, "%lf ", &self->tolerance[expected_i].value[dof_i] );
 
 			expected_i++;
@@ -662,7 +661,6 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	int 			sizes[3];
 	double* 		data;
 	int 			dataPos = 0;
-	double			nodeDummy;
 
 	Stg_Component_Initialise( feMesh,     context, False );
 	Stg_Component_Initialise( feVariable, context, False );
@@ -714,7 +712,6 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 		H5Dread( dataSet, H5T_NATIVE_DOUBLE, memSpace, dataSpace, H5P_DEFAULT, data );
 
       dataPos  = 0;
-		nodeDummy = data[dataPos++];
 		posx[lineNum] = data[dataPos++];
 		posy[lineNum] = data[dataPos++];
 		if( nDims == 3 ) posz[lineNum] = data[dataPos++];
@@ -863,17 +860,15 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 }
 
 void _FieldTest_DumpToAnalysisFile( FieldTest* self, Stream* analysisStream ) {
-	int			field_I, numDofs, dim, dof_I;
+	int			numDofs, dof_I;
 	/* double		error; */
-	FeVariable*	errorField;
 
-	for( field_I = 0; field_I < self->fieldCount; field_I++ ) {
+	for(uint field_I = 0; field_I < self->fieldCount; field_I++ ) {
 		/* should be using MT_VOLUME for the reference field mesh, but seems to have a bug */
-		errorField = self->errorFieldList[field_I];
 		numDofs	   = self->numericFieldList[field_I]->fieldComponentCount;
-		dim = self->numericFieldList[field_I]->dim;
 
 #if 0
+		uint dim = self->numericFieldList[field_I]->dim;
 		/* Fancy error measurements of magnitudes and 2ndInvars, no needed
 		 * but I'm leaving it in incase */
 		if( dim == numDofs ) {
@@ -906,7 +901,6 @@ void FieldTest_EvaluatePhysicsTest( void* _context, void* data ) {
 	FieldTest_ExpectedResultFunc*	expectedFunc		= self->expectedFunc;
 	FILE*				dumpExpectedFilePtr;
 	char*				dumpExpectedFileName;
-	int				dim_i, dof_i;
 
 	if( expectedFunc( self->expectedData, context, self->expected, self->numeric, self->tolerance ) )
 		self->expectedPass = True;
@@ -918,9 +912,9 @@ void FieldTest_EvaluatePhysicsTest( void* _context, void* data ) {
 		dumpExpectedFilePtr = fopen( dumpExpectedFileName, "a" );
 
 		fprintf( dumpExpectedFilePtr, "%.8e ", self->numeric[context->timeStep].time );
-		for( dim_i = 0; dim_i < context->dim; dim_i++ )
+		for(uint dim_i = 0; dim_i < context->dim; dim_i++ )
 			fprintf( dumpExpectedFilePtr, "%.8e ", self->numeric[context->timeStep].place[dim_i] );
-		for( dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
+		for(uint dof_i = 0; dof_i < self->expectedDofs; dof_i++ )
 			fprintf( dumpExpectedFilePtr, "%.8e ", self->numeric[context->timeStep].value[dof_i] );
 
 		fprintf( dumpExpectedFilePtr, "\n" );

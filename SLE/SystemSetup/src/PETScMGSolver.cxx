@@ -156,10 +156,6 @@ void _PETScMGSolver_Delete( void* matrixSolver ) {
 void _PETScMGSolver_Print( void* matrixSolver, Stream* stream ) {
 	PETScMGSolver*	self = (PETScMGSolver*)matrixSolver;
 	
-	/* Set the Journal for printing informations */
-	Stream* matrixSolverStream;
-	matrixSolverStream = Journal_Register( InfoStream_Type, (Name)"PETScMGSolverStream"  );
-
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 
 	/* Print parent */

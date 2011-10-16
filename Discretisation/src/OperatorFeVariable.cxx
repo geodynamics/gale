@@ -478,22 +478,20 @@ void _OperatorFeVariable_GetValueAtNode( void* feVariable, Node_DomainIndex dNod
 
 void _OperatorFeVariable_SyncShadowValues( void* feVariable ) {
 	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
-	int v_i;
 
 	assert( self );
-	for( v_i = 0; v_i < self->feVariableCount; v_i++ )
-		FeVariable_SyncShadowValues( self->feVariableList[v_i] );
+	for(uint v_i = 0; v_i < self->feVariableCount; v_i++ )
+          FeVariable_SyncShadowValues( self->feVariableList[v_i] );
 	self->shadowValuesSynchronised = True;
 }
 
 
 /** Private Functions */
 Bool _OperatorFeVariable_CheckIfValidToInterpolateInShadowSpace( OperatorFeVariable* self ){
-	int                     feVar_I;
 	FeVariable*             currFeVar;
 	Bool                    parentIsValid;
 
-	for ( feVar_I=0; feVar_I < self->feVariableCount; feVar_I++ ) {
+	for (uint feVar_I=0; feVar_I < self->feVariableCount; feVar_I++ ) {
 		currFeVar = self->feVariableList[feVar_I];
 		if( Stg_Class_IsInstance( currFeVar, FeVariable_Type ) ) {
 			if ( False == currFeVar->shadowValuesSynchronised ) {

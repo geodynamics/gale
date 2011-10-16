@@ -47,9 +47,9 @@
 	/** MultigridSolver class contents */
 	typedef struct {
 		MGSolver_PETScData*	downSolver;
-		unsigned		nDownIts;
+		int		nDownIts;
 		MGSolver_PETScData*	upSolver;
-		unsigned		nUpIts;
+		int		nUpIts;
 		unsigned		nCycles;
 
 		Mat			A;

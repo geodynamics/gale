@@ -365,7 +365,6 @@ void ForceVector_PrintElementForceVector(
 
 /* from the depreciated Vector class */
 void _ForceVector_VectorView( Vec v, Stream* stream ) {
-	unsigned	entry_i;
 	PetscInt	size;
 	PetscScalar*	array;
 
@@ -373,7 +372,7 @@ void _ForceVector_VectorView( Vec v, Stream* stream ) {
 	VecGetArray( v, &array );
 
 	Journal_Printf( stream, "%p = [", v );
-	for( entry_i = 0; entry_i < size; entry_i++ ) 
+	for(int entry_i = 0; entry_i < size; entry_i++ ) 
 		Journal_Printf( stream, "\t%u: \t %.12g\n", entry_i, array[entry_i] );
 	Journal_Printf( stream, "];\n" );
 
@@ -458,11 +457,11 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
                         if( !self->feVariable->eqNum->removeBCs ) {
                            DofLayout* dofs;
                            int nDofs, curInd;
-                           int ii, jj;
+                           int jj;
 
                            dofs = self->feVariable->dofLayout; /* shortcut to the dof layout */
                            curInd = 0; /* need a counter to track where we are in the element force vector */
-                           for( ii = 0; ii < nodeCountCurrElement; ii++ ) {
+                           for(uint ii = 0; ii < nodeCountCurrElement; ii++ ) {
                               nDofs = dofs->dofCounts[inc[ii]]; /* number of dofs on this node */
                               for( jj = 0; jj < nDofs; jj++ ) {
                                  if( !FeVariable_IsBC( self->feVariable, inc[ii], jj ) ) {

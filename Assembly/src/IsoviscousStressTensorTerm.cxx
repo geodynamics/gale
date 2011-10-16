@@ -182,7 +182,6 @@ void _IsoviscousStressTensorTerm_AssembleElement(
 	
 	Cell_Index                          cell_I;
 	ElementType*                        elementType;
-	int                                 nodalDofs;
 	Dof_Index                           diagDof_I;
 	Dof_Index                           rowDof_I;
 	Dof_Index                           colDof_I;
@@ -196,7 +195,6 @@ void _IsoviscousStressTensorTerm_AssembleElement(
 	nodesPerEl = elementType->nodeCount;
 
 	/* assumes constant number of dofs per element */
-	nodalDofs = nodesPerEl * dim;
 	dofsPerNode = dim;
 	
 	if( nodesPerEl > self->max_nElNodes ) {

@@ -235,7 +235,6 @@ void _TrilinearInnerElType_ConvertGlobalCoordToElementLocal( void* elementType, 
 */
 void _TrilinearInnerElType_SF_allNodes( void* elementType, const double localCoord[], double* const evaluatedValues ) {
 	double xi, eta, zeta;
-	double fac;
 	
 	xi   = localCoord[0];
 	eta  = localCoord[1];
@@ -252,13 +251,6 @@ void _TrilinearInnerElType_SF_allNodes( void* elementType, const double localCoo
 void _TrilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const double localCoord[],
 		double** const evaluatedDerivatives )
 {		
-	double xi, eta, zeta;
-	double fac;
-	
-	xi   = localCoord[0];
-	eta  = localCoord[1];
-	zeta = localCoord[2];	
-	
 	evaluatedDerivatives[0][0] = -1;
 	evaluatedDerivatives[0][1] =  1;
 	evaluatedDerivatives[0][2] =  0;

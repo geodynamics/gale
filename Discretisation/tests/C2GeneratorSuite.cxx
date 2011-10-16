@@ -308,7 +308,6 @@ void C2GeneratorSuite_TestEdgeVertexInc( C2GeneratorSuiteData* data ) {
 	unsigned	nIncVerts;
 	unsigned	dim		= ((IGraph*)data->mesh->topo)->nDims;
 	unsigned	sizes[3];
-	unsigned	edge_i;
 	unsigned	gEdge;
 	unsigned	dimInds[3];
 	unsigned	gNode0, gNode1, gNode2;
@@ -330,7 +329,7 @@ void C2GeneratorSuite_TestEdgeVertexInc( C2GeneratorSuiteData* data ) {
 	Grid_SetNumDims( edgeGrid_2, dim );
 	Grid_SetSizes( edgeGrid_2, sizes );
 
-	for( edge_i = 0; edge_i < Sync_GetNumDomains( edgeSync ); edge_i++ ) {
+	for(int edge_i = 0; edge_i < Sync_GetNumDomains( edgeSync ); edge_i++ ) {
 		gEdge = Sync_DomainToGlobal( edgeSync, edge_i );
 
 		MeshTopology_GetIncidence( (IGraph*)data->mesh->topo, MT_EDGE, edge_i, MT_VERTEX, inc );
@@ -433,7 +432,6 @@ void C2GeneratorSuite_TestFaceVertexInc( C2GeneratorSuiteData* data ) {
 	unsigned	nIncVerts;
 	unsigned	dim		= ((IGraph*)data->mesh->topo)->nDims;
 	unsigned	sizes[3];
-	unsigned	face_i;
 	unsigned	gFace;
 	unsigned	dimInds[3];
 	unsigned	gNode0, gNode1, gNode2;
@@ -455,7 +453,7 @@ void C2GeneratorSuite_TestFaceVertexInc( C2GeneratorSuiteData* data ) {
 	Grid_SetNumDims( faceGrid_2, dim );
 	Grid_SetSizes( faceGrid_2, sizes );
 
-	for( face_i = 0; face_i < ((IGraph*)data->mesh->topo)->remotes[MT_FACE]->nDomains; face_i++ ) {
+	for(int face_i = 0; face_i < ((IGraph*)data->mesh->topo)->remotes[MT_FACE]->nDomains; face_i++ ) {
 		gFace = Sync_DomainToGlobal( faceSync, face_i );
 
 		MeshTopology_GetIncidence( (IGraph*)data->mesh->topo, MT_FACE, face_i, MT_VERTEX, inc );
