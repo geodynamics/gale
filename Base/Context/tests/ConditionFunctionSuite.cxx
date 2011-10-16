@@ -47,7 +47,7 @@ typedef struct {
 
 #define TEST_CF_RESULT 10
 
-void func(Index index, Variable_Index var_I, void* context, void* result)
+void func(const double *coord, void* context, void* result)
 {
    *((double*)result) = TEST_CF_RESULT;
 }

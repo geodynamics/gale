@@ -75,7 +75,7 @@ typedef struct {
 } SetVC_SuiteData;
 
 
-void quadratic(Index index, Variable_Index var_I, void* context, void* result)
+void quadratic(const double *coord, void* context, void* result)
 {
 	*(double *)result = 20.0;
 }

@@ -145,17 +145,16 @@ if env['static_libs']:
 #
 
 libs = ['StGermain'] + env.get('LIBS', [])
-env.Program('bin/FlattenXML', 'Base/FlattenXML/src/main.cxx', LIBS=libs)
 if env['shared_libs']:
     env.Program('bin/StGermain', 'src/main.cxx', LIBS=libs)
-env.PCUTest('tests/testStGermain', suites,
-    PCU_LIBHEADERS="#include <StGermain/StGermain.h>",
-    PCU_SETUP="StGermain_Init(&argc, &argv);",
-    PCU_TEARDOWN="StGermain_Finalise();",
-    LIBS=libs,
-    PCU_EXP=tst_exp,
-    PCU_INPUT=tst_input,
-    PROJECT="StGermain")
+# env.PCUTest('tests/testStGermain', suites,
+#     PCU_LIBHEADERS="#include <StGermain/StGermain.h>",
+#     PCU_SETUP="StGermain_Init(&argc, &argv);",
+#     PCU_TEARDOWN="StGermain_Finalise();",
+#     LIBS=libs,
+#     PCU_EXP=tst_exp,
+#     PCU_INPUT=tst_input,
+#     PROJECT="StGermain")
 
 #
 # Copy XML validation file to correct destination.

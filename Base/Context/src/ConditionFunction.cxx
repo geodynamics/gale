@@ -32,9 +32,11 @@
 #include "Base/Foundation/Foundation.h"
 #include "Base/IO/IO.h"
 #include "Base/Container/Container.h"
-
 #include "types.h"
 #include "ConditionFunction.h"
+
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
 
 #include <stdio.h>
 #include <assert.h>
@@ -167,6 +169,17 @@ void _ConditionFunction_Apply(void* conditionFunction, Index index, Variable_Ind
 	ConditionFunction*	self = (ConditionFunction*)conditionFunction;
 	
 	ConditionFunction_Apply(self, index, var_I, context, result);
+}
+
+void ConditionFunction_Apply(void* conditionFunction,
+                             Index index, Variable_Index var_I,
+                             void* context, void* result)
+{
+  MeshVariable* meshVar = (MeshVariable*)Variable_Register_GetByIndex( ((AbstractContext*)context)->variable_Register, var_I );
+  Mesh* mesh = (Mesh*)meshVar->mesh;
+  assert( mesh != NULL );
+  double* coord = Mesh_GetVertex( mesh, index );
+  ConditionFunction_Apply(conditionFunction,coord,context,result);
 }
 
 

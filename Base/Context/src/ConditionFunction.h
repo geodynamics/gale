@@ -42,7 +42,7 @@
 #define __StGermain_Base_Context_ConditionFunction_h__
 
 
-	typedef void	(ConditionFunction_ApplyFunc)	(Index index, Variable_Index var_I, void* context, void* result);
+	typedef void	(ConditionFunction_ApplyFunc)	(const double *coord, void* context, void* result);
 	
 
 	extern const Type ConditionFunction_Type;
@@ -98,15 +98,18 @@
 	
 	void	_ConditionFunction_Print(void* conditionFunction, Stream* stream);
 	
+
+        inline void ConditionFunction_Apply(void* conditionFunction,
+                                            const double *coord,
+                                            void* context, void* result)
+        {
+          ((ConditionFunction*)conditionFunction)->apply(coord,context,result);
+        }
 	
-	/*--------------------------------------------------------------------------------------------------------------------------
-	** Macros
-	*/
-	
-	#define ConditionFunction_Apply(self, index, var_I, context, result) \
-		(self)->apply((index), (var_I), (context), (result))
-	
-	
+        void ConditionFunction_Apply(void* conditionFunction,
+                                     Index index, Variable_Index var_I,
+                                     void* context, void* result);
+
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
 	*/
