@@ -45,7 +45,7 @@
 
 const Type AnalyticPressure_Type = "PICellerator_AnalyticPressure";
 
-void _PICellerator_AnalyticPressure_PressureFunction( void* _self, double* coord, double* pressure ) {
+void _PICellerator_AnalyticPressure_PressureFunction( void* _self, const double* coord, double* pressure ) {
   AnalyticPressure*  self    = (AnalyticPressure*)_self;
   double             density = self->density;
   double             gravity = self->gravity;
