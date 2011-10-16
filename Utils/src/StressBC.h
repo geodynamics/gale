@@ -99,7 +99,7 @@
 	void _StressBC_Destroy( void* forceTerm, void* data ) ;
 
 	void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
-        void _StressBC_GetValues(Stg_ComponentFactory* cf, void *stressBC, char *direction, void *data);
+        void _StressBC_GetValues(Stg_ComponentFactory* cf, void *stressBC, const char direction, void *data);
         unsigned StressBC_get_overcount(Dimension_Index dim, IJK ijk,
                                         unsigned sizes[]);
 
