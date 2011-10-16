@@ -116,4 +116,9 @@ void _NearestNeighborMapper_Init( void* mapper, IntegrationPointsSwarm* swarm );
          ExtensionInfo_Index extHandle,
          int offs);
 
+        int NearestNeighbor_FindNeighbor(void* mapper,
+                                         const Element_LocalIndex &lElement_I,
+                                         const int &cell_I,
+                                         double *xi, const int &dim);
+
 #endif

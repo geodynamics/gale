@@ -52,6 +52,7 @@
 #include <assert.h>
 #include <string.h>
 #include <math.h>
+#include <limits>
 
 #include "MaterialPoints.h"
 
@@ -207,4 +208,39 @@ double _NearestNeighborMapper_GetDoubleFromMaterial
  int offs) {
   abort();
   return 0;
+}
+
+/* This does a search over all of the particles in the swarm in the
+   element to find the one that is closest to the gauss point.  There
+   may be more efficient ways of doing this, but this works for
+   now. */
+int NearestNeighbor_FindNeighbor(void* mapper, const Element_LocalIndex &lElement_I,
+                                 const int &cell_I, double *xi, const int &dim)
+{
+  NearestNeighborMapper* self = (NearestNeighborMapper*)mapper;
+  IntegrationPointsSwarm* swarm=self->swarm;
+    
+  int cellParticleCount(swarm->cellParticleCountTbl[cell_I]);
+
+  Journal_Firewall(cellParticleCount!=0,
+                   Journal_Register(Error_Type,(Name)NearestNeighborMapper_Type),
+                   "In func %s: cellParticleCount is 0.\n",__func__);
+
+  double min_dist(std::numeric_limits<double>::max());
+  int nearest_particle(-1);
+
+  for(int cParticle_I=0; cParticle_I<cellParticleCount; cParticle_I++)
+    {
+      IntegrationPoint* particle=
+        (IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,cParticle_I);
+                                                  
+      double dist=
+        StGermain_DistanceBetweenPoints(xi,particle->xi,dim);
+      if(dist<min_dist)
+        {
+          nearest_particle=cParticle_I;
+          min_dist=dist;
+        }
+    }
+  return nearest_particle;
 }
