@@ -53,6 +53,7 @@
 #include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
+#include <limits>
 
 #if defined(READ_HDF5) || defined(WRITE_HDF5)
 #include <hdf5.h>
@@ -500,7 +501,7 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	/* Note: these try for deprecated key "maxLoops" as well as new one "maxTimeSteps" - Main.PatrickSunter - 4 November 2004 */
 	dictEntryVal = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"maxLoops" );
 	if ( NULL == dictEntryVal  ) {
-		dictEntryVal = Dictionary_GetDefault( self->dictionary, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( 0 ) );
+          dictEntryVal = Dictionary_GetDefault( self->dictionary, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( std::numeric_limits<uint>::max()));
 	}
 	self->maxTimeSteps = Dictionary_Entry_Value_AsUnsignedInt( dictEntryVal );
 
@@ -537,6 +538,11 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 
 	self->CF = cf;
 
+	/* Construct the list of plugins. we do this in the construct phase
+	 * because some components require plugins. */
+	if( self->plugins->codelets->count )
+		ModulesManager_ConstructModules( self->plugins, self->CF, data );
+
 	/* Extensions are the last thing we want to do */
 	KeyCall( self, self->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->constructExtensionsK), self );
 	
@@ -559,14 +565,11 @@ void _AbstractContext_Build( void* context, void* data ) {
 		Context_WarnIfNoHooks( self, self->buildK, __func__  );
 	#endif
 	
-	/* Pre-mark the phase as complete as a default hook will attempt to build all live components (including this again) */
+	/* Pre-mark the phase as complete as a default hook will
+           attempt to build all live components (including this
+           again) */
 	isBuilt = self->isBuilt;
 	self->isBuilt = True;
-
-	/* Construct the list of plugins. do this in the build phase se that we know that any components required by the plugins 
-	 * have already been constructed */
-	if( self->plugins->codelets->count )
-		ModulesManager_ConstructModules( self->plugins, self->CF, data );
 
 	KeyCall( self, self->buildK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(self,self->buildK), self );
 	self->isBuilt = isBuilt;
@@ -768,11 +771,11 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 	double             dt = 0;
 	double             dtLoadedFromFile = 0;
 	
-	if (self->maxTimeSteps>=0) {
+	if (self->maxTimeSteps!=std::numeric_limits<uint>::max()) {
 		Journal_RPrintf( self->info, "Run until %u timeSteps have been run\n", self->maxTimeSteps );
 	}
 	if (self->finalTimeStep ) {
-		if (self->maxTimeSteps>=0) {
+		if (self->maxTimeSteps!=std::numeric_limits<uint>::max()) {
 			Journal_RPrintf( self->info, "or " );
 		}	
 		else {
@@ -782,7 +785,8 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 	}
 	
 	if (self->stopTime) {
-		if (self->maxTimeSteps>=0 || self->finalTimeStep ) {
+		if (self->maxTimeSteps!=std::numeric_limits<uint>::max()
+                    || self->finalTimeStep ) {
 			Journal_RPrintf( self->info, "or " );
 		}	
 		else {
@@ -846,9 +850,13 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 			}
 		}	
 
-		if (self->maxTimeSteps>=0 && (self->timeStepSinceJobRestart >= self->maxTimeSteps)) break;
-		if (self->finalTimeStep && (self->timeStep >= self->finalTimeStep)) break;
-		if (self->stopTime && (self->currentTime >= self->stopTime)) break; 
+		if (self->maxTimeSteps!=std::numeric_limits<uint>::max()
+                    && (self->timeStepSinceJobRestart >= self->maxTimeSteps))
+                  break;
+		if (self->finalTimeStep
+                    && (self->timeStep >= self->finalTimeStep)) break;
+		if (self->stopTime
+                    && (self->currentTime >= self->stopTime)) break; 
 
 		stg_log_printf( "========================= Done step %d =========================\n\n", self->timeStep );
 		

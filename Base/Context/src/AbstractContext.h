@@ -107,7 +107,7 @@
 			maxTimeSteps (which is now relative to job restart).*/ \
 		unsigned int				timeStepSinceJobRestart; \
 		/** Maximum number of time steps to run for. If set to 0, then this will  be ignored. */ \
-		int				        maxTimeSteps; \
+		uint				        maxTimeSteps; \
 		/** Final Time Step: last time step to run till, no matter if maxTimeSteps still has some
 		     left in a checkpoint restart run. If 0 (the default), not active. */ \
 		unsigned int				finalTimeStep; \
