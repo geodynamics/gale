@@ -163,7 +163,6 @@ MaterialPointRef* getIntParticleMaterialRef_PointingToMaterialParticle( Integrat
 void splitIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
 void deleteIntParticleByIndexWithinCell( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm,  Cell_LocalIndex lCell_I, Particle_Index intParticleToSplit_IndexWithinCell );
 void deleteIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexWithinCell );
-void splitIntParticleByIndexOnCPU( IntegrationPointsSwarm* intSwarm,  MaterialPointsSwarm* matSwarm, Particle_Index intParticleToSplit_IndexOnCPU, Coord xi );
 void _PCDVC_Calculate3D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );
 void _PCDVC_Calculate2D( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I );  
 void _PCDVC_Calculate( void* pcdvc, void* _swarm, Cell_LocalIndex lCell_I ) ;
