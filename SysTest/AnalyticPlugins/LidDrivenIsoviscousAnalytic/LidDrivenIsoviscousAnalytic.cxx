@@ -78,7 +78,7 @@ void LidDrivenIsoviscousAnalytic_CalculateConstants( LidDrivenIsoviscousAnalytic
 	self->D = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
 }
 
-void LidDrivenIsoviscousAnalytic_VelocityFunction( void* analyticSolution, double* coord, double* velocity ) {
+void LidDrivenIsoviscousAnalytic_VelocityFunction( void* analyticSolution, const double* coord, double* velocity ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
 	double x,y;
 	double n;
@@ -104,16 +104,14 @@ void LidDrivenIsoviscousAnalytic_VelocityFunction( void* analyticSolution, doubl
 }
 
 
-void LidDrivenIsoviscousAnalytic_PressureFunction( void* analyticSolution, double* coord, double* pressure ) {
+void LidDrivenIsoviscousAnalytic_PressureFunction( void* analyticSolution, const double* coord, double* pressure ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)analyticSolution;
 	double x,y;
 	double n;
-	double A, B, C, D;
+	double C, D;
 
 	/* Get local copy of constants */
 	n = (double) self->wavenumber;
-	A = self->A;
-	B = self->B;
 	C = self->C;
 	D = self->D;
 

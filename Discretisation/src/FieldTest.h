@@ -56,7 +56,7 @@
 		double  value[9];
 	} Event;
 
-	typedef void (FieldTest_AnalyticSolutionFunc) ( void* fieldTest, double* coord, double* value );
+	typedef void (FieldTest_AnalyticSolutionFunc) ( void* fieldTest, const double* coord, double* value );
 	typedef Bool (FieldTest_ExpectedResultFunc) ( void** data, void* context, Event* expected, Event* numeric, Event* tolerance );
 
 	/** Textual name of this class */
@@ -83,7 +83,7 @@
 		/* constant to add to analytic element integral */ 		\
 		/* normalising by this so you dont get divide by zero issues */ \
 		double					epsilon; \
-		int             testTimestep; /** the timestep to run the test */  \
+		uint                                    testTimestep; /** the timestep to run the test */  \
 		double**				gAnalyticSq; \
 		double**				gErrorSq;		\
 		double**				gError;			\

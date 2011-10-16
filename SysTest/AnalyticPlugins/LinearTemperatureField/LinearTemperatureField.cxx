@@ -51,7 +51,7 @@ const Type LinearTemperatureField_Type = "LinearTemperatureField";
 
 typedef struct { __FieldTest FeVariable* temperatureField; } LinearTemperatureField;
 
-void LinearTemperatureField_TemperatureFunction( void* analyticSolution, double* coord, double* value ) {
+void LinearTemperatureField_TemperatureFunction( void* analyticSolution, const double* coord, double* value ) {
 	*value = 1.0 - coord[ J_AXIS ];
 }
 

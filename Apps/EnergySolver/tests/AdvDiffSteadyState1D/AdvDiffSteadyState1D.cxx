@@ -71,16 +71,9 @@ void AdvDiffSteadyState1D_TemperatureFunction( void* analyticSolution, FeVariabl
 	*temperature = self->A * exp( exponent ) + self->B;
 }
 
-void AdvDiffSteadyState1D_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* temperature ){
+void AdvDiffSteadyState1D_TemperatureBC(const double *coord, void* _context, void* temperature ){
 	DomainContext*	context    = (DomainContext*)_context;
 	AdvDiffSteadyState1D*   self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)AdvDiffSteadyState1D_Type, AdvDiffSteadyState1D, True, 0 /* dummy */ );
-	FeVariable*             feVariable = NULL;
-	FeMesh*     mesh       = NULL;
-	double*                 coord;
-	
-	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	mesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( mesh, node_lI );
 
 	AdvDiffSteadyState1D_TemperatureFunction( self, NULL, coord, temperature );
 }

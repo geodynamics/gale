@@ -52,7 +52,7 @@ typedef struct {
 } HomogeneousEssentialBCs;
 
 
-void HomogeneousEssentialBCs_Velocity_SkewToMesh( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void HomogeneousEssentialBCs_Velocity_SkewToMesh(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	HomogeneousEssentialBCs*  self    = Stg_ComponentFactory_ConstructByName( context->CF, (Name)HomogeneousEssentialBCs_Type, HomogeneousEssentialBCs, True, 0 );
 	double*                 result  = (double*) _result;
@@ -76,17 +76,13 @@ void HomogeneousEssentialBCs_TemperatureFunction( void* analyticSolution, FeVari
 	}
 }
 	
-void HomogeneousEssentialBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void HomogeneousEssentialBCs_TemperatureBC(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context    = (DomainContext*)_context;
 	HomogeneousEssentialBCs*  self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)HomogeneousEssentialBCs_Type, HomogeneousEssentialBCs, True, 0 );
 	FeVariable*             feVariable = NULL;
-	FeMesh*			mesh       = NULL;
 	double*                 result     = (double*) _result;
-	double*                 coord;
 	
 	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	mesh       = feVariable->feMesh;
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	HomogeneousEssentialBCs_TemperatureFunction( self, feVariable, coord, result );
 }

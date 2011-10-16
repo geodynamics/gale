@@ -76,7 +76,7 @@ void LidDrivenIsoviscousAnalytic_CalculateConstants( LidDrivenIsoviscousAnalytic
 	self->D = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
 }
 
-void LidDrivenIsoviscousAnalytic_VelocityFunction( void* codelet, double* coord, double* velocity ) {
+void LidDrivenIsoviscousAnalytic_VelocityFunction( void* codelet, const double* coord, double* velocity ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)codelet;
 	double x,y;
 	double n;
@@ -101,7 +101,7 @@ void LidDrivenIsoviscousAnalytic_VelocityFunction( void* codelet, double* coord,
 		+ ( B + D * y ) * exp( - n * M_PI * y ) );
 }
 
-void LidDrivenIsoviscousAnalytic_PressureFunction( void* codelet, double* coord, double* pressure ) {
+void LidDrivenIsoviscousAnalytic_PressureFunction( void* codelet, const double* coord, double* pressure ) {
 	LidDrivenIsoviscousAnalytic *self = (LidDrivenIsoviscousAnalytic*)codelet;
 	double x,y;
 	double n;

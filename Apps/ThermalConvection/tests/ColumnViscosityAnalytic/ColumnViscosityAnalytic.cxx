@@ -68,7 +68,7 @@ typedef struct {
  *  Shijie Zhong. Analytic solutions for Stokes' flow with lateral variations in viscosity. Geophys. J. Int., 124:18-28, 1996.
  *  All equations refer to this paper */
 
-void ColumnViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void ColumnViscosityAnalytic_TemperatureIC(const double *coord, void* _context, void* _result ) {
 	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*     mesh               = temperatureField->feMesh;
@@ -84,9 +84,6 @@ void ColumnViscosityAnalytic_TemperatureIC( Node_LocalIndex node_lI, Variable_In
 	double                  L;
 	double			min[3], max[3];
 	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
-
 	/* Make sure that the box has right dimensions */
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	assert( ( max[ J_AXIS ] - min[ J_AXIS ] - 1.0 ) < SMALL );

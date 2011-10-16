@@ -104,8 +104,6 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
   condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SinusoidalLid, "Velocity_SinusoidalLid"  );
   ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
-  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_CornerOnly, "Velocity_Lid_CornerOnly"  );
-  ConditionFunction_Register_Add( condFunc_Register, condFunc );
   condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_TemperatureCosineHill, "Temperature_CosineHill"  );
   ConditionFunction_Register_Add( condFunc_Register, condFunc );
 	
@@ -167,21 +165,6 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
   ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
   condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpecRidge3D, "SpecRidge3D" );
-  ConditionFunction_Register_Add( condFunc_Register, condFunc );
-
-  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCX, "SpectralBCX" );
-  ConditionFunction_Register_Add( condFunc_Register, condFunc );
-
-  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCY, "SpectralBCY" );
-  ConditionFunction_Register_Add( condFunc_Register, condFunc );
-
-  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralBCZ, "SpectralBCZ" );
-  ConditionFunction_Register_Add( condFunc_Register, condFunc );
-
-  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCX, "SpectralPressureBCX" );
-  ConditionFunction_Register_Add( condFunc_Register, condFunc );
-
-  condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_SpectralPressureBCY, "SpectralPressureBCY" );
   ConditionFunction_Register_Add( condFunc_Register, condFunc );
 
   condFunc = ConditionFunction_New( StgFEM_StandardConditionFunctions_ErrorFunc, "ErrorFunc" );
@@ -674,28 +657,19 @@ erfc(double x)
 #endif
 
 
-void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_SolidBodyRotation(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	Coord                   centre;
 	Coord                   vector;
 	double                  omega;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-
 	/* Find Centre of Solid Body Rotation */
 	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreX", 0.0  );
 	centre[ J_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreY", 0.0  );
 	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
 	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
-
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	/* Find vector from centre to node */
 	StGermain_VectorSubtraction( vector, coord, centre, 2 );
@@ -705,20 +679,14 @@ void StgFEM_StandardConditionFunctions_SolidBodyRotation( Node_LocalIndex node_l
 }
 
 
-void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_PartialRotationX(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	Coord                   centre;
 	Coord                   vector;
 	double                  omega;
 	double			size;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
 	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreX", 0.0  );
@@ -726,9 +694,6 @@ void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI
 	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
 	size             = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"RadiusCylinder", 0.0  );
 	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
-
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	/* Find vector from centre to node */
 	StGermain_VectorSubtraction( vector, coord, centre, 2 );
@@ -742,20 +707,14 @@ void StgFEM_StandardConditionFunctions_PartialRotationX( Node_LocalIndex node_lI
 		*result = 0.0;
 }
 
-void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_PartialRotationY(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	Coord                   centre;
 	Coord                   vector;
 	double                  omega;
 	double			size;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
 	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreX", 0.0  );
@@ -763,9 +722,6 @@ void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI
 	centre[ K_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationCentreZ", 0.0  );
 	size             = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"RadiusCylinder", 0.0  );
 	omega            = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SolidBodyRotationOmega", 1.0  );
-
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	/* Find vector from centre to node */
 	StGermain_VectorSubtraction( vector, coord, centre, 2 );
@@ -777,20 +733,14 @@ void StgFEM_StandardConditionFunctions_PartialRotationY( Node_LocalIndex node_lI
 }
 
 
-void StgFEM_StandardConditionFunctions_TaperedRotationX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_TaperedRotationX(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	Coord                   centre;
 	Coord                   vector;
 	double                  omega;
 	double			size, r, taper;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
 	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
@@ -800,9 +750,6 @@ void StgFEM_StandardConditionFunctions_TaperedRotationX( Node_LocalIndex node_lI
 	omega            = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationOmega",   1.0 );
 
 	taper            = Dictionary_GetDouble_WithDefault( dictionary, "TaperedRadius",   0.0 );
-
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	/* Find vector from centre to node */
 	StGermain_VectorSubtraction( vector, coord, centre, 2 );
@@ -817,20 +764,14 @@ void StgFEM_StandardConditionFunctions_TaperedRotationX( Node_LocalIndex node_lI
           *result = 0;
 }
 
-void StgFEM_StandardConditionFunctions_TaperedRotationY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_TaperedRotationY(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	Coord                   centre;
 	Coord                   vector;
 	double                  omega;
 	double			size, r, taper;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
 
 	/* Find Centre of Solid Body Rotation */
 	centre[ I_AXIS ] = Dictionary_GetDouble_WithDefault( dictionary, "SolidBodyRotationCentreX", 0.0 );
@@ -841,12 +782,8 @@ void StgFEM_StandardConditionFunctions_TaperedRotationY( Node_LocalIndex node_lI
 
 	taper            = Dictionary_GetDouble_WithDefault( dictionary, "TaperedRadius",   0.0 );
 
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
-
 	/* Find vector from centre to node */
 	StGermain_VectorSubtraction( vector, coord, centre, 2 );
-
 
         r=sqrt(vector[ I_AXIS ]*vector[ I_AXIS ]
                +vector[ J_AXIS ]*vector[ J_AXIS ]);
@@ -861,119 +798,77 @@ void StgFEM_StandardConditionFunctions_TaperedRotationY( Node_LocalIndex node_lI
 
 
 
-void StgFEM_StandardConditionFunctions_SimpleShear( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_SimpleShear(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  centre;
 	double                  factor;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-
 	/* Find Centre of Solid Body Rotation */
 	centre = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearCentreY", 0.0  );
 	factor = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearFactor", 1.0  );
 
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
-
 	*result = factor * (coord[ J_AXIS ] - centre);
 }
 
-void StgFEM_StandardConditionFunctions_ShearZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_ShearZ(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  centre;
 	double                  factor;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-
 	/* Find Centre of Solid Body Rotation */
 	centre = Dictionary_GetDouble_WithDefault( dictionary, "ShearZCentre", 0.0 );
 	factor = Dictionary_GetDouble_WithDefault( dictionary, "ShearZFactor", 1.0 );
 
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
-
 	*result = factor * (coord[ K_AXIS ] - centre);
 }
 
-void StgFEM_StandardConditionFunctions_SimpleShearInverted( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_SimpleShearInverted(const double *coord, void* _context, void* _result ) {
         DomainContext*  context            = (DomainContext*)_context;
         Dictionary*             dictionary         = context->dictionary;
-        FeVariable*             feVariable         = NULL;
-        FeMesh*                 mesh               = NULL;
         double*                 result             = (double*) _result;
-        double*                 coord;
-        double                  centre;
         double                  factor;
-        double                  yAxisInvert;
-
-        feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-        mesh       = feVariable->feMesh;
 
         /* Find Centre of Solid Body Rotation */
-        centre = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearCentreY", 0.0  );
         factor = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SimpleShearFactor", 1.0  );
-
-        /* Find coordinate of node */
-        coord = Mesh_GetVertex( mesh, node_lI );
-
-        yAxisInvert = coord[ J_AXIS ] * -1.0 - 1.0;
 
         *result = factor * ( 1.0 - coord[ J_AXIS ] ) ;
 }
 
 
-void StgFEM_StandardConditionFunctions_Extension( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_Extension(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			mesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  centre;
 	double                  factor;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-
 	/* Find Centre of Solid Body Rotation */
 	centre = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ExtensionCentreX", 0.0  );
 	factor = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ExtensionFactor", 1.0  );
-
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	*result = factor * (coord[ I_AXIS ] - centre);
 }
 
 
-void StgFEM_StandardConditionFunctions_PartialLid_TopLayer( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+void StgFEM_StandardConditionFunctions_PartialLid_TopLayer(const double *coord, void* _context, void* result ) {
 	DomainContext*	context = (DomainContext*)_context;
-	FeVariable*             velVar = NULL;
-	FeMesh*			mesh = NULL;
 	double*			velResult = (double*)result;
 	double                  margin = 0;
 	double			min[3], max[3];
+	FeVariable*             velVar = NULL;
+	FeMesh*			mesh = NULL;
 	
 	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
 	mesh = velVar->feMesh;
-
 	Mesh_GetMinimumSeparation( mesh, &margin, NULL );
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	margin *= 1.1;
-	if( (Mesh_GetVertex( mesh, node_lI )[I_AXIS] < (max[I_AXIS] - margin )) && 
-	    (Mesh_GetVertex( mesh, node_lI )[I_AXIS] > (min[I_AXIS] + margin )))
+	if((coord[I_AXIS] < (max[I_AXIS] - margin )) && 
+           (coord[I_AXIS] > (min[I_AXIS] + margin )))
 	{
 		(*velResult) = 1;
 	}
@@ -982,7 +877,7 @@ void StgFEM_StandardConditionFunctions_PartialLid_TopLayer( Node_LocalIndex node
 	}
 }
 
-void StgFEM_StandardConditionFunctions_LinearInterpolationLid( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+void StgFEM_StandardConditionFunctions_LinearInterpolationLid(const double *coord, void* _context, void* result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
@@ -1001,11 +896,11 @@ void StgFEM_StandardConditionFunctions_LinearInterpolationLid( Node_LocalIndex n
 	leftHandSideValue = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"bcLeftHandSideValue", 0.0  );
 	rightHandSideValue = Dictionary_GetDouble_WithDefault( context->dictionary, (Dictionary_Entry_Key)"bcRightHandSideValue", 1.0 );
 	gradient = (rightHandSideValue - leftHandSideValue) / boxLength;
-	(*velResult ) = leftHandSideValue + gradient * (Mesh_GetVertex( mesh, node_lI )[I_AXIS] - min[I_AXIS] );
+	(*velResult ) = leftHandSideValue + gradient * (coord[I_AXIS] - min[I_AXIS] );
 }
 
 
-void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax(const double *coord, void* _context, void* result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
@@ -1018,7 +913,7 @@ void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax( Node_LocalIndex n
 	mesh = velVar->feMesh;
 
 	Mesh_GetGlobalCoordRange( mesh, min, max );
-	xPosRelativeToTopLeft = Mesh_GetVertex( mesh, node_lI )[I_AXIS] - min[I_AXIS];
+	xPosRelativeToTopLeft = coord[I_AXIS] - min[I_AXIS];
 	boxLength = max[I_AXIS] - min[I_AXIS];
 	if ( xPosRelativeToTopLeft < boxLength / 2 ) {
 		(*velResult) =  2 * xPosRelativeToTopLeft / boxLength;
@@ -1027,7 +922,7 @@ void StgFEM_StandardConditionFunctions_Lid_RampWithCentralMax( Node_LocalIndex n
 		(*velResult) = 1 - 2 * ( xPosRelativeToTopLeft - (boxLength/2) );
 	}
 }
-void StgFEM_StandardConditionFunctions_LinearVelocityLeftWall( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+void StgFEM_StandardConditionFunctions_LinearVelocityLeftWall(const double *coord, void* _context, void* result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
@@ -1042,11 +937,9 @@ void StgFEM_StandardConditionFunctions_LinearVelocityLeftWall( Node_LocalIndex n
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	gradient = maxvel/(min[1] - max[1]);
 	
-	(*velResult)   = gradient*Mesh_GetVertex( mesh, node_lI )[J_AXIS];
-	 //printf("Left velResult is %g\n",(*velResult));
-	 
+	(*velResult)   = gradient*coord[J_AXIS];
 }
-void StgFEM_StandardConditionFunctions_LinearVelocityRightWall( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+void StgFEM_StandardConditionFunctions_LinearVelocityRightWall(const double *coord, void* _context, void* result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
@@ -1061,12 +954,11 @@ void StgFEM_StandardConditionFunctions_LinearVelocityRightWall( Node_LocalIndex 
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	gradient = maxvel/(max[1] - min[1]);
 	 
-	(*velResult)   = maxvel - gradient*Mesh_GetVertex( mesh, node_lI )[J_AXIS];
-	//printf("Right velResult is %g\n",(*velResult));
+	(*velResult)   = maxvel - gradient*coord[J_AXIS];
 }
 
 
-void StgFEM_StandardConditionFunctions_SinusoidalLid( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
+void StgFEM_StandardConditionFunctions_SinusoidalLid(const double *coord, void* _context, void* result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	FeVariable*             velVar = NULL;
 	FeMesh*			mesh = NULL;
@@ -1083,37 +975,11 @@ void StgFEM_StandardConditionFunctions_SinusoidalLid( Node_LocalIndex node_lI, V
 
 	Mesh_GetGlobalCoordRange( mesh, min, max );
 	boxLength = max[I_AXIS] - min[I_AXIS];
-	linearInterp = (Mesh_GetVertex( mesh, node_lI )[I_AXIS] - min[I_AXIS] ) / boxLength;
+	linearInterp = (coord[I_AXIS] - min[I_AXIS] ) / boxLength;
 	(*velResult) = sin( linearInterp * M_PI * wavenumber );
 }
 
-
-void StgFEM_StandardConditionFunctions_CornerOnly( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* result ) {
-	DomainContext*	context = (DomainContext*)_context;
-	FeVariable*             velVar = NULL;
-	FeMesh*			feMesh = NULL;
-	double*			velResult = (double*)result;
-	Node_GlobalIndex	node_gI = 0;
-	unsigned		inds[3];
-	Grid*			elGrid;
-
-	velVar = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	feMesh = velVar->feMesh;
-	elGrid = *(Grid**)ExtensionManager_Get( feMesh->info, feMesh, 
-						ExtensionManager_GetHandle( feMesh->info, (Name)"elGrid" )  );
-
-	node_gI = Mesh_DomainToGlobal( feMesh, MT_VERTEX, node_lI );
-	RegularMeshUtils_Node_1DTo3D( feMesh, node_gI, inds );
-	
-	if ( inds[0] == elGrid->sizes[I_AXIS] ) {
-		(*velResult) = 1;
-	}
-	else {
-		(*velResult) = 0;
-	}
-}
-
-double StGermain_CosineHillValue( double* centre, double* position, double height, double diameterAtBase, Dimension_Index dim ) {
+double StGermain_CosineHillValue( const double* centre, const double* position, const double height, const double diameterAtBase, Dimension_Index dim ) {
 	double distanceFromCentre = StGermain_DistanceBetweenPoints( centre, position, dim );
 	
 	if (distanceFromCentre < diameterAtBase * 0.5 ) 
@@ -1122,11 +988,9 @@ double StGermain_CosineHillValue( double* centre, double* position, double heigh
 		return 0.0;
 }
 
-void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_TemperatureCosineHill(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			feMesh               = NULL;
 	double*                 result             = (double*) _result;
 	Coord                   centre;
 	Coord                   rotationCentre;
@@ -1134,9 +998,6 @@ void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex no
 	double                  hillHeight;
 	double                  hillDiameter;
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	feMesh       = feVariable->feMesh;
-
 	/* Read values from dictionary */
 	hillHeight       = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"CosineHillHeight"  , 1.0  );
 	hillDiameter     = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"CosineHillDiameter", 1.0  );
@@ -1156,16 +1017,15 @@ void StgFEM_StandardConditionFunctions_TemperatureCosineHill( Node_LocalIndex no
 		StGermain_VectorAddition( centre, centre, rotationCentre, context->dim );
 	}
 
-	*result = StGermain_CosineHillValue( centre, Mesh_GetVertex( feMesh, node_lI ), hillHeight, hillDiameter, context->dim );
+	*result = StGermain_CosineHillValue( centre, coord, hillHeight, hillDiameter, context->dim );
 }
 
 
-void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	FeVariable*             feVariable = NULL;
 	FeMesh*			feMesh = NULL;
-	unsigned		nDims;
 	double*                 result = (double*) _result;
 	double                  topLayerBC;
 	double                  bottomLayerBC;
@@ -1173,14 +1033,12 @@ void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_Lo
 	double                  horizontalWaveNumber;
 	double                  verticalWaveNumber;
 	double                  scaleFactor;
-	double*                 coord;
 	Coord                   relScaledCoord; 
 	double			min[3], max[3], topLayerCoord, bottomLayerCoord;
 	
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	feMesh       = feVariable->feMesh;
 
-	nDims = Mesh_GetDimSize( feMesh );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
 
 	topLayerCoord = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_TopLayerCoord", max[J_AXIS]  );
@@ -1194,8 +1052,6 @@ void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_Lo
 	 * half a full sin or cos cycle. Wavenumber = 3 means the range is 0 -> 3pi, or 1 and a half full cycles. */
 	horizontalWaveNumber = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_HorizontalWaveNumber", 1.0  );
 	verticalWaveNumber = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_VerticalWaveNumber", 1.0  );
-
-	coord = Mesh_GetVertex( feMesh, node_lI );
 
 	/* if node is outside IC shape set to 0 temperature */
 	if( coord[J_AXIS] > topLayerCoord || coord[J_AXIS] < bottomLayerCoord ) {
@@ -1213,36 +1069,32 @@ void StgFEM_StandardConditionFunctions_LinearWithSinusoidalPerturbation( Node_Lo
 					    * sin( verticalWaveNumber * M_PI * relScaledCoord[ J_AXIS ] ) );
 }
 
-void StgFEM_StandardConditionFunctions_Trigonometry( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_Trigonometry(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			feMesh               = NULL;
 	double*                 result             = (double*) _result;
-	double*                 coord;
-	double                  height, width;
+	double                  width;
 	double			min[3], max[3];
 
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	feMesh       = feVariable->feMesh;
 
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
-	coord = Mesh_GetVertex( feMesh, node_lI );
 
 	/* Get Aspect Ratio */
-	height = max[ J_AXIS ] - min[ J_AXIS ];
 	width  = max[ I_AXIS ] - min[ I_AXIS ];
 	
 	*result = 1.0 - 0.5 * M_PI * coord[ J_AXIS ] * sin( M_PI * coord[ I_AXIS ]/width );
 }
 
 #define SMALL 1.0e-5
-void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Stg_FEM_VelicTemperatureIC(const double *coord, void* _context, void* _result ) {
 	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh               = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  x; 
 	double                  y;
 	double                  kx;
@@ -1253,8 +1105,6 @@ void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, 
 	double                  Lx;
 	double			min[3], max[3];
 	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( feMesh, node_lI );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
 
 	/* Make sure that the box has right dimensions */
@@ -1279,13 +1129,12 @@ void Stg_FEM_VelicTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, 
 }
 
 /* IC from Mirko Velic. This is the IC temperature for his solB, from his Analytic Suite. Added 22-May-2006 */
-void Stg_FEM_VelicTemperatureIC_SolB( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void Stg_FEM_VelicTemperatureIC_SolB(const double *coord, void* _context, void* _result ) {
 	DomainContext*  context            = (DomainContext*)_context;
 	FeVariable*             temperatureField   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	FeMesh*			feMesh               = temperatureField->feMesh;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  x; 
 	double                  y;
 	double                  km; /*  for y-direction */
@@ -1296,8 +1145,6 @@ void Stg_FEM_VelicTemperatureIC_SolB( Node_LocalIndex node_lI, Variable_Index va
 	double                  sigma;
 	double			min[3], max[3];
 	
-	/* Find coordinate of node */
-	coord = Mesh_GetVertex( feMesh, node_lI );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
 
 	/* Make sure that the box has right dimensions */
@@ -1322,13 +1169,12 @@ void Stg_FEM_VelicTemperatureIC_SolB( Node_LocalIndex node_lI, Variable_Index va
 
 /* Initial Condition derived from Boundary Layer theory -
    taken from P. E. van Keken, S. D. King, U. R. Schmeling, U. R. Christensen, D. Neumeister, and M.-P. Doin. A comparison of methods for the modeling of thermochemical convection. Journal of Geophysical Research, 102(B10):22477-22496, october 1997. */
-void StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	FeVariable*             feVariable         = NULL;
 	FeMesh*			feMesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	double*                 coord;
 	double                  u0, v0, Q;
 	double                  x, y;
 	double                  RaT;
@@ -1339,7 +1185,6 @@ void StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC( Node_LocalIndex 
 	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
 	feMesh       = feVariable->feMesh;
 
-	coord      = Mesh_GetVertex( feMesh, node_lI );
 	Mesh_GetGlobalCoordRange( feMesh, min, max );
 
 	/* Get Aspect Ratio */
@@ -1377,53 +1222,37 @@ void StgFEM_StandardConditionFunctions_AnalyticalTemperatureIC( Node_LocalIndex 
 	
 }
 
-void StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_EdgeDriveConvectionIC(const double *coord, void* _context, void* _result ) 
 {        
 	DomainContext*  context = (DomainContext*)_context;        
 	Dictionary*             dictionary         = context->dictionary;        
-	FeVariable*             feVariable = NULL;        
-	FeMesh*			mesh = NULL;        
 	double*                 result = (double*) _result;        
 	double                  perturbationAmplitude;        
 	double                  thermalAnomalyOffset;        
-	double*                 coord;        
 	
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );        
-	mesh       = feVariable->feMesh;        
 	perturbationAmplitude = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SinusoidalTempIC_PerturbationAmplitude", 0.1  );        
 	thermalAnomalyOffset = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"thermalAnomalyOffset", 0.0  );        
-	coord = Mesh_GetVertex( mesh, node_lI );
-	
 	/* eqn 1 from S.D.King & D.L. Anderson, "Edge-drive convection", EPSL 160 (1998) 289-296 */        
 	
 	*result = 1.0 + perturbationAmplitude * sin( M_PI * coord[ J_AXIS ] ) * cos( 0.5 * M_PI * ( coord[ I_AXIS ] + thermalAnomalyOffset ) );
 }
 
-void StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result )
+void StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC(const double *coord, void* _context, void* _result )
 {
         DomainContext*  context = (DomainContext*)_context;
         Dictionary*             dictionary         = context->dictionary;
-        FeVariable*             feVariable = NULL;
-        FeMesh*                 mesh = NULL;
         double*                 result = (double*) _result;
-        double*                 coord;
         int                     dim;
         double                  contStartX, contEndX;
         double                  contStartY, contEndY;
         double                  contStartZ, contEndZ;
-        double                  minY, maxY, interiorTemp;
+        double                  interiorTemp;
 
-        feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-        mesh       = feVariable->feMesh;
-        coord = Mesh_GetVertex( mesh, node_lI );
-        
 	dim = Dictionary_GetInt_WithDefault( dictionary, (Dictionary_Entry_Key)"dim", 0.0  );
         contStartX = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contStartX", 0.0  );
         contEndX = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contEndX", 0.0  );
         contStartY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contStartY", 0.0  );
         contEndY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contEndY", 0.0  );
-        minY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"minY", 0.0  );
-        maxY = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"maxY", 0.0  );
 	interiorTemp = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"interiorTemp", 1.0 );
         if ( dim == 3  ) {
                 contStartZ = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"contStartZ", 0.0  );
@@ -1442,7 +1271,7 @@ void StgFEM_StandardConditionFunctions_ThermalEdgeDriveConvectionIC( Node_LocalI
                         *result = interiorTemp;
 }
 
-void StgFEM_StandardConditionFunctions_SinusoidalExtension( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_SinusoidalExtension(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
@@ -1461,20 +1290,13 @@ void StgFEM_StandardConditionFunctions_SinusoidalExtension( Node_LocalIndex node
 }
 
 
-void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_StepFunction(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			feMesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  lower_offset, upper_offset;
 	double                  value, lower_value, upper_value;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	feMesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( feMesh, node_lI );
 
 	lower_offset = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionLowerOffset", 0.0 );
 	upper_offset = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionUpperOffset", lower_offset );
@@ -1502,20 +1324,13 @@ void StgFEM_StandardConditionFunctions_StepFunction( Node_LocalIndex node_lI, Va
 }
 
 
-void StG_FEM_StandardConditionFunctions_StepFunctionProduct1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct1(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*     mesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  start, end;
 	double                  value;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( mesh, node_lI );
 
 	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct1Start", 0.0 );
 	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct1End", 0.0 );
@@ -1530,20 +1345,13 @@ void StG_FEM_StandardConditionFunctions_StepFunctionProduct1( Node_LocalIndex no
         }
 }
 
-void StG_FEM_StandardConditionFunctions_StepFunctionProduct2( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct2(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*     mesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  start, end;
 	double                  value;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( mesh, node_lI );
 
 	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct2Start", 0.0 );
 	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct2End", 0.0 );
@@ -1559,20 +1367,13 @@ void StG_FEM_StandardConditionFunctions_StepFunctionProduct2( Node_LocalIndex no
 }
 
 
-void StG_FEM_StandardConditionFunctions_StepFunctionProduct3( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct3(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*     mesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  start, end;
 	double                  value;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( mesh, node_lI );
 
 	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct3Start", 0.0 );
 	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct3End", 0.0 );
@@ -1587,20 +1388,13 @@ void StG_FEM_StandardConditionFunctions_StepFunctionProduct3( Node_LocalIndex no
         }
 }
 
-void StG_FEM_StandardConditionFunctions_StepFunctionProduct4( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StG_FEM_StandardConditionFunctions_StepFunctionProduct4(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*     mesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  start, end;
 	double                  value;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( mesh, node_lI );
 
 	start = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct4Start", 0.0 );
 	end = Dictionary_GetDouble_WithDefault( dictionary, "StepFunctionProduct4End", 0.0 );
@@ -1618,20 +1412,13 @@ void StG_FEM_StandardConditionFunctions_StepFunctionProduct4( Node_LocalIndex no
 /* A Gaussian GaussianHeight*exp(-((GaussianCenter-x)/GaussianWidth)^2) */
 
 void StG_FEM_StandardConditionFunctions_Gaussian
-( Node_LocalIndex node_lI, Variable_Index var_I, void* _context,
+(const double *coord, void* _context,
   void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*     mesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  center, width, height;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	mesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( mesh, node_lI );
 
         center = Dictionary_GetDouble_WithDefault( dictionary,
                                                    "GaussianCenter", 0.0 );
@@ -1646,13 +1433,14 @@ void StG_FEM_StandardConditionFunctions_Gaussian
                            /(width*width));
 }
 
-void StgFEM_StandardConditionFunctions_MovingStepFunction( Node_LocalIndex nodeInd, Variable_Index varInd, void* _ctx, void* _result ) {
+void StgFEM_StandardConditionFunctions_MovingStepFunction
+(const double *coord, void* _ctx, void* _result ) {
    FiniteElementContext* ctx = (FiniteElementContext*)_ctx;
    FeVariable* velField;
    FeMesh* mesh;
    Dictionary* dict = ctx->dictionary;
    double* result = (double*)_result;
-   double* coord, offsetLower, offsetUpper, left, right;
+   double offsetLower, offsetUpper, left, right;
    double *wallCrd, pos;
    int dim, wallDepth;
    unsigned ijk[3];
@@ -1665,9 +1453,8 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( Node_LocalIndex nodeI
       ctx->fieldVariable_Register, "VelocityField" );
 
    /*
-   ** Get the mesh and the coordinate of the node. */
+   ** Get the mesh. */
    mesh = velField->feMesh;
-   coord = Mesh_GetVertex( mesh, nodeInd );
 
    /*
    ** Extract all the parameters we need from the dictionary. */
@@ -1710,7 +1497,7 @@ void StgFEM_StandardConditionFunctions_MovingStepFunction( Node_LocalIndex nodeI
    }
 }
 
-void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_ConvectionBenchmark(const double *coord, void* _context, void* _result ) {
 	/* This IC is for the 2D ConvectionBenchmark defined in
 	 * http://www.mcc.monash.edu.au/twiki/view/Research/ConvectionBenchmarks
 	 */
@@ -1720,7 +1507,6 @@ void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node
 	FeMesh*			mesh;
 	double*                 result             = (double*) _result;
 	double			min[3], max[3];
-        double*                 coord;
 	double                  x,y;
 	double                  Lx, Ly;
 
@@ -1732,8 +1518,6 @@ void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node
 	Lx = max[ I_AXIS ] - min[ I_AXIS ];
 	Ly = max[ J_AXIS ] - min[ J_AXIS ];
 	
-	coord      = Mesh_GetVertex( mesh, node_lI );
-
 	x = ( coord[0] - min[ I_AXIS ] ) / Lx;
 	y = ( coord[1] - min[ J_AXIS ] ) / Ly;
 
@@ -1741,7 +1525,7 @@ void StgFEM_StandardConditionFunctions_ConvectionBenchmark( Node_LocalIndex node
 	*result = ( 1 - y ) + ( cos( M_PI * x ) * sin( M_PI * y ) ) / 100 ;
 }
 
-void StgFEM_StandardConditionFunctions_ConstantVector( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_ConstantVector(const double *coord, void* _context, void* _result ) {
 	DomainContext*		context            = (DomainContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
@@ -1754,13 +1538,10 @@ void StgFEM_StandardConditionFunctions_ConstantVector( Node_LocalIndex node_lI, 
 
 /* 3D spec ridge top BC (for milestone 1 of magma project ) 
  * to be applied to the top x-z plane of the domain */
-void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_SpecRidge3D(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			feMesh             = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 
 	double			leftVal;
 	double			rightVal;
@@ -1770,10 +1551,6 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 	double			xBegin, xEnd;
 	double			zBegin, zEnd;
 
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	feMesh     = feVariable->feMesh;
-	coord      = Mesh_GetVertex( feMesh, node_lI );
 
 	leftVal = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DLeftSide", 0.0  );
 	rightVal = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"SpecRidge3DRightSide", 0.0  );
@@ -1799,20 +1576,13 @@ void StgFEM_StandardConditionFunctions_SpecRidge3D( Node_LocalIndex node_lI, Var
 		*result = rightVal;
 }
 
-void StgFEM_StandardConditionFunctions_TemperatureProfile( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_TemperatureProfile(const double *coord, void* _context, void* _result ) {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
-  FeVariable*             feVariable         = NULL;
-  FeMesh*     mesh               = NULL;
   Dictionary*             dictionary         = context->dictionary;
   double*                 result             = (double*) _result;
-  double*                 coord;
   double                  T_0, H_0, dH, H, H_m, A, B, C, x_min, x_max, y_max, T_m, xc, dum;
   /* G.Ito 10/08 added variables x_min, x_max, T_m, Xc, to do variation in x
      and limit maximum T */
-  
-  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-  mesh       = feVariable->feMesh;
-  coord      = Mesh_GetVertex( mesh, node_lI );
   
   T_0 = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileTop", 0.0 );
   T_m = Dictionary_GetDouble_WithDefault( dictionary, "TemperatureProfileMax", 10000.0 );
@@ -1858,19 +1628,12 @@ void StgFEM_StandardConditionFunctions_TemperatureProfile( Node_LocalIndex node_
 
 }
 
-void StgFEM_StandardConditionFunctions_ERF( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_ERF(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			feMesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  width, scale, dilate, offset, constant;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	feMesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( feMesh, node_lI );
 
 	width = Dictionary_GetDouble_WithDefault( dictionary, "ERFWidth", 0.0 );
 	offset= Dictionary_GetDouble_WithDefault(dictionary, "ERFOffset",0.0 );
@@ -1893,22 +1656,13 @@ void StgFEM_StandardConditionFunctions_ERF( Node_LocalIndex node_lI, Variable_In
           *result=constant+scale*erf((coord[dim]+offset)/dilate);
 }
 
-void StgFEM_StandardConditionFunctions_ERFC(Node_LocalIndex node_lI,
-                                            Variable_Index var_I,
+void StgFEM_StandardConditionFunctions_ERFC(const double *coord,
                                             void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			feMesh               = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double                  width, scale, dilate, offset, constant;
 	unsigned		dim;
-
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName
-          ( context->fieldVariable_Register, "VelocityField" );
-	feMesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( feMesh, node_lI );
 
 	width = Dictionary_GetDouble_WithDefault(dictionary, "ERFCWidth", 0.0 );
 	offset= Dictionary_GetDouble_WithDefault(dictionary, "ERFCOffset",0.0 );
@@ -1931,24 +1685,20 @@ void StgFEM_StandardConditionFunctions_ERFC(Node_LocalIndex node_lI,
           *result=constant+scale*erfc((coord[dim]+offset)/dilate);
 }
 
-void StgFEM_StandardConditionFunctions_RubberSheet( Node_LocalIndex node_lI,
-                                                    Variable_Index var_I,
-                                                    void* _context,
-                                                    void* _result )
+void StgFEM_StandardConditionFunctions_RubberSheet(const double *coord,
+                                                   void* _context, void* _result)
 {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
   FeVariable*             feVariable         = NULL;
   FeMesh*			feMesh               = NULL;
   Dictionary*             dictionary         = context->dictionary;
   double*                 result             = (double*) _result;
-  double*                 coord;
   double                  lower_offset, upper_offset;
   double                  lower_value, upper_value, time;
   unsigned		dim;
 
   feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
   feMesh       = feVariable->feMesh;
-  coord      = Mesh_GetVertex( feMesh, node_lI );
 
   lower_offset = Dictionary_GetDouble_WithDefault( dictionary,
                                                    "RubberSheetLowerOffset",
@@ -1986,130 +1736,6 @@ void StgFEM_StandardConditionFunctions_RubberSheet( Node_LocalIndex node_lI,
     }
 }
 
-/* get the BC's from the analytic solution as stored on the relevant FeVariable */
-void StgFEM_StandardConditionFunctions_SpectralBCX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             analyticFeVarX     = NULL;
-	FeVariable*             numericFeVar       = NULL;
-	double*                 result             = (double*) _result;
-	/*FeMesh*			feMesh             = NULL;
-        double*                 coord;
-	Node_LocalIndex		analyticNodeI;
-	Element_DomainIndex	analyticElement_I;
-	double			analyticLocalElementCoord[3];
-	FeMesh*			analyticFeMesh;
-	*/
-	analyticFeVarX = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityXField" );
-	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	//feMesh         = numericFeVar->feMesh;
-	//coord          = Mesh_GetVertex( feMesh, node_lI );
-
-	//analyticFeMesh = analyticFeVarX->feMesh;
-	//if( Mesh_SearchElements( analyticFeMesh, coord, &analyticElement_I ) ) {
-	//	FeMesh_CoordGlobalToLocal( analyticFeMesh, analyticElement_I, coord, analyticLocalElementCoord );
-	//	FeVariable_InterpolateWithinElement( analyticFeVarX, analyticElement_I, analyticLocalElementCoord, result );
-	//}
-	//else {	/* numerical solution node outside analytic mesh - just find closest point & use that */
-	//	analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
-	//	FeVariable_GetValueAtNode( analyticFeVarX, analyticNodeI, result );
-	//}
-	
-	FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );
-}
-
-void StgFEM_StandardConditionFunctions_SpectralBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             analyticFeVarY     = NULL;
-	FeVariable*             numericFeVar       = NULL;
-	double*                 result             = (double*) _result;
-	/*FeMesh*			feMesh             = NULL;
-        double*                 coord;
-	Node_LocalIndex		analyticNodeI;
-	Element_DomainIndex	analyticElement_I;
-	double			analyticLocalElementCoord[3];
-	FeMesh*			analyticFeMesh;
-	*/
-	analyticFeVarY = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityYField" );
-	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	//feMesh         = numericFeVar->feMesh;
-	//coord          = Mesh_GetVertex( feMesh, node_lI );
-
-	//analyticFeMesh = analyticFeVarY->feMesh;
-	//if( Mesh_SearchElements( analyticFeMesh, coord, &analyticElement_I ) ) {
-	//	FeMesh_CoordGlobalToLocal( analyticFeMesh, analyticElement_I, coord, analyticLocalElementCoord );
-	//	FeVariable_InterpolateWithinElement( analyticFeVarY, analyticElement_I, analyticLocalElementCoord, result );
-	//}
-	//else {
-	//	analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
-	//	FeVariable_GetValueAtNode( analyticFeVarY, analyticNodeI, result );
-	//}
-	
-	FeVariable_GetValueAtNode( analyticFeVarY, node_lI, result );
-}
-
-void StgFEM_StandardConditionFunctions_SpectralBCZ( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             analyticFeVarZ     = NULL;
-	FeVariable*             numericFeVar       = NULL;
-	double*                 result             = (double*) _result;
-	/*
-	FeMesh*			feMesh             = NULL;
-        double*                 coord;
-	Node_LocalIndex		analyticNodeI;
-	Element_DomainIndex	analyticElement_I;
-	double			analyticLocalElementCoord[3];
-	FeMesh*			analyticFeMesh;
-	*/
-	analyticFeVarZ = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralVelocityZField" );
-	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	//feMesh         = numericFeVar->feMesh;
-	//coord          = Mesh_GetVertex( feMesh, node_lI );
-
-	//analyticFeMesh = analyticFeVarZ->feMesh;
-	//if( Mesh_SearchElements( analyticFeMesh, coord, &analyticElement_I ) ) {
-	//	FeMesh_CoordGlobalToLocal( analyticFeMesh, analyticElement_I, coord, analyticLocalElementCoord );
-	//	FeVariable_InterpolateWithinElement( analyticFeVarZ, analyticElement_I, analyticLocalElementCoord, result );
-	//}
-	//else {
-	//	analyticNodeI  = Mesh_NearestVertex( analyticFeMesh, coord );
-	//	FeVariable_GetValueAtNode( analyticFeVarZ, analyticNodeI, result );
-	//}
-	
-	FeVariable_GetValueAtNode( analyticFeVarZ, node_lI, result );
-}
-
-void StgFEM_StandardConditionFunctions_SpectralPressureBCX( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             analyticFeVarX     = NULL;
-	FeVariable*             numericFeVar       = NULL;
-	FeMesh*			feMesh             = NULL;
-	double*                 result             = (double*) _result;
-        double*                 coord;
-
-	analyticFeVarX = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralPressureField" );
-	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
-	feMesh         = numericFeVar->feMesh;
-	coord          = Mesh_GetVertex( feMesh, node_lI );
-
-	FeVariable_GetValueAtNode( analyticFeVarX, node_lI, result );
-}
-
-void StgFEM_StandardConditionFunctions_SpectralPressureBCY( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             analyticFeVarY     = NULL;
-	FeVariable*             numericFeVar       = NULL;
-	FeMesh*			feMesh             = NULL;
-	double*                 result             = (double*) _result;
-        double*                 coord;
-
-	analyticFeVarY = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "SpectralPressureField" );
-	numericFeVar   = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "PressureField" );
-	feMesh         = numericFeVar->feMesh;
-	coord          = Mesh_GetVertex( feMesh, node_lI );
-
-	FeVariable_GetValueAtNode( analyticFeVarY, node_lI, result );
-}
-
 /* error function for use in 3D spec ridge top BC */
 double errorFunction( double z, int n ) {
 	double		pi	= 3.1415926535;
@@ -2133,19 +1759,12 @@ double errorFunction( double z, int n ) {
 
 
 
-void StgFEM_StandardConditionFunctions_ErrorFunc( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_ErrorFunc(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	FeMesh*			feMesh             = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-        double*                 coord;
 	double			dilate;
 	double			width; 
-
-	feVariable  = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-	feMesh      = feVariable->feMesh;
-	coord       = Mesh_GetVertex( feMesh, node_lI );
 
 	dilate      = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ErrorFuncDilate", 0.0  );
 	width       = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"ErrorFuncWidth", 0.0 );
@@ -2161,13 +1780,10 @@ void StgFEM_StandardConditionFunctions_ErrorFunc( Node_LocalIndex node_lI, Varia
 	}
 }
 
-void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_GaussianDistribution(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	Name			variableName;
-	double*			coord;
 	unsigned		nDims              = context->dim;
 	unsigned		dim_I;
 	double			orig[3];
@@ -2175,10 +1791,6 @@ void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex nod
 	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianScale", 1.0  );
 	double			background         = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"backgroundValue", 1.0  );
 	double			distsq             = 0.0;
-
-	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
-	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
 
 	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"x0", 0.0  );
 	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"y0", 0.0  );
@@ -2190,37 +1802,21 @@ void StgFEM_StandardConditionFunctions_GaussianDistribution( Node_LocalIndex nod
 	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma )  ) + background;
 }
 
-void StgFEM_StandardConditionFunctions_GravitationalPotential( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
-	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
-	Dictionary*             dictionary         = context->dictionary;
-	double*                 result             = (double*) _result;
-	Name			variableName;
-	double*			coord;
-
-	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
-	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
+void StgFEM_StandardConditionFunctions_GravitationalPotential(const double *coord, void* _context, void* _result ) {
+	double* result=(double*) _result;
 
 	*result = -1.0 * coord[J_AXIS];
 }
 
-void StgFEM_StandardConditionFunctions_1DGaussianDistribution( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_1DGaussianDistribution(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	Name			variableName;
-	double*			coord;
 	double			orig[3];
 	double			sigma              = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"sigma", 1.0  );
 	double			gaussianScale      = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianScale", 1.0  );
 	double			background         = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"backgroundValue", 1.0  );
 	double			distsq             = 0.0;
-
-	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
-	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
 
 	orig[0] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"x0", 0.0  );
 	orig[1] = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"y0", 0.0  );
@@ -2231,18 +1827,11 @@ void StgFEM_StandardConditionFunctions_1DGaussianDistribution( Node_LocalIndex n
 	*result = gaussianScale * exp( -distsq / ( 2.0 * sigma * sigma )  ) + background;
 }
 
-void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_HalfContainer(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
-	FeVariable*             feVariable         = NULL;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
-	Name			variableName;
-	double*			coord;
 	double			halfPoint          = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"halfPoint", 0.0  );
-
-	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
-	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
 
 	if( coord[1] < halfPoint )
 		*result = 1;
@@ -2250,7 +1839,7 @@ void StgFEM_StandardConditionFunctions_HalfContainer( Node_LocalIndex node_lI, V
 		*result = 0;	
 }
 
-void StgFEM_StandardConditionFunctions_ConstantValue( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_ConstantValue(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
@@ -2259,18 +1848,11 @@ void StgFEM_StandardConditionFunctions_ConstantValue( Node_LocalIndex node_lI, V
 	*result = value;
 }
 
-void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_DiagonalLine(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
 	double			width              = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"lineWidth", 1.0  );
-	double*			coord;
-	Name			variableName;
-	FeVariable*             feVariable         = NULL;
-
-	variableName = Dictionary_GetString_WithDefault( dictionary, "FieldVariable", "" );
-	feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
-	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
 
 	if( fabs( coord[0] - coord[1] ) < width )
 		*result = 1.0;
@@ -2278,7 +1860,7 @@ void StgFEM_StandardConditionFunctions_DiagonalLine( Node_LocalIndex node_lI, Va
 		*result = 0.0;
 }
 
-void StgFEM_StandardConditionFunctions_DeltaFunction( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_DeltaFunction(const double *coord, void* _context, void* _result ) {
 	FiniteElementContext *	context            = (FiniteElementContext*)_context;
 	Dictionary*             dictionary         = context->dictionary;
 	double*                 result             = (double*) _result;
@@ -2286,16 +1868,11 @@ void StgFEM_StandardConditionFunctions_DeltaFunction( Node_LocalIndex node_lI, V
 	unsigned		dim		   = Dictionary_GetUnsignedInt_WithDefault( dictionary, "deltaFunctionDim", 0 );
 	double			centre		   = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"deltaFunctionCentre", 0.5  );
 	double			value		   = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"deltaFunctionValue", 1.0  );
-	double*			coord;
-	Name			variableName	   = Dictionary_GetString_WithDefault( dictionary, "DeltaFunctionFeVariable", "" );
-	FeVariable*		feVariable	   = (FeVariable*) FieldVariable_Register_GetByName( context->fieldVariable_Register, variableName );
-
-	coord = Mesh_GetVertex( feVariable->feMesh, node_lI );
 	
 	*result = (fabs( coord[dim] - centre ) < epsilon) ? value : 0.0;
 }
 
-void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void StgFEM_StandardConditionFunctions_InflowBottom(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context            = (DomainContext*)_context;
 	FeVariable* feVariable;
 	Dictionary*             dictionary         = context->dictionary;
@@ -2314,7 +1891,7 @@ void StgFEM_StandardConditionFunctions_InflowBottom( Node_LocalIndex node_lI, Va
 	*result = 2.0 * sideV * sideLength / wallLength;
 }
 
-void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_GaussianTube(const double *coord, void* _context, void* _result ) 
 {
         DomainContext*  context = (DomainContext*)_context;
         Dictionary*             dictionary         = context->dictionary;
@@ -2323,7 +1900,6 @@ void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Va
         unsigned                nDims;
         double*                 result = (double*) _result;
         double                  a1,b1,c1, a2,b2,c2, x,y,z,r_y,r_yz;
-        double*                 coord;
         double                  min[3], max[3];
 	double                  y_shift, z_shift;
 
@@ -2343,7 +1919,6 @@ void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Va
 	y_shift = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_y_origin", 0.0  );
 	z_shift = Dictionary_GetDouble_WithDefault( dictionary, (Dictionary_Entry_Key)"GaussianTube_z_origin", 0.0  );
 
-        coord = Mesh_GetVertex( feMesh, node_lI );
 
 	x = coord[ I_AXIS ];
 	y = coord[ J_AXIS ];
@@ -2367,20 +1942,13 @@ void StgFEM_StandardConditionFunctions_GaussianTube( Node_LocalIndex node_lI, Va
 }
 
 
-void StgFEM_StandardConditionFunctions_WarsTemperature( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_WarsTemperature(const double *coord, void* _context, void* _result ) 
 {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
-  FeVariable*             feVariable         = NULL;
-  FeMesh*     mesh               = NULL;
   Dictionary*             dictionary         = context->dictionary;
   double*                 result             = (double*) _result;
-  double*                 coord;
   double                  EAEnd, WarsStart, WarsHeight, WarsTTop,
     WarsTBottom, h, maxY;
-  
-  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-  mesh       = feVariable->feMesh;
-  coord      = Mesh_GetVertex( mesh, node_lI );
   
   EAEnd = Dictionary_GetDouble( dictionary, "EAEnd");
   WarsStart = Dictionary_GetDouble( dictionary, "WarsStart");
@@ -2398,20 +1966,13 @@ void StgFEM_StandardConditionFunctions_WarsTemperature( Node_LocalIndex node_lI,
   *result=WarsTBottom + ((coord[1]-h)/(maxY-h))*(WarsTTop-WarsTBottom);
 }
 
-void StgFEM_StandardConditionFunctions_Quadratic( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_Quadratic(const double *coord, void* _context, void* _result ) 
 {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
-  FeVariable*             feVariable         = NULL;
-  FeMesh*     mesh               = NULL;
   Dictionary*             dictionary         = context->dictionary;
   double*                 result             = (double*) _result;
-  double*                 coord;
   int                     dim;
   double                  a, b, c;
-  
-  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-  mesh       = feVariable->feMesh;
-  coord      = Mesh_GetVertex( mesh, node_lI );
   
   dim = Dictionary_GetInt( dictionary, "Quadratic_Dim");
   a = Dictionary_GetDouble( dictionary, "Quadratic_Constant");
@@ -2423,103 +1984,87 @@ void StgFEM_StandardConditionFunctions_Quadratic( Node_LocalIndex node_lI, Varia
 
 int Binary_Search(double *data, int s, int e, double value);
 
-void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double **coords, double **data);
+void StgFEM_StandardConditionFunctions_FileN(const double *coord, void* _context, void* _result, int file_num, double **coords, double **data);
 
-void StgFEM_StandardConditionFunctions_File1( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File1(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,1,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,1,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File2( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File2(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,2,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,2,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File3( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File3(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,3,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,3,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File4( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File4(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,4,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,4,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File5( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File5(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,5,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,5,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File6( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File6(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,6,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,6,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File7( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File7(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,7,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,7,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File8( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File8(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,8,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,8,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File9( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File9(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,9,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,9,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_File10( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) 
+void StgFEM_StandardConditionFunctions_File10(const double *coord, void* _context, void* _result ) 
 {
   static double *coords=NULL;
   static double *data=NULL;
-  StgFEM_StandardConditionFunctions_FileN(node_lI,var_I,_context,_result,10,
-                                          &coords,&data);
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,10,&coords,&data);
 }
 
-void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result, int file_num, double **coords, double **data)
+void StgFEM_StandardConditionFunctions_FileN(const double *coord, void* _context, void* _result, int file_num, double **coords, double **data)
 {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
-  FeVariable*             feVariable         = NULL;
-  FeMesh*     mesh               = NULL;
   Dictionary*             dictionary         = context->dictionary;
   double*                 result             = (double*) _result;
-  double*                 coord;
   int                     dim, dim2, dim3, i, j, k;
   char *filename;
   int N, N2, N3, ndims;
   double factor, factor2, factor3;
-  feVariable = (FeVariable*)FieldVariable_Register_GetByName( context->fieldVariable_Register, "VelocityField" );
-  mesh       = feVariable->feMesh;
-  coord      = Mesh_GetVertex( mesh, node_lI );
   
   char fileN_number[10], fileN_dim[15], fileN_dim2[15], fileN_dim3[15],
     fileN_name[128], fileN_N[15], fileN_N2[15], fileN_N3[15];
@@ -2631,6 +2176,7 @@ void StgFEM_StandardConditionFunctions_FileN( Node_LocalIndex node_lI, Variable_
                      "The range in the file '%s' does not cover this value %g\nIt only covers %g to %g in the %d direction.\n",
                      filename,coord[dim3],(*coords)[N+N2],(*coords)[N+N2+N3-1],dim2);
 
+  // i=std::lower_bound(coords,coords+N,coord[dim])-coords;
   i=Binary_Search(*coords,0,N-1,coord[dim]);
   factor=((*coords)[i+1]-coord[dim])/((*coords)[i+1]-(*coords)[i]);
     
@@ -2688,110 +2234,89 @@ int Binary_Search(double *data, int s, int e, const double value)
   return start;
 }
 
-void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
+void StgFEM_StandardConditionFunctions_EquationN(const double *coord,
                                                  void* _context,
                                                  void* _result,
                                                  std::string &equation_string,
                                                  const int equation_number);
 
-void StgFEM_StandardConditionFunctions_Equation1(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation1(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,1);
 }
 
-void StgFEM_StandardConditionFunctions_Equation2(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation2(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,2);
 }
 
-void StgFEM_StandardConditionFunctions_Equation3(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation3(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,3);
 }
 
-void StgFEM_StandardConditionFunctions_Equation4(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation4(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,4);
 }
 
-void StgFEM_StandardConditionFunctions_Equation5(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation5(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,5);
 }
 
-void StgFEM_StandardConditionFunctions_Equation6(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation6(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,6);
 }
 
-void StgFEM_StandardConditionFunctions_Equation7(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation7(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,7);
 }
 
-void StgFEM_StandardConditionFunctions_Equation8(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation8(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,8);
 }
 
-void StgFEM_StandardConditionFunctions_Equation9(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
-                                                 void* _context,
-                                                 void* _result)
+void StgFEM_StandardConditionFunctions_Equation9(const double *coord,
+                                                 void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,9);
 }
 
-void StgFEM_StandardConditionFunctions_Equation10(Node_LocalIndex node_lI,
-                                                  Variable_Index var_I,
-                                                  void* _context,
-                                                  void* _result)
+void StgFEM_StandardConditionFunctions_Equation10(const double *coord,
+                                                  void* _context, void* _result)
 {
   static std::string equation_string;
-  StgFEM_StandardConditionFunctions_EquationN(node_lI,var_I,_context,_result,
+  StgFEM_StandardConditionFunctions_EquationN(coord,_context,_result,
                                               equation_string,10);
 }
 
@@ -2804,19 +2329,14 @@ mu::value_type* StgFEM_StandardConditionFunctions_AddVariable
   return &(*(variables.begin()));
 }
 
-void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
-                                                 Variable_Index var_I,
+void StgFEM_StandardConditionFunctions_EquationN(const double *coord,
                                                  void* _context,
                                                  void* _result,
                                                  std::string &equation_string,
                                                  const int equation_number) 
 {
   FiniteElementContext *context=(FiniteElementContext*)_context;
-  FeVariable *feVariable=(FeVariable*)FieldVariable_Register_GetByName
-    (context->fieldVariable_Register, "VelocityField");
-  FeMesh *mesh(feVariable->feMesh);
   Dictionary *dictionary=context->dictionary;
-  double *coord=Mesh_GetVertex(mesh,node_lI);
   double *result=(double*)_result;
 
   if(equation_string.empty())
@@ -2833,19 +2353,20 @@ void StgFEM_StandardConditionFunctions_EquationN(Node_LocalIndex node_lI,
   try
     {
       mu::Parser p;
-      p.DefineVar("x", coord); 
-      p.DefineVar("y", coord+1); 
-      p.DefineVar("z", coord+2); 
+      double temp[]={coord[0], coord[1], coord[2]};
+      p.DefineVar("x", temp);
+      p.DefineVar("y", temp+1); 
+      p.DefineVar("z", temp+2); 
       p.DefineVar("t", &(context->currentTime));
       p.SetVarFactory(StgFEM_StandardConditionFunctions_AddVariable, &p);
       p.SetExpr(equation_string);
 
       *result=p.Eval();
 
-      Journal_Printf(Journal_Register( Info_Type,"StgFEM_StandardConditionFunctions_EquationN"),
-                      "Equation %d:  x=%g y=%g z=%g t=%g result=%g\n",
-                     equation_number,coord[0],coord[1],coord[2],
-                     context->currentTime,*result);
+      Journal_PrintfL(Journal_Register( Info_Type,"StgFEM_StandardConditionFunctions_EquationN"),
+                      2, "Equation %d:  x=%g y=%g z=%g t=%g result=%g\n",
+                      equation_number,coord[0],coord[1],coord[2],
+                      context->currentTime,*result);
     }
   catch (mu::Parser::exception_type &e)
     {

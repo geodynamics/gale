@@ -110,7 +110,7 @@ void LinearVelocityAnalytic_GetCornerNodeVelocities(void* analyticSolution) {
 	}
 }
 
-void GetLocalCoords( LinearVelocityAnalytic* self, double* coord, double* xi ) {
+void GetLocalCoords( LinearVelocityAnalytic* self, const double* coord, double* xi ) {
 	FeVariable*             velocityField = self->velocityField;
 	XYZ                     min;
 	XYZ                     max;
@@ -124,7 +124,7 @@ void GetLocalCoords( LinearVelocityAnalytic* self, double* coord, double* xi ) {
 }	
 
 /* Do a normal linear interpolation as if the box were a FEM element */
-void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocity ) {
+void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* velocity ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 	FeVariable*             velocityField = self->velocityField;
 	FeMesh*                 mesh = velocityField->feMesh;
@@ -151,11 +151,11 @@ void LinearVelocityAnalytic_VelocityFunction( void* analyticSolution, FeVariable
 		}
 	}
 }
-void LinearVelocityAnalytic_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* pressure ) {
+void LinearVelocityAnalytic_PressureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* pressure ) {
 	*pressure = 0.0;
 }
 
-void LinearVelocityAnalytic_VelocityGradientsFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* velocityGradients ) {
+void LinearVelocityAnalytic_VelocityGradientsFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* velocityGradients ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 	FeVariable*             velocityField = self->velocityField;
 	FeMesh*                 mesh = velocityField->feMesh;
@@ -295,7 +295,7 @@ void LinearVelocityAnalytic_VelocityGradientsFunction( void* analyticSolution, F
 	Memory_Free( GNx );
 }
 
-void LinearVelocityAnalytic_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRate ) {
+void LinearVelocityAnalytic_StrainRateFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* strainRate ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 	Dimension_Index         dim = self->velocityField->dim;
 	TensorArray             velocityGradients;
@@ -307,7 +307,7 @@ void LinearVelocityAnalytic_StrainRateFunction( void* analyticSolution, FeVariab
 	TensorArray_GetSymmetricPart( velocityGradients, dim, strainRate );
 }
 
-void LinearVelocityAnalytic_StrainRateInvFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* strainRateInv ) {
+void LinearVelocityAnalytic_StrainRateInvFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* strainRateInv ) {
 	LinearVelocityAnalytic *self = (LinearVelocityAnalytic*)analyticSolution;
 	Dimension_Index         dim = self->velocityField->dim;
 	SymmetricTensor         strainRate;

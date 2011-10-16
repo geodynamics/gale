@@ -52,7 +52,7 @@ typedef struct {
 } HomogeneousNaturalBCs;
 
 
-void HomogeneousNaturalBCs_Velocity_SkewToMesh( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void HomogeneousNaturalBCs_Velocity_SkewToMesh(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context = (DomainContext*)_context;
 	HomogeneousNaturalBCs*  self    = Stg_ComponentFactory_ConstructByName( context->CF, (Name)HomogeneousNaturalBCs_Type, HomogeneousNaturalBCs, True, 0 );
 	double*                 result  = (double*) _result;
@@ -62,7 +62,7 @@ void HomogeneousNaturalBCs_Velocity_SkewToMesh( Node_LocalIndex node_lI, Variabl
 }
 
 
-void HomogeneousNaturalBCs_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* temperature ) {
+void HomogeneousNaturalBCs_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, const double* coord, double* temperature ) {
 	HomogeneousNaturalBCs *self = (HomogeneousNaturalBCs*)analyticSolution;
 
 	if ( coord[ J_AXIS ] < tan( self->angle ) * coord[ I_AXIS ] + 0.25 )
@@ -71,17 +71,13 @@ void HomogeneousNaturalBCs_TemperatureFunction( void* analyticSolution, FeVariab
 		*temperature = 0.0;
 }
 	
-void HomogeneousNaturalBCs_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void HomogeneousNaturalBCs_TemperatureBC(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context    = (DomainContext*)_context;
 	HomogeneousNaturalBCs*  self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)HomogeneousNaturalBCs_Type, HomogeneousNaturalBCs, True, 0 );
 	FeVariable*             feVariable = NULL;
-	FeMesh*			mesh       = NULL;
 	double*                 result     = (double*) _result;
-	double*                 coord;
 	
 	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	mesh       = feVariable->feMesh;
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	HomogeneousNaturalBCs_TemperatureFunction( self, feVariable, coord, result );
 }

@@ -78,7 +78,7 @@ void StgFEM_LidDrivenStokesAnalytic_CalculateConstants( FieldTest *fieldTest ) {
 	self->D     = - ( 2.0 * n * M_PI * e_2nPI - e_2nPI + 1.0 ) * e_nPI / E;
 }
 
-void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( void* data, double* coord, double* velocity ) {
+void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( void* data, const double* coord, double* velocity ) {
 	StgFEM_LidDrivenStokesAnalytic* self = (StgFEM_LidDrivenStokesAnalytic*)data;
 	double x,y;
 	double n;
@@ -103,15 +103,13 @@ void StgFEM_LidDrivenStokesAnalytic_VelocityFunction( void* data, double* coord,
 }
 
 
-void StgFEM_LidDrivenStokesAnalytic_PressureFunction( void* data, double* coord, double* pressure ) {
+void StgFEM_LidDrivenStokesAnalytic_PressureFunction( void* data, const double* coord, double* pressure ) {
 	StgFEM_LidDrivenStokesAnalytic* self = (StgFEM_LidDrivenStokesAnalytic*)data;
 	double x,y;
 	double n;
-	double A, B, C, D;
+	double C, D;
 	
 	n = (double)self->n;
-	A = self->A;
-	B = self->B;
 	C = self->C;
 	D = self->D;
 
@@ -125,13 +123,13 @@ void StgFEM_LidDrivenStokesAnalytic_PressureFunction( void* data, double* coord,
 void _StgFEM_LidDrivenStokesAnalytic_AssignFromXML( void* codelet, Stg_ComponentFactory* cf, void* data ) {
 	StgFEM_LidDrivenStokesAnalytic *self = (StgFEM_LidDrivenStokesAnalytic*)codelet;
 	
-	unsigned int* waveSpeed;
+	uint waveSpeed;
 
 	_FieldTest_AssignFromXML( self, cf, data );
 
 	/* Set constants */
-	*waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"sinusoidalLidWavenumber", 1 );
-	self->n = *waveSpeed;
+	waveSpeed = Stg_ComponentFactory_GetRootDictUnsignedInt( cf, (Dictionary_Entry_Key)"sinusoidalLidWavenumber", 1 );
+	self->n = waveSpeed;
 	
 	StgFEM_LidDrivenStokesAnalytic_CalculateConstants( (FieldTest*)self  );
 }

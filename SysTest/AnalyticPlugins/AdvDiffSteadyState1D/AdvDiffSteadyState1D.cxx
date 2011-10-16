@@ -62,7 +62,7 @@ typedef struct {
 	FeVariable*		  temperatureField;
 } AdvDiffSteadyState1D;
 
-void AdvDiffSteadyState1D_TemperatureFunction( void* analyticSolution, double* coord, double* temperature ) {
+void AdvDiffSteadyState1D_TemperatureFunction( void* analyticSolution, const double* coord, double* temperature ) {
 	AdvDiffSteadyState1D* self = (AdvDiffSteadyState1D*)analyticSolution;
 	double                exponent;
 	double                kappa = self->residual->defaultDiffusivity;
@@ -71,16 +71,9 @@ void AdvDiffSteadyState1D_TemperatureFunction( void* analyticSolution, double* c
 	*temperature = self->A * exp( exponent ) + self->B;
 }
 
-void AdvDiffSteadyState1D_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* temperature ){
+void AdvDiffSteadyState1D_TemperatureBC(const double *coord, void* _context, void* temperature ){
 	DomainContext*	context    = (DomainContext*)_context;
 	AdvDiffSteadyState1D*   self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)AdvDiffSteadyState1D_Type, AdvDiffSteadyState1D, True, 0 /* dummy */ );
-	FeVariable*             feVariable = NULL;
-	FeMesh*     mesh       = NULL;
-	double*                 coord;
-	
-	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	mesh       = feVariable->feMesh;
-	coord      = Mesh_GetVertex( mesh, node_lI );
 
 	AdvDiffSteadyState1D_TemperatureFunction( self, coord, (double*)temperature );
 }

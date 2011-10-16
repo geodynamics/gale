@@ -53,7 +53,8 @@ typedef struct {
 	Coord       rotationCentre;
 } CosineHillRotate;
 
-void CosineHillRotate_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable, double* coord, double* temperature ) {
+void CosineHillRotate_TemperatureFunction( void* analyticSolution, FeVariable* analyticFeVariable,
+                                           const double* coord, double* temperature ) {
 	CosineHillRotate *self = (CosineHillRotate*)analyticSolution;
 	double distanceFromCentre = StGermain_DistanceBetweenPoints( self->rotationCentre, coord, 2 );
 	
@@ -63,17 +64,13 @@ void CosineHillRotate_TemperatureFunction( void* analyticSolution, FeVariable* a
 		*temperature = 0.0;
 }
 
-void CosineHillRotate_TemperatureBC( Node_LocalIndex node_lI, Variable_Index var_I, void* _context, void* _result ) {
+void CosineHillRotate_TemperatureBC(const double *coord, void* _context, void* _result ) {
 	DomainContext*	context    = (DomainContext*)_context;
 	CosineHillRotate*  self       = Stg_ComponentFactory_ConstructByName( context->CF, (Name)CosineHillRotate_Type, CosineHillRotate, True, 0 );
 	FeVariable*             feVariable = NULL;
-	FeMesh*			mesh       = NULL;
 	double*                 result     = (double*) _result;
-	double*                 coord;
 	
 	feVariable = (FeVariable* )FieldVariable_Register_GetByName( context->fieldVariable_Register, "TemperatureField" );
-	mesh       = feVariable->feMesh;
-	coord = Mesh_GetVertex( mesh, node_lI );
 
 	CosineHillRotate_TemperatureFunction( self, feVariable, coord, result );
 }
