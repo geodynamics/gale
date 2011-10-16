@@ -196,7 +196,7 @@ void _BelowPlane_Destroy( void* belowPlane, void* data ) {
 ** Private Member functions
 */
 
-Bool _BelowPlane_IsCoordInside( void* belowPlane, Coord coord ) {
+Bool _BelowPlane_IsCoordInside( void* belowPlane, const Coord coord ) {
 	BelowPlane*            self       = (BelowPlane*)belowPlane;
 	Coord           newCoord;
 
@@ -223,7 +223,7 @@ double _BelowPlane_CalculateVolume( void* belowPlane ) {
 	return volume;
 }
 
-void _BelowPlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+void _BelowPlane_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 

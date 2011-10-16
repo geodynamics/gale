@@ -100,9 +100,9 @@
 	void _Intersection_Execute( void* intersection, void* data );
 	void _Intersection_Destroy( void* intersection, void* data ) ;
 	
-	Bool _Intersection_IsCoordInside( void* intersection, Coord coord ) ;
+	Bool _Intersection_IsCoordInside( void* intersection, const Coord coord ) ;
 	double _Intersection_CalculateVolume( void* intersection );
-	void _Intersection_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+	void _Intersection_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions
 	*/

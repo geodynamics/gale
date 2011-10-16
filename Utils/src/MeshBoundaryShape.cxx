@@ -117,14 +117,13 @@ void _MeshBoundaryShape_AssignFromXML( void* _self, Stg_ComponentFactory* cf, vo
    /* Read in the walls to have friction applied. */
    wallList = _Stg_ComponentFactory_GetDictionaryValue( cf, self->name, "walls", NULL );
    if( wallList ) {
-      int nWalls, curWall;
+      int nWalls;
       char* name;
 
       /* List exists, use it. Extract the number of walls specified. */
       nWalls = Dictionary_Entry_Value_GetCount( wallList );
 
       /* Read in each wall's name. */
-      curWall = 0;
       for( ii = 0; ii < nWalls; ii++ ) {
 
          /* Rip out the name from the list. */
@@ -188,7 +187,7 @@ void _MeshBoundaryShape_Initialise( void* _self, void* data ) {
    Stg_Component_Initialise( self->gen, data, False );
 }
 
-Bool _MeshBoundaryShape_IsCoordInside( void* _self, Coord coord ) {
+Bool _MeshBoundaryShape_IsCoordInside( void* _self, const Coord coord ) {
    MeshBoundaryShape* self = (MeshBoundaryShape*)_self;
    Coord newCoord;
 #if 0
@@ -246,7 +245,7 @@ double _MeshBoundaryShape_CalculateVolume( void* _self ) {
    return 0.0;
 }
 
-void _MeshBoundaryShape_DistanceFromCenterAxis( void* _self, Coord coord, double* disVec ) {
+void _MeshBoundaryShape_DistanceFromCenterAxis( void* _self, const Coord coord, double* disVec ) {
    abort();
 }
 

@@ -51,7 +51,7 @@
 */
 
 /** (Assumes 3D) Define a cross product of 2 vectors */
-void Vec_Cross3D( double* dst, double* a, double* b ) {
+void Vec_Cross3D( double* dst, const double* a, const double* b ) {
 	double	tmp[3];
 
 	tmp[0] = a[1] * b[2] - a[2] * b[1];
@@ -62,33 +62,33 @@ void Vec_Cross3D( double* dst, double* a, double* b ) {
 }
 
 /** (Assumes 3D) Divide a vector by a real */
-void Vec_Div2D( double* dst, double* a, double s ) {
+void Vec_Div2D( double* dst, const double* a, const double s ) {
 	double	inv = 1.0 / s;
 
 	Vec_Scale2D( dst, a, inv );
 }
 
-void Vec_Div3D( double* dst, double* a, double s ) {
+void Vec_Div3D( double* dst, const double* a, const double s ) {
 	double	inv = 1.0 / s;
 
 	Vec_Scale3D( dst, a, inv );
 }
 
 /** Calculate the normal of the vector. (ie length = 1 )*/
-void Vec_Norm3D( double* dst, double* a ) {
+void Vec_Norm3D( double* dst, const double* a ) {
 	double	invMag = 1.0 / Vec_Mag3D( a );
 
 	Vec_Scale3D( dst, a, invMag );
 }
 
-void Vec_Norm2D( double* dst, double* a ) {
+void Vec_Norm2D( double* dst, const double* a ) {
 	double	invMag = 1.0 / Vec_Mag2D( a );
 
 	Vec_Scale2D( dst, a, invMag );
 }
 
 /** Swap coordinates according to i,j, k index */
-void Vec_Swizzle( double* dst, double* src, unsigned char iInd, unsigned char jInd, unsigned char kInd ) {
+void Vec_Swizzle( double* dst, const double* src, unsigned char iInd, unsigned char jInd, unsigned char kInd ) {
 	assert( iInd < 3 && jInd < 3 && kInd < 3 );
 	
 	dst[0] = src[iInd];
@@ -103,7 +103,7 @@ void Vec_Swizzle( double* dst, double* src, unsigned char iInd, unsigned char jI
 which was taken from: 
 Eric W. Weisstein et al. "Rodrigues' Rotation Formula." From MathWorld--A Wolfram Web Resource. 
 http://mathworld.wolfram.com/RodriguesRotationFormula.html. */
-void StGermain_RotateVector(double* rotatedVector, double* vector, double* w, double theta) {
+void StGermain_RotateVector(double* rotatedVector, const double* vector, const double* w, const double theta) {
 	double rotationMatrix[3][3]; 	/* Indicies [Column][Row] */
 	double cosTheta = cos(theta);
 	double sinTheta = sin(theta);
@@ -129,7 +129,7 @@ void StGermain_RotateVector(double* rotatedVector, double* vector, double* w, do
 Is a simpler function than StGermain_RotateVector for more specific cases where the vector is to be rotated around one of the axes of the co-ordinate system. The arguments are the same except the the 'axis' argument is of type 'Index' which could be either I_AXIS, J_AXIS or K_AXIS. Vectors have to be the size of 3 doubles.
 See, Eric W. Weisstein. "Rotation Matrix." 
 From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/RotationMatrix.htm */
-void StGermain_RotateCoordinateAxis( double* rotatedVector, double* vector, Index axis, double theta ) {
+void StGermain_RotateCoordinateAxis( double* rotatedVector, const double* vector, Index axis, const double theta ) {
 	
 	/* Rotation around one axis will always leave the component on that axis alone */
 	rotatedVector[axis] = vector[axis];
@@ -159,7 +159,7 @@ void StGermain_RotateCoordinateAxis( double* rotatedVector, double* vector, Inde
 destination = vector1 - vector2
 Destination vector may be the same as either of the other two input vectors 
 Function is optimised for 1-3 dimensions but will work for any dimension */
-void StGermain_VectorSubtraction(double* destination, double* vector1, double* vector2, Index dim) {
+void StGermain_VectorSubtraction(double* destination, const double* vector1, const double* vector2, Index dim) {
 	switch (dim) {
 		case 3: 
 			destination[2] = vector1[2] - vector2[2];
@@ -181,7 +181,7 @@ void StGermain_VectorSubtraction(double* destination, double* vector1, double* v
 destination = vector1 + vector2
 Destination vector may be the same as either of the other two input vectors 
 Function is optimised for 1-3 dimensions but will work for any dimension */
-void StGermain_VectorAddition(double* destination, double* vector1, double* vector2, Index dim) {
+void StGermain_VectorAddition(double* destination, const double* vector1, const double* vector2, Index dim) {
 	switch (dim) {
 		case 3: 
 			destination[2] = vector1[2] + vector2[2];
@@ -203,7 +203,7 @@ void StGermain_VectorAddition(double* destination, double* vector1, double* vect
 |v| = \sqrt{ v . v } 
 This function uses function StGermain_VectorDotProduct to calculate v . v. 
 Vector has to be of size dim doubles */
-double StGermain_VectorMagnitude(double* vector, Index dim) {
+double StGermain_VectorMagnitude(const double* vector, Index dim) {
 	return sqrt(StGermain_VectorDotProduct(vector,vector,dim));
 }
 
@@ -212,7 +212,7 @@ double StGermain_VectorMagnitude(double* vector, Index dim) {
 This function uses function StGermain_VectorDotProduct to calculate v . v. 
 Vectors have to be of size dim doubles
 */
-double StGermain_VectorDotProduct(double* vector1, double* vector2, Index dim) {
+double StGermain_VectorDotProduct(const double* vector1, const double* vector2, Index dim) {
 	double dotProduct = 0.0;
 
 	switch (dim) {
@@ -237,7 +237,7 @@ double StGermain_VectorDotProduct(double* vector1, double* vector2, Index dim) {
 /** See Eric W. Weisstein. "Cross Product." 
 From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/CrossProduct.html 
 Tested against http://www.engplanet.com/redirect.html?3859 */
-void StGermain_VectorCrossProduct(double* destination, double* vector1, double* vector2) {
+void StGermain_VectorCrossProduct(double* destination, const double* vector1, const double* vector2) {
 	destination[0] = vector1[1]*vector2[2] - vector1[2]*vector2[1];
 	destination[1] = vector1[2]*vector2[0] - vector1[0]*vector2[2];
 	destination[2] = vector1[0]*vector2[1] - vector1[1]*vector2[0];
@@ -247,7 +247,7 @@ void StGermain_VectorCrossProduct(double* destination, double* vector1, double* 
 From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/CrossProduct.html 
 |a \times b| = |a||b|\sqrt{ 1 - (\hat a . \hat b)^2}
 */
-double StGermain_VectorCrossProductMagnitude( double* vector1, double* vector2, Dimension_Index dim ) {
+double StGermain_VectorCrossProductMagnitude( const double* vector1, const double* vector2, Dimension_Index dim ) {
 	double mag1       = StGermain_VectorMagnitude( vector1, dim );
 	double mag2       = StGermain_VectorMagnitude( vector2, dim );
 	double dotProduct = StGermain_VectorDotProduct( vector1, vector2, dim );
@@ -259,7 +259,7 @@ double StGermain_VectorCrossProductMagnitude( double* vector1, double* vector2, 
 /** StGermain_ScalarTripleProduct - Calculates the scalar vector product of three vectors -
  * see Eric W. Weisstein. "Scalar Triple Product." From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/ScalarTripleProduct.html
  * Assumes 3 Dimensions */
-double StGermain_ScalarTripleProduct( double* vectorA, double* vectorB, double* vectorC ) {
+double StGermain_ScalarTripleProduct( const double* vectorA, const double* vectorB, const double* vectorC ) {
 	double crossProduct[3];
 	
 	StGermain_VectorCrossProduct( crossProduct, vectorB, vectorC );
@@ -296,7 +296,7 @@ void StGermain_VectorNormalise(double* vector, Index dim) {
 \cos{\theta} = \frac{a.b}{|a||b|}
 Uses StGermain_AngleBetweenVectors and StGermain_VectorMagnitude
 Vectors has to be of size dim doubles */
-double StGermain_AngleBetweenVectors( double* vectorA, double* vectorB, Index dim ) {
+double StGermain_AngleBetweenVectors( const double* vectorA, const double* vectorB, Index dim ) {
 	double dotProduct = StGermain_VectorDotProduct(vectorA, vectorB, dim);
 	double magA = StGermain_VectorMagnitude( vectorA, dim );
 	double magB = StGermain_VectorMagnitude( vectorB, dim );
@@ -315,7 +315,7 @@ double StGermain_AngleBetweenVectors( double* vectorA, double* vectorB, Index di
 distance = |a - b|
 Uses StGermain_VectorSubtraction and StGermain_VectorMagnitude
 Position vectors have to be of size dim doubles */
-double StGermain_DistanceBetweenPoints( double* pos1, double* pos2, Index dim) {
+double StGermain_DistanceBetweenPoints( const double* pos1, const double* pos2, Index dim) {
 	double mag;
 	double *vector;
 	
@@ -333,7 +333,7 @@ double StGermain_DistanceBetweenPoints( double* pos1, double* pos2, Index dim) {
 /** Given three points which define a plane, StGermain_NormalToPlane will give the unit vector which is normal to that plane
 Uses StGermain_VectorSubtraction, StGermain_VectorCrossProduct and StGermain_VectorNormalise
 Position vectors and normal have to be of size 3 doubles */
-void StGermain_NormalToPlane( double* normal, double* pos0, double* pos1, double* pos2) {
+void StGermain_NormalToPlane( double* normal, const double* pos0, const double* pos1, const double* pos2) {
 	double vector1[3], vector2[3];
 
 	StGermain_VectorSubtraction( vector1, pos1, pos0, 3) ;
@@ -347,7 +347,7 @@ void StGermain_NormalToPlane( double* normal, double* pos0, double* pos1, double
 #define ONE_THIRD 0.3333333333333333333
 /** Calculates the position vector to the centroid of a triangle whose vertices are given by position vectors 
 Position vectors have to be of size dim doubles */
-void StGermain_TriangleCentroid( double* centroid, double* pos0, double* pos1, double* pos2, Index dim) {
+void StGermain_TriangleCentroid( double* centroid, const double* pos0, const double* pos1, const double* pos2, Index dim) {
 
 	switch (dim) {
 		case 3:
@@ -370,7 +370,7 @@ void StGermain_TriangleCentroid( double* centroid, double* pos0, double* pos1, d
 Position vectors have to be of size dim doubles 
 Only works for dim == 2 or dim == 3
 */
-double StGermain_TriangleArea( double* pos0, double* pos1, double* pos2, Index dim ) {
+double StGermain_TriangleArea( const double* pos0, const double* pos1, const double* pos2, Index dim ) {
 	double normal[3];
 	double vector1[3], vector2[3];
 	double area;
@@ -393,7 +393,7 @@ double StGermain_TriangleArea( double* pos0, double* pos1, double* pos2, Index d
  * Area = \frac{1}{2}| p \times q | where p and q are diagonals of a convex polygon
  * This function will not work for dim > 3 and vertices have to be given in a winding direction
 */
-double StGermain_ConvexQuadrilateralArea( double* vertexCoord1, double* vertexCoord2, double* vertexCoord3, double* vertexCoord4, Dimension_Index dim ) {
+double StGermain_ConvexQuadrilateralArea( const double* vertexCoord1, const double* vertexCoord2, const double* vertexCoord3, const double* vertexCoord4, Dimension_Index dim ) {
 	Coord diagonal1;	
 	Coord diagonal2;
 
@@ -408,10 +408,10 @@ double StGermain_ConvexQuadrilateralArea( double* vertexCoord1, double* vertexCo
  * see Eric W. Weisstein et al. "Parallelepiped." From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/Parallelepiped.html
  * Assumes 3 Dimensions */
 double StGermain_ParallelepipedVolume( 
-		double* coordLeftBottomFront, 
-		double* coordRightBottomFront, 
-		double* coordLeftTopFront, 
-		double* coordLeftBottomBack ) {
+		const double* coordLeftBottomFront, 
+		const double* coordRightBottomFront, 
+		const double* coordLeftTopFront, 
+		const double* coordLeftBottomBack ) {
 
 	double vectorA[3], vectorB[3], vectorC[3];
 
@@ -461,7 +461,7 @@ void StGermain_AverageCoord( double* coord, double** coordList, Index count, Dim
 }
 /** Prints a vector of any non-zero positive length 
 Uses %lf print statement*/
-void StGermain_PrintVector( Stream* stream, double* vector, Index dim ) {
+void StGermain_PrintVector( Stream* stream, const double* vector, Index dim ) {
 	Index d;
 
 	if ( dim <= 0 ) {

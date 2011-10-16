@@ -99,9 +99,9 @@
 	void _ConvexHull_Execute( void* convexHull, void* data );
 	void _ConvexHull_Destroy( void* convexHull, void* data ) ;
 	
-	Bool _ConvexHull_IsCoordInside( void* convexHull, Coord coord ) ;
+	Bool _ConvexHull_IsCoordInside( void* convexHull, const Coord coord ) ;
 	double _ConvexHull_CalculateVolume( void* convexHull );
-	void _ConvecHull_DistanceFromCenterAxis( void* self, Coord coord, double* disVec );
+	void _ConvecHull_DistanceFromCenterAxis( void* self, const Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

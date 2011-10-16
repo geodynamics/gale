@@ -50,11 +50,11 @@ typedef struct {
 	int		nProcs;
 } CompositeVCSuiteData;
 
-void CompositeVCSuite_quadratic(Index index, Variable_Index var_I, void* context, void* result) {
+void CompositeVCSuite_quadratic(const double *coord, void* context, void* result) {
    *(double *)result = 20.0;
 }
 
-void CompositeVCSuite_exponential(Index index, Variable_Index var_I, void* context, void* result) {
+void CompositeVCSuite_exponential(const double *coord, void* context, void* result) {
    *(double *)result = 30.0;
 }
 

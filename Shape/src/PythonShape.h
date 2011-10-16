@@ -106,9 +106,9 @@
 	void _PythonShape_Execute( void* pythonShape, void* data );
 	void _PythonShape_Destroy( void* pythonShape, void* data ) ;
 	
-	Bool _PythonShape_IsCoordInside( void* pythonShape, Coord coord ) ;
+	Bool _PythonShape_IsCoordInside( void* pythonShape, const Coord coord ) ;
 	double _PythonShape_CalculateVolume( void* pythonShape );
-	void _PythonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+	void _PythonShape_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

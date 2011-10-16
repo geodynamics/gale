@@ -244,7 +244,7 @@ void _Union_Destroy( void* combination, void* data ) {
 /*---------------------------------------------------------------------------------------------------------------------
 ** Private Member functions
 */
-Bool _Union_IsCoordInside( void* combination, Coord coord ) {
+Bool _Union_IsCoordInside( void* combination, const Coord coord ) {
 	Union*    self           = (Union*)combination;
 	Index           shapeCount     = self->shapeCount;
 	Index           shape_I;
@@ -269,7 +269,7 @@ double _Union_CalculateVolume( void* combination ) {
 	return 0.0;
 }
 
-void _Union_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
+void _Union_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ) {
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 

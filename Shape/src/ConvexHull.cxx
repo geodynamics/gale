@@ -277,7 +277,7 @@ void _ConvexHull_Destroy( void* convexHull, void* data ) {
 /*---------------------------------------------------------------------------------------------------------------------
 ** Private Member functions
 */
-Bool _ConvexHull_IsCoordInside( void* convexHull, Coord point ) {
+Bool _ConvexHull_IsCoordInside( void* convexHull, const Coord point ) {
 	ConvexHull*     self                 = (ConvexHull*)convexHull;
 	Index           vertex_I;
 	XYZ             tmpVector;
@@ -298,7 +298,7 @@ double _ConvexHull_CalculateVolume( void* convexHull ) {
 	assert( 0 );
 	return 0.0;
 }
-void _ConvecHull_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
+void _ConvecHull_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ) {
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 

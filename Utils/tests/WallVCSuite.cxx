@@ -50,11 +50,11 @@ typedef struct {
 	int		nProcs;
 } WallVCSuiteData;
 
-void WallVCSuite_quadratic(Index index, Variable_Index var_I, void* context, void* result) {
+void WallVCSuite_quadratic(const double *coord, void* context, void* result) {
 	*(double *)result = 20.0;
 }
 
-void WallVCSuite_exponential(Index index, Variable_Index var_I, void* context, void* result) {
+void WallVCSuite_exponential(const double *coord, void* context, void* result) {
 	*(double *)result = 30.0;
 }
 
@@ -98,11 +98,12 @@ void WallVCSuite_TestWallVC( WallVCSuiteData* data ) {
 	int									procToWatch;
 	double								minCrds[3] = {0.0, 0.0, 0.0};
 	double								maxCrds[3] = {1.0, 1.0, 1.0};
-	char*									vcKey[] = {"WallVC_Front", "WallVC_Back", "WallVC_Left", "WallVC_Right",
-														"WallVC_Top", "WallVC_Bottom"};
-	char*   								vcKeyName[] = {"WallVC_FrontName", "WallVC_BackName", "WallVC_LeftName", "WallVC_RightName",
-														"WallVC_TopName", "WallVC_BottomName"};
-	char*									varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
+	const char* vcKey[] = {"WallVC_Front", "WallVC_Back", "WallVC_Left",
+                               "WallVC_Right", "WallVC_Top", "WallVC_Bottom"};
+	const char* vcKeyName[] = {"WallVC_FrontName", "WallVC_BackName",
+                                   "WallVC_LeftName", "WallVC_RightName",
+                                   "WallVC_TopName", "WallVC_BottomName"};
+	const char* varName[] = {"x", "y", "z", "vx", "vy", "vz", "temp"};
 	char									input_file[PCU_PATH_MAX];
 	char									expected_file[PCU_PATH_MAX];
 	Mesh*									mesh;

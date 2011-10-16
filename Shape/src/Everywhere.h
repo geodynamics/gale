@@ -90,9 +90,9 @@
 	void _Everywhere_Execute( void* everywhere, void* data );
 	void _Everywhere_Destroy( void* everywhere, void* data ) ;
 	
-	Bool _Everywhere_IsCoordInside( void* everywhere, Coord coord ) ;
+	Bool _Everywhere_IsCoordInside( void* everywhere, const Coord coord ) ;
 	double _Everywhere_CalculateVolume( void* everywhere );
-	void _Everywhere_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+	void _Everywhere_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

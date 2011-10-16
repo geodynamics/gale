@@ -97,8 +97,8 @@
 	void _Sphere_Execute( void* sphere, void* data );
 	void _Sphere_Destroy( void* sphere, void* data ) ;
 	
-	Bool _Sphere_IsCoordInside( void* sphere, Coord coord ) ;
-	void _Sphere_DistanceFromCenterAxis( void* sphere, Coord coord, double* disVec );
+	Bool _Sphere_IsCoordInside( void* sphere, const Coord coord ) ;
+	void _Sphere_DistanceFromCenterAxis( void* sphere, const Coord coord, double* disVec );
 	double _Sphere_CalculateVolume( void* sphere );
 
 	/*---------------------------------------------------------------------------------------------------------------------

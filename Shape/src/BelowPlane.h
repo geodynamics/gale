@@ -90,10 +90,10 @@
 	void _BelowPlane_Execute( void* belowPlane, void* data );
 	void _BelowPlane_Destroy( void* belowPlane, void* data ) ;
 	
-	Bool _BelowPlane_IsCoordInside( void* belowPlane, Coord coord ) ;
+	Bool _BelowPlane_IsCoordInside( void* belowPlane, const Coord coord ) ;
 
 	double _BelowPlane_CalculateVolume( void* belowPlane );
-	void _BelowPlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+	void _BelowPlane_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

@@ -118,40 +118,40 @@
 	** Functions
 	*/
 
-	void Vec_Cross3D( double* dst, double* a, double* b );
-	void Vec_Div2D( double* dst, double* a, double s );
-	void Vec_Div3D( double* dst, double* a, double s );
-	void Vec_Norm2D( double* dst, double* a );
-	void Vec_Norm3D( double* dst, double* a );
+	void Vec_Cross3D( double* dst, const double* a, const double* b );
+	void Vec_Div2D( double* dst, const double* a, const double s );
+	void Vec_Div3D( double* dst, const double* a, const double s );
+	void Vec_Norm2D( double* dst, const double* a );
+	void Vec_Norm3D( double* dst, const double* a );
 
-	void StGermain_RotateVector(double* rotatedVector, double* vector, double* w, double theta) ;
-	void StGermain_RotateCoordinateAxis( double* rotatedVector, double* vector, Index axis, double theta ) ;
-	void StGermain_VectorSubtraction(double* destination, double* vector1, double* vector2, Index dim) ;
-	void StGermain_VectorAddition(double* destination, double* vector1, double* vector2, Index dim) ;
-	double StGermain_VectorMagnitude(double* vector, Index dim) ;
-	double StGermain_VectorDotProduct(double* vector1, double* vector2, Index dim) ;
-	void StGermain_VectorCrossProduct(double* destination, double* vector1, double* vector2) ;
-	double StGermain_VectorCrossProductMagnitude( double* vector1, double* vector2, Dimension_Index dim ) ;
-	double StGermain_ScalarTripleProduct( double* vectorA, double* vectorB, double* vectorC ) ;
+	void StGermain_RotateVector(double* rotatedVector, const double* vector, const double* w, const double theta) ;
+	void StGermain_RotateCoordinateAxis( double* rotatedVector, const double* vector, Index axis, const double theta ) ;
+	void StGermain_VectorSubtraction(double* destination, const double* vector1, const double* vector2, Index dim) ;
+	void StGermain_VectorAddition(double* destination, const double* vector1, const double* vector2, Index dim) ;
+	double StGermain_VectorMagnitude(const double* vector, Index dim) ;
+	double StGermain_VectorDotProduct(const double* vector1, const double* vector2, Index dim) ;
+	void StGermain_VectorCrossProduct(double* destination, const double* vector1, const double* vector2) ;
+	double StGermain_VectorCrossProductMagnitude( const double* vector1, const double* vector2, Dimension_Index dim ) ;
+	double StGermain_ScalarTripleProduct( const double* vectorA, const double* vectorB, const double* vectorC ) ;
 
 	void StGermain_VectorNormalise(double* vector, Index dim) ;
-	double StGermain_AngleBetweenVectors( double* vectorA, double* vectorB, Index dim ) ;
-	double StGermain_DistanceBetweenPoints( double* pos1, double* pos2, Index dim) ;
-	void StGermain_NormalToPlane( double* normal, double* pos0, double* pos1, double* pos2) ;
+	double StGermain_AngleBetweenVectors( const double* vectorA, const double* vectorB, Index dim ) ;
+	double StGermain_DistanceBetweenPoints( const double* pos1, const double* pos2, Index dim) ;
+	void StGermain_NormalToPlane( double* normal, const double* pos0, const double* pos1, const double* pos2) ;
 
-	void StGermain_TriangleCentroid( double* centroid, double* pos0, double* pos1, double* pos2, Index dim) ;
-	double StGermain_TriangleArea( double* pos0, double* pos1, double* pos2, Index dim ) ;
-	double StGermain_ConvexQuadrilateralArea( double* vertexCoord1, double* vertexCoord2, 
-						  double* vertexCoord3, double* vertexCoord4, 
+	void StGermain_TriangleCentroid( double* centroid, const double* pos0, const double* pos1, const double* pos2, Index dim) ;
+	double StGermain_TriangleArea( const double* pos0, const double* pos1, const double* pos2, Index dim ) ;
+	double StGermain_ConvexQuadrilateralArea( const double* vertexCoord1, const double* vertexCoord2, 
+						  const double* vertexCoord3, const double* vertexCoord4, 
 						  Dimension_Index dim ) ;
-	double StGermain_ParallelepipedVolume( double* coordLeftBottomFront, 
-					       double* coordRightBottomFront, 
-					       double* coordLeftTopFront, 
-					       double* coordLeftBottomBack );
+	double StGermain_ParallelepipedVolume( const double* coordLeftBottomFront, 
+					       const double* coordRightBottomFront, 
+					       const double* coordLeftTopFront, 
+					       const double* coordLeftBottomBack );
 	double StGermain_ParallelepipedVolumeFromCoordList( Coord_List list ) ;
 	
 	void StGermain_AverageCoord( double* coord, double** coordList, Index count, Dimension_Index dim ) ;
-	void StGermain_PrintVector( Stream* stream, double* vector, Index dim ) ;
+	void StGermain_PrintVector( Stream* stream, const double* vector, Index dim ) ;
 
 	/** Print a named vector. Name comes from vector variable in file*/
 	#define StGermain_PrintNamedVector(stream, vector, dim)		\

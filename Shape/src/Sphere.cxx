@@ -186,7 +186,7 @@ void _Sphere_Destroy( void* sphere, void* data ) {
 ** Private Member functions
 */
 
-Bool _Sphere_IsCoordInside( void* sphere, Coord coord ) {
+Bool _Sphere_IsCoordInside( void* sphere, const Coord coord ) {
 	Sphere*         self              = (Sphere*)sphere;
 	Coord           newCoord;
 	double          insideOutsideValue;
@@ -208,7 +208,7 @@ Bool _Sphere_IsCoordInside( void* sphere, Coord coord ) {
 	
 }
 
-void _Sphere_DistanceFromCenterAxis( void* sphere, Coord coord, double* disVec ) {
+void _Sphere_DistanceFromCenterAxis( void* sphere, const Coord coord, double* disVec ) {
 	Sphere*         self              = (Sphere*)sphere;
 	Coord           newCoord;
 

@@ -206,7 +206,7 @@ void _Box_Destroy( void* shape, void* data ) {
 ** Private Member functions
 */
 
-Bool _Box_IsCoordInside( void* shape, Coord coord ) {
+Bool _Box_IsCoordInside( void* shape, const Coord coord ) {
 	Box*            self       = (Box*)shape;
 	Coord           newCoord;
 	Dimension_Index dim_I;
@@ -232,7 +232,7 @@ double _Box_CalculateVolume( void* shape ) {
 	return result;
 }
 
-void _Box_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ) {
+void _Box_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ) {
 	/* To be implemented */
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),

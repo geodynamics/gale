@@ -266,7 +266,7 @@ void _PolygonShape_Destroy( void* polygon, void* data ) {
  * Algorithm works by summing the angles between the test coordinate and each pair of vertices that make up an edge 
  * in the polygon. An inside point will give an angle of 2pi and and outside point will give an angle of 0 */
 
-Bool _PolygonShape_IsCoordInside( void* polygon, Coord coord ) {
+Bool _PolygonShape_IsCoordInside( void* polygon, const Coord coord ) {
 	PolygonShape*        self                = (PolygonShape*) polygon;
 	Index           vertexCount         = self->vertexCount;
 	Coord_List      vertexList          = self->vertexList;
@@ -326,7 +326,7 @@ double _PolygonShape_CalculateVolume( void* polygon ) {
 	return 0.0;
 }
 
-void _PolygonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+void _PolygonShape_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 

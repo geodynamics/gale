@@ -100,9 +100,9 @@
 	void _Superellipsoid_Execute( void* superellipsoid, void* data );
 	void _Superellipsoid_Destroy( void* superellipsoid, void* data ) ;
 	
-	Bool _Superellipsoid_IsCoordInside( void* superellipsoid, Coord coord ) ;
+	Bool _Superellipsoid_IsCoordInside( void* superellipsoid, const Coord coord ) ;
 	double _Superellipsoid_CalculateVolume( void* superellipsoid );
-	void _Superellipsoid_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+	void _Superellipsoid_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

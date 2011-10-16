@@ -100,9 +100,9 @@
 	void _Union_Execute( void* combination, void* data );
 	void _Union_Destroy( void* combination, void* data ) ;
 	
-	Bool _Union_IsCoordInside( void* combination, Coord coord ) ;
+	Bool _Union_IsCoordInside( void* combination, const Coord coord ) ;
 	double _Union_CalculateVolume( void* combination );
-	void _Union_DistanceFromCenterAxis( void* sphere, Coord coord, double* disVec );
+	void _Union_DistanceFromCenterAxis( void* sphere, const Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

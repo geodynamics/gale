@@ -212,7 +212,7 @@ void _Cylinder_Destroy( void* cylinder, void* data ) {
 ** Private Member functions
 */
 
-Bool _Cylinder_IsCoordInside( void* cylinder, Coord coord ) {
+Bool _Cylinder_IsCoordInside( void* cylinder, const Coord coord ) {
 	Cylinder*       self       = (Cylinder*)cylinder;
 	Coord           newCoord;
 	double          insideOutsideValue;
@@ -246,7 +246,7 @@ Bool _Cylinder_IsCoordInside( void* cylinder, Coord coord ) {
 	return True;
 }
 
-void _Cylinder_DistanceFromCenterAxis( void* cylinder, Coord coord, double* disVec ) {
+void _Cylinder_DistanceFromCenterAxis( void* cylinder, const Coord coord, double* disVec ) {
 	Cylinder*       self       = (Cylinder*)cylinder;
 	Coord           newCoord;
 

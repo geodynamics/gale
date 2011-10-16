@@ -104,9 +104,9 @@
 	void _PolygonShape_Execute( void* polygon, void* data );
 	void _PolygonShape_Destroy( void* polygon, void* data ) ;
 	
-	Bool _PolygonShape_IsCoordInside( void* polygon, Coord coord ) ;
+	Bool _PolygonShape_IsCoordInside( void* polygon, const Coord coord ) ;
 	double _PolygonShape_CalculateVolume( void* polygon );
-	void _PolygonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+	void _PolygonShape_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec );
 
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions

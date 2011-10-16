@@ -104,10 +104,10 @@
 	void _BelowCosinePlane_Execute( void* belowPlane, void* data );
 	void _BelowCosinePlane_Destroy( void* belowPlane, void* data ) ;
 	
-	Bool _BelowCosinePlane_IsCoordInside( void* belowPlane, Coord coord ) ;
+	Bool _BelowCosinePlane_IsCoordInside( void* belowPlane, const Coord coord ) ;
 
 	double _BelowCosinePlane_CalculateVolume( void* belowPlane );
-	void _BelowCosinePlane_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
+	void _BelowCosinePlane_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec );
 
 
 	/*---------------------------------------------------------------------------------------------------------------------

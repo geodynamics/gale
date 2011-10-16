@@ -198,7 +198,7 @@ void _Stg_Shape_Destroy( void* shape, void* data ) {
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Virtual Functions
 */
-Bool Stg_Shape_IsCoordInside( void* shape, Coord coord ) {
+Bool Stg_Shape_IsCoordInside( void* shape, const Coord coord ) {
 	Stg_Shape* self              = (Stg_Shape*)shape;
 
 	/* XOR the output */
@@ -234,7 +234,7 @@ void Stg_Shape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec 
 /*--------------------------------------------------------------------------------------------------------------------------
 ** Public Functions
 */
-void Stg_Shape_TransformCoord( void* shape, Coord coord, Coord transformedCoord ) {
+void Stg_Shape_TransformCoord( void* shape, const Coord coord, Coord transformedCoord ) {
 	Stg_Shape* self              = (Stg_Shape*)shape;
 	Coord      rotatedCoord;
 
@@ -263,7 +263,8 @@ void Stg_Shape_TransformCoord( void* shape, Coord coord, Coord transformedCoord 
 
 }
 
-void Stg_Shape_TranslateCoord( void* shape, Coord coord, Coord translatedCoord ) {
+void Stg_Shape_TranslateCoord( void* shape, const Coord coord,
+                               Coord translatedCoord ) {
 	Stg_Shape* self              = (Stg_Shape*)shape;
 
    self->dim == 2 ? 

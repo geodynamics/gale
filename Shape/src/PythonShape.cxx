@@ -214,7 +214,7 @@ void _PythonShape_Destroy( void* pythonShape, void* data ) {
 ** Private Member functions
 */
 
-Bool _PythonShape_IsCoordInside( void* pythonShape, Coord coord ) {
+Bool _PythonShape_IsCoordInside( void* pythonShape, const Coord coord ) {
 	PythonShape*          self                   = (PythonShape*)pythonShape;
 	Coord                 newCoord;
 	PyObject*             xCoord;
@@ -251,7 +251,7 @@ double _PythonShape_CalculateVolume( void* pythonShape ) {
 	assert( 0 );
 	return 0.0;
 }
-void _PythonShape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+void _PythonShape_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 

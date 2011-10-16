@@ -50,7 +50,7 @@ typedef struct {
 	int		nProcs;
 } AllNodesVCSuiteData;
 
-void AllNodesVCSuite_quadratic(Index index, Variable_Index var_I, void* context, void* result) {
+void AllNodesVCSuite_quadratic(const double *coord, void* context, void* result) {
 	*(double *)result = 20.0;
 }
 

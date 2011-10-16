@@ -79,9 +79,9 @@ void _MeshBoundaryShape_AssignFromXML( void* _self, Stg_ComponentFactory* cf, vo
 void _MeshBoundaryShape_Build( void* _self, void* data );
 void _MeshBoundaryShape_Initialise( void* _self, void* data );
 
-Bool _MeshBoundaryShape_IsCoordInside( void* _self, Coord coord ) ;
+Bool _MeshBoundaryShape_IsCoordInside( void* _self, const Coord coord ) ;
 double _MeshBoundaryShape_CalculateVolume( void* _self );
-void _MeshBoundaryShape_DistanceFromCenterAxis( void* _self, Coord coord, double* disVec );
+void _MeshBoundaryShape_DistanceFromCenterAxis( void* _self, const Coord coord, double* disVec );
 
 #endif
 

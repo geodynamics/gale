@@ -253,7 +253,7 @@ void _Intersection_Destroy( void* intersection, void* data ) {
 /*---------------------------------------------------------------------------------------------------------------------
 ** Private Member functions
 */
-Bool _Intersection_IsCoordInside( void* intersection, Coord coord ) {
+Bool _Intersection_IsCoordInside( void* intersection, const Coord coord ) {
 	Intersection*   self           = (Intersection*)intersection;
 	Index           shapeCount     = self->shapeCount;
 	Index           shape_I;
@@ -276,7 +276,7 @@ double _Intersection_CalculateVolume( void* intersection ) {
 	assert( 0 /* not impossible as long as you have other shapes with volum */ );
 	return 0.0;
 }
-void _Intersection_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+void _Intersection_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 

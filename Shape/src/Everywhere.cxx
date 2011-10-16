@@ -160,14 +160,14 @@ void _Everywhere_Destroy( void* everywhere, void* data ) {
 ** Private Member functions
 */
 
-Bool _Everywhere_IsCoordInside( void* everywhere, Coord coord ) {
+Bool _Everywhere_IsCoordInside( void* everywhere, const Coord coord ) {
 	return True;
 }
 
 double _Everywhere_CalculateVolume( void* everywhere ) {
 	return 1.0;
 }	
-void _Everywhere_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+void _Everywhere_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 

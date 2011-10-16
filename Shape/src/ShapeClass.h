@@ -39,9 +39,9 @@
 #ifndef __StgDomain_Shape_ShapeClass_h__
 #define __StgDomain_Shape_ShapeClass_h__
 
-	typedef Bool (Stg_Shape_IsCoordInsideFunction) ( void* shape, Coord coord );
+	typedef Bool (Stg_Shape_IsCoordInsideFunction) ( void* shape, const Coord coord );
 
-	typedef void (Stg_Shape_DistanceFromCenterAxisFunction) ( void* shape, Coord coord, double* disVec );
+	typedef void (Stg_Shape_DistanceFromCenterAxisFunction) ( void* shape, const Coord coord, double* disVec );
 
 	typedef double (Stg_Shape_CalculateVolumeFunction) ( void* shape );
 
@@ -114,7 +114,7 @@ Stg_Shape* _Stg_Shape_New(  STG_SHAPE_DEFARGS  );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Virtual Function Implementation 
 	*/
-	Bool Stg_Shape_IsCoordInside( void* shape, Coord coord ) ;
+	Bool Stg_Shape_IsCoordInside( void* shape, const Coord coord ) ;
 
 	double Stg_Shape_CalculateVolume( void* shape );
 	void Stg_Shape_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec );
@@ -122,8 +122,8 @@ Stg_Shape* _Stg_Shape_New(  STG_SHAPE_DEFARGS  );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions
 	*/
-	void Stg_Shape_TransformCoord( void* shape, Coord coord, Coord transformedCoord ) ;
-	void Stg_Shape_TranslateCoord( void* shape, Coord coord, Coord translatedCoord ) ;
+	void Stg_Shape_TransformCoord( void* shape, const Coord coord, Coord transformedCoord ) ;
+	void Stg_Shape_TranslateCoord( void* shape, const Coord coord, Coord translatedCoord ) ;
 	
 #endif 
 

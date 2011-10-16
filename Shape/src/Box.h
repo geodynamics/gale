@@ -96,11 +96,11 @@
 	void _Box_Execute( void* box, void* data );
 	void _Box_Destroy( void* box, void* data ) ;
 	
-	Bool _Box_IsCoordInside( void* box, Coord coord ) ;
+	Bool _Box_IsCoordInside( void* box, const Coord coord ) ;
 
 	double _Box_CalculateVolume( void* box );
 
-	void _Box_DistanceFromCenterAxis( void* box, Coord coord, double* disVec );
+	void _Box_DistanceFromCenterAxis( void* box, const Coord coord, double* disVec );
 	/*---------------------------------------------------------------------------------------------------------------------
 	** Public member functions
 	*/

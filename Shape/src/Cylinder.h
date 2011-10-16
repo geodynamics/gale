@@ -101,8 +101,8 @@
 	void _Cylinder_Execute( void* cylinder, void* data );
 	void _Cylinder_Destroy( void* cylinder, void* data ) ;
 	
-	Bool _Cylinder_IsCoordInside( void* cylinder, Coord coord ) ;
-	void _Cylinder_DistanceFromCenterAxis( void* cylinder, Coord coord, double* disVec );
+	Bool _Cylinder_IsCoordInside( void* cylinder, const Coord coord ) ;
+	void _Cylinder_DistanceFromCenterAxis( void* cylinder, const Coord coord, double* disVec );
 	double _Cylinder_CalculateVolume( void* cylinder );
 
 	/*---------------------------------------------------------------------------------------------------------------------

@@ -197,7 +197,7 @@ void _Superellipsoid_Destroy( void* superellipsoid, void* data ) {
 ** Private Member functions
 */
 
-Bool _Superellipsoid_IsCoordInside( void* superellipsoid, Coord coord ) {
+Bool _Superellipsoid_IsCoordInside( void* superellipsoid, const Coord coord ) {
 	Superellipsoid* self              = (Superellipsoid*)superellipsoid;
 	Coord           newCoord;
 	double          insideOutsideValue;
@@ -228,7 +228,7 @@ double _Superellipsoid_CalculateVolume( void* superellipsoid ) {
 	return 0.0;
 }
 
-void _Superellipsoid_DistanceFromCenterAxis( void* shape, Coord coord, double* disVec ){
+void _Superellipsoid_DistanceFromCenterAxis( void* shape, const Coord coord, double* disVec ){
 	Stg_Shape* self = (Stg_Shape*)shape;
 	Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ),
 	"Error in function %s: This functions hasn't been implemented.", 
