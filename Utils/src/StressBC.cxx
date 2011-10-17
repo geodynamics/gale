@@ -331,133 +331,107 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
     return;
 
   /* Set up directions particular to each wall */
-  int x,y,z;
-  int local_bottom(-1);
+  uint face;
   switch(self->_wall)
     {
       case Wall_Right:
-        local_bottom=1;
+        face=3;
+        break;
       case Wall_Left:
-        x=1;
-        y=2;
-        z=0;
+        face=2;
         break;
       case Wall_Top:
-        local_bottom=1;
+        face=1;
+        break;
       case Wall_Bottom:
-        x=0;
-        y=2;
-        z=1;
+        face=0;
         break;
       case Wall_Front:
-        local_bottom=1;
+        face=5;
+        break;
       case Wall_Back:
-        x=0;
-        y=1;
-        z=2;
+        face=4;
         break;
       default:
         abort();
       }
-  /* Fix up for 2D */
-  if(dim==2)
-    y=1-x;
 
-  /* For each gaussian integration point, compute the value of the
-     Jacobian */
-  double **jacobian=Memory_Alloc_2DArray(double,dim,dim,
-                                         (Name)"Temporary Jacobian");
-  double xi[]={-sqrt(3/5.0),0,sqrt(3/5.0)};
-  double weights[]={5/9.0, 8/9.0, 5/9.0};
+  const double xi[]={-sqrt(3/5.0),0,sqrt(3/5.0)};
+  const double weights[]={5/9.0, 8/9.0, 5/9.0};
 
-  for(int i=0;i<3;++i)
+  for(uint norm=0;norm<dim;++norm)
     {
-      for(int j=0;j<(dim==2 ? 1 : 3); ++j)
+      int surface[dim-1];
+      surface[0]=(norm+1)%dim;
+      if(dim==3)
+        surface[1]=(norm+2)%dim;
+      for(int i=0;i<3;++i)
         {
-          double local_coord[dim], global_coord[dim];
-          local_coord[x]=xi[i];
-          if(dim==2)
+          for(int j=0;j<(dim==2 ? 1 : 3); ++j)
             {
-              local_coord[y]=local_bottom;
-            }
-          else
-            {
-              local_coord[y]=xi[j];
-              local_coord[z]=local_bottom;
-            }
-          double Ni[num_nodes];
-          ElementType_EvaluateShapeFunctionsAt(mesh->feElType,local_coord,Ni);
-          ElementType_Jacobian_AxisIndependent(mesh->feElType,mesh,lElement_I,
-                                               local_coord,dim,jacobian,NULL,
-                                               x,y,z);
-          double geometric_factor;
-          if(dim==2)
-            {
-              geometric_factor=sqrt(jacobian[0][x]*jacobian[0][x]
-                                    + jacobian[1][x]*jacobian[1][x]);
-            }
-          else
-            {
-              geometric_factor=
-                sqrt(square(jacobian[0][x]*jacobian[1][y]
-                            - jacobian[1][x]*jacobian[0][y])
-                     + square(jacobian[0][x]*jacobian[2][y]
-                              - jacobian[2][x]*jacobian[0][y])
-                     + square(jacobian[1][x]*jacobian[2][y]
-                              - jacobian[2][x]*jacobian[1][y]));
-            }
-          
-
-          FeMesh_CoordLocalToGlobal(mesh,lElement_I,local_coord,global_coord);
-
-          /* Get the applied stress */
-          ConditionFunction* cf;
-          for(int entry_I=0; entry_I<self->numEntries; ++entry_I)
-            {
-              double stress;
-              switch(self->_entryTbl[entry_I].type)
+              double local_coord[dim], global_coord[dim];
+              local_coord[surface[0]]=xi[i];
+              local_coord[norm]=(face%2==0 ? -1 : 1);
+              if(dim==3)
                 {
-                case StressBC_Double:
-                  stress=self->_entryTbl[entry_I].DoubleValue;
-                  break;
-                case StressBC_ConditionFunction:
-                  cf=self->conFunc_Register->
-                    _cf[self->_entryTbl[entry_I].CFIndex];
-
-                  /* We use a variable number of zero "0",
-                     because we don't use the variable number
-                     and that one is always going to exist. */
-                  ConditionFunction_Apply(cf,global_coord,
-                                          self->context,&stress);
-                  break;
-                default:
-                  abort();
-                  break;
+                  local_coord[surface[1]]=xi[j];
                 }
+              double Ni[num_nodes];
+              ElementType_EvaluateShapeFunctionsAt(mesh->feElType,local_coord,Ni);
+              double geometric_factor=
+                ElementType_JacobianDeterminantSurface(mesh->feElType,mesh,
+                                                       lElement_I,local_coord,
+                                                       face,norm);
 
-              /* Now loop over the nodes of the element */
-              for(int el=0;el<num_nodes;++el)
+              FeMesh_CoordLocalToGlobal(mesh,lElement_I,local_coord,global_coord);
+
+              /* Get the applied stress */
+              ConditionFunction* cf;
+              for(int entry_I=0; entry_I<self->numEntries; ++entry_I)
                 {
-                  /* Make sure that node is on the boundary */
-                  IJK ijk;
-                  RegularMeshUtils_Node_1DTo3D
-                    (mesh,Mesh_DomainToGlobal(mesh,MT_VERTEX,elementNodes[el]),
-                     ijk);
-                  if(on_wall(self->_wall,grid,ijk))
+                  double stress;
+                  switch(self->_entryTbl[entry_I].type)
                     {
-                      double total=stress*weights[i]*geometric_factor*Ni[el];
-                      if(dim==3)
+                    case StressBC_Double:
+                      stress=self->_entryTbl[entry_I].DoubleValue;
+                      break;
+                    case StressBC_ConditionFunction:
+                      cf=self->conFunc_Register->
+                        _cf[self->_entryTbl[entry_I].CFIndex];
+
+                      /* We use a variable number of zero "0",
+                         because we don't use the variable number
+                         and that one is always going to exist. */
+                      ConditionFunction_Apply(cf,global_coord,
+                                              self->context,&stress);
+                      break;
+                    default:
+                      abort();
+                      break;
+                    }
+
+                  /* Now loop over the nodes of the element */
+                  for(int el=0;el<num_nodes;++el)
+                    {
+                      /* Make sure that node is on the boundary */
+                      IJK ijk;
+                      RegularMeshUtils_Node_1DTo3D
+                        (mesh,Mesh_DomainToGlobal(mesh,MT_VERTEX,
+                                                  elementNodes[el]),ijk);
+                      if(on_wall(self->_wall,grid,ijk))
                         {
-                          total*=weights[j];
+                          double total=stress*weights[i]*geometric_factor*Ni[el];
+                          if(dim==3)
+                            {
+                              total*=weights[j];
+                            }
+                          elForceVec[el*nodeDofCount+norm]+=total;
                         }
-                      elForceVec[el*nodeDofCount+self->_entryTbl[entry_I].axis]+=
-                        total;
                     }
                 }
             }
         }
     }
-  Memory_Free( jacobian );
   NewClass_Delete(incidence);
 }
 
