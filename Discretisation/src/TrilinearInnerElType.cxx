@@ -267,41 +267,6 @@ void _TrilinearInnerElType_SF_allLocalDerivs_allNodes( void* elementType, const 
 	evaluatedDerivatives[2][3] = 1;
 }
 
-/* get rid of this function and just use the superclass (elementType) version, as for BilinearInner class?? */
-/*
-void _TrilinearInnerElType_ConvertGlobalCoordToElLocal(
-		void*		elementType,
-		void*		_mesh, 
-		unsigned	element, 
-		const double*	globalCoord,
-		double*		elLocalCoord )
-{
-	TrilinearInnerElType*	self = (TrilinearInnerElType*)elementType;
-	Mesh*			mesh = (Mesh*)_mesh;
-	unsigned		inside;
-	double			bc[4];
-	static double		lCrds[8][3] = {{-1.0, -1.0, -1.0}, {1.0, -1.0, -1.0}, 
-					       {-1.0, 1.0, -1.0}, {1.0, 1.0, -1.0}, 
-					       {-1.0, -1.0, 1.0}, {1.0, -1.0, 1.0}, 
-					       {-1.0, 1.0, 1.0}, {1.0, 1.0, 1.0}};
-	unsigned		nInc, *inc;
-	unsigned		bc_i;
-
-	Mesh_GetIncidence( mesh, MT_VOLUME, element, MT_VERTEX, &nInc, &inc );
-	assert( nInc == 8 );
-
-	insist( Simplex_Search3D( mesh->verts, inc, 10, self->tetInds, (double*)globalCoord, bc, &inside ), == True );
-
-	elLocalCoord[0] = bc[0] * lCrds[self->tetInds[inside][0]][0];
-	elLocalCoord[1] = bc[0] * lCrds[self->tetInds[inside][0]][1];
-	elLocalCoord[2] = bc[0] * lCrds[self->tetInds[inside][0]][2];
-	for( bc_i = 1; bc_i < 4; bc_i++ ) {
-		elLocalCoord[0] += bc[bc_i] * lCrds[self->tetInds[inside][bc_i]][0];
-		elLocalCoord[1] += bc[bc_i] * lCrds[self->tetInds[inside][bc_i]][1];
-		elLocalCoord[2] += bc[bc_i] * lCrds[self->tetInds[inside][bc_i]][2];
-	}
-}*/
-
 int _TrilinearInnerElType_SurfaceNormal( void* elementType, unsigned element_I, unsigned dim, double* xi, double* normal ) {
 	Stream* errStream = Journal_Register( ErrorStream_Type, (Name)ElementType_Type  );
 
