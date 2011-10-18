@@ -71,7 +71,7 @@ typedef struct
   StressBC_Types type;
   double DoubleValue;
   Index CFIndex;
-  Axis axis;
+  uint direction;
   HydrostaticTerm *hydrostaticTerm;
 } StressBC_Entry;
 

@@ -62,6 +62,9 @@
 
 #include <assert.h>
 #include <string.h>
+#include <cctype>
+#include <string>
+#include <algorithm>
 
 /* Textual name of this class */
 const Type StressBC_Type = "StressBC";
@@ -156,118 +159,123 @@ void* _StressBC_DefaultNew( Name name ) {
 	return (void*)_StressBC_New( STRESSBC_PASSARGS);
 }
 
-void _StressBC_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
-	StressBC*          self             = (StressBC*)forceTerm;
-
-	/* Construct Parent */
-	_ForceTerm_AssignFromXML( self, cf, data );
-
-	_StressBC_Init( self, condFunc_Register );
-        {
-          char*	wallStr;
-		
-          /* Obtain which wall */
-          wallStr = Stg_ComponentFactory_GetString( cf, self->name,
-                                                    "wall", "");
-          if (!strcasecmp(wallStr, "back"))
-            self->_wall = Wall_Back;
-          else if (!strcasecmp(wallStr, "left"))
-            self->_wall = Wall_Left;
-          else if (!strcasecmp(wallStr, "bottom"))
-            self->_wall = Wall_Bottom;
-          else if (!strcasecmp(wallStr, "right"))
-            self->_wall = Wall_Right;
-          else if (!strcasecmp(wallStr, "top"))
-            self->_wall = Wall_Top;
-          else if (!strcasecmp(wallStr, "front"))
-            self->_wall = Wall_Front;
-          else {
-            assert( 0 );
-            self->_wall = Wall_Size; /* invalid entry */
-          }
-        }
-        _StressBC_GetValues(cf,self,'x',data);
-        _StressBC_GetValues(cf,self,'y',data);
-        _StressBC_GetValues(cf,self,'z',data);
-
-        self->bottom_density=
-          Stg_ComponentFactory_GetDouble(cf,self->name,"bottomDensity",0.0);
+namespace {
+  void get_values(Stg_ComponentFactory* cf, void *stressBC,
+                  const std::string &direction, void *data);
 }
 
-/* Gets the actual values used by the StressBC (e.g. a float or a function). */
-void _StressBC_GetValues(Stg_ComponentFactory* cf, void *stressBC,
-                         const char direction, void *data)
-{
-          StressBC*          self             = (StressBC*)stressBC;
-          char *type;
+void _StressBC_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
+  StressBC*          self             = (StressBC*)forceTerm;
 
-          switch(direction)
-            {
-            case 'x':
-              self->_entryTbl[self->numEntries].axis=I_AXIS;
-              break;
-            case 'y':
-              self->_entryTbl[self->numEntries].axis=J_AXIS;
-              break;
-            case 'z':
-              self->_entryTbl[self->numEntries].axis=K_AXIS;
-              break;
-            }
+  /* Construct Parent */
+  _ForceTerm_AssignFromXML( self, cf, data );
 
-          std::string temp_str(direction + std::string("_type"));
-          type=Stg_ComponentFactory_GetString( cf, self->name, temp_str.c_str(), "");
-          temp_str=direction+std::string("_value");
+  _StressBC_Init( self, condFunc_Register );
+  {
+    /* Obtain which wall */
+    std::string wallStr(Stg_ComponentFactory_GetString(cf,self->name,
+                                                       "wall", ""));
+    /* We need this wierd cast because there is a tolower in both
+       <cctype> and <locale> */
+    std::transform(wallStr.begin(),wallStr.end(),wallStr.begin(),
+                   (int(*)(int)) std::tolower);
+    if(wallStr=="back")
+      self->_wall = Wall_Back;
+    else if(wallStr=="left")
+      self->_wall = Wall_Left;
+    else if(wallStr=="bottom")
+      self->_wall = Wall_Bottom;
+    else if(wallStr=="right")
+      self->_wall = Wall_Right;
+    else if(wallStr=="top")
+      self->_wall = Wall_Top;
+    else if(wallStr=="front")
+      self->_wall = Wall_Front;
+    else {
+      Stream* errorStr=Journal_Register(Error_Type,self->type);
+      Journal_Firewall(0,errorStr,"Error while parsing "
+                       "StressBC: The wall type \"%s\" is not valid.\nValid wall types are\n\tBack\n\tLeft\n\tBottom\n\tRight\n\tTop\n\tFront\n",
+                       wallStr.c_str());
+    }
+  }
+  get_values(cf,self,"normal",data);
+  get_values(cf,self,"shear_x",data);
+  get_values(cf,self,"shear_y",data);
+  get_values(cf,self,"shear_z",data);
+}
 
-          if(!strcasecmp(type,"double") || !strcasecmp(type,"float"))
-            {
-              self->_entryTbl[self->numEntries].type = StressBC_Double;
-              self->_entryTbl[self->numEntries].DoubleValue =
-                Stg_ComponentFactory_GetDouble( cf, self->name, temp_str.c_str(), 0.0);
-              (self->numEntries)++;
-            }
-          else if(!strcasecmp(type,"func"))
-            {
-              char *funcName =
-                Stg_ComponentFactory_GetString( cf, self->name, temp_str.c_str(), "");
-              int cfIndex = ConditionFunction_Register_GetIndex
-                ( self->conFunc_Register, funcName);
-              self->_entryTbl[self->numEntries].type =
-                StressBC_ConditionFunction;
-              if ( cfIndex == -1 ) {	
-                Stream*	errorStr = Journal_Register( Error_Type, self->type );
+namespace {
+  const uint normal_direction=3;
+
+  /* Gets the actual values used by the StressBC (e.g. a float or a function). */
+  void get_values(Stg_ComponentFactory* cf, void *stressBC,
+                  const std::string &direction, void *data)
+  {
+    StressBC*          self             = (StressBC*)stressBC;
+    char *type;
+
+    if(direction=="normal")
+      {
+        self->_entryTbl[self->numEntries].direction=normal_direction;
+      }
+    else if(direction=="shearx")
+      {
+        self->_entryTbl[self->numEntries].direction=0;
+      }
+    else if(direction=="sheary")
+      {
+        self->_entryTbl[self->numEntries].direction=1;
+      }
+    else if(direction=="shearz")
+      {
+        self->_entryTbl[self->numEntries].direction=2;
+      }
+
+    std::string temp_str(direction + std::string("_type"));
+    type=Stg_ComponentFactory_GetString( cf, self->name, temp_str.c_str(), "");
+    temp_str=direction+std::string("_value");
+
+    if(!strcasecmp(type,"double") || !strcasecmp(type,"float"))
+      {
+        self->_entryTbl[self->numEntries].type = StressBC_Double;
+        self->_entryTbl[self->numEntries].DoubleValue =
+          Stg_ComponentFactory_GetDouble( cf, self->name, temp_str.c_str(), 0.0);
+        (self->numEntries)++;
+      }
+    else if(!strcasecmp(type,"func"))
+      {
+        char *funcName =
+          Stg_ComponentFactory_GetString( cf, self->name, temp_str.c_str(), "");
+        int cfIndex = ConditionFunction_Register_GetIndex
+          ( self->conFunc_Register, funcName);
+        self->_entryTbl[self->numEntries].type =
+          StressBC_ConditionFunction;
+        if ( cfIndex == -1 ) {	
+          Stream*	errorStr = Journal_Register( Error_Type, self->type );
                 
-                Journal_Printf(errorStr, "Error- in %s: While parsing "
-                               "definition of StressBC (applies to wall \"%s\"), the cond. func. applied to "
-                               "direction \"%c\": \"%s\" - wasn't found in the c.f. register.\n",
-                               __func__, WallEnumToStr[self->_wall],
-                               direction, funcName);
-                Journal_Printf(errorStr,
-                               "(Available functions in the C.F. register are: ");	
-                ConditionFunction_Register_PrintNameOfEachFunc
-                  ( self->conFunc_Register, errorStr );
-                Journal_Printf( errorStr, ")\n");	
-                abort();
-              }	
-              self->_entryTbl[self->numEntries].CFIndex = cfIndex;
-              (self->numEntries)++;
-            }
-          else if(!strcasecmp(type,"HydrostaticTerm"))
-            {
-              self->_entryTbl[self->numEntries].type = StressBC_HydrostaticTerm;
-              self->_entryTbl[self->numEntries].hydrostaticTerm =
-                Stg_ComponentFactory_ConstructByKey( cf, self->name, temp_str.c_str(),
-                                                     HydrostaticTerm, True,
-                                                     data ) ;
-              (self->numEntries)++;
-            }
-          else if(strlen(type)!=0)
-            {
-              Stream* errorStr = Journal_Register( Error_Type, self->type );
-              Journal_Firewall( 0, errorStr, "Error- in %s: While parsing "
-                              "definition of StressBC (applies to wall \"%s\"), the type of condition \"%s\"\nis not supported.  Supported types are \"double\" and \"function\".",
-                                __func__, WallEnumToStr[self->_wall],
-                                type );
-            }
+          Journal_Printf(errorStr, "Error- in %s: While parsing "
+                         "definition of StressBC (applies to wall \"%s\"), the cond. func. applied to "
+                         "direction \"%s\": \"%s\" - wasn't found in the c.f. register.\n",
+                         __func__, WallEnumToStr[self->_wall],
+                         direction.c_str(), funcName);
+          Journal_Printf(errorStr,
+                         "(Available functions in the C.F. register are: ");	
+          ConditionFunction_Register_PrintNameOfEachFunc
+            ( self->conFunc_Register, errorStr );
+          Journal_Firewall(0, errorStr, ")\n");	
+        }	
+        self->_entryTbl[self->numEntries].CFIndex = cfIndex;
+        (self->numEntries)++;
+      }
+    else if(strlen(type)!=0)
+      {
+        Stream* errorStr = Journal_Register( Error_Type, self->type );
+        Journal_Firewall( 0, errorStr, "Error- in %s: While parsing "
+                          "definition of StressBC (applies to wall \"%s\"), the type of condition \"%s\"\nis not supported.  Supported types are \"double\" and \"function\".",
+                          __func__, WallEnumToStr[self->_wall],
+                          type );
+      }
+  }
 }
 
 void _StressBC_Build( void* forceTerm, void* data ) {
@@ -331,65 +339,76 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
     return;
 
   /* Set up directions particular to each wall */
-  uint face;
+  uint local_norm, face;
   switch(self->_wall)
     {
       case Wall_Right:
+        local_norm=0;
         face=3;
         break;
       case Wall_Left:
+        local_norm=0;
         face=2;
         break;
       case Wall_Top:
+        local_norm=1;
         face=1;
         break;
       case Wall_Bottom:
+        local_norm=1;
         face=0;
         break;
       case Wall_Front:
+        local_norm=2;
         face=5;
         break;
       case Wall_Back:
+        local_norm=2;
         face=4;
         break;
       default:
         abort();
       }
 
+  int surface((local_norm+1)%dim), surface2((surface+1)%dim);
+
+  /* For each gaussian integration point, compute the value of the
+     Jacobian */
+  double **jac=Memory_Alloc_2DArray(double,dim,dim,(Name)"Temporary Jacobian");
+                                    
   const double xi[]={-sqrt(3/5.0),0,sqrt(3/5.0)};
   const double weights[]={5/9.0, 8/9.0, 5/9.0};
 
-  for(uint norm=0;norm<dim;++norm)
+  for(uint d=0;d<dim;++d)
     {
-      int surface[dim-1];
-      surface[0]=(norm+1)%dim;
-      if(dim==3)
-        surface[1]=(norm+2)%dim;
       for(int i=0;i<3;++i)
         {
           for(int j=0;j<(dim==2 ? 1 : 3); ++j)
             {
               double local_coord[dim], global_coord[dim];
-              local_coord[surface[0]]=xi[i];
-              local_coord[norm]=(face%2==0 ? -1 : 1);
+              local_coord[surface]=xi[i];
+              local_coord[local_norm]=(face%2==0 ? -1 : 1);
               if(dim==3)
                 {
-                  local_coord[surface[1]]=xi[j];
+                  local_coord[surface2]=xi[j];
                 }
               double Ni[num_nodes];
               ElementType_EvaluateShapeFunctionsAt(mesh->feElType,local_coord,Ni);
-              double geometric_factor=
-                ElementType_JacobianDeterminantSurface(mesh->feElType,mesh,
-                                                       lElement_I,local_coord,
-                                                       face,norm);
-
+              ElementType_Jacobian_AxisIndependent(mesh->feElType,mesh,lElement_I,
+                                                   local_coord,dim,jac,NULL,
+                                                   0,1,2);
               FeMesh_CoordLocalToGlobal(mesh,lElement_I,local_coord,global_coord);
 
               /* Get the applied stress */
-              ConditionFunction* cf;
               for(int entry_I=0; entry_I<self->numEntries; ++entry_I)
                 {
+                  /* If this is not the right direction to apply the
+                     stress, then go on to the next StressBC. */
+                  if(self->_entryTbl[entry_I].direction!=normal_direction
+                     && self->_entryTbl[entry_I].direction!=d)
+                    continue;
                   double stress;
+                  ConditionFunction* cf;
                   switch(self->_entryTbl[entry_I].type)
                     {
                     case StressBC_Double:
@@ -399,9 +418,6 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                       cf=self->conFunc_Register->
                         _cf[self->_entryTbl[entry_I].CFIndex];
 
-                      /* We use a variable number of zero "0",
-                         because we don't use the variable number
-                         and that one is always going to exist. */
                       ConditionFunction_Apply(cf,global_coord,
                                               self->context,&stress);
                       break;
@@ -410,28 +426,67 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                       break;
                     }
 
-                  /* Now loop over the nodes of the element */
-                  for(int el=0;el<num_nodes;++el)
+                  double geometric_factor;
+                  if(self->_entryTbl[entry_I].direction==normal_direction)
                     {
+                      if(dim==2)
+                        {
+                          geometric_factor=
+                            jac[surface][(d+1)%dim]*(d==face/2 ? -1 : 1);
+                        }
+                      else
+                        geometric_factor=jac[surface][(d+1)%dim]
+                          * jac[surface2][(d+2)%dim]
+                          - jac[surface][(d+2)%dim]
+                          * jac[surface2][(d+1)%dim];
+                    }
+                  else
+                    {
+                      if(dim==2)
+                        {
+                          geometric_factor=jac[surface][d];
+                        }
+                      else
+                        {
+                          const double area=
+                            sqrt(square(jac[surface][0]*jac[surface2][1]
+                                        - jac[surface2][0]*jac[surface][1])
+                                 + square(jac[surface][0]*jac[surface2][2]
+                                          - jac[surface2][0]*jac[surface][2])
+                                 + square(jac[surface][1]*jac[surface2][2]
+                                          - jac[surface2][1]*jac[surface][2]));
+
+                          geometric_factor=area * jac[surface][d]
+                            /sqrt(square(jac[surface][0])
+                                  + square(jac[surface][1])
+                                  + square(jac[surface][2]));
+                        }
+                    }
+
+                  /* Now loop over the nodes of the element */
+                  const int num_face_nodes(dim==2 ? (num_nodes==4 ? 2 : 3)
+                                           : (num_nodes==8 ? 4 : 9));
+                  for(int el=0;el<num_face_nodes;++el)
+                    {
+                      const int node=mesh->feElType->faceNodes[face][el];
                       /* Make sure that node is on the boundary */
                       IJK ijk;
                       RegularMeshUtils_Node_1DTo3D
                         (mesh,Mesh_DomainToGlobal(mesh,MT_VERTEX,
-                                                  elementNodes[el]),ijk);
-                      if(on_wall(self->_wall,grid,ijk))
+                                                  elementNodes[node]),ijk);
+                      double total=stress*weights[i]*geometric_factor
+                        *Ni[node];
+                      if(dim==3)
                         {
-                          double total=stress*weights[i]*geometric_factor*Ni[el];
-                          if(dim==3)
-                            {
-                              total*=weights[j];
-                            }
-                          elForceVec[el*nodeDofCount+norm]+=total;
+                          total*=weights[j];
                         }
+                      elForceVec[node*nodeDofCount+d]+=total;
                     }
                 }
             }
         }
     }
+  Memory_Free( jac );
   NewClass_Delete(incidence);
 }
 
