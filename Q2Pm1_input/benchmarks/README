@@ -33,3 +33,17 @@ In 3D
 
 The L-Infinity norm of the velocity should decrease by a factor of 8
 each time for both 2D and 3D.
+
+divergence
+----------
+
+  Gale divergence.xml --linearTolerance=1.0e-5 --outputPath=divergence5
+  Gale divergence.xml --linearTolerance=1.0e-6 --outputPath=divergence6
+  Gale divergence.xml --linearTolerance=1.0e-7 --outputPath=divergence7
+  Gale divergence.xml --linearTolerance=1.0e-8 --outputPath=divergence8
+  Gale divergence.xml --linearTolerance=1.0e-9 --outputPath=divergence9
+
+  Gale divergence3D.xml --linearTolerance=1.0e-5 --outputPath=divergence3D_5
+  Gale divergence3D.xml --linearTolerance=1.0e-6 --outputPath=divergence3D_6
+  Gale divergence3D.xml --linearTolerance=1.0e-7 --outputPath=divergence3D_7
+  Gale divergence3D.xml --linearTolerance=1.0e-8 --outputPath=divergence3D_8
