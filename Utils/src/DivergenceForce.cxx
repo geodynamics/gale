@@ -203,7 +203,7 @@ void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, 
           {
             Stream* errorStr = Journal_Register( Error_Type, self->type );
             Journal_Printf( errorStr, "Error- in %s: While parsing "
-                            "definition of DivergenceForce, force_type is not specified.\nSupported types are \"double\" and \"function\".\n",
+                            "definition of DivergenceForce, force_type is not specified.\nSupported types are \"double\" and \"func\".\n",
                             __func__);
             assert(0);
           }
@@ -211,7 +211,7 @@ void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, 
           {
             Stream* errorStr = Journal_Register( Error_Type, self->type );
             Journal_Printf( errorStr, "Error- in %s: While parsing "
-                            "definition of DivergenceForce, the type of condition \"%s\"\nis not supported.  Supported types are \"double\" and \"function\".\n",
+                            "definition of DivergenceForce, the type of condition \"%s\"\nis not supported.  Supported types are \"double\" and \"func\".\n",
                             __func__, type );
             assert(0);
           }
@@ -246,52 +246,66 @@ void _DivergenceForce_AssembleElement( void* forceTerm,
                                        double* elForceVec ) {
   DivergenceForce* self=(DivergenceForce*) forceTerm;
   FeMesh* mesh=forceVector->feVariable->feMesh;
-  Node_ElementLocalIndex           eNode_I;
-  Element_NodeIndex                elementNodeCount;
-  Node_DomainIndex *elementNodes=NULL;
 
-  double xi[3], force, factor;
-  ElementType* geometryElementType;
+  IArray *incidence=IArray_New();
+  const MeshTopology_Dim dim(Mesh_GetDimSize(mesh));
+  Mesh_GetIncidence(mesh,dim,lElement_I,MT_VERTEX,incidence);
+  const int num_nodes=IArray_GetSize(incidence);
+  Node_DomainIndex *nodes=(Node_DomainIndex*)IArray_GetPtr(incidence);
   
-  IArray *incidence;
+  /* Integrate the divergence force over the element using gaussian
+     quadrature */
+  double xi[]={-sqrt(3/5.0),0,sqrt(3/5.0)};
+  double weights[]={5/9.0, 8/9.0, 5/9.0};
 
-  xi[0]=0;
-  xi[1]=0;
-  xi[2]=0;
-  geometryElementType=FeMesh_GetElementType(self->geometryMesh,lElement_I);
-  factor=ElementType_JacobianDeterminant( geometryElementType,
-                                          self->geometryMesh,
-                                          lElement_I,
-                                          xi, forceVector->dim );
-  incidence=IArray_New();
-  Mesh_GetIncidence(mesh, Mesh_GetDimSize(mesh), lElement_I,
-                    MT_VERTEX,incidence);
-  elementNodeCount=IArray_GetSize(incidence);
-  elementNodes=(Node_DomainIndex*)IArray_GetPtr(incidence);
-  
-  for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) {
-    if(Stg_Shape_IsCoordInside(self->domainShape,
-                               Mesh_GetVertex(mesh,elementNodes[eNode_I])))
-      {
-        switch(self->force.type)
-          {
-          case StressBC_Double:
-            force=self->force.DoubleValue;
-            break;
-          case StressBC_ConditionFunction:
+  for(int i=0;i<3;++i)
+    {
+      for(int j=0;j<3;++j)
+        {
+          for(int k=0;k<(dim==2 ? 1 : 3); ++k)
+            {
+              double local_coord[dim], global_coord[dim];
+              local_coord[0]=xi[i];
+              local_coord[1]=xi[j];
+              if(dim==3)
+                local_coord[2]=xi[k];
+              double Ni[num_nodes];
+              ElementType_EvaluateShapeFunctionsAt(mesh->feElType,local_coord,
+                                                   Ni);
+              double jac(ElementType_JacobianDeterminant(mesh->feElType,mesh,
+                                                          lElement_I,
+                                                          local_coord,dim));
+              FeMesh_CoordLocalToGlobal(mesh,lElement_I,local_coord,
+                                        global_coord);
+              double force;
+              switch(self->force.type)
+                {
+                case StressBC_Double:
+                  force=self->force.DoubleValue;
+                  break;
+                case StressBC_ConditionFunction:
             
-            /* We use a variable number of zero "0", because
-               we don't use the variable number and that one
-               is always going to exist. */
-            ConditionFunction_Apply
-              (condFunc_Register->_cf[self->force.CFIndex],
-               elementNodes[eNode_I],0,self->context,&force);
-            break;
-          }
-
-        // This needs to be properly integrated.
-        elForceVec[ eNode_I] += force*factor;
-      }
-  }
+                  ConditionFunction_Apply
+                    (condFunc_Register->_cf[self->force.CFIndex],
+                     global_coord,self->context,&force);
+                  break;
+                default:
+                  abort();
+                  break;
+                }
+              for(int node=0;node<num_nodes;++node)
+                {
+                  if(Stg_Shape_IsCoordInside(self->domainShape,
+                                             Mesh_GetVertex(mesh,nodes[node])))
+                    {
+                      double total_force=force*jac*weights[i]*weights[j]*Ni[node];
+                      if(dim==3)
+                        total_force*=weights[k];
+                      elForceVec[node]+=total_force;
+                    }
+                }
+            }
+        }
+    }
   NewClass_Delete(incidence);
 }
