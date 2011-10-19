@@ -308,7 +308,7 @@
       <param name="tolerance">linearTolerance</param>
       <param name="monitor">false</param>
       <param name="maxIterations">5000</param>
-      <param name="minIterations">4</param>
+      <param name="minIterations">1</param>
     </struct>
     <struct name="stokesEqn">
       <param name="Type">Stokes_SLE</param>
@@ -501,8 +501,4 @@
   <param name="gravity">1.0</param>
   <param name="Equation1">1.0-y</param>
   <param name="linearTolerance">1e-10</param>
- <!-- <param name="journal.info">True</param> -->
- <!-- <param name="journal.debug">True</param> -->
- <!-- <param name="journal-level.info">2</param>  -->
- <!-- <param name="journal-level.debug">2</param> -->
 </StGermainData>
