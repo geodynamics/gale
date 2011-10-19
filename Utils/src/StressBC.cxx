@@ -394,9 +394,8 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                 }
               double Ni[num_nodes];
               ElementType_EvaluateShapeFunctionsAt(mesh->feElType,local_coord,Ni);
-              ElementType_Jacobian_AxisIndependent(mesh->feElType,mesh,lElement_I,
-                                                   local_coord,dim,jac,NULL,
-                                                   0,1,2);
+              ElementType_Jacobian(mesh->feElType,mesh,lElement_I,
+                                   local_coord,dim,jac,NULL);
               FeMesh_CoordLocalToGlobal(mesh,lElement_I,local_coord,global_coord);
 
               /* Get the applied stress */
@@ -474,8 +473,7 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                       RegularMeshUtils_Node_1DTo3D
                         (mesh,Mesh_DomainToGlobal(mesh,MT_VERTEX,
                                                   elementNodes[node]),ijk);
-                      double total=stress*weights[i]*geometric_factor
-                        *Ni[node];
+                      double total=stress*weights[i]*geometric_factor*Ni[node];
                       if(dim==3)
                         {
                           total*=weights[j];
