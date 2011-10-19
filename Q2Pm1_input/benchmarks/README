@@ -1,0 +1,35 @@
+sphere in cylinder
+------------------
+
+  Gale sphere_in_cylinder.xml --elementResI=8 --elementResJ=16 --elementResK=8 --outputPath="./sphere_cylinder_16_4_8"
+
+  Gale sphere_in_cylinder.xml --elementResI=16 --elementResJ=32 --elementResK=16 --outputPath="./sphere_cylinder_32_4_8"
+
+  Gale sphere_in_cylinder.xml --elementResI=32 --elementResJ=64 --elementResK=32 --outputPath="./sphere_cylinder_64_4_8"
+
+  Gale sphere_in_cylinder.xml --elementResI=32 --elementResJ=128 --elementResK=64 --outputPath="./sphere_cylinder_128_4_8"
+
+sinusoid
+--------
+
+  Gale sinusoid.xml --elementResI=64 --elementResJ=128 --outputPath="./sinusoid_64_128"
+  Gale sinusoid.xml --elementResI=128 --elementResJ=256 --outputPath="./sinusoid_128_256"
+  Gale sinusoid.xml --elementResI=256 --elementResJ=512 --outputPath="./sinusoid_256_512"
+
+stressbc
+--------
+
+In 2D
+
+  Gale stressbc.xml --elementResI=5 --elementResJ=5 --outputPath="./stressbc_5"
+  Gale stressbc.xml --elementResI=10 --elementResJ=10 --outputPath="./stressbc_10"
+  Gale stressbc.xml --elementResI=20 --elementResJ=20 --outputPath="./stressbc_20"
+
+In 3D
+
+  Gale stressbc3D.xml --elementResI=4 --elementResJ=4 --elementResK=4 --outputPath="./stressbc3D_4"
+  Gale stressbc3D.xml --elementResI=8 --elementResJ=8 --elementResK=8 --outputPath="./stressbc3D_8"
+  Gale stressbc3D.xml --elementResI=16 --elementResJ=16 --elementResK=16 --outputPath="./stressbc3D_16"
+
+The L-Infinity norm of the velocity should decrease by a factor of 8
+each time for both 2D and 3D.
