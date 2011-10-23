@@ -234,7 +234,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
    Dof_Index               nodeDofCount;
    double**                Dtilda_B;
    double                  vel[3], velDerivs[9], *Ni, eta;
-   Bool                    oneToMany, nearestNeighbor;
+   Bool                    oneToMany;
 
    self->sle = sle;
 
@@ -275,7 +275,6 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 	*/
 
    oneToMany = Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type);
-   nearestNeighbor = Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, NearestNeighborMapper_Type);
 
    /* Loop over points to build Stiffness Matrix */
    for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
@@ -303,7 +302,7 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
        OneToManyRef *ref;
        double **matrixData;
-       uint jj, kk;
+       unsigned int jj, kk;
 
        matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
        memset(matrixData[0], 0, self->columnSize*self->rowSize*sizeof(double));
@@ -324,23 +323,16 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
        memcpy(self->matrixData[0], matrixData[0], self->columnSize*self->rowSize*sizeof(double));
        Memory_Free(matrixData);
      }
-     else if(nearestNeighbor) {
-       IntegrationPointsSwarm* NNswarm=
-         ((NearestNeighborMapper*)((IntegrationPointsSwarm*)self->integrationSwarm)->mapper)->swarm;
-       int NNcell_I            = CellLayout_MapElementIdToCellId( NNswarm->cellLayout, lElement_I );
-       int nearest_particle=
-         NearestNeighbor_FindNeighbor(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper,
-                                      lElement_I,NNcell_I,particle->xi,dim);
-                                      
-       IntegrationPoint* NNparticle = (IntegrationPoint*)Swarm_ParticleInCellAt( NNswarm, NNcell_I, nearest_particle );
-       ConstitutiveMatrix_Assemble(constitutiveMatrix, lElement_I,
-                                   NNswarm->cellParticleTbl[NNcell_I][nearest_particle], NNparticle,
-                                   NNswarm);
-     }
      else {
-       // TODO : pass in the context here?
-       ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I,
-                                    swarm->cellParticleTbl[cell_I][cParticle_I], particle );
+       IntegrationPointsSwarm*
+         NNswarm((IntegrationPointsSwarm*)self->integrationSwarm);
+       IntegrationPoint* NNparticle(particle);
+       int NNparticle_index(swarm->cellParticleTbl[cell_I][cParticle_I]);
+       NearestNeighbor_Replace(&NNswarm,&NNparticle,&NNparticle_index,
+                               lElement_I,dim);
+       ConstitutiveMatrix_Assemble(constitutiveMatrix, lElement_I,
+                                   NNparticle_index, NNparticle,
+                                   NNswarm);
      }
 
      eta = self->matrixData[2][2];
