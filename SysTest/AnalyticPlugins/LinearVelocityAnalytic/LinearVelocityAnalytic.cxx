@@ -51,7 +51,7 @@ typedef struct {
 	FeVariable* velocityField;
 	double  nodeVelocity[8][3];
 	double  nodeCoords[8][3];
-	uint    cornerNodeCount;
+	unsigned int    cornerNodeCount;
 } LinearVelocityAnalytic;
 
 Index Grid_ProjectIJK( Grid* grid, Index i, Index j, Index k ) {

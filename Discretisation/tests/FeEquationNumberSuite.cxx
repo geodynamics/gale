@@ -195,7 +195,7 @@ void FeEquationNumberSuite_TestLocal( FeEquationNumberSuiteData* data ) {
    int curEqNum;
    int nDofs;
    int rank;
-   uint n_i;
+   unsigned int n_i;
    int dof_i;
 
    eqNum = buildEqNum();

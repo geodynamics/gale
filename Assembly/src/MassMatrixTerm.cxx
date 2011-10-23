@@ -177,7 +177,7 @@ void _MassMatrixTerm_AssembleElement(
 	Swarm*                              swarm        = self->integrationSwarm;
 	FeVariable*                         variable1    = stiffnessMatrix->rowVariable;
 	Dimension_Index                     dim          = stiffnessMatrix->dim;
-	uint num_node_dofs = self->field->fieldComponentCount;
+	unsigned int num_node_dofs = self->field->fieldComponentCount;
 	IntegrationPoint*                   currIntegrationPoint;
 	double*                             xi;
 	double                              weight;

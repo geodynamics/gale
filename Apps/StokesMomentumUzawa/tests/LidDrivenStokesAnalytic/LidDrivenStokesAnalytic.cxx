@@ -123,7 +123,7 @@ void StgFEM_LidDrivenStokesAnalytic_PressureFunction( void* data, const double* 
 void _StgFEM_LidDrivenStokesAnalytic_AssignFromXML( void* codelet, Stg_ComponentFactory* cf, void* data ) {
 	StgFEM_LidDrivenStokesAnalytic *self = (StgFEM_LidDrivenStokesAnalytic*)codelet;
 	
-	uint waveSpeed;
+	unsigned int waveSpeed;
 
 	_FieldTest_AssignFromXML( self, cf, data );
 

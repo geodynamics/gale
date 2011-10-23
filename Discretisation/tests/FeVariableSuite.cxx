@@ -108,7 +108,7 @@ FeVariable* BuildFeVariable_AsPosition( unsigned dim ) {
 	fieldReg = FieldVariable_Register_New();
 	feVar = FeVariable_New( "velocity", NULL, feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
 
-	for(uint n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
+	for(unsigned int n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
 		double* pos = Mesh_GetVertex( feMesh, n_i );
 		Variable_SetValue( var, n_i, pos );
 	}
@@ -177,7 +177,7 @@ FeVariable* BuildFeVariable_AsConstant( unsigned dim ) {
 	fieldReg = FieldVariable_Register_New();
 	feVar = FeVariable_New( "pressure", NULL, feMesh, NULL, dofs, NULL, NULL, NULL, dim, True, False, False, fieldReg );
 
-	for(uint n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
+	for(unsigned int n_i = 0; n_i < Mesh_GetLocalSize( feMesh, (MeshTopology_Dim)0 ); n_i++ ) {
 		Variable_SetValue( var, n_i, constant );
 	}
 

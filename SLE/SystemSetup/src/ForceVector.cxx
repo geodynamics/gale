@@ -461,7 +461,7 @@ void ForceVector_GlobalAssembly_General( void* forceVector ) {
 
                            dofs = self->feVariable->dofLayout; /* shortcut to the dof layout */
                            curInd = 0; /* need a counter to track where we are in the element force vector */
-                           for(uint ii = 0; ii < nodeCountCurrElement; ii++ ) {
+                           for(unsigned int ii = 0; ii < nodeCountCurrElement; ii++ ) {
                               nDofs = dofs->dofCounts[inc[ii]]; /* number of dofs on this node */
                               for( jj = 0; jj < nDofs; jj++ ) {
                                  if( !FeVariable_IsBC( self->feVariable, inc[ii], jj ) ) {

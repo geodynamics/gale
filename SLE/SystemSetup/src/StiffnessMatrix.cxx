@@ -650,7 +650,7 @@ void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
 	Node_Index		uniqueRelatedColNodes_AllocCount = 0;
 	Node_Index		uniqueRelatedColNode_I = 0;
 	Dof_Index		currNodeDof_I = 0;
-	uint            	currDofMatrixRow = 0;
+	unsigned int            	currDofMatrixRow = 0;
 	unsigned		nNodeInc, *nodeInc;
 
 	Journal_DPrintfL( self->debug, 3, "In %s - for row local node %d\n", __func__, rowNode_lI );
@@ -702,7 +702,7 @@ void _StiffnessMatrix_CalcAndUpdateNonZeroEntriesAtRowNode(
 
 				for ( currNodeDof_I = 0; currNodeDof_I < self->rowVariable->dofLayout->dofCounts[rowNode_lI]; currNodeDof_I++) {
 					if ( -1 != rowEqNum->destinationArray[rowNode_lI][currNodeDof_I] ) {
-						currDofMatrixRow = *(uint*)STreeMap_Map(
+						currDofMatrixRow = *(unsigned int*)STreeMap_Map(
 							rowEqNum->ownedMap,
 							rowEqNum->destinationArray[rowNode_lI] + currNodeDof_I );
 
@@ -2784,8 +2784,8 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 	memset( nOffDiagNonZeros, 0, nRowEqs * sizeof(int) );
 	netNonZeros = 0;
 
-	for(uint n_i = 0; n_i < FeMesh_GetNodeLocalSize( rowMesh ); n_i++ ) {
-		for(uint dof_i = 0; dof_i < rowDofs->dofCounts[n_i]; dof_i++ ) {
+	for(unsigned int n_i = 0; n_i < FeMesh_GetNodeLocalSize( rowMesh ); n_i++ ) {
+		for(unsigned int dof_i = 0; dof_i < rowDofs->dofCounts[n_i]; dof_i++ ) {
 			rowEq = rowEqNum->destinationArray[n_i][dof_i];
 
 			if( rowEq == -1 ) continue;
@@ -2804,7 +2804,7 @@ void StiffnessMatrix_CalcNonZeros( void* stiffnessMatrix ) {
 				colNodes = IArray_GetPtr( self->colInc );
 
 				for( n_j = 0; n_j < nColNodes; n_j++ ) {
-					for(uint dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
+					for(unsigned int dof_j = 0; dof_j < colDofs->dofCounts[colNodes[n_j]]; dof_j++ ) {
 						colEq = colEqNum->destinationArray[colNodes[n_j]][dof_j];
 
 						if( colEq == -1 ) continue;

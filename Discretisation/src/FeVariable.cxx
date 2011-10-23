@@ -2244,8 +2244,8 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
       ver = FeCHECKPOINT_V1;
    else {
       int checkVer;
-      uint ndims;
-      uint res[self->dim];
+      unsigned int ndims;
+      unsigned int res[self->dim];
       Grid**     grid;
       unsigned*  sizes;
 
@@ -2485,7 +2485,7 @@ void FeVariable_InterpolateFromFile( void* feVariable, DomainContext* context, N
    hid_t									attrib_id, group_id;
    int									res[3];
    int									checkVer;
-   uint									ndims;
+   unsigned int									ndims;
 	double								crdMin[3], crdMax[3];
 	double*								value;
 	unsigned								nDomainVerts;

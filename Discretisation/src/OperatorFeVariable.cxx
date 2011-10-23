@@ -480,7 +480,7 @@ void _OperatorFeVariable_SyncShadowValues( void* feVariable ) {
 	OperatorFeVariable* self            = (OperatorFeVariable*) feVariable;
 
 	assert( self );
-	for(uint v_i = 0; v_i < self->feVariableCount; v_i++ )
+	for(unsigned int v_i = 0; v_i < self->feVariableCount; v_i++ )
           FeVariable_SyncShadowValues( self->feVariableList[v_i] );
 	self->shadowValuesSynchronised = True;
 }
@@ -491,7 +491,7 @@ Bool _OperatorFeVariable_CheckIfValidToInterpolateInShadowSpace( OperatorFeVaria
 	FeVariable*             currFeVar;
 	Bool                    parentIsValid;
 
-	for (uint feVar_I=0; feVar_I < self->feVariableCount; feVar_I++ ) {
+	for (unsigned int feVar_I=0; feVar_I < self->feVariableCount; feVar_I++ ) {
 		currFeVar = self->feVariableList[feVar_I];
 		if( Stg_Class_IsInstance( currFeVar, FeVariable_Type ) ) {
 			if ( False == currFeVar->shadowValuesSynchronised ) {

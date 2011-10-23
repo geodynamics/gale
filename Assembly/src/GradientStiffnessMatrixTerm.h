@@ -50,7 +50,7 @@
 		__StiffnessMatrixTerm \
 		/* Virtual info */ \
 		/* GradientStiffnessMatrixTerm info */ \
-		uint		max_nElNodes_col;    \
+		unsigned int		max_nElNodes_col;    \
 		double	*Ni_col;
 
 	struct GradientStiffnessMatrixTerm { __GradientStiffnessMatrixTerm };
