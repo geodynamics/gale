@@ -224,22 +224,22 @@ if env['static_libs']:
 # Test runner program.
 #
 
-env.PCUTest('tests/testPICellerator', suites,
-            PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n" \
-                "#include <StgFEM/StgFEM.h>\n#include <PICellerator/PICellerator.h>\nextern void picellerator_register_static_modules();\nextern void stgfem_register_static_modules();\nextern void stgdomain_register_static_modules();",
-            PCU_SETUP="StGermain_Init(&argc, &argv);\nStgDomain_Init(&argc, &argv);\n" \
-                "StgFEM_Init(&argc, &argv);\nPICellerator_Init(&argc, &argv);\n\n" \
-                "#ifdef NOSHARED\n" \
-                "   picellerator_register_static_modules();\n" \
-                "   stgfem_register_static_modules();\n" \
-                "   stgdomain_register_static_modules();\n" \
-                "#endif",
-            PCU_TEARDOWN="PICellerator_Finalise();\nStgFEM_Finalise();\n" \
-                "StgDomain_Finalise();\nStGermain_Finalise();",
-            LIBS=libs,
-            PCU_EXP=tst_exp,
-            PCU_INPUT=tst_input,
-            PROJECT="PICellerator")
+# env.PCUTest('tests/testPICellerator', suites,
+#             PCU_LIBHEADERS="#include <StGermain/StGermain.h>\n#include <StgDomain/StgDomain.h>\n" \
+#                 "#include <StgFEM/StgFEM.h>\n#include <PICellerator/PICellerator.h>\nextern void picellerator_register_static_modules();\nextern void stgfem_register_static_modules();\nextern void stgdomain_register_static_modules();",
+#             PCU_SETUP="StGermain_Init(&argc, &argv);\nStgDomain_Init(&argc, &argv);\n" \
+#                 "StgFEM_Init(&argc, &argv);\nPICellerator_Init(&argc, &argv);\n\n" \
+#                 "#ifdef NOSHARED\n" \
+#                 "   picellerator_register_static_modules();\n" \
+#                 "   stgfem_register_static_modules();\n" \
+#                 "   stgdomain_register_static_modules();\n" \
+#                 "#endif",
+#             PCU_TEARDOWN="PICellerator_Finalise();\nStgFEM_Finalise();\n" \
+#                 "StgDomain_Finalise();\nStGermain_Finalise();",
+#             LIBS=libs,
+#             PCU_EXP=tst_exp,
+#             PCU_INPUT=tst_input,
+#             PROJECT="PICellerator")
 
 #
 # Install XML input files.
