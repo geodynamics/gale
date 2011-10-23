@@ -192,7 +192,7 @@ void _TracerOutput_Build( void* swarmOutput, void* data ) {
 
   if(self->pressureField)
     Stg_Component_Build( self->pressureField, data, False );
-  for(uint i=0;i<self->num_fields;++i)
+  for(unsigned int i=0;i<self->num_fields;++i)
     Stg_Component_Build( self->fields[i], data, False );
 
   _SwarmOutput_Build( self, data );
@@ -202,7 +202,7 @@ void _TracerOutput_Initialise( void* swarmOutput, void* data ) {
 
   if(self->pressureField)
     Stg_Component_Initialise( self->pressureField, data, False );
-  for(uint i=0;i<self->num_fields;++i)
+  for(unsigned int i=0;i<self->num_fields;++i)
     Stg_Component_Initialise( self->fields[i], data, False );
 	
   _SwarmOutput_Initialise( self, data );
@@ -217,7 +217,7 @@ void _TracerOutput_Destroy( void* swarmOutput, void* data ) {
 
   if(self->pressureField)
     Stg_Component_Destroy( self->pressureField, data, False );
-  for(uint i=0;i<self->num_fields;++i)
+  for(unsigned int i=0;i<self->num_fields;++i)
     Stg_Component_Destroy( self->fields[i], data, False );
 	
   _SwarmOutput_Destroy( self, data );
@@ -232,7 +232,7 @@ void _TracerOutput_PrintHeader( void* swarmOutput, Stream* stream,
   _SwarmOutput_PrintHeader( self, stream, lParticle_I, context );
 	
   SwarmOutput_PrintString( self, stream, "Pressure" );
-  for(uint i=0;i<self->num_fields;++i)
+  for(unsigned int i=0;i<self->num_fields;++i)
     {
       sprintf(name,"Field%d",i);
       SwarmOutput_PrintString( self, stream, name );
@@ -268,7 +268,7 @@ void _TracerOutput_PrintData( void* swarmOutput, Stream* stream,
       }
       SwarmOutput_PrintValue( self, stream, pressure );
     }
-  for(uint i=0;i<self->num_fields;++i)
+  for(unsigned int i=0;i<self->num_fields;++i)
     {
       FieldVariable_InterpolateValueAt(self->fields[i],coord,&field);
       SwarmOutput_PrintValue( self, stream, field );

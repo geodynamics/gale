@@ -441,7 +441,7 @@ void VTKOutput_particles(Swarm* swarm,
           fprintf(fp,"      </CellData>\n");
           fprintf(fp,"      <Cells>\n");
           fprintf(fp,"        <DataArray type=\"Int32\" Name=\"connectivity\" format=\"ascii\">\n");
-          for(uint i=0;i<(num_particles-1)/stepping+1;++i)
+          for(unsigned int i=0;i<(num_particles-1)/stepping+1;++i)
             fprintf(fp,"%d ",i);
           fprintf(fp,"\n        </DataArray>\n");
           fprintf(fp,"        <DataArray type=\"Int32\" Name=\"offsets\" format=\"ascii\">\n");
@@ -472,7 +472,7 @@ void VTKOutput_particles(Swarm* swarm,
 /* Print out the coordinates of the mesh. */
 
 void VTKOutput_print_coords(FILE *fp, FeMesh *feMesh, Grid *grid, int nDims,
-                            uint lower[3], uint upper[3]) {
+                            unsigned int lower[3], uint upper[3]) {
   IJK ijk;
 
   fprintf(fp,"      <Points>\n");
@@ -503,7 +503,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
   Index var_I;
   int header_printed=0;
   int nDims, i;
-  uint lower[3], upper[3];
+  unsigned int lower[3], upper[3];
 
   HydrostaticTerm *hydrostaticTerm;
   char* field_filename;
@@ -743,7 +743,7 @@ void VTKOutput_fields(void *context, int myRank, int nprocs,
                       double p;
                       /* First add the trace of the stress */
 
-                      for(uint stress_I = 0;
+                      for(unsigned int stress_I = 0;
                           stress_I<self->fieldVariable_Register->objects->count;
                           stress_I++ ) {
                         FieldVariable* stressVar;

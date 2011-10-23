@@ -355,7 +355,7 @@ void _Director_Initialise( void* director, void* data ) {
 			"randomInitialDirections");
 
 			/* Loop over materials and get material properties from dictionary */
-			for (uint material_I = 0 ; material_I < materialsCount ; material_I++ ) {
+			for (unsigned int material_I = 0 ; material_I < materialsCount ; material_I++ ) {
 				material = Materials_Register_GetByIndex( 
 						self->materialPointsSwarm->materials_Register, 
 						material_I );
@@ -385,7 +385,7 @@ void _Director_Initialise( void* director, void* data ) {
 			
 			/* If material is random, set the local srand, 
 			locate all random particles, and set their director */
-			for (uint material_I = 0; material_I < materialsCount; material_I++) {
+			for (unsigned int material_I = 0; material_I < materialsCount; material_I++) {
 				if (randomInitialDirections[material_I] == True) {
 					Particle_Index	gParticle_I;
 					unsigned	approxGlobalParticleCount = particleLocalCount * self->materialPointsSwarm->nProc;
@@ -428,7 +428,7 @@ void _Director_Initialise( void* director, void* data ) {
 		    /* For each non-random particle, set the initial direction */
 			for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) {
 				/* Initialise the norm of each director */
-				uint material_I = MaterialPointsSwarm_GetMaterialIndexAt(
+				unsigned int material_I = MaterialPointsSwarm_GetMaterialIndexAt(
 						self->materialPointsSwarm, 
 						lParticle_I );
 				if (randomInitialDirections[material_I] == False) {

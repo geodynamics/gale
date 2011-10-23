@@ -251,7 +251,7 @@ double _VonMises_GetYieldIndicator(
         SymmetricTensor_GetTrace(strainRate, constitutiveMatrix->dim,
                                  &strainRateTrace);
 
-        for(uint i=0;i<constitutiveMatrix->dim;++i)
+        for(unsigned int i=0;i<constitutiveMatrix->dim;++i)
           {
             strainRate[TensorMapST3D[i][i]]-=
               strainRateTrace/constitutiveMatrix->dim;

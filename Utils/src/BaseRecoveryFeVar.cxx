@@ -141,8 +141,8 @@ void _BaseRecoveryFeVar_AssignFromXML( void* _self, Stg_ComponentFactory* cf, vo
 void _BaseRecoveryFeVar_Build( void* _self, void* data ) {
   BaseRecoveryFeVar* self = (BaseRecoveryFeVar*) _self;
 	Sync*	               sync;
-	uint                  componentsCount = 0;
-	uint                  variable_I;
+	unsigned int                  componentsCount = 0;
+	unsigned int                  variable_I;
 	int                  *nodeDomainCountPtr = NULL;
 	char                 **variableName, *tmpName;
 	Variable*            dataVariable;
@@ -411,10 +411,10 @@ void BaseUtils_PopulateBoundaryNodesInfo( FeMesh* mesh, BoundaryNodesInfo* bninf
 	Node_Index              tmpNodeID, tmpNode_I;
 	Element_Index           nbrElementID;
         int                     *els;
-	uint                    nNodes;
+	unsigned int                    nNodes;
 	LmStruct                list;
 	Sync*                   sync;
-	uint                    nLocalNodes;
+	unsigned int                    nLocalNodes;
 	int                     nVerts;
         const int               *verts;
 	IArray*			            inc[2];
@@ -460,7 +460,7 @@ void BaseUtils_PopulateBoundaryNodesInfo( FeMesh* mesh, BoundaryNodesInfo* bninf
 	 */
 	inc[0] = IArray_New();
 	inc[1] = IArray_New();
-	for( uint dNodes_I = 0 ; dNodes_I < FeMesh_GetNodeDomainSize( mesh ) ; dNodes_I++ ) {
+	for( unsigned int dNodes_I = 0 ; dNodes_I < FeMesh_GetNodeDomainSize( mesh ) ; dNodes_I++ ) {
 		if( !bninfo[dNodes_I].onMeshBoundary ) 
 			continue;
 

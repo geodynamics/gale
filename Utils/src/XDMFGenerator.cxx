@@ -503,16 +503,16 @@ namespace {
     int totalVerts        = Mesh_GetGlobalSize( feMesh, (MeshTopology_Dim)0 );
     int elementGlobalSize = FeMesh_GetElementGlobalSize(feMesh);
 
-    uint maxNodes;
+    unsigned int maxNodes;
     /* get connectivity array size */
     if (feMesh->nElTypes == 1)
       maxNodes = FeMesh_GetElementNodeSize( feMesh, 0);
     else {
       /* determine the maximum number of nodes each element has */
       maxNodes = 0;
-      for (uint gElement_I = 0; gElement_I < FeMesh_GetElementGlobalSize(feMesh);
+      for (unsigned int gElement_I = 0; gElement_I < FeMesh_GetElementGlobalSize(feMesh);
            gElement_I++ ) {
-        uint numNodes;
+        unsigned int numNodes;
         numNodes = FeMesh_GetElementNodeSize( feMesh, gElement_I);
         if( maxNodes < numNodes ) maxNodes = numNodes;
       }
@@ -522,7 +522,7 @@ namespace {
       {
         /* First separate each node of each element into its own
            variable C0-C8 or C0-C26 */
-        for(uint i=0;i<maxNodes;++i)
+        for(unsigned int i=0;i<maxNodes;++i)
           {
             Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"C%u\">\n",
                            elementGlobalSize, i);
@@ -640,8 +640,8 @@ namespace {
     /** determine whether feVariable data is cell centered (like
         Pressure with P0 elements), or on the nodes (like
         Velocity) **/
-    uint totalVerts(Mesh_GetGlobalSize(feMesh,(MeshTopology_Dim)0));
-    uint elementGlobalSize(FeMesh_GetElementGlobalSize(feMesh));
+    unsigned int totalVerts(Mesh_GetGlobalSize(feMesh,(MeshTopology_Dim)0));
+    unsigned int elementGlobalSize(FeMesh_GetElementGlobalSize(feMesh));
     if(meshSize == elementGlobalSize){
       centering="Cell";
     } else if(meshSize == totalVerts) {
@@ -652,7 +652,7 @@ namespace {
     }
 
     /** how many degrees of freedom does the fevariable have? **/
-    uint dofAtEachNodeCount = feVar->fieldComponentCount;
+    unsigned int dofAtEachNodeCount = feVar->fieldComponentCount;
     if (dofAtEachNodeCount == 1) {
       Journal_Printf( stream, "    <Attribute Type=\"Scalar\" Center=\"%s\" Name=\"%s\">\n", centering.c_str(),  feVar->name);
       Journal_Printf( stream, "       <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", meshSize );
@@ -686,7 +686,7 @@ namespace {
       Journal_Printf( stream, "         </Attribute>\n\n" );
     } else {
       /** where there are more than 3 components, we write each one out as a scalar **/
-      for(uint dofCountIndex = 0 ; dofCountIndex < dofAtEachNodeCount ; ++dofCountIndex){
+      for(unsigned int dofCountIndex = 0 ; dofCountIndex < dofAtEachNodeCount ; ++dofCountIndex){
         Journal_Printf( stream, "         <Attribute Type=\"Scalar\" Center=\"%s\" Name=\"%s-Component-%u\">\n", centering.c_str(),  feVar->name, dofCountIndex);
         Journal_Printf( stream, "            <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" >\n", meshSize );
         Journal_Printf( stream, "               <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n", (offset+dofCountIndex), meshSize );

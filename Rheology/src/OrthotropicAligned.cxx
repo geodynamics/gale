@@ -153,8 +153,8 @@ void _OrthotropicAligned_ModifyConstitutiveMatrix(
         /*	if(!flag){ // if not visited modify matrix else no need to update */
         /* Snark dies if I only allow this to be called once.. */
 	/* ahh need to allow it to be called once for every particle */
-	   for(uint i=0;i<dim*(dim+1)/2;i++){
-	      for(uint j=0;j<dim*(dim+1)/2;j++){
+	   for(unsigned int i=0;i<dim*(dim+1)/2;i++){
+	      for(unsigned int j=0;j<dim*(dim+1)/2;j++){
 		 D[i][j] = 0.0;
 	      }
 	   }

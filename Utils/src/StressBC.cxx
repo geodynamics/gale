@@ -205,7 +205,7 @@ void _StressBC_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* d
 }
 
 namespace {
-  const uint normal_direction=3;
+  const unsigned int normal_direction=3;
 
   /* Gets the actual values used by the StressBC (e.g. a float or a function). */
   void get_values(Stg_ComponentFactory* cf, void *stressBC,
@@ -339,7 +339,7 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
     return;
 
   /* Set up directions particular to each wall */
-  uint local_norm, face;
+  unsigned int local_norm, face;
   switch(self->_wall)
     {
       case Wall_Right:
@@ -379,7 +379,7 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
   const double xi[]={-sqrt(3/5.0),0,sqrt(3/5.0)};
   const double weights[]={5/9.0, 8/9.0, 5/9.0};
 
-  for(uint d=0;d<dim;++d)
+  for(unsigned int d=0;d<dim;++d)
     {
       for(int i=0;i<3;++i)
         {

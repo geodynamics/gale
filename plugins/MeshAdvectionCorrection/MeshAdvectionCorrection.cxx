@@ -124,7 +124,7 @@ void MeshAdvectionCorrection_EulerDeformCorrection( FeVariable *artDField, doubl
 	FeMesh*      mesh = artDField->feMesh;
 	Dof_Index    dof  = artDField->fieldComponentCount;
 	double       artV[3], artD[3];
-	uint numLocalNodes = FeMesh_GetNodeLocalSize( mesh );
+	unsigned int numLocalNodes = FeMesh_GetNodeLocalSize( mesh );
 	Dof_Index    dof_I, lNode_I;
 
 		/* INITIAL CONDITION: artV = 0 */

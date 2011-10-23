@@ -177,7 +177,7 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 	Particle_InCellIndex                 cellParticleCount;
 	Element_NodeIndex                    elementNodeCount;
 	Dimension_Index                      dim                = forceVector->dim;
-	Swarm*                               swarm              = self->integrationSwarm;
+	IntegrationPointsSwarm*              swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
 	FeMesh*       		             mesh               = forceVector->feVariable->feMesh;
 	Node_ElementLocalIndex               eNode_I;
 	Cell_Index                           cell_I;
@@ -201,8 +201,15 @@ void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* force
 	for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
+                /* Handle case where we are using gauss swarms with
+                   NearestNeighborMapper instead of a material
+                   swarm */
+                IntegrationPointsSwarm* NNswarm(swarm);
+                IntegrationPoint* NNparticle(particle);
+                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+                  
 		/* Get parameters */
-		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*)swarm, particle );
+		material = IntegrationPointsSwarm_GetMaterialOn(NNswarm,NNparticle);
 		materialExt = (RadiogenicHeatingTerm_MaterialExt*)ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 		
 		/* Check if this material has heating term */

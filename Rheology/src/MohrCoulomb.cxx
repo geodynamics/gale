@@ -397,7 +397,7 @@ void _MohrCoulomb_StoreCurrentParameters(
 	/* Subtract the trace (which should be zero anyway).  We can
 		use TensorMapST3D even for 2D, because it is the same for
 		the xx and yy components */
-	for(uint i=0;i<dim;++i)
+	for(unsigned int i=0;i<dim;++i)
 		self->currentStrainRate[TensorMapST3D[i][i]]-=trace/dim;
 
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, self->currentStrainRate, self->currentStress );

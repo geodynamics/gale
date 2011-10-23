@@ -186,8 +186,8 @@ void _Orthotropic_ModifyConstitutiveMatrix(
 	n1 = self->n[0];
 	n2 = self->n[1];
 
-	for(uint i=0;i<dim*(dim+1)/2;i++){
-	      for(uint j=0;j<dim*(dim+1)/2;j++){
+	for(unsigned int i=0;i<dim*(dim+1)/2;i++){
+	      for(unsigned int j=0;j<dim*(dim+1)/2;j++){
 		    C[i][j] = 0.0;
 	      }
 	}
