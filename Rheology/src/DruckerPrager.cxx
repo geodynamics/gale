@@ -70,12 +70,10 @@ DruckerPrager* DruckerPrager_New(
 	MaterialPointsSwarm*  materialPointsSwarm, 
 	double                minVisc, 
 	FeVariable*           strainRateField,
-	SwarmVariable*        swarmStrainRate,
 	double                cohesion,
 	double                cohesionAfterSoftening,
 	Bool                  strainRateSoftening,
 	FeVariable*           pressureField,
-	SwarmVariable*        swarmPressure,
 	double                minimumYieldStress,
 	double                minimumViscosity,
 	double                maxStrainRate,
@@ -97,8 +95,9 @@ DruckerPrager* DruckerPrager_New(
 
    _Rheology_Init( self, (PICelleratorContext*)self->context );
    _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
-   _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
-   _DruckerPrager_Init( self, pressureField, swarmPressure,
+   _VonMises_Init( (VonMises*)self, strainRateField, cohesion,
+                   cohesionAfterSoftening, strainRateSoftening );
+   _DruckerPrager_Init( self, pressureField,
                         materialPointsSwarm,
                         frictionCoefficient,
                         frictionCoefficientAfterSoftening,
@@ -137,7 +136,6 @@ DruckerPrager* _DruckerPrager_New(  DRUCKERPRAGER_DEFARGS  )
 void _DruckerPrager_Init(
 		DruckerPrager*                                     self,
 		FeVariable*                                        pressureField,
-		SwarmVariable*                                     swarmPressure,
 		MaterialPointsSwarm*                               materialPointsSwarm,
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening,
@@ -156,18 +154,12 @@ void _DruckerPrager_Init(
                 double                    maxStrainRate,
                 HydrostaticTerm*          hydrostaticTerm )
 {
-	DruckerPrager_Particle*   particleExt;
-	StandardParticle          materialPoint;
-	
-	self->particleExtHandle = ExtensionManager_Add( materialPointsSwarm->particleExtensionMgr, (Name)DruckerPrager_Type, sizeof(DruckerPrager_Particle) );
-		
 	/* Assign Pointers */
 	self->pressureField       = pressureField;
 	self->frictionCoefficient = frictionCoefficient;
 	self->minimumYieldStress  = minimumYieldStress;
 	self->minimumViscosity    = minimumViscosity;
 	self->maxStrainRate       = maxStrainRate;
-	self->swarmPressure       = swarmPressure;
 	
 	/* Strain softening of Cohesion and friction - (linear
            weakening is assumed) needs a softening factor between +0
@@ -193,18 +185,6 @@ void _DruckerPrager_Init(
 	EP_PrependClassHook( Context_GetEntryPoint( self->context, AbstractContext_EP_DumpClass ),
 								_DruckerPrager_UpdateDrawParameters, self );
 	
-	particleExt = (DruckerPrager_Particle*)ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr, &materialPoint, self->particleExtHandle );
-	
-	/* Setup Variables for Visualisation */
-	self->brightness = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"DruckerPragerBrightness", (ArithPointer) &particleExt->brightness - (ArithPointer) &materialPoint, Variable_DataType_Float  );
-	
-	self->opacity = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"DruckerPragerOpacity", (ArithPointer) &particleExt->opacity - (ArithPointer) &materialPoint, Variable_DataType_Float  );
-	
-	self->diameter = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"DruckerPragerDiameter", (ArithPointer) &particleExt->diameter - (ArithPointer) &materialPoint, Variable_DataType_Float  );
-
-	/* The tensileFailure variable allows to check whether a materialPoint has failed in tensile mode or not */
-	self->tensileFailure = Swarm_NewScalarVariable( materialPointsSwarm, (Name)"DruckerPragerTensileFailure", (ArithPointer) &particleExt->tensileFailure - (ArithPointer) &materialPoint, Variable_DataType_Char );
-
         self->curFrictionCoef = 0.0;
 }
 
@@ -235,7 +215,6 @@ void* _DruckerPrager_DefaultNew( Name name ) {
 void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf, void* data ){
 	DruckerPrager*          self           = (DruckerPrager*)druckerPrager;
 	FeVariable*             pressureField = NULL;
-	SwarmVariable*          swarmPressure = NULL;
 	MaterialPointsSwarm*    materialPointsSwarm = NULL;
 
 	/* Construct Parent */
@@ -243,18 +222,12 @@ void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf
 	
 	pressureField      = (FeVariable *) 
             Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, False, data  );
-   swarmPressure = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"swarmPressure", SwarmVariable, False, data );
-   Journal_Firewall( 
-			( pressureField || swarmPressure ), 
-			Journal_Register( Error_Type, (Name)self->type  ), 
-			"\n Error in component type %s, name '%s'.\n Must specify a PressureField OR a swarmPressure, but not both. \n", self->type, self->name ); 
 			
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );
 		
 	_DruckerPrager_Init( self, 
 			pressureField,
-			swarmPressure,
 			materialPointsSwarm, 
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficient", 0.0 ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"frictionCoefficientAfterSoftening", 0.0 ),
@@ -281,28 +254,16 @@ void _DruckerPrager_Build( void* rheology, void* data ) {
 	/* Build parent */
 	_VonMises_Build( self, data );
 
-	if(self->pressureField) Stg_Component_Build( self->pressureField, data, False );
-	if(self->swarmPressure) Stg_Component_Build( self->swarmPressure, data, False );
-	Stg_Component_Build( self->brightness, data, False );
-	Stg_Component_Build( self->opacity, data, False );
-	Stg_Component_Build( self->diameter, data, False );
-	Stg_Component_Build( self->tensileFailure, data, False );
-
+        Stg_Component_Build( self->pressureField, data, False );
 }
 
 void _DruckerPrager_Destroy( void* rheology, void* data ) {
 	DruckerPrager*          self               = (DruckerPrager*) rheology;
 
-	if(self->pressureField) Stg_Component_Destroy( self->pressureField, data, False );
-	if(self->swarmPressure) Stg_Component_Destroy( self->swarmPressure, data, False );
-	Stg_Component_Destroy( self->brightness, data, False );
-	Stg_Component_Destroy( self->opacity, data, False );
-	Stg_Component_Destroy( self->diameter, data, False );
-	Stg_Component_Destroy( self->tensileFailure, data, False );
+        Stg_Component_Destroy( self->pressureField, data, False );
 
 	/* Destroy parent */
 	_VonMises_Destroy( self, data );
-
 }
 
 
@@ -315,16 +276,11 @@ void _DruckerPrager_Initialise( void* rheology, void* data ) {
 
 	/* Initialise variables that I've created - (mainly just SwarmVariables)
 	 * This will run a Variable_Update for us */
-	if(self->pressureField) Stg_Component_Initialise( self->pressureField, data, False );
-	if(self->swarmPressure) Stg_Component_Initialise( self->swarmPressure, data, False );
+        Stg_Component_Initialise( self->pressureField, data, False );
 
 	/* We should only set initial conditions if in regular non-restart mode. If in restart mode, then
 	the particle-based variables will be set correcty when we re-load the Swarm. */
 	if ( self->context->loadFromCheckPoint == False ) {
-      Stg_Component_Initialise( self->brightness, data, False );
-      Stg_Component_Initialise( self->opacity, data, False );
-      Stg_Component_Initialise( self->diameter, data, False );
-      Stg_Component_Initialise( self->tensileFailure, data, False );
 
 		/* We don't need to Initialise hasYieldedVariable because it's a parent variable and _YieldRheology_Initialise
 		 * has already been called */
@@ -332,12 +288,7 @@ void _DruckerPrager_Initialise( void* rheology, void* data ) {
 
 		for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
 		
-			Variable_SetValueFloat( self->brightness->variable, lParticle_I, 0.0 );
-			Variable_SetValueFloat( self->opacity->variable,    lParticle_I, 0.0 );
-			Variable_SetValueFloat( self->diameter->variable,   lParticle_I, 0.0 );
-		
 			Variable_SetValueChar( self->hasYieldedVariable->variable, lParticle_I, False );
-			Variable_SetValueChar( self->tensileFailure->variable,lParticle_I, False );
 		}
 	}	
 }
@@ -368,13 +319,7 @@ double _DruckerPrager_GetYieldCriterion(
 	/* Get Parameters From Rheology */
 	minimumYieldStress                 = self->minimumYieldStress;
 	
-        if( self->pressureField )
-          FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &pressure );
-        else {
-          SwarmVariable_ValueAt( self->swarmPressure,
-                                 constitutiveMatrix->currentParticleIndex,
-                                 &pressure );
-        }
+        FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &pressure );
 
         cell_I=CellLayout_MapElementIdToCellId(materialPointsSwarm->cellLayout,
                                                lElement_I );
@@ -545,118 +490,16 @@ double _DruckerPrager_EffectiveFrictionCoefficient( void* rheology, void* materi
 }
 
 void _DruckerPrager_UpdateDrawParameters( void* rheology ) {
-	DruckerPrager*                   self               = (DruckerPrager*) rheology;
-	Particle_Index                   lParticle_I;
-	Particle_Index                   particleLocalCount;
-	StrainWeakening*                 strainWeakening    = self->strainWeakening;
-	MaterialPoint*                   materialPoint;
-	
-	double                           length;
-	double                           brightness;
-	double                           opacity;
-	double                           strainWeakeningRatio;
-	double                           localMaxStrainIncrement;
-	double                           localMeanStrainIncrement;
-	Particle_Index                   localFailed;
-	
-	double                           globalMaxStrainIncrement;
-	double                           globalMeanStrainIncrement;
-	Particle_Index                   globalFailed;
-	
-	double                           averagedGlobalMaxStrainIncrement = 0.0;
+  DruckerPrager* self=(DruckerPrager*) rheology;
+  StrainWeakening* strainWeakening=self->strainWeakening;
+  /* We should only update the drawing parameters if the strain
+     weakening is defined */ 
+  if (strainWeakening==NULL)
+    return;
 
-	double                           oneOverGlobalMaxStrainIncrement;
-	double                           postFailureWeakeningIncrement;
-
-	/* Note : this function defines some drawing parameters (brightness, opacity, diameter) as
-	 * functions of the strain weakening - this needs to be improved since most of the parameters
-	 * that define this dependency are hard coded here. We need to have a more flexible way
-	 * to construct the viz parameters as functions of material parameters */
-
-	/* We should only update the drawing parameters if the strain weakening is defined */ 
-	if (strainWeakening==NULL)
-		return;
-	
-	localMaxStrainIncrement = 0.0;
-	localMeanStrainIncrement = 0.0;
-	localFailed = 0;
-
-	/* Update all variables */
-	Variable_Update( self->hasYieldedVariable->variable );
-	Variable_Update( self->brightness->variable );
-	Variable_Update( self->opacity->variable );
-	Variable_Update( self->diameter->variable );
-	Variable_Update( strainWeakening->postFailureWeakeningIncrement->variable );
-
-	particleLocalCount = self->hasYieldedVariable->variable->arraySize;
-	
-	for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
-		if ( Variable_GetValueChar( self->hasYieldedVariable->variable, lParticle_I )) {
-			localFailed++;
-
-			postFailureWeakeningIncrement = 
-					Variable_GetValueDouble( strainWeakening->postFailureWeakeningIncrement->variable, lParticle_I );
-			
-			localMeanStrainIncrement += postFailureWeakeningIncrement;
-		
-			if(localMaxStrainIncrement < postFailureWeakeningIncrement)
-				localMaxStrainIncrement = postFailureWeakeningIncrement;
-		}
-	}
-	
-	MPI_Allreduce( &localMaxStrainIncrement,  &globalMaxStrainIncrement,  1, MPI_DOUBLE, MPI_MAX, MPI_COMM_WORLD );
-	MPI_Allreduce( &localMeanStrainIncrement, &globalMeanStrainIncrement, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD );
-	MPI_Allreduce( &localFailed,              &globalFailed,              1, MPI_INT,    MPI_SUM, MPI_COMM_WORLD );
-	
-	if(globalFailed == 0) 
-		return;
-				
-	globalMeanStrainIncrement /= (double) globalFailed;
-	
-	averagedGlobalMaxStrainIncrement = 
-			0.5 * averagedGlobalMaxStrainIncrement + 
-			0.25 * globalMeanStrainIncrement +
-			0.25 * globalMaxStrainIncrement;
-	
-	/* Let's simply assume that twice the mean is a good place to truncate these values */
-	oneOverGlobalMaxStrainIncrement = 1.0 / averagedGlobalMaxStrainIncrement;
-	
-	for ( lParticle_I = 0 ; lParticle_I < particleLocalCount ; lParticle_I++ ) { 
-		materialPoint = (MaterialPoint*)Swarm_ParticleAt( strainWeakening->swarm, lParticle_I );
-
-		if ( Variable_GetValueChar( self->hasYieldedVariable->variable, lParticle_I ) == False ||
-					StrainWeakening_GetPostFailureWeakening( strainWeakening, materialPoint ) < 0.0 ) 
-		{
-			Variable_SetValueFloat( self->brightness->variable, lParticle_I, 0.0 );
-			Variable_SetValueFloat( self->opacity->variable, lParticle_I, 0.0 );
-			Variable_SetValueFloat( self->diameter->variable, lParticle_I, 0.0 );
-			continue;
-		}  
-
-		postFailureWeakeningIncrement = 
-				Variable_GetValueDouble( strainWeakening->postFailureWeakeningIncrement->variable, lParticle_I );
-			
-		strainWeakeningRatio = StrainWeakening_CalcRatio( strainWeakening, materialPoint );
-		
-		length     = 0.001 + 0.003 * strainWeakeningRatio;
-		brightness = strainWeakeningRatio * postFailureWeakeningIncrement * oneOverGlobalMaxStrainIncrement;
-		
-		opacity = 0.5 * brightness; 
-		
-		if( brightness > 1.0 )
-			brightness = 1.0;
-		
-		if( opacity > 0.5 )
-			opacity = 0.5;
-		
-		if( opacity < 0.1 )
-			opacity = 0.0;
-		
-		Variable_SetValueFloat( self->brightness->variable, lParticle_I, brightness );
-		Variable_SetValueFloat( self->opacity->variable,    lParticle_I, opacity );
-		Variable_SetValueFloat( self->diameter->variable,   lParticle_I, (float) length );
-	}
-	
+  /* Update all variables */
+  Variable_Update( self->hasYieldedVariable->variable );
+  Variable_Update(strainWeakening->postFailureWeakeningIncrement->variable);
 }
 
 

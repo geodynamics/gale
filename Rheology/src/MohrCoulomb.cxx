@@ -80,7 +80,6 @@ void _MohrCoulomb_Init(
 		MohrCoulomb*          self,
 		FeVariable*           pressureField,
 		FeVariable*           strainRateField,
-		SwarmVariable*        swarmStrainRate,
 		MaterialPointsSwarm*  materialPointsSwarm,
 		double                cohesion,
 		double                cohesionAfterSoftening,
@@ -136,7 +135,6 @@ void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
 	FeVariable*            pressureField;
 	MaterialPointsSwarm*   materialPointsSwarm;
 	FeVariable*            strainRateField;
-	SwarmVariable*         swarmStrainRate;
 	
 	/* Construct Parent */
 	_YieldRheology_AssignFromXML( self, cf, data );
@@ -152,13 +150,10 @@ void _MohrCoulomb_AssignFromXML( void* rheology, Stg_ComponentFactory* cf,
 	pressureField          = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data  );
 	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateField", FeVariable, True, data  );
 
-	swarmStrainRate = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"swarmStrainRate", SwarmVariable, False, data  );
-	
 	_MohrCoulomb_Init( 
 			self,
 			pressureField,
 			strainRateField,
-			swarmStrainRate,
 			materialPointsSwarm, 
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesion", 0.0  ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesionAfterSoftening", 0.0  ),
@@ -385,12 +380,7 @@ void _MohrCoulomb_StoreCurrentParameters(
 	double				trace;
 	
 	FeVariable_InterpolateWithinElement( self->pressureField, lElement_I, xi, &self->currentPressure );
-	if( !self->swarmStrainRate ) {
-		FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, self->currentStrainRate );
-	}
-	else {
-	   SwarmVariable_ValueAt( self->swarmStrainRate, constitutiveMatrix->currentParticleIndex, self->currentStrainRate );
-	}
+        FeVariable_InterpolateWithinElement( self->strainRateField, lElement_I, xi, self->currentStrainRate );
 
 	SymmetricTensor_GetTrace(self->currentStrainRate, dim, &trace);
 

@@ -49,27 +49,15 @@
    /** Textual name of this class - This is a global pointer which is used for times when you need to refer to class and not a particular instance of a class */
    extern const Type DruckerPrager_Type;
 
-   typedef struct {
-      float          brightness;
-      float          opacity;
-      float          diameter;
-      Particle_Bool  tensileFailure;
-   }  DruckerPrager_Particle;
-
    /** Rheology class contents - this is defined as a macro so that sub-classes of this class can use this macro at the start of the definition of their struct */
    #define __DruckerPrager \
       /* Parent info */ \
       __VonMises \
       /* Virtual functions go here */ \
       /* General Info */\
-      SwarmVariable*                                      brightness;                            \
-      SwarmVariable*                                      opacity;                               \
-      SwarmVariable*                                      diameter;                              \
-      SwarmVariable*                                      tensileFailure;                        \
       ExtensionInfo_Index                                 particleExtHandle;                     \
       /* Param passed in */\
       FeVariable*                                         pressureField;                         \
-      SwarmVariable*                                      swarmPressure;                         \
       double                                              minimumYieldStress;                    \
       double                                              minimumViscosity;                      \
       double                                              maxStrainRate;                      \
@@ -98,12 +86,10 @@
       MaterialPointsSwarm*  materialPointsSwarm,
       double                minVisc,
       FeVariable*           strainRateField,
-      SwarmVariable*        swarmStrainRate,
       double                cohesion,
       double                cohesionAfterSoftening,
       Bool                  strainRateSoftening,
       FeVariable*           pressureField,
-      SwarmVariable*        swarmPressure,
       double                minimumYieldStress,
       double                minimumViscosity,
       double                maxStrainRate,
@@ -145,7 +131,6 @@
    void _DruckerPrager_Init(
 		DruckerPrager*                                     self,
 		FeVariable*                                        pressureField,
-		SwarmVariable*                                     swarmPressure,
 		MaterialPointsSwarm*                               materialPointsSwarm,
 		double                                             frictionCoefficient,
 		double                                             frictionCoefficientAfterSoftening,

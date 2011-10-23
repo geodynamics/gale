@@ -489,7 +489,7 @@ void _REP_Algorithm_AssembleElement( REP_Algorithm* self, int lElement_I, double
 
 		for( field_I = 0 ; field_I < self->repFieldCount ; field_I++ )  {
 			_RecoveredFeVariable_AssembleAtParticle( self->repFieldList[field_I], self->constitutiveMatrix, 
-					self->constitutiveMatrix->currentParticleIndex, particle, lElement_I, 
+					particle, lElement_I, 
 					globalCoord, (double**)GNx, detJac, Hi_Mat[field_I], Fi_Mat[field_I]);
 
 			/* could be a useful functionPtr later on, JG 12May09

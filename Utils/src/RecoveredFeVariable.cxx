@@ -252,7 +252,6 @@ void _RecoveredFeVariable_Destroy( void* recFeVariable, void* data ) {
 void _RecoveredFeVariable_AssembleAtParticle(
    RecoveredFeVariable* self,
    ConstitutiveMatrix*  constitutiveMatrix,
-   int                  particleIndex,
    IntegrationPoint*    particle,
    int                  lElement_I, 
    double*              globalCoord,
@@ -286,7 +285,7 @@ void _RecoveredFeVariable_AssembleAtParticle(
          ConstitutiveMatrix_GetStoredMatrixOnParticle( constitutiveMatrix, particle, tmpC );
       } else {
          /* build total constitutive matrix - could diagree with current velcoity and pressure solution */
-         ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I, particleIndex, particle ); 
+         ConstitutiveMatrix_Assemble( constitutiveMatrix, lElement_I, particle ); 
       }
 
       if( !self->recoverStrain ) {

@@ -79,7 +79,6 @@
 		Index																columnSize; \
 		Index																rowSize; \
 		Bool																previousSolutionExists; \
-		int																currentParticleIndex; \
 		SystemLinearEquations*										sle; \
 		Iteration_Index												sleNonLinearIteration_I;
 		
@@ -173,7 +172,6 @@
 		void*							constitutiveMatrix,
 		Element_LocalIndex		lElement_I,
 		IntegrationPointsSwarm*	swarm,
-		int							particleIndex,
 		IntegrationPoint*			particle );
 
 	#define ConstitutiveMat_Refactored_SetToNonLinear( constitutiveMatrix ) \

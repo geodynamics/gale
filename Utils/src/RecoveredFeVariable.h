@@ -147,7 +147,7 @@
 	void RecoveredFeVariable_RemoveWorkSpace( RecoveredFeVariable* self );
 
 	void _RecoveredFeVariable_AssembleAtParticle( RecoveredFeVariable* self, ConstitutiveMatrix* constitutiveMatrix,
-		int particleIndex, IntegrationPoint* particle, int lElement_I, 
+		IntegrationPoint* particle, int lElement_I, 
 		double* globalCoord, double** GNx, double detJac,
 		double*** Hi_Mat, double** Fi_Mat	);
 

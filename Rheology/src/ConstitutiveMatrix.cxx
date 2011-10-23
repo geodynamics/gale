@@ -269,11 +269,10 @@ void _ConstitutiveMatrix_Destroy( void* constitutiveMatrix, void* data ) {
 void ConstitutiveMatrix_Assemble(
       void*                                              constitutiveMatrix,
       Element_LocalIndex                                 lElement_I,
-      int                                                particleIndex,
       IntegrationPoint*                                  particle )
 {
   ConstitutiveMatrix*     self          = (ConstitutiveMatrix*)constitutiveMatrix;
-  ConstitutiveMatrix_Assemble(constitutiveMatrix,lElement_I,particleIndex,
+  ConstitutiveMatrix_Assemble(constitutiveMatrix,lElement_I,
                               particle,
                               (IntegrationPointsSwarm*)self->integrationSwarm);
 }
@@ -281,7 +280,6 @@ void ConstitutiveMatrix_Assemble(
 void ConstitutiveMatrix_Assemble(
       void*                                              constitutiveMatrix,
       Element_LocalIndex                                 lElement_I,
-      int                                                particleIndex,
       IntegrationPoint*                                  particle,
       IntegrationPointsSwarm* swarm)
 {
@@ -305,7 +303,6 @@ void ConstitutiveMatrix_Assemble(
     */
    material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn( swarm, particle );
    materialPoint = OneToOneMapper_GetMaterialPoint( swarm->mapper, particle, &materialSwarm );
-   self->currentParticleIndex = particleIndex;
 
    RheologyMaterial_RunRheologies( material, self, materialSwarm, lElement_I, materialPoint, particle->xi );
 
@@ -333,7 +330,6 @@ void ConstitutiveMatrix_AssembleMaterialPoint(void *constitutiveMatrix, int elem
 	matPoint = (MaterialPoint*)Swarm_ParticleAt(matSwarm, matPointInd);
 	material = (RheologyMaterial*)MaterialPointsSwarm_GetMaterialOn(matSwarm, matPoint);
 	FeMesh_CoordGlobalToLocal(matSwarm->mesh, element, matPoint->coord, xi);
-	self->currentParticleIndex = matPointInd;
 	RheologyMaterial_RunRheologies(material, self, matSwarm, element, matPoint, xi);
 
   if( self->storeConstitutiveMatrix ) {

@@ -327,12 +327,9 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
        IntegrationPointsSwarm*
          NNswarm((IntegrationPointsSwarm*)self->integrationSwarm);
        IntegrationPoint* NNparticle(particle);
-       int NNparticle_index(swarm->cellParticleTbl[cell_I][cParticle_I]);
-       NearestNeighbor_Replace(&NNswarm,&NNparticle,&NNparticle_index,
-                               lElement_I,dim);
+       NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
        ConstitutiveMatrix_Assemble(constitutiveMatrix, lElement_I,
-                                   NNparticle_index, NNparticle,
-                                   NNswarm);
+                                   NNparticle, NNswarm);
      }
 
      eta = self->matrixData[2][2];

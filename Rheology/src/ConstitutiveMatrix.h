@@ -78,7 +78,6 @@
 		Index                                        columnSize;                        \
 		Index                                        rowSize;                           \
 		Bool                                         previousSolutionExists;            \
-		int                                          currentParticleIndex;              \
 		SystemLinearEquations*                       sle;                               \
 		Iteration_Index                              sleNonLinearIteration_I;           \
     /* below is needed to store the constitutiveMatrix per particle */ \
@@ -162,11 +161,9 @@
 	void ConstitutiveMatrix_Assemble( 
 		void*                                              constitutiveMatrix,
 		Element_LocalIndex                                 lElement_I,
-		int                                                particleIndex,
 		IntegrationPoint*                                  particle );
         void ConstitutiveMatrix_Assemble(void* constitutiveMatrix,
                                          Element_LocalIndex lElement_I,
-                                         int particleIndex,
                                          IntegrationPoint* particle,
                                          IntegrationPointsSwarm* swarm);
 

@@ -69,7 +69,6 @@ VonMises* VonMises_New(
 	MaterialPointsSwarm*  materialPointsSwarm, 
 	double                minVisc, 
 	FeVariable*           strainRateField,
-	SwarmVariable*        swarmStrainRate,
 	double                cohesion,
 	double                cohesionAfterSoftening,
 	Bool                  strainRateSoftening )
@@ -78,7 +77,7 @@ VonMises* VonMises_New(
 
    _Rheology_Init( self, (PICelleratorContext*)context );
    _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
-   _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
+   _VonMises_Init( (VonMises*)self, strainRateField, cohesion, cohesionAfterSoftening, strainRateSoftening );
 
    self->isConstructed = True;
    return self;
@@ -102,13 +101,11 @@ VonMises* _VonMises_New(  VONMISES_DEFARGS  )
 void _VonMises_Init( 
 		VonMises*      self, 
 		FeVariable*    strainRateField,
-		SwarmVariable* swarmStrainRate,
 		double         cohesion, 
 		double         cohesionAfterSoftening,
 		Bool           strainRateSoftening)
 {
 	self->strainRateField        = strainRateField;
-	self->swarmStrainRate        = swarmStrainRate;
 	self->cohesion               = cohesion;
 	
 	/* Strain softening of Cohesion - (linear weakening is assumed) */
@@ -144,22 +141,15 @@ void* _VonMises_DefaultNew( Name name ) {
 void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* data ){
 	VonMises*          self           = (VonMises*)rheology;
 	FeVariable*        strainRateField;
-	SwarmVariable*     swarmStrainRate;
 
 	/* Construct Parent */
 	_YieldRheology_AssignFromXML( self, cf, data );
 	
 	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateField", FeVariable, False, data  );
-	swarmStrainRate = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"swarmStrainRate", SwarmVariable, False, data );
-   Journal_Firewall( 
-			(strainRateField || self->swarmStrainRate ), 
-			Journal_Register( Error_Type, (Name)self->type  ), 
-			"\n Error in component type %s, name '%s'.\n Must specify a strainRateField OR a swarmStrainRate, but not both. \n", self->type, self->name ); 
 
 	_VonMises_Init( 
 			self, 
 			strainRateField,
-			swarmStrainRate,
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesion", 0.0  ),
 			Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"cohesionAfterSoftening", 0.0  ),
 			Stg_ComponentFactory_GetBool( cf, self->name, (Dictionary_Entry_Key)"strainRateSoftening", False )  );
@@ -168,9 +158,7 @@ void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* da
 void _VonMises_Destroy( void* rheology, void* data ){
    VonMises* self = (VonMises*) rheology;
    
-   if( self->strainRateField ) Stg_Component_Destroy( self->strainRateField, data, False );
-   if( self->swarmStrainRate ) Stg_Component_Destroy( self->swarmStrainRate, data, False );
-   
+   Stg_Component_Destroy( self->strainRateField, data, False );
    _YieldRheology_Destroy( self, data );
 }
 
@@ -180,9 +168,7 @@ void _VonMises_Build( void* rheology, void* data ){
    /* build parent */
    _YieldRheology_Build( self, data );
    
-   if( self->strainRateField ) Stg_Component_Build( self->strainRateField, data, False );
-   if( self->swarmStrainRate ) Stg_Component_Build( self->swarmStrainRate, data, False );
-   
+   Stg_Component_Build( self->strainRateField, data, False );
 }
 
 void _VonMises_Initialise( void* rheology, void* data ){
@@ -191,9 +177,7 @@ void _VonMises_Initialise( void* rheology, void* data ){
    /* Initialise parent */
    _YieldRheology_Initialise( self, data );
    
-   if( self->strainRateField ) Stg_Component_Initialise( self->strainRateField, data, False );
-   if( self->swarmStrainRate ) Stg_Component_Initialise( self->swarmStrainRate, data, False );
-   
+   Stg_Component_Initialise( self->strainRateField, data, False );
 }
 
 double _VonMises_GetYieldCriterion( 
@@ -233,16 +217,8 @@ double _VonMises_GetYieldIndicator(
         double stressTrace, strainRateTrace;
 	
 	/* Get Strain Rate */
-	if( self->strainRateField ) {
-	   FeVariable_InterpolateWithinElement(
-	      self->strainRateField, lElement_I, xi, strainRate );
-	}
-	else {
-	   SwarmVariable_ValueAt( self->swarmStrainRate,
-				  constitutiveMatrix->currentParticleIndex,
-				  strainRate );
-	}
-
+        FeVariable_InterpolateWithinElement(self->strainRateField,
+                                            lElement_I, xi, strainRate );
 	/* Get Stress */
 	ConstitutiveMatrix_CalculateStress( constitutiveMatrix, strainRate,
                                             self->stress );

@@ -244,7 +244,6 @@ void ConstitutiveMat_Refactored_Assemble(
 		void*                                              constitutiveMatrix,
 		Element_LocalIndex                                 lElement_I,
 		IntegrationPointsSwarm*				   swarm,
-		int                                                particleIndex,
 		IntegrationPoint*                                  particle )
 {
 	ConstitutiveMat_Refactored*     self          = (ConstitutiveMat_Refactored*)constitutiveMatrix;
@@ -267,7 +266,6 @@ void ConstitutiveMat_Refactored_Assemble(
 	 */
 	material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn( swarm, particle );
 	materialPoint = OneToOneMapper_GetMaterialPoint( swarm->mapper, particle, &materialSwarm );
-	self->currentParticleIndex = particleIndex;
 
 	/* need to change the interface for this function, so it takes in a new constitutive matrix */
 	/* TODO!!! not sure if passing a ConstitutiveMat_Refactored to this function is going to be a problem !!!TODO */

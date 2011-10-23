@@ -69,7 +69,6 @@ Byerlee* Byerlee_New(
       MaterialPointsSwarm*  materialPointsSwarm, 
       double                minVisc, 
       FeVariable*           strainRateField,
-      SwarmVariable*        swarmStrainRate,
       double                cohesion,
       double                cohesionAfterSoftening,
       Bool                  strainRateSoftening,
@@ -80,7 +79,7 @@ Byerlee* Byerlee_New(
 
    _Rheology_Init( self, (PICelleratorContext*)context );
    _YieldRheology_Init( (YieldRheology*)self, strainWeakening, materialPointsSwarm, minVisc ); 
-   _VonMises_Init( (VonMises*)self, strainRateField, swarmStrainRate, cohesion, cohesionAfterSoftening, strainRateSoftening );
+   _VonMises_Init( (VonMises*)self, strainRateField, cohesion, cohesionAfterSoftening, strainRateSoftening );
    _Byerlee_Init( self, mesh, depthCoefficient );
    self->isConstructed = True;
    return self;

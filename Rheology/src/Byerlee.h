@@ -68,7 +68,6 @@
       MaterialPointsSwarm*  materialPointsSwarm,
       double                minVisc,
       FeVariable*           strainRateField,
-      SwarmVariable*        swarmStrainRate,
       double                cohesion,
       double                cohesionAfterSoftening,
       Bool                  strainRateSoftening,

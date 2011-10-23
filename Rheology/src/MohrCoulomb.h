@@ -60,7 +60,6 @@
 		MaterialPointsSwarm*                                materialPointsSwarm;                                 \
 		FeVariable*                                         pressureField;                         \
 		FeVariable*                                         strainRateField;\
-		SwarmVariable*                                      swarmStrainRate;\
 		/* Director component is used to update the normal */\
 		Director*                                           director;                              \
 		double                                              cohesion;                              \
@@ -100,7 +99,6 @@
 		MohrCoulomb*          self,
 		FeVariable*           pressureField,
 		FeVariable*           strainRateField,
-		SwarmVariable*        swarmStrainRate,
 		MaterialPointsSwarm*  materialPointsSwarm,
 		double                cohesion,
 		double                cohesionAfterSoftening,
