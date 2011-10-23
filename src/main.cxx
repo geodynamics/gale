@@ -154,7 +154,6 @@ int main( int argc, char* argv[] ) {
 	Stg_ObjectList*			listAllTopics;
 	char*							listTopic;
 	Stg_ObjectList*			listTopics;
-	Dictionary*					componentDict;
 	Stg_ComponentFactory*	cf;
 
 	/* Initialise PETSc, get world info */
