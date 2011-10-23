@@ -501,7 +501,7 @@ void _AbstractContext_AssignFromXML( void* context, Stg_ComponentFactory* cf, vo
 	/* Note: these try for deprecated key "maxLoops" as well as new one "maxTimeSteps" - Main.PatrickSunter - 4 November 2004 */
 	dictEntryVal = Dictionary_Get( self->dictionary, (Dictionary_Entry_Key)"maxLoops" );
 	if ( NULL == dictEntryVal  ) {
-          dictEntryVal = Dictionary_GetDefault( self->dictionary, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( std::numeric_limits<uint>::max()));
+          dictEntryVal = Dictionary_GetDefault( self->dictionary, "maxTimeSteps", Dictionary_Entry_Value_FromUnsignedInt( std::numeric_limits<unsigned int>::max()));
 	}
 	self->maxTimeSteps = Dictionary_Entry_Value_AsUnsignedInt( dictEntryVal );
 
@@ -771,11 +771,11 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 	double             dt = 0;
 	double             dtLoadedFromFile = 0;
 	
-	if (self->maxTimeSteps!=std::numeric_limits<uint>::max()) {
+	if (self->maxTimeSteps!=std::numeric_limits<unsigned int>::max()) {
 		Journal_RPrintf( self->info, "Run until %u timeSteps have been run\n", self->maxTimeSteps );
 	}
 	if (self->finalTimeStep ) {
-		if (self->maxTimeSteps!=std::numeric_limits<uint>::max()) {
+		if (self->maxTimeSteps!=std::numeric_limits<unsigned int>::max()) {
 			Journal_RPrintf( self->info, "or " );
 		}	
 		else {
@@ -785,7 +785,7 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 	}
 	
 	if (self->stopTime) {
-		if (self->maxTimeSteps!=std::numeric_limits<uint>::max()
+		if (self->maxTimeSteps!=std::numeric_limits<unsigned int>::max()
                     || self->finalTimeStep ) {
 			Journal_RPrintf( self->info, "or " );
 		}	
@@ -850,7 +850,7 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 			}
 		}	
 
-		if (self->maxTimeSteps!=std::numeric_limits<uint>::max()
+		if (self->maxTimeSteps!=std::numeric_limits<unsigned int>::max()
                     && (self->timeStepSinceJobRestart >= self->maxTimeSteps))
                   break;
 		if (self->finalTimeStep
