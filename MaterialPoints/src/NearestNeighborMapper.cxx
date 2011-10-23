@@ -244,3 +244,30 @@ int NearestNeighbor_FindNeighbor(void* mapper, const Element_LocalIndex &lElemen
     }
   return nearest_particle;
 }
+
+/* A convenience function to replace the gauss swarm and particle with
+   the mapped swarm and nearest particle */
+
+void NearestNeighbor_Replace
+(IntegrationPointsSwarm **swarm, IntegrationPoint **particle,
+ int *particle_index, const Element_LocalIndex &lElement_I,
+ const int &dim)
+{
+  if(Stg_Class_IsInstance((*swarm)->mapper,NearestNeighborMapper_Type))
+    {
+      IntegrationPointsSwarm* NNswarm=
+        ((NearestNeighborMapper*)((*swarm)->mapper))->swarm;
+      int NNcell_I=
+        CellLayout_MapElementIdToCellId(NNswarm->cellLayout,lElement_I);
+      int nearest_particle=
+        NearestNeighbor_FindNeighbor((*swarm)->mapper,lElement_I,
+                                     NNcell_I,(*particle)->xi,dim);
+      IntegrationPoint *NNparticle=
+        (IntegrationPoint*)Swarm_ParticleInCellAt(NNswarm,
+                                                  NNcell_I,
+                                                  nearest_particle);
+      *swarm=NNswarm;
+      *particle=NNparticle;
+      *particle_index=NNswarm->cellParticleTbl[NNcell_I][nearest_particle];
+    }
+}

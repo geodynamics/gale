@@ -462,24 +462,10 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
                    swarm */
                 IntegrationPointsSwarm* NNswarm(swarm);
                 IntegrationPoint* NNparticle(particle);
-                  
-                if(Stg_Class_IsInstance(swarm->mapper,NearestNeighborMapper_Type))
-                  {
-                    NNswarm=((NearestNeighborMapper*)(swarm->mapper))->swarm;
-                    int NNcell_I=
-                      CellLayout_MapElementIdToCellId(NNswarm->cellLayout,
-                                                      lElement_I);
-                    int nearest_particle=
-                      NearestNeighbor_FindNeighbor(swarm->mapper,lElement_I,
-                                                   NNcell_I,particle->xi,dim);
-                    NNparticle=
-                      (IntegrationPoint*)Swarm_ParticleInCellAt(NNswarm,
-                                                                NNcell_I,
-                                                                nearest_particle);
-                  }
+                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
                 /* Get density and alpha */
-                uint material_index=
+                unsigned int material_index=
                   IntegrationPointMapper_GetMaterialIndexOn(NNswarm->mapper,
                                                             NNparticle);
                 Journal_Firewall(material_index<densities.size()
