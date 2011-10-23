@@ -76,7 +76,7 @@ void DofLayoutSuite_TestBasic( DofLayoutSuiteData* data ) {
 		Index						ii, dof_I, var_I;
 		Index						arraySize = 27;
 		double*					varArrays[6];
-		uint					counts[27];
+		unsigned int				counts[27];
 
 		Stream_RedirectFile( stream, "testBasic.dat" );
 
