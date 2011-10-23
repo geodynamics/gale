@@ -71,7 +71,6 @@
 		char*									massMatrixName; \
 		ForceVector*								massMatrix; \
 		ForceTerm*								massMatrixForceTerm; \
-		int									currentParticleIndex; \
 		Bool									useDeriv; 
 		
 	struct ParticleFeVariable { __ParticleFeVariable };

@@ -265,7 +265,6 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 		/* Find this particle in the element */
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
-		self->currentParticleIndex = swarm->cellParticleTbl[cell_I][cParticle_I];
 		ParticleFeVariable_ValueAtParticle( self, swarm, lElement_I, particle, particleValue );
 
 		/* get shape function and detJac */

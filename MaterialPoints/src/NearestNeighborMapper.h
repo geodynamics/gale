@@ -123,16 +123,7 @@ void _NearestNeighborMapper_Init( void* mapper, IntegrationPointsSwarm* swarm );
 
         void NearestNeighbor_Replace(IntegrationPointsSwarm **swarm,
                                      IntegrationPoint **particle,
-                                     int *particle_index,
                                      const Element_LocalIndex &lElement_I,
                                      const int &dim);
 
-        inline void NearestNeighbor_Replace(IntegrationPointsSwarm **swarm,
-                                            IntegrationPoint **particle,
-                                            const Element_LocalIndex &lElement_I,
-                                            const int &dim)
-        {
-          int temp(0);
-          NearestNeighbor_Replace(swarm,particle,&temp,lElement_I,dim);
-        }
 #endif

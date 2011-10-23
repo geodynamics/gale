@@ -250,7 +250,7 @@ int NearestNeighbor_FindNeighbor(void* mapper, const Element_LocalIndex &lElemen
 
 void NearestNeighbor_Replace
 (IntegrationPointsSwarm **swarm, IntegrationPoint **particle,
- int *particle_index, const Element_LocalIndex &lElement_I,
+ const Element_LocalIndex &lElement_I,
  const int &dim)
 {
   if(Stg_Class_IsInstance((*swarm)->mapper,NearestNeighborMapper_Type))
@@ -268,6 +268,5 @@ void NearestNeighbor_Replace
                                                   nearest_particle);
       *swarm=NNswarm;
       *particle=NNparticle;
-      *particle_index=NNswarm->cellParticleTbl[NNcell_I][nearest_particle];
     }
 }
