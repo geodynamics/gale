@@ -221,7 +221,7 @@ void _DruckerPrager_AssignFromXML( void* druckerPrager, Stg_ComponentFactory* cf
 	_VonMises_AssignFromXML( self, cf, data );
 	
 	pressureField      = (FeVariable *) 
-            Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, False, data  );
+            Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureField", FeVariable, True, data  );
 			
 	materialPointsSwarm     = (MaterialPointsSwarm*)
 			Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialPointsSwarm", MaterialPointsSwarm, True, data  );

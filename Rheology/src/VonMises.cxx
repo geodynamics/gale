@@ -145,7 +145,7 @@ void _VonMises_AssignFromXML( void* rheology, Stg_ComponentFactory* cf, void* da
 	/* Construct Parent */
 	_YieldRheology_AssignFromXML( self, cf, data );
 	
-	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateField", FeVariable, False, data  );
+	strainRateField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StrainRateField", FeVariable, True, data  );
 
 	_VonMises_Init( 
 			self, 
