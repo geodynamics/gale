@@ -186,9 +186,6 @@ void _Underworld_SurfaceProcess_AssignFromXML( void* component,
   Codelet* sp = (Codelet*)component;
   UnderworldContext*			uwCtx;
   Underworld_SurfaceProcess_Context*	spCtx;
-  Dictionary*			spDict;
-  char*				meshName;
-  char*                         velocityName;
 
   assert( component );
   assert( cf );
@@ -216,47 +213,46 @@ void _Underworld_SurfaceProcess_AssignFromXML( void* component,
   spCtx->timeIntegrator =
     Stg_ComponentFactory_ConstructByName( cf, (Name)"timeIntegrator",
                                           TimeIntegrator, True, data  );
-
-  /* Get the dictionary. */
-  spDict = Dictionary_GetDictionary( uwCtx->dictionary, "SurfaceProcess" );
-  if( !spDict )
-    return;
-
-  /* Read in the variables. */
-  meshName = Dictionary_GetString( spDict, "mesh" );
-  assert( meshName && strcmp( meshName, "" ) );
-  spCtx->mesh = Stg_ComponentFactory_ConstructByName( cf, meshName, Mesh, True,
-                                                      NULL );
-  velocityName = Dictionary_GetString( spDict, "VelocityField" );
-  assert( velocityName && strcmp( velocityName, "" ) );
-  spCtx->v = Stg_ComponentFactory_ConstructByName( cf, velocityName, FeVariable,
-                                                   True, NULL );
-  assert( spCtx->v);
-  spCtx->K = Dictionary_GetDouble( spDict, "diffusionCoefficient" );
 }
 
 void _Underworld_SurfaceProcess_Build( void* codelet, void* data ) {
-	Codelet* sp= (Codelet*)codelet;
-	UnderworldContext* UnderworldCtx = (UnderworldContext*)sp->context;
-	Underworld_SurfaceProcess_Context*	spCtx;
+  Codelet* sp= (Codelet*)codelet;
+  UnderworldContext* uwCtx = (UnderworldContext*)sp->context;
+  Underworld_SurfaceProcess_Context*	spCtx;
 
-	assert( codelet );
-	assert( UnderworldCtx );
+  assert( codelet );
+  assert( uwCtx );
 
-	/* Get the context. */
-	spCtx = (Underworld_SurfaceProcess_Context*)ExtensionManager_Get( UnderworldCtx->extensionMgr, UnderworldCtx, Underworld_SurfaceProcess_ContextHandle );
+  /* Get the context. */
+  spCtx = (Underworld_SurfaceProcess_Context*)
+    ExtensionManager_Get(uwCtx->extensionMgr,uwCtx,
+                         Underworld_SurfaceProcess_ContextHandle);
 
-	if( !spCtx->mesh )
-		return;
+  /* Get the dictionary. */
+  Dictionary* spDict=Dictionary_GetDictionary(uwCtx->dictionary,"SurfaceProcess");
+  Journal_Firewall(spDict!=NULL,Underworld_Error,
+                   "Could not find SurfaceProcess struct");
 
-	/* Append to the list of time integratee finish routines.  It
-           should come last, because EulerDeform will reset the
-           values. */
-	TimeIntegrator_AppendSetupEP( spCtx->timeIntegrator, 
-					"Underworld_SurfaceProcess_Execute", 
-                                      (void*)Underworld_SurfaceProcess_Execute, 
-					"SurfaceProcess", 
-					spCtx );
+  /* Read in the variables. */
+  char *meshName = Dictionary_GetString( spDict, "mesh" );
+  assert( meshName && strcmp( meshName, "" ) );
+  spCtx->mesh=
+    Stg_ComponentFactory_ConstructByName(uwCtx->CF,meshName,Mesh,True,NULL);
+  char *velocityName = Dictionary_GetString( spDict, "VelocityField" );
+  assert( velocityName && strcmp( velocityName, "" ) );
+  spCtx->v=Stg_ComponentFactory_ConstructByName(uwCtx->CF,velocityName,
+                                                FeVariable,True,NULL);
+  assert( spCtx->v);
+  spCtx->K = Dictionary_GetDouble( spDict, "diffusionCoefficient" );
+
+  /* Append to the list of time integratee finish routines.  It
+     should come last, because EulerDeform will reset the
+     values. */
+  TimeIntegrator_AppendSetupEP( spCtx->timeIntegrator, 
+                                "Underworld_SurfaceProcess_Execute", 
+                                (void*)Underworld_SurfaceProcess_Execute, 
+                                "SurfaceProcess", 
+                                spCtx );
 }
 
 void _Underworld_SurfaceProcess_Destroy( void* codelet, void* data ) {
