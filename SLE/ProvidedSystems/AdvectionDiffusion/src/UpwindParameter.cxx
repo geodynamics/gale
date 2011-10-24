@@ -91,17 +91,22 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(
 	
 	/* Compute the average diffusivity */
 	/* Find Number of Particles in Element */
-	cell_I = CellLayout_MapElementIdToCellId( self->picSwarm->cellLayout, lElement_I );
-	particleCount = self->picSwarm->cellParticleCountTbl[ cell_I ];
+	cell_I = CellLayout_MapElementIdToCellId( self->integrationSwarm->cellLayout, lElement_I );
+	particleCount = self->integrationSwarm->cellParticleCountTbl[ cell_I ];
 
 	/* Average diffusivity for element */
         averageDiffusivity = 0.0;
         for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
-          lParticle_I = self->picSwarm->cellParticleTbl[cell_I][cParticle_I];
-          particle = (IntegrationPoint*) Swarm_ParticleAt( self->picSwarm, lParticle_I );
+          lParticle_I = self->integrationSwarm->cellParticleTbl[cell_I][cParticle_I];
+          particle = (IntegrationPoint*) Swarm_ParticleAt( self->integrationSwarm, lParticle_I );
+
+          IntegrationPointsSwarm*
+            NNswarm((IntegrationPointsSwarm*)(self->integrationSwarm));
+          IntegrationPoint* NNparticle(particle);
+          NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
           averageDiffusivity +=
-            IntegrationPointMapper_GetDoubleFromMaterial(((IntegrationPointsSwarm *)self->picSwarm)->mapper, particle, self->materialExtHandle,
+            IntegrationPointMapper_GetDoubleFromMaterial(NNswarm->mapper, NNparticle, self->materialExtHandle,
 		    offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
         }
         averageDiffusivity /= (double)particleCount;

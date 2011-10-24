@@ -60,27 +60,26 @@
 /* Textual name of this class */
 const Type AdvDiffResidualForceTerm_Type = "AdvDiffResidualForceTerm";
 
-AdvDiffResidualForceTerm* AdvDiffResidualForceTerm_New( 
-	Name							name,
-	FiniteElementContext*	context,
-	ForceVector*				forceVector,
-	Swarm*						integrationSwarm,
-	Stg_Component*				sle, 
-	FeVariable*					velocityField,
-	double						defaultDiffusivity,
-        Swarm*						picSwarm,
-	void*		materials_Register,
-	AdvDiffResidualForceTerm_UpwindParamFuncType upwindFuncType )
+AdvDiffResidualForceTerm*
+AdvDiffResidualForceTerm_New(Name name,
+                             FiniteElementContext* context,
+                             ForceVector* forceVector,
+                             Swarm* swarm,
+                             Stg_Component* sle, 
+                             FeVariable* velocityField,
+                             double defaultDiffusivity,
+                             void* materials_Register,
+                             AdvDiffResidualForceTerm_UpwindParamFuncType
+                             upwindFuncType )
 {
-	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*) _AdvDiffResidualForceTerm_DefaultNew( name );
+  AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*) _AdvDiffResidualForceTerm_DefaultNew( name );
 
-	self->isConstructed = True;
-	_ForceTerm_Init( self, context, forceVector, integrationSwarm, sle );
-	_AdvDiffResidualForceTerm_Init( self, velocityField, defaultDiffusivity,
-                                        picSwarm,
-                                        materials_Register, upwindFuncType );
+  self->isConstructed = True;
+  _ForceTerm_Init( self, context, forceVector, swarm, sle );
+  _AdvDiffResidualForceTerm_Init(self,velocityField,defaultDiffusivity,
+                                 materials_Register,upwindFuncType );
 
-	return self;
+  return self;
 }
 
 void* _AdvDiffResidualForceTerm_DefaultNew( Name name ) {
@@ -169,21 +168,19 @@ void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle ){
 	NewClass_Delete(sle->advDiffResidualForceTerm->incarray);
 }
 
-void _AdvDiffResidualForceTerm_Init(
-	void*			residual,
-	FeVariable*		velocityField,
-	double			defaultDiffusivity,
-        Swarm*			picSwarm,
-	void*	                materials_Register,
-	AdvDiffResidualForceTerm_UpwindParamFuncType	upwindFuncType ) //WHY IS THIS LINE HERE???
+void _AdvDiffResidualForceTerm_Init(void* residual,
+                                    FeVariable* velocityField,
+                                    double defaultDiffusivity,
+                                    void* materials_Register,
+                                    AdvDiffResidualForceTerm_UpwindParamFuncType
+                                    upwindFuncType)
 {
-	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
+  AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
 
-	self->velocityField = velocityField;
-	self->defaultDiffusivity = defaultDiffusivity;
-        self->picSwarm = picSwarm;
-	self->materials_Register  = materials_Register;
-	self->upwindParamType = upwindFuncType;
+  self->velocityField = velocityField;
+  self->defaultDiffusivity = defaultDiffusivity;
+  self->materials_Register  = materials_Register;
+  self->upwindParamType = upwindFuncType;
 }
 
 void _AdvDiffResidualForceTerm_Delete( void* residual ) {
@@ -217,7 +214,6 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 	double													defaultDiffusivity;
 	Materials_Register*		materials_Register;
 	AdvDiffResidualForceTerm_UpwindParamFuncType	upwindFuncType = (AdvDiffResidualForceTerm_UpwindParamFuncType)0;
-        Swarm *picSwarm;
 
 	/* Construct Parent */
 	_ForceTerm_AssignFromXML( self, cf, data );
@@ -235,11 +231,10 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 		Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ), "Cannot understand '%s'\n", upwindParamFuncName );
 
 	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"defaultDiffusivity", 1.0  );
-	picSwarm       = (Swarm*)Stg_ComponentFactory_ConstructByName( cf, (Name)"picIntegrationPoints", IntegrationPointsSwarm, True, data  ) ;
 	materials_Register = ((PICelleratorContext*)(self->context))->materials_Register;
 
 	_AdvDiffResidualForceTerm_Init( self, velocityField, defaultDiffusivity,
-                                        picSwarm, materials_Register,
+                                        materials_Register,
                                         upwindFuncType );
 }
 
@@ -249,7 +244,7 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 	Material_Index                   material_I;
 	Material*                        material;
 	Materials_Register*              materials_Register = (Materials_Register*)(self->materials_Register);
-	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->picSwarm;
+	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
 	MaterialPointsSwarm**            materialSwarms;
 	Index                            materialSwarm_I;
 	Stg_ComponentFactory*            cf;
@@ -276,7 +271,7 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 	}
 	
 	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */
-	materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms( swarm->mapper, &(self->materialSwarmCount) );
+	materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms(swarm->mapper, &(self->materialSwarmCount) );
 	self->diffusivitySwarmVariables = (void**)Memory_Alloc_Array( MaterialSwarmVariable*, self->materialSwarmCount, "DiffusivityVariables" );
 	
 	for ( materialSwarm_I = 0; materialSwarm_I < self->materialSwarmCount; ++materialSwarm_I ) {
@@ -330,7 +325,7 @@ void _AdvDiffResidualForceTerm_Destroy( void* residual, void* data ) {
 void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elementResidual ) {
 	AdvDiffResidualForceTerm*  self               = Stg_CheckType( forceTerm, AdvDiffResidualForceTerm );
 	AdvectionDiffusionSLE*     sle                = Stg_CheckType( self->extraInfo, AdvectionDiffusionSLE );
-	Swarm*                     swarm              = self->picSwarm;
+	Swarm*                     swarm              = self->integrationSwarm;
 	Particle_Index             lParticle_I;
 	Particle_Index             cParticle_I;
 	Particle_Index             cellParticleCount;
@@ -421,9 +416,13 @@ void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* fo
 		totalDerivative = phiDot + StGermain_VectorDotProduct( velocity, phiGrad, dim );
 
 		/* Get Diffusivity */
-		diffusivity = IntegrationPointMapper_GetDoubleFromMaterial(((IntegrationPointsSwarm *)swarm)->mapper, particle, self->materialExtHandle,
+                IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*)swarm);
+                IntegrationPoint* NNparticle(particle);
+                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
-		    offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
+		diffusivity = IntegrationPointMapper_GetDoubleFromMaterial
+                  (NNswarm->mapper, NNparticle, self->materialExtHandle,
+                   offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
 
 		/* Add to element residual */
 		factor = particle->weight * detJac;
