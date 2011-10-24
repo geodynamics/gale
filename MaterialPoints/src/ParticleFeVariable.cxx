@@ -265,7 +265,14 @@ void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVec
 		/* Find this particle in the element */
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
 
-		ParticleFeVariable_ValueAtParticle( self, swarm, lElement_I, particle, particleValue );
+                /* Handle case where we are using gauss swarms with
+                   NearestNeighborMapper instead of a material
+                   swarm */
+                IntegrationPointsSwarm* NNswarm(swarm);
+                IntegrationPoint* NNparticle(particle);
+                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+
+		ParticleFeVariable_ValueAtParticle( self, NNswarm, lElement_I, NNparticle, particleValue );
 
 		/* get shape function and detJac */
 		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
