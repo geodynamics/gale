@@ -203,7 +203,6 @@ void _Compressible_AssembleElement(
 	double                    factor;
 	FeMesh*  		  geometryMesh        = self->geometryMesh;
 	ElementType*              geometryElementType;
-	Particle_Index            lParticle_I;
 	double oneOnLambda = 0.0;
 	Bool oneToMany;
 
@@ -226,7 +225,6 @@ void _Compressible_AssembleElement(
 	/* Loop over points to build Stiffness Matrix */
 	for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
 		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
-		lParticle_I = swarm->cellParticleTbl[cell_I][cParticle_I];
 
 		if(oneToMany) {
 		    /*
@@ -254,14 +252,18 @@ void _Compressible_AssembleElement(
 		    oneOnLambda /= ((double)ref->numParticles);
 		}
 		else {
+                  IntegrationPointsSwarm* NNswarm(swarm);
+                  IntegrationPoint* NNparticle(particle);
+                  NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
-		    material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialAt( swarm, lParticle_I );
+                  material = (RheologyMaterial*)
+                    IntegrationPointsSwarm_GetMaterialOn( swarm, NNparticle );
 
-		    /* Only make contribution to the compressibility matrix if this material is compressible */
-		    if ( !material->compressible ) 
-			continue;
+                  /* Only make contribution to the compressibility matrix if this material is compressible */
+                  if ( !material->compressible ) 
+                    continue;
 
-		    oneOnLambda = material->compressible->oneOnLambda;
+                  oneOnLambda = material->compressible->oneOnLambda;
 		}
 
 		/* Calculate Determinant of Jacobian and Shape Functions */

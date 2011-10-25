@@ -261,8 +261,12 @@ void _RecoveredFeVariable_AssembleAtParticle(
    double**             Fi_Mat )
 {
 	SymmetricTensor p_StrainRate, p_Stress, theCopy;
-   RheologyMaterial* material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*)constitutiveMatrix->integrationSwarm, particle );
 	int dim  = self->dim;
+
+        IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*)constitutiveMatrix->integrationSwarm);
+        IntegrationPoint* NNparticle(particle);
+        NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+        RheologyMaterial* material = (RheologyMaterial*) IntegrationPointsSwarm_GetMaterialOn(NNswarm, NNparticle);
 	int dofThatExist = self->fieldComponentCount;
 	int order = self->orderOfInterpolation;
 	int dof_I;
