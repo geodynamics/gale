@@ -269,8 +269,12 @@ void _DiffusionSMT_AssembleElement(
 	currIntegrationPoint = (IntegrationPoint*)Swarm_ParticleInCellAt(
 	    swarm, cell_I, cParticle_I );
 
-	material = IntegrationPointsSwarm_GetMaterialOn(
-	    (IntegrationPointsSwarm*) swarm, currIntegrationPoint );
+        IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*) swarm);
+        IntegrationPoint* NNparticle(currIntegrationPoint);
+        NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+
+	material = IntegrationPointsSwarm_GetMaterialOn(NNswarm,NNparticle);
+                                                        
 	materialExt = (DiffusionSMT_MaterialExt*)ExtensionManager_Get(material->extensionMgr, material, self->materialExtHandle );
 
 	xi = currIntegrationPoint->xi;

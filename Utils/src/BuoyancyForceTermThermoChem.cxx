@@ -332,7 +332,11 @@ void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector*
 		if ( temperatureField )
 			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
 
-		material = IntegrationPointsSwarm_GetMaterialOn( (IntegrationPointsSwarm*) swarm, particle );
+                IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*) swarm);
+                IntegrationPoint* NNparticle(particle);
+                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+
+		material = IntegrationPointsSwarm_GetMaterialOn(NNswarm, NNparticle);
 		materialExt = (BuoyancyForceTermThermoChem_MaterialExt*)ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
 
 		/* Calculate Force */
