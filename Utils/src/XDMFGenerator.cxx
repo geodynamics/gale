@@ -157,17 +157,6 @@ namespace {
                                       const std::string &var_name,
                                       const int &timestep,
                                       const int &num_elements);
-  void pack_together_rows(Stream *stream, const std::string &mesh_name,
-                          const std::string &coord_name,
-                          const int &number_in_element,
-                          unsigned *sizes);
-  int pack_together_rows(Stream *stream, const std::string &mesh_name,
-                         const std::string &coord_name,
-                         const int &number_in_element,
-                         const std::string &prefix,
-                         const int &start,
-                         const int &end,
-                         unsigned *sizes);
 }
 
 void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream ) {
@@ -763,16 +752,16 @@ namespace {
            sides of elements can not share.  */
 
         /* First get the coordinates from the vertex mesh */
-        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XCoords\">\n",
-                       num_vertices);
+        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u %u\" Name=\"XCoords\">\n",
+                       sizes[0]*2+1,sizes[1]*2+1);
         Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n",
                        num_vertices);
         Journal_Printf(stream,"      <DataItem Format=\"HDF\" NumberType=\"Float\" Precision=\"8\" Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n",
                        num_vertices,vert_mesh_name,timestep);
         Journal_Printf(stream,"    </DataItem>\n");
 
-        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YCoords\">\n",
-                       num_vertices);
+        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u %u\" Name=\"YCoords\">\n",
+                       sizes[0]*2+1,sizes[1]*2+1);
         Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n",
                        num_vertices);
         Journal_Printf(stream,"      <DataItem Format=\"HDF\" NumberType=\"Float\" Precision=\"8\" Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n",
@@ -782,10 +771,15 @@ namespace {
         std::string direction[]={"X", "Y"};
         for(int d=0;d<2;++d)
           {
-            for(int number_in_element=0;number_in_element<9;++number_in_element)
+            for(int n=0;n<9;++n)
               {
-                pack_together_rows(stream,mesh->name,direction[d],
-                                   number_in_element,sizes);
+                Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"%s%u\">\n",
+                               sizes[0]*sizes[1],direction[d].c_str(),n);
+                Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> %u %u 2 2 %u %u </DataItem>\n",
+                               n/3,n%3,sizes[0],sizes[1]);
+                Journal_Printf(stream,"      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"%sCoords\"] </DataItem>\n",
+                               mesh->name,direction[d].c_str());
+                Journal_Printf(stream,"    </DataItem>\n");
               }
             Journal_Printf(stream,"    <DataItem ItemType=\"Function\" Dimensions=\"%u 1\" Function=\"$0, $1, $2, $3, $4, $5, $6, $7, $8\" Name=\"%s\">\n",
                            9*num_elements,direction[d].c_str());
@@ -811,89 +805,6 @@ namespace {
       {
         abort();
       }
-  }
-
-  void pack_together_rows(Stream *stream, const std::string &mesh_name,
-                          const std::string &coord_name,
-                          const int &number_in_element,
-                          unsigned *sizes)
-  {
-    std::stringstream ss;
-    ss << coord_name
-       << number_in_element;
-    pack_together_rows(stream,mesh_name,coord_name,number_in_element,
-                       ss.str(),0,sizes[1],sizes);
-  }
-
-  int pack_together_rows(Stream *stream, const std::string &mesh_name,
-                         const std::string &coord_name,
-                         const int &number_in_element,
-                         const std::string &prefix,
-                         const int &start,
-                         const int &end,
-                         unsigned *sizes)
-  {
-    int total_size(0);
-    int n_elements;
-    int row_start[]={0,1,2,2*sizes[0]+1,2*sizes[0]+2,2*sizes[0]+3,
-                     2*(2*sizes[0]+1),2*(2*sizes[0]+1)+1,2*(2*sizes[0]+1)+2};
-    if(end-start<10)
-      {
-        for(int i=start;i<end;++i)
-          {
-            Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"%s%u\">\n",
-                           sizes[0],prefix.c_str(),i-start);
-            Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> %u 0 2 1 %u 1 </DataItem>\n",
-                           i*(2*sizes[0]+1)*2 + row_start[number_in_element],
-                           sizes[0]);
-            Journal_Printf(stream,"      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"%sCoords\"] </DataItem>\n",
-                           mesh_name.c_str(),coord_name.c_str());
-            Journal_Printf(stream,"    </DataItem>\n");
-          }
-        n_elements=end-start;
-        total_size=sizes[0]*n_elements;
-      }
-    else
-      {
-        for(int i=0;i<10;++i)
-          {
-            int new_start=((end-start)*i)/10;
-            int new_end=((end-start)*(i+1))/10;
-            std::stringstream ss;
-            ss << prefix
-               << i;
-            total_size+=pack_together_rows(stream,mesh_name,coord_name,
-                                           number_in_element,
-                                           ss.str(),new_start,
-                                           new_end,sizes);
-          }
-        n_elements=10;
-      }
-    std::stringstream ss;
-    ss << "    <DataItem ItemType=\"Function\" Dimensions=\""
-       << total_size
-       << " 1\" Function=\"";
-    for(int i=0;i<n_elements-1;++i)
-      ss << "$" << i << "; ";
-    ss << "$" << n_elements-1
-       << "\" Name=\""
-       << prefix
-       << "\">\n";
-    Journal_Printf(stream,ss.str().c_str());
-    for(int i=0;i<n_elements;++i)
-      {
-        std::stringstream s;
-        s << "      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_"
-          << mesh_name
-          << "\"]/DataItem[@Name=\""
-          << prefix
-          << i
-          << "\"] </DataItem>\n";
-        Journal_Printf(stream,s.str().c_str());
-      }
-    Journal_Printf(stream,"    </DataItem>\n");
-
-    return total_size;
   }
 
   void write_three_component_function(Stream *stream, 
