@@ -203,7 +203,7 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
       /** now print out topology info **/
 
       /* Discontinuous elements are written separately. */
-      if(element_family=="linear-inner" && nDims==2)
+      if(element_family=="linear-inner")
         {
           write_discontinuous_geometry(stream,mesh,context->timeStep,nDims);
         }
@@ -499,8 +499,8 @@ namespace {
     else {
       /* determine the maximum number of nodes each element has */
       maxNodes = 0;
-      for (unsigned int gElement_I = 0; gElement_I < FeMesh_GetElementGlobalSize(feMesh);
-           gElement_I++ ) {
+      for (unsigned int gElement_I = 0;
+           gElement_I < FeMesh_GetElementGlobalSize(feMesh); gElement_I++ ) {
         unsigned int numNodes;
         numNodes = FeMesh_GetElementNodeSize( feMesh, gElement_I);
         if( maxNodes < numNodes ) maxNodes = numNodes;
@@ -513,19 +513,25 @@ namespace {
            variable C0-C8 or C0-C26 */
         for(unsigned int i=0;i<maxNodes;++i)
           {
-            Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"C%u\">\n",
+            Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" "
+                           "Dimensions=\"%u 1\" Name=\"C%u\">\n",
                            elementGlobalSize, i);
-            Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n",
+            Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" "
+                           "Format=\"XML\"> 0 %u 1 1 %u 1 </DataItem>\n",
                            i, elementGlobalSize);
-            Journal_Printf(stream,"      <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+            Journal_Printf(stream,"      <DataItem Format=\"HDF\" "
+                           "DataType=\"Int\"  Dimensions=\"%u %u\">"
+                           "Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
                            elementGlobalSize, maxNodes, feMesh->name, timestep );
             Journal_Printf(stream,"    </DataItem>\n");
           }
         /* Print out the topology */
         int num_nodes=(maxNodes==9) ? 4 : 8;
-        Journal_Printf(stream,"    <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n",
+        Journal_Printf(stream,"    <Topology Type=\"%s\" "
+                       "NumberOfElements=\"%u\"> \n",
                        topologyType.c_str(),elementGlobalSize*num_nodes);
-        Journal_Printf(stream,"      <DataItem ItemType=\"Function\"  Dimensions=\"%u %u\" Function=\"JOIN(",
+        Journal_Printf(stream,"      <DataItem ItemType=\"Function\"  "
+                       "Dimensions=\"%u %u\" Function=\"JOIN(",
                        elementGlobalSize*num_nodes, num_nodes);
         for(int j=0;j<num_nodes-1;++j)
           {
@@ -551,7 +557,8 @@ namespace {
            nodes */
         for(int j=0;j<num_nodes;++j)
           {
-            Journal_Printf(stream,"        <DataItem ItemType=\"Function\"  Dimensions=\"%u %u\" Function=\"JOIN(",
+            Journal_Printf(stream,"        <DataItem ItemType=\"Function\" "
+                           "Dimensions=\"%u %u\" Function=\"JOIN(",
                            elementGlobalSize, num_nodes);
             for(int k=0;k<num_nodes-1;++k)
               {
@@ -560,7 +567,9 @@ namespace {
             Journal_Printf(stream,"$%u)\">\n",num_nodes-1);
             for(int k=0;k<num_nodes;++k)
               {
-                Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"C%u\"] </DataItem>\n",
+                Journal_Printf(stream,"          <DataItem Reference=\"XML\">"
+                               "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                               "/DataItem[@Name=\"C%u\"] </DataItem>\n",
                                feMesh->name, mapping[j][k]);
               }
             Journal_Printf(stream,"        </DataItem>\n");
@@ -572,9 +581,12 @@ namespace {
     /* Continuous linear elements */
     else
       {
-        Journal_Printf( stream, "         <Topology Type=\"%s\" NumberOfElements=\"%u\"> \n",
+        Journal_Printf( stream, "         <Topology Type=\"%s\" "
+                        "NumberOfElements=\"%u\"> \n",
                         topologyType.c_str(), elementGlobalSize );
-        Journal_Printf( stream, "            <DataItem Format=\"HDF\" DataType=\"Int\"  Dimensions=\"%u %u\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+        Journal_Printf( stream, "            <DataItem Format=\"HDF\" "
+                        "DataType=\"Int\"  Dimensions=\"%u %u\">"
+                        "Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
                         elementGlobalSize, maxNodes, feMesh->name,
                         timestep );
         Journal_Printf( stream, "         </Topology>\n\n" );
@@ -583,30 +595,55 @@ namespace {
     /* Print out coordinates of the vertices */
     Journal_Printf( stream, "    <Geometry Type=\"XYZ\">\n" );
     std::string variableType("NumberType=\"Float\" Precision=\"8\"");
-    if(nDims==2){
-      /** note that for 2d, we feed back a quasi 3d array, with the
-          3rd Dof zeroed.  so in effect we always work in 3d.  this
-          is done because paraview in particular seems to do
-          everything in 3d, and if you try and give it a 2d vector
-          or array, it complains.... and hence the verbosity of the
-          following 2d definitions**/
-      Journal_Printf( stream, "      <DataItem ItemType=\"Function\" Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n", totalVerts );
-      Journal_Printf( stream, "        <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"XCoords\">\n", totalVerts );
-      Journal_Printf( stream, "          <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n", totalVerts );
-      Journal_Printf( stream, "          <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n", variableType.c_str(), totalVerts, feMesh->name,  timestep );
-      Journal_Printf( stream, "        </DataItem>\n" );
-      Journal_Printf( stream, "        <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"YCoords\">\n", totalVerts );
-      Journal_Printf( stream, "          <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n", totalVerts );
-      Journal_Printf( stream, "          <DataItem Format=\"HDF\" %s Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n", variableType.c_str(), totalVerts, feMesh->name, timestep );
-      Journal_Printf( stream, "        </DataItem>\n" );
-      Journal_Printf( stream, "      </DataItem>\n" );
-    } else if ( nDims == 3 ) {
-      /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
-      Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s Dimensions=\"%u 3\">Mesh.%s.%05d.h5:/vertices</DataItem>\n", variableType.c_str(), totalVerts, feMesh->name, timestep );
-    } else {
-      Stream* errorStream=Journal_Register(Error_Type,(Name)CURR_MODULE_NAME);
-      Journal_DPrintf( errorStream, "\n\n Error: Mesh vertex location is not of dofCount 2 or 3.\n\n" );
-    }
+    if(nDims==2)
+      {
+        /** note that for 2d, we feed back a quasi 3d array, with the
+            3rd Dof zeroed.  so in effect we always work in 3d.  this
+            is done because paraview in particular seems to do
+            everything in 3d, and if you try and give it a 2d vector
+            or array, it complains.... and hence the verbosity of the
+            following 2d definitions**/
+        Journal_Printf(stream, "      <DataItem ItemType=\"Function\" "
+                       "Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n",
+                       totalVerts);
+        Journal_Printf(stream, "        <DataItem ItemType=\"HyperSlab\" "
+                       "Dimensions=\"%u 1\" Name=\"XCoords\">\n",
+                       totalVerts);
+        Journal_Printf(stream, "          <DataItem Dimensions=\"3 2\" "
+                       "Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n",
+                       totalVerts);
+        Journal_Printf(stream, "          <DataItem Format=\"HDF\" %s "
+                       "Dimensions=\"%u 2\">Mesh.%s.%05d.h5:"
+                       "/vertices</DataItem>\n",
+                       variableType.c_str(),totalVerts,feMesh->name,timestep);
+        Journal_Printf(stream, "        </DataItem>\n" );
+        Journal_Printf(stream, "        <DataItem ItemType=\"HyperSlab\" "
+                       "Dimensions=\"%u 1\" Name=\"YCoords\">\n",
+                       totalVerts);
+        Journal_Printf(stream, "          <DataItem Dimensions=\"3 2\" "
+                       "Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n",
+                       totalVerts);
+        Journal_Printf(stream, "          <DataItem Format=\"HDF\" %s "
+                       "Dimensions=\"%u 2\">Mesh.%s.%05d.h5:"
+                       "/vertices</DataItem>\n",
+                       variableType.c_str(),totalVerts,feMesh->name,timestep);
+        Journal_Printf(stream, "        </DataItem>\n" );
+        Journal_Printf(stream, "      </DataItem>\n" );
+      }
+    else if ( nDims == 3 )
+      {
+        /** in 3d we simply feed back the 3d hdf5 array, nice and easy **/
+        Journal_Printf( stream, "            <DataItem Format=\"HDF\" %s "
+                        "Dimensions=\"%u 3\">Mesh.%s.%05d.h5:"
+                        "/vertices</DataItem>\n",
+                        variableType.c_str(),totalVerts,feMesh->name,timestep);
+      }
+    else
+      {
+        Stream* errorStream=Journal_Register(Error_Type,(Name)CURR_MODULE_NAME);
+        Journal_DPrintf(errorStream,"\n\n Error: Mesh vertex location is not "
+                        "of dofCount 2 or 3.\n\n" );
+      }
     Journal_Printf( stream, "    </Geometry>\n\n" );
   }
 
@@ -689,122 +726,207 @@ namespace {
 
   void write_discontinuous_geometry(Stream *stream, Mesh *mesh,
                                     const int &timestep,
-                                    const int &nDims)
+                                    const int &dim)
   {
-    if(nDims==2)
+    Grid** grid=
+      (Grid** )ExtensionManager_Get
+      (mesh->info, mesh, 
+       ExtensionManager_GetHandle(mesh->info, (Name)"elementGrid"));
+
+    const unsigned *grid_sizes=Grid_GetSizes(*grid);
+    const unsigned sizes[]={grid_sizes[0], grid_sizes[1],
+                            (dim==2 ? 1 : grid_sizes[2])};
+    const unsigned num_elements(sizes[0]*sizes[1]*sizes[2]);
+    unsigned vert_sizes[3]={2*sizes[0]+1, 2*sizes[1]+1, 1};
+    if(dim==3)
+      vert_sizes[2]=2*sizes[2]+1;
+    unsigned num_vertices(vert_sizes[0]*vert_sizes[1]*vert_sizes[2]);
+
+    char *vert_mesh_name(((InnerGenerator*)(mesh->generator))->elMesh->name);
+
+    /* We need a number that goes from 0 to num_elements.  We hack
+       it with a WHERE clause that is always true */
+    Journal_Printf(stream,"    <DataItem ItemType=\"Function\" "
+                   "Dimensions=\"%u 1\" Function=\"WHERE( $0 != -1)\" "
+                   "Name=\"N\">\n",
+                   num_elements);
+    Journal_Printf(stream,"      <DataItem Format=\"HDF\" "
+                   "NumberType=\"Float\" Precision=\"8\" Dimensions=\"%d %d\">"
+                   "Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
+                   num_elements,dim+1,mesh->name,timestep);
+    Journal_Printf(stream,"    </DataItem>\n");
+
+    const int start[]={0,1,3,4,9,10,12,13};
+    if(dim==2)
       {
-        Grid** grid=
-          (Grid** )ExtensionManager_Get
-          (mesh->info, mesh, 
-           ExtensionManager_GetHandle(mesh->info, (Name)"elementGrid"));
-
-        unsigned *sizes=Grid_GetSizes(*grid);
-        unsigned num_elements(sizes[0]*sizes[1]);
-        unsigned vert_sizes[]={2*sizes[0]+1,2*sizes[1]+1};
-        unsigned num_vertices=vert_sizes[0] * vert_sizes[1];
-
-        char
-          *vert_mesh_name(((InnerGenerator*)(mesh->generator))->elMesh->name);
-
-        /* We need a number that goes from 0 to num_elements.  We hack
-           it with a WHERE clause that is always true */
-        Journal_Printf(stream,"    <DataItem ItemType=\"Function\" Dimensions=\"%u 1\" Function=\"WHERE( $0 != -1)\" Name=\"N\">\n",
-                       num_elements);
-        Journal_Printf(stream,"      <DataItem Format=\"HDF\" NumberType=\"Float\" Precision=\"8\" Dimensions=\"%u 3\">Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
-                       num_elements,mesh->name,timestep);
-        Journal_Printf(stream,"    </DataItem>\n");
-
-        /* Write out the Quadrilaterals connectivity.  There are 4 quads per element. */
-        Journal_Printf(stream,"    <Topology Type=\"Quadrilateral\" NumberOfElements=\"%u\">\n",
+        /* Write out the Quadrilaterals connectivity.  There are 4 quads
+           per element. */
+        Journal_Printf(stream,"    <Topology Type=\"Quadrilateral\" "
+                       "NumberOfElements=\"%u\">\n",
                        num_elements*4);
-        Journal_Printf(stream,"      <DataItem ItemType=\"Function\" Dimensions=\"%u 4\" Function=\"($0; $1; $2; $3)\">\n",
+        Journal_Printf(stream,"      <DataItem ItemType=\"Function\" "
+                       "Dimensions=\"%u 4\" Function=\"($0; $1; $2; $3)\">\n",
                        num_elements*4);
-        /* Quad 0 */
-        Journal_Printf(stream,"        <DataItem ItemType=\"Function\" Dimensions=\"%u 4\" Function=\"(9*$0), (1 + 9*$0), (4 + 9*$0), (3 + 9*$0)\">\n",
-                       num_elements);
-        Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"N\"] </DataItem>\n",
-                       mesh->name);
-        Journal_Printf(stream,"        </DataItem>\n");
-        /* Quad 1 */
-        Journal_Printf(stream,"        <DataItem ItemType=\"Function\" Dimensions=\"%u 4\" Function=\"(1 + 9*$0), (2 + 9*$0), (5 + 9*$0), (4 + 9*$0)\">\n",
-                       num_elements);
-        Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"N\"] </DataItem>\n",
-                       mesh->name);
-        Journal_Printf(stream,"        </DataItem>\n");
-        /* Quad 2 */
-        Journal_Printf(stream,"        <DataItem ItemType=\"Function\" Dimensions=\"%u 4\" Function=\"(3 + 9*$0), (4 + 9*$0), (7 + 9*$0), (6 + 9*$0)\">\n",
-                       num_elements);
-        Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"N\"] </DataItem>\n",
-                       mesh->name);
-        Journal_Printf(stream,"        </DataItem>\n");
-        /* Quad 3 */
-        Journal_Printf(stream,"        <DataItem ItemType=\"Function\" Dimensions=\"%u 4\" Function=\"(4 + 9*$0), (5 + 9*$0), (8 + 9*$0), (7 + 9*$0)\">\n",
-                       num_elements);
-        Journal_Printf(stream,"          <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"N\"] </DataItem>\n",
-                       mesh->name);
-        Journal_Printf(stream,"        </DataItem>\n");
-        Journal_Printf(stream,"      </DataItem>\n");
-        Journal_Printf(stream,"    </Topology>\n");
-
-
-        /* Write out the coordinates.  This is a bit complicated,
-           because we want separate vertices for each element, so the
-           sides of elements can not share.  */
-
-        /* First get the coordinates from the vertex mesh */
-        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u %u\" Name=\"XCoords\">\n",
-                       sizes[0]*2+1,sizes[1]*2+1);
-        Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 0 1 1 %u 1 </DataItem>\n",
-                       num_vertices);
-        Journal_Printf(stream,"      <DataItem Format=\"HDF\" NumberType=\"Float\" Precision=\"8\" Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n",
-                       num_vertices,vert_mesh_name,timestep);
-        Journal_Printf(stream,"    </DataItem>\n");
-
-        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u %u\" Name=\"YCoords\">\n",
-                       sizes[0]*2+1,sizes[1]*2+1);
-        Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> 0 1 1 1 %u 1 </DataItem>\n",
-                       num_vertices);
-        Journal_Printf(stream,"      <DataItem Format=\"HDF\" NumberType=\"Float\" Precision=\"8\" Dimensions=\"%u 2\">Mesh.%s.%05d.h5:/vertices</DataItem>\n",
-                       num_vertices,vert_mesh_name,timestep);
-        Journal_Printf(stream,"    </DataItem>\n");
-
-        std::string direction[]={"X", "Y"};
-        for(int d=0;d<2;++d)
+        for(int n=0;n<4;++n)
           {
-            for(int n=0;n<9;++n)
+            Journal_Printf(stream,"        <DataItem ItemType=\"Function\" "
+                           "Dimensions=\"%u 4\" Function=\"(%d + 9*$0), "
+                           "(%d + 1 + 9*$0), "
+                           "(%d + 4 + 9*$0), (%d + 3 + 9*$0)\">\n",
+                           num_elements,start[n],start[n],start[n],start[n]);
+            Journal_Printf(stream,"          <DataItem Reference=\"XML\">"
+                           "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/"
+                           "DataItem[@Name=\"N\"] </DataItem>\n",
+                           mesh->name);
+            Journal_Printf(stream,"        </DataItem>\n");
+          }
+      }
+    else
+      {
+        /* Write out the Hexahedron connectivity.  There are 8 hexes
+           per element. */
+        Journal_Printf(stream,"    <Topology Type=\"Hexahedron\" "
+                       "NumberOfElements=\"%u\">\n",
+                       num_elements*8);
+        Journal_Printf(stream,"      <DataItem ItemType=\"Function\" "
+                       "Dimensions=\"%u 8\" Function=\"($0; $1; $2; $3; "
+                       "$4; $5; $6; $7)\">\n",
+                       num_elements*8);
+        /* Write the Hexahedra */
+        for(int n=0; n<8; ++n)
+          {
+            Journal_Printf(stream,"        <DataItem ItemType=\"Function\" "
+                           "Dimensions=\"%u 8\" Function=\""
+                           "(%d + 27*$0), (%d + 1 + 27*$0), "
+                           "(%d + 4 + 27*$0), (%d + 3 + 27*$0), "
+                           "(%d + 9 + 27*$0), (%d + 10 + 27*$0), "
+                           "(%d + 13 + 27*$0), (%d + 12 + 27*$0)\">\n",
+                           num_elements,
+                           start[n],start[n],start[n],start[n],
+                           start[n],start[n],start[n],start[n]);
+            Journal_Printf(stream,"          <DataItem Reference=\"XML\">"
+                           "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/"
+                           "DataItem[@Name=\"N\"] </DataItem>\n",
+                           mesh->name);
+            Journal_Printf(stream,"        </DataItem>\n");
+          }
+      }
+    Journal_Printf(stream,"      </DataItem>\n");
+    Journal_Printf(stream,"    </Topology>\n");
+
+    /* Write out the coordinates.  This is a bit complicated, because
+       we want separate vertices for each element, so the sides of
+       elements can not share.  */
+
+    const char direction[]="XYZ";
+    const int num_points(dim==2 ? 9 : 27);
+    for(int d=0;d<dim;++d)
+      {
+        /* First get the coordinates from the vertex mesh */
+        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" "
+                       "Dimensions=\"%u %u %u\" Name=\"%cCoords\">\n",
+                       vert_sizes[0],vert_sizes[1],vert_sizes[2],
+                       direction[d]);
+        Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" "
+                       "Format=\"XML\"> 0 %d 1 1 %u 1 </DataItem>\n",
+                       d,num_vertices);
+        Journal_Printf(stream,"      <DataItem Format=\"HDF\" "
+                       "NumberType=\"Float\" Precision=\"8\" "
+                       "Dimensions=\"%d %d\">Mesh.%s.%05d.h5:"
+                       "/vertices</DataItem>\n",
+                       num_vertices,dim,vert_mesh_name,timestep);
+        Journal_Printf(stream,"    </DataItem>\n");
+
+
+        for(int n=0;n<num_points;++n)
+          {
+            Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" "
+                           "Dimensions=\"%u 1\" Name=\"%c%u\">\n",
+                           num_elements,direction[d],n);
+            Journal_Printf(stream,"      <DataItem Dimensions=\"3 3\" "
+                           "Format=\"XML\"> %u %u %u 2 2 2 %u %u %u "
+                           "</DataItem>\n",
+                           (n%9)/3,n%3,n/9,sizes[0],sizes[1],sizes[2]);
+            Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
+                           "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                           "/DataItem[@Name=\"%cCoords\"] </DataItem>\n",
+                           mesh->name,direction[d]);
+            Journal_Printf(stream,"    </DataItem>\n");
+          }
+
+        /* We have to build up the coordinates hierarchically, because
+           you can not have more than 10 variables in an equation at a
+           time. */
+        const int num_partitions(num_points/9);
+        for(int p=0;p<num_partitions;++p)
+          {
+            std::stringstream ss;
+            ss << "    <DataItem ItemType=\"Function\" "
+               << "Dimensions=\"%u 1\" Function=\"";
+
+            for(int n=0;n<num_points/num_partitions;++n)
               {
-                Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"%s%u\">\n",
-                               sizes[0]*sizes[1],direction[d].c_str(),n);
-                Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> %u %u 2 2 %u %u </DataItem>\n",
-                               n/3,n%3,sizes[0],sizes[1]);
-                Journal_Printf(stream,"      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"%sCoords\"] </DataItem>\n",
-                               mesh->name,direction[d].c_str());
-                Journal_Printf(stream,"    </DataItem>\n");
+                if(n==0)
+                  ss << "$" << n;
+                else
+                  ss << ", $" << n;
               }
-            Journal_Printf(stream,"    <DataItem ItemType=\"Function\" Dimensions=\"%u 1\" Function=\"$0, $1, $2, $3, $4, $5, $6, $7, $8\" Name=\"%s\">\n",
-                           9*num_elements,direction[d].c_str());
-            for(int i=0;i<9;++i)
+            ss << "\" Name=\"%c_%d\">\n";
+            Journal_Printf(stream,ss.str().c_str(),
+                           num_elements*num_points/num_partitions,direction[d],p);
+
+            for(int i=p;i<num_points;i+=num_partitions)
               {
-                Journal_Printf(stream,"      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"%s%d\"] </DataItem>\n",
-                               mesh->name,direction[d].c_str(),i);
+                Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
+                               "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                               "/DataItem[@Name=\"%c%d\"] </DataItem>\n",
+                               mesh->name,direction[d],i);
               }
             Journal_Printf(stream,"    </DataItem>\n");
           }
-        Journal_Printf(stream,"    <Geometry Type=\"XYZ\">\n");
-        Journal_Printf(stream,"      <DataItem ItemType=\"Function\" Dimensions=\"%u 3\" Function=\"JOIN($0, $1, 0*$1)\">\n",
-                       9*num_elements);
-        Journal_Printf(stream,"        <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"X\"] </DataItem>\n",
-                       mesh->name);
-        Journal_Printf(stream,"        <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]/DataItem[@Name=\"Y\"] </DataItem>\n",
-                       mesh->name);
-        Journal_Printf(stream,"      </DataItem>\n");
-        Journal_Printf(stream,"    </Geometry>\n");
+
+        std::stringstream ss;
+        ss << "    <DataItem ItemType=\"Function\" "
+           << "Dimensions=\"%u 1\" Function=\"";
+        for(int n=0;n<num_partitions;++n)
+          {
+            if(n==0)
+              ss << "$" << n;
+            else
+              ss << ", $" << n;
+          }
+        ss << "\" Name=\"%c\">\n";
+        Journal_Printf(stream,ss.str().c_str(),
+                       num_elements*num_points,direction[d]);
+        for(int n=0;n<num_partitions;++n)
+          {
+            Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
+                           "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                           "/DataItem[@Name=\"%c_%d\"] </DataItem>\n",
+                           mesh->name,direction[d],n);
+          }
+        Journal_Printf(stream,"    </DataItem>\n");
       }
-    /* nDim==3 */
+
+    /* Finally, write the coordinates */
+    Journal_Printf(stream,"    <Geometry Type=\"XYZ\">\n");
+    std::stringstream ss;
+    ss << "      <DataItem ItemType=\"Function\" "
+       << "Dimensions=\"%u 3\" Function=\"JOIN($0, $1, ";
+    if(dim==2)
+      ss << "0*$1";
     else
-      {
-        abort();
-      }
+      ss << "$2";
+    ss << ")\">\n";
+
+    Journal_Printf(stream,ss.str().c_str(),num_points*num_elements);
+    for(int d=0;d<dim;++d)
+      Journal_Printf(stream,"        <DataItem Reference=\"XML\">"
+                     "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                     "/DataItem[@Name=\"%c\"] </DataItem>\n",
+                     mesh->name,direction[d]);
+    Journal_Printf(stream,"      </DataItem>\n");
+    Journal_Printf(stream,"    </Geometry>\n");
   }
 
   void write_three_component_function(Stream *stream, 
