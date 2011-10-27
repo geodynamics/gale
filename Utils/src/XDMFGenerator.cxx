@@ -821,7 +821,9 @@ namespace {
 
     /* Write out the coordinates.  This is a bit complicated, because
        we want separate vertices for each element, so the sides of
-       elements can not share.  */
+       elements can not share.  We put the coordinates in a matrix
+       that is (NZ,NY,NX) rather than (NX,NY,NZ).  We flip the order
+       because when XDMF reads in the file, XDMF flips the order. */
 
     const std::string direction[]={"X","Y","Z"};
     const int num_points(dim==2 ? 9 : 27);
@@ -830,7 +832,7 @@ namespace {
         /* First get the coordinates from the vertex mesh */
         Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" "
                        "Dimensions=\"%u %u %u\" Name=\"%sCoords\">\n",
-                       vert_sizes[0],vert_sizes[1],vert_sizes[2],
+                       vert_sizes[2],vert_sizes[1],vert_sizes[0],
                        direction[d].c_str());
         Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" "
                        "Format=\"XML\"> 0 %d 1 1 %u 1 </DataItem>\n",
@@ -851,7 +853,7 @@ namespace {
             Journal_Printf(stream,"      <DataItem Dimensions=\"3 3\" "
                            "Format=\"XML\"> %u %u %u 2 2 2 %u %u %u "
                            "</DataItem>\n",
-                           (n%9)/3,n%3,n/9,sizes[0],sizes[1],sizes[2]);
+                           n/9,(n%9)/3,n%3,sizes[2],sizes[1],sizes[0]);
             Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
                            "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
                            "/DataItem[@Name=\"%sCoords\"] </DataItem>\n",
@@ -992,7 +994,7 @@ namespace {
       {
         std::stringstream ss;
         ss << i;
-        std::string equation("$0" + dy[i%3] + dx[(i/3)%3]);
+        std::string equation("$0" + dx[i%3] + dy[(i/3)%3]);
         std::vector<std::string> variables;
         variables.push_back("_avg");
         variables.push_back("_dx");
