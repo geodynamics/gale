@@ -52,6 +52,7 @@
 #include <string.h>
 #include <string>
 #include <sstream>
+#include <vector>
 
 #ifndef MASTER
 	#define MASTER 0
@@ -156,7 +157,11 @@ namespace {
                                       const std::string &mesh_name,
                                       const std::string &var_name,
                                       const int &timestep,
-                                      const int &num_elements);
+                                      const int &num_elements,
+                                      const int &nDims);
+  void bundle_fields(Stream* stream,
+                     const int &num_elements, const int &num_points,
+                     const std::string &mesh_name, const std::string &var_name);
 }
 
 void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream ) {
@@ -246,11 +251,11 @@ void _XDMFGenerator_WriteFieldSchema( UnderworldContext* context, Stream* stream
                 that used above for the geometry definition, if so
                 proceed **/
             if( feVarMesh == feMesh ){
-              if(element_family=="linear-inner" && nDims==2)
+              if(element_family=="linear-inner")
                 {
                   write_discontinuous_FeVariable(stream,feMesh->name,feVar->name,
                                                  context->timeStep,
-                                                 elementGlobalSize);
+                                                 elementGlobalSize,nDims);
                 }
               else
                 {
@@ -522,7 +527,7 @@ namespace {
             Journal_Printf(stream,"      <DataItem Format=\"HDF\" "
                            "DataType=\"Int\"  Dimensions=\"%u %u\">"
                            "Mesh.%s.%05d.h5:/connectivity</DataItem>\n",
-                           elementGlobalSize, maxNodes, feMesh->name, timestep );
+                           elementGlobalSize,maxNodes,feMesh->name,timestep);
             Journal_Printf(stream,"    </DataItem>\n");
           }
         /* Print out the topology */
@@ -818,15 +823,15 @@ namespace {
        we want separate vertices for each element, so the sides of
        elements can not share.  */
 
-    const char direction[]="XYZ";
+    const std::string direction[]={"X","Y","Z"};
     const int num_points(dim==2 ? 9 : 27);
     for(int d=0;d<dim;++d)
       {
         /* First get the coordinates from the vertex mesh */
         Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" "
-                       "Dimensions=\"%u %u %u\" Name=\"%cCoords\">\n",
+                       "Dimensions=\"%u %u %u\" Name=\"%sCoords\">\n",
                        vert_sizes[0],vert_sizes[1],vert_sizes[2],
-                       direction[d]);
+                       direction[d].c_str());
         Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" "
                        "Format=\"XML\"> 0 %d 1 1 %u 1 </DataItem>\n",
                        d,num_vertices);
@@ -841,71 +846,23 @@ namespace {
         for(int n=0;n<num_points;++n)
           {
             Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" "
-                           "Dimensions=\"%u 1\" Name=\"%c%u\">\n",
-                           num_elements,direction[d],n);
+                           "Dimensions=\"%u 1\" Name=\"%s%u\">\n",
+                           num_elements,direction[d].c_str(),n);
             Journal_Printf(stream,"      <DataItem Dimensions=\"3 3\" "
                            "Format=\"XML\"> %u %u %u 2 2 2 %u %u %u "
                            "</DataItem>\n",
                            (n%9)/3,n%3,n/9,sizes[0],sizes[1],sizes[2]);
             Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
                            "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
-                           "/DataItem[@Name=\"%cCoords\"] </DataItem>\n",
-                           mesh->name,direction[d]);
+                           "/DataItem[@Name=\"%sCoords\"] </DataItem>\n",
+                           mesh->name,direction[d].c_str());
             Journal_Printf(stream,"    </DataItem>\n");
           }
 
         /* We have to build up the coordinates hierarchically, because
            you can not have more than 10 variables in an equation at a
            time. */
-        const int num_partitions(num_points/9);
-        for(int p=0;p<num_partitions;++p)
-          {
-            std::stringstream ss;
-            ss << "    <DataItem ItemType=\"Function\" "
-               << "Dimensions=\"%u 1\" Function=\"";
-
-            for(int n=0;n<num_points/num_partitions;++n)
-              {
-                if(n==0)
-                  ss << "$" << n;
-                else
-                  ss << ", $" << n;
-              }
-            ss << "\" Name=\"%c_%d\">\n";
-            Journal_Printf(stream,ss.str().c_str(),
-                           num_elements*num_points/num_partitions,direction[d],p);
-
-            for(int i=p;i<num_points;i+=num_partitions)
-              {
-                Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
-                               "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
-                               "/DataItem[@Name=\"%c%d\"] </DataItem>\n",
-                               mesh->name,direction[d],i);
-              }
-            Journal_Printf(stream,"    </DataItem>\n");
-          }
-
-        std::stringstream ss;
-        ss << "    <DataItem ItemType=\"Function\" "
-           << "Dimensions=\"%u 1\" Function=\"";
-        for(int n=0;n<num_partitions;++n)
-          {
-            if(n==0)
-              ss << "$" << n;
-            else
-              ss << ", $" << n;
-          }
-        ss << "\" Name=\"%c\">\n";
-        Journal_Printf(stream,ss.str().c_str(),
-                       num_elements*num_points,direction[d]);
-        for(int n=0;n<num_partitions;++n)
-          {
-            Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
-                           "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
-                           "/DataItem[@Name=\"%c_%d\"] </DataItem>\n",
-                           mesh->name,direction[d],n);
-          }
-        Journal_Printf(stream,"    </DataItem>\n");
+        bundle_fields(stream,num_elements,num_points,mesh->name,direction[d]);
       }
 
     /* Finally, write the coordinates */
@@ -923,22 +880,20 @@ namespace {
     for(int d=0;d<dim;++d)
       Journal_Printf(stream,"        <DataItem Reference=\"XML\">"
                      "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
-                     "/DataItem[@Name=\"%c\"] </DataItem>\n",
-                     mesh->name,direction[d]);
+                     "/DataItem[@Name=\"%s\"] </DataItem>\n",
+                     mesh->name,direction[d].c_str());
     Journal_Printf(stream,"      </DataItem>\n");
     Journal_Printf(stream,"    </Geometry>\n");
   }
 
-  void write_three_component_function(Stream *stream, 
-                                      const std::string &start,
-                                      const std::string &end,
-                                      const int &num_elements,
-                                      const std::string &equation,
-                                      const std::string &prefix,
-                                      const std::string &result,
-                                      const std::string &first,
-                                      const std::string &second,
-                                      const std::string &third)
+  void write_function(Stream *stream, 
+                      const std::string &start,
+                      const std::string &end,
+                      const int &num_elements,
+                      const std::string &equation,
+                      const std::string &prefix,
+                      const std::string &result,
+                      const std::vector<std::string> &v)
   {
     std::stringstream ss;
     ss << "    <DataItem ItemType=\"Function\"  Dimensions=\""
@@ -951,9 +906,8 @@ namespace {
        << "\">\n";
     Journal_Printf(stream, ss.str().c_str());
 
-    Journal_Printf(stream,(start + first + end).c_str());
-    Journal_Printf(stream,(start + second + end).c_str());
-    Journal_Printf(stream,(start + third + end).c_str());
+    for(std::vector<std::string>::const_iterator i=v.begin(); i!=v.end(); ++i)
+      Journal_Printf(stream,(start + *i + end).c_str());
 
     Journal_Printf(stream,"    </DataItem>\n");
   }
@@ -962,74 +916,167 @@ namespace {
                                       const std::string &mesh_name,
                                       const std::string &var_name,
                                       const int &timestep,
-                                      const int &num_elements)
+                                      const int &num_elements,
+                                      const int &dim)
   {
-    for(int i=0;i<3;++i)
+    for(int i=0;i<dim+1;++i)
       {
-        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" Dimensions=\"%u 1\" Name=\"%s%d\">\n",
+        Journal_Printf(stream,"    <DataItem ItemType=\"HyperSlab\" "
+                       "Dimensions=\"%u 1\" Name=\"%s_n%d\">\n",
                        num_elements,var_name.c_str(),i);
-        Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" Format=\"XML\"> %u 0 3 1 %u 1 </DataItem>\n",
-                       i,num_elements);
-        Journal_Printf(stream,"      <DataItem Format=\"HDF\" NumberType=\"Float\" Precision=\"8\" Dimensions=\"%u 1\">%s.%05d.h5:/data</DataItem>\n",
+        Journal_Printf(stream,"      <DataItem Dimensions=\"3 2\" "
+                       "Format=\"XML\"> %d 0 %d 1 %d 1 </DataItem>\n",
+                       i,dim+1,num_elements);
+        Journal_Printf(stream,"      <DataItem Format=\"HDF\" "
+                       "NumberType=\"Float\" Precision=\"8\" "
+                       "Dimensions=\"%u 1\">%s.%05d.h5:/data</DataItem>\n",
                        3*num_elements,var_name.c_str(),timestep);
         Journal_Printf(stream,"    </DataItem>\n");
       }
 
     /* Write P_avg, dP/dx, dP/dy */
-    std::string start("      <DataItem Reference=\"XML\">/Xdmf/Domain/Grid[@Name=\"FEM_Grid_"
+    std::string start("      <DataItem Reference=\"XML\">"
+                      "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_"
                       + mesh_name
                       + "\"]/DataItem[@Name=\""
                       + var_name);
     std::string end("\"] </DataItem>\n");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "($2 + ($1 + $0) / 2) / 2",
-                                   var_name,"_avg","0","1","2");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "($1 - $0)",var_name,"_dx","0","1","2");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "($2 - ($1 + $0) / 2)",
-                                   var_name,"_dy","0","1","2");
+    std::vector<std::string> variables;
+    variables.push_back("_n0");
+    variables.push_back("_n1");
+    variables.push_back("_n2");
+    if(dim==3)
+      variables.push_back("_n3");
+      
+    /* Write the average */
+    if(dim==2)
+      {
+        write_function(stream,start,end,num_elements,
+                       "($2 + ($1 + $0) / 2) / 2",var_name,"_avg",variables);
+      }
+    else
+      {
+        write_function(stream,start,end,num_elements,
+                       "($3 + ($2 + ($1 + $0) / 2) / 2) / 2",
+                       var_name,"_avg",variables);
+      }
 
-    /* Write P at each vertex */
-    write_three_component_function(stream,start,end,num_elements,
-                                   "($0 - $1 - $2)",var_name,
-                                   "_0","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0 - $2",var_name,"_1","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0 + $1 - $2",var_name,
-                                   "_2","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0 - $1",var_name,"_3","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0",var_name,"_4","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0 + $1",var_name,"_5","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0 - $1 + $2",var_name,
-                                   "_6","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0 + $2",var_name,"_7","_avg","_dx","_dy");
-    write_three_component_function(stream,start,end,num_elements,
-                                   "$0 + $1 + $2",var_name,
-                                   "_8","_avg","_dx","_dy");
+    /* Write the derivatives */
+    write_function(stream,start,end,num_elements,
+                   "($1 - $0)",var_name,"_dx",variables);
+    write_function(stream,start,end,num_elements,
+                   "($2 - ($1 + $0) / 2)",var_name,"_dy",variables);
+    if(dim==3)
+      {
+        write_function(stream,start,end,num_elements,
+                       "($3 - ($2 + ($1 + $0) / 2) / 2)",
+                       var_name,"_dz",variables);
+      }
 
-    /* Bundle them all together for the field */
-    Journal_Printf(stream,"    <Attribute Type=\"Scalar\" Center=\"Node\" Name=\"%s\">\n",
-                   var_name.c_str());
-    Journal_Printf(stream,"      <DataItem ItemType=\"Function\"  Dimensions=\"%u 1\" Function=\"$0, $1, $2, $3, $4, $5, $6, $7, $8\">\n",
-                   num_elements*9);
-    for(int i=0;i<9;++i)
+    /* Write the values at the nodes */
+    std::vector<std::string> dx;
+    dx.push_back(" - $1");
+    dx.push_back("");
+    dx.push_back(" + $1");
+    std::vector<std::string> dy;
+    dy.push_back(" - $2");
+    dy.push_back("");
+    dy.push_back(" + $2");
+    std::vector<std::string> dz;
+    dz.push_back(" - $3");
+    dz.push_back("");
+    dz.push_back(" + $3");
+
+    const int num_points(dim==2 ? 9 : 27);
+    for(int i=0;i<num_points;++i)
       {
         std::stringstream ss;
-        ss << "  "
-           << start
-           << "_"
-           << i
-           << end;
-        Journal_Printf(stream,ss.str().c_str());
+        ss << i;
+        std::string equation("$0" + dy[i%3] + dx[(i/3)%3]);
+        std::vector<std::string> variables;
+        variables.push_back("_avg");
+        variables.push_back("_dx");
+        variables.push_back("_dy");
+        if(dim==3)
+          {
+            equation+=dz[(i/9)%3];
+            variables.push_back("_dz");
+          }
+
+        write_function(stream,start,end,num_elements,
+                       equation,var_name,ss.str().c_str(),
+                       variables);
       }
-    Journal_Printf(stream,"      </DataItem>\n");
+
+    bundle_fields(stream,num_elements,num_points,mesh_name,var_name);
+
+    Journal_Printf(stream,"    <Attribute Type=\"Scalar\" Dimensions=\"%u 1\" "
+                   "Center=\"Node\" Name=\"%s\">\n",
+                   num_elements*num_points,var_name.c_str());
+    Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
+                   "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                   "/DataItem[@Name=\"%s\"] </DataItem>\n",
+                   mesh_name.c_str(),var_name.c_str());
     Journal_Printf(stream,"    </Attribute>\n");
   }
+
+  void bundle_fields(Stream *stream,
+                     const int &num_elements, const int &num_points,
+                     const std::string &mesh_name, const std::string &var_name)
+  {
+    /* Bundle individual fields into one field.  We have to do it
+       hierarchically because we can not have more than 10 variables
+       in a single equation in XDMF. */
+    const int num_partitions(num_points/9);
+    for(int p=0;p<num_partitions;++p)
+      {
+        std::stringstream ss;
+        ss << "    <DataItem ItemType=\"Function\" "
+           << "Dimensions=\"%u 1\" Function=\"";
+        
+        for(int n=0;n<num_points/num_partitions;++n)
+          {
+            if(n==0)
+              ss << "$" << n;
+            else
+              ss << ", $" << n;
+          }
+        ss << "\" Name=\"%s_%d\">\n";
+        Journal_Printf(stream,ss.str().c_str(),
+                       num_elements*num_points/num_partitions,
+                       var_name.c_str(),p);
+
+        for(int i=p;i<num_points;i+=num_partitions)
+          {
+            Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
+                           "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                           "/DataItem[@Name=\"%s%d\"] </DataItem>\n",
+                           mesh_name.c_str(),var_name.c_str(),i);
+          }
+        Journal_Printf(stream,"    </DataItem>\n");
+      }
+    
+    std::stringstream ss;
+    ss << "    <DataItem ItemType=\"Function\" "
+       << "Dimensions=\"%u 1\" Function=\"";
+    for(int n=0;n<num_partitions;++n)
+      {
+        if(n==0)
+          ss << "$" << n;
+        else
+          ss << ", $" << n;
+      }
+    ss << "\" Name=\"%s\">\n";
+    Journal_Printf(stream,ss.str().c_str(),
+                   num_elements*num_points,var_name.c_str());
+    for(int n=0;n<num_partitions;++n)
+      {
+        Journal_Printf(stream,"      <DataItem Reference=\"XML\">"
+                       "/Xdmf/Domain/Grid[@Name=\"FEM_Grid_%s\"]"
+                       "/DataItem[@Name=\"%s_%d\"] </DataItem>\n",
+                       mesh_name.c_str(),var_name.c_str(),n);
+      }
+    Journal_Printf(stream,"    </DataItem>\n");
+  }    
+
 }
