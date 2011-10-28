@@ -894,7 +894,7 @@ void _AbstractContext_Step( void* _context, double dt ) {
         /* Call updateClassK first, to advect and remesh.  Then solve
            on the new mesh.  Do not advect etc. if this is the first
            step. */
-        if(self->timeStep!=0)
+        if(self->timeStep!=self->restartTimestep)
           {
             KeyCall( self, self->updateClassK, EntryPoint_Class_VoidPtr_CallCast* )( KeyHandle(self,self->updateClassK), self );
           }
