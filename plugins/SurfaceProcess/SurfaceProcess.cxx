@@ -256,10 +256,11 @@ void _Underworld_SurfaceProcess_Build( void* codelet, void* data ) {
 }
 
 void _Underworld_SurfaceProcess_Destroy( void* codelet, void* data ) {
-	UnderworldContext*	UnderworldCtx = (UnderworldContext*)data;
+	Codelet* ed=(Codelet*)codelet;
+	UnderworldContext* uwCtx=(UnderworldContext*)ed->context;
 
 	assert( codelet );
-	assert( UnderworldCtx );
+	assert( uwCtx );
 
 	/* Clear the lot. */
 	/* TODO */
