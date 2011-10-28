@@ -70,8 +70,6 @@ void Underworld_SurfaceProcess_Execute( TimeIntegrand* crdAdvector,
   assert( spCtx );
   
   dt = spCtx->ctx->dt;
-  if(dt==0.0)
-    return;
 
   mesh=spCtx->mesh;
   velocity=spCtx->v;
