@@ -69,8 +69,9 @@ void Underworld_SurfaceProcess_Execute( TimeIntegrand* crdAdvector,
 
   assert( spCtx );
   
-  /* Extract information from contexts. */
   dt = spCtx->ctx->dt;
+  if(dt==0.0)
+    return;
 
   mesh=spCtx->mesh;
   velocity=spCtx->v;
@@ -101,24 +102,20 @@ void Underworld_SurfaceProcess_Execute( TimeIntegrand* crdAdvector,
 
           Vec_Set2D(ijk_minus,ijk);
           ijk_minus[0]-=1;
-          if(!Mesh_GlobalToDomain
-             (mesh,MT_VERTEX,
-              RegularMeshUtils_Node_3DTo1D(mesh,ijk_minus),&n_minus))
-            {
-              printf("Can not map to local domain %d %d %d\n",
-                     ijk_minus[0],ijk_minus[1],n_i);
-              abort();
-            }
+          Journal_Firewall(Mesh_GlobalToDomain
+                           (mesh,MT_VERTEX,
+                            RegularMeshUtils_Node_3DTo1D(mesh,ijk_minus),
+                            &n_minus),Underworld_Error,
+                           "Can not map to local domain %d %d %d\n",
+                           ijk_minus[0],ijk_minus[1],n_i);
           Vec_Set2D(ijk_plus,ijk);
           ijk_plus[0]+=1;
-          if(!Mesh_GlobalToDomain
-             (mesh,MT_VERTEX,
-              RegularMeshUtils_Node_3DTo1D(mesh,ijk_plus),&n_plus))
-            {
-              printf("Can not map to local domain %d %d %d\n",
-                     ijk_plus[0],ijk_plus[1],n_i);
-              abort();
-            }
+          Journal_Firewall(Mesh_GlobalToDomain
+                           (mesh,MT_VERTEX,
+                            RegularMeshUtils_Node_3DTo1D(mesh,ijk_plus),&n_plus),
+                           Underworld_Error,
+                           "Can not map to local domain %d %d %d\n",
+                           ijk_plus[0],ijk_plus[1],n_i);
 
           y_plus=mesh->verts[n_plus][1];
           y_minus=mesh->verts[n_minus][1];
