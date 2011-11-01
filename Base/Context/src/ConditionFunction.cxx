@@ -37,6 +37,7 @@
 
 #include <StGermain/StGermain.h>
 #include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
 
 #include <stdio.h>
 #include <assert.h>
@@ -173,10 +174,13 @@ void _ConditionFunction_Apply(void* conditionFunction, Index index, Variable_Ind
 
 void ConditionFunction_Apply(void* conditionFunction,
                              Index index, Variable_Index var_I,
-                             void* context, void* result)
+                             void* _context, void* result)
 {
-  MeshVariable* meshVar = (MeshVariable*)Variable_Register_GetByIndex( ((AbstractContext*)context)->variable_Register, var_I );
-  Mesh* mesh = (Mesh*)meshVar->mesh;
+  FiniteElementContext *context=(FiniteElementContext*)_context;
+  FeVariable *feVariable=(FeVariable*)FieldVariable_Register_GetByName
+    (context->fieldVariable_Register, "VelocityField");
+
+  FeMesh* mesh=feVariable->feMesh;
   assert( mesh != NULL );
   double* coord = Mesh_GetVertex( mesh, index );
   ConditionFunction_Apply(conditionFunction,coord,context,result);
