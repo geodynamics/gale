@@ -190,6 +190,7 @@ void _IntegrationPointsSwarm_AssignFromXML( void* integrationPoints, Stg_Compone
 			(weights == NULL && (Stg_Class_IsInstance( mapper, GaussMapper_Type ) ||
 					     Stg_Class_IsInstance( mapper, GaussCoincidentMapper_Type) ||
 					     Stg_Class_IsInstance( mapper, NearestNeighborMapper_Type) ||
+					     Stg_Class_IsInstance( mapper, OneToManyMapper_Type) ||
 					     !strcmp( mapper->type, "PCDVCGaussMapper"))),
 			Journal_MyStream( Error_Type, self ),
 			"In func %s, %s which is a %s must either have a %s or use %s\n",
@@ -432,6 +433,7 @@ void IntegrationPointsSwarm_RemapIntegrationPointsAndRecalculateWeights( void* s
 		Journal_Firewall( Stg_Class_IsInstance( self->mapper, GaussMapper_Type ) ||
 				  Stg_Class_IsInstance( self->mapper, GaussCoincidentMapper_Type ) ||
 				  Stg_Class_IsInstance( self->mapper, NearestNeighborMapper_Type ) ||
+				  Stg_Class_IsInstance( self->mapper, OneToManyMapper_Type ) ||
 				  !strcmp(self->mapper->type, "PCDVCGaussMapper"), errorStream,
 			"Error - in %s(): for IntegrationPointSwarm \"%s\", no weights calculator provided "
 			"and mapper is not a %s.\n", GaussMapper_Type );

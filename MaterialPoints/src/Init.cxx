@@ -73,6 +73,7 @@ Bool PICellerator_MaterialPoints_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentsRegister, GaussCoincidentMapper_Type, "0", _GaussCoincidentMapper_DefaultNew  );
 	Stg_ComponentRegister_Add( componentsRegister, GaussMapper_Type, "0", _GaussMapper_DefaultNew  );
 	Stg_ComponentRegister_Add( componentsRegister, NearestNeighborMapper_Type, "0", _NearestNeighborMapper_DefaultNew  );
+	Stg_ComponentRegister_Add( componentsRegister, OneToManyMapper_Type, "0", _OneToManyMapper_DefaultNew  );
 	
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvector_Type, "0", _SwarmAdvector_DefaultNew  );
 	Stg_ComponentRegister_Add( componentsRegister, SwarmAdvectionInAPlane_Type, "0", _SwarmAdvectionInAPlane_DefaultNew  );

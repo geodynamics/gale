@@ -61,18 +61,18 @@
 
 	extern const Type OneToManyMapper_Type;
 
-        struct OneToManyRef {
-	    int numParticles;
-	    int *particleInds;
-	    float *weights;
-        };
+        // struct OneToManyRef {
+	//     int numParticles;
+	//     int *particleInds;
+	//     float *weights;
+        // };
 
 	/* OneToManyMapper information */
 	#define __OneToManyMapper \
 		__IntegrationPointMapper \
 		\
 		Stream*				errorStream; \
-		MaterialPointsSwarm*		materialSwarm; \
+		IntegrationPointsSwarm*		swarm; \
 		Index                           refHandle; /**< Extension handle to reference struct of material points */
 
 	struct OneToManyMapper { __OneToManyMapper };
@@ -82,14 +82,16 @@
 	#endif
 
 	#define ONETOMANYMAPPER_DEFARGS \
-                INTEGRATIONPOINTMAPPER_DEFARGS
+                INTEGRATIONPOINTMAPPER_DEFARGS, \
+                IntegrationPointsSwarm *_swarm
 
 	#define ONETOMANYMAPPER_PASSARGS \
-                INTEGRATIONPOINTMAPPER_PASSARGS
+                INTEGRATIONPOINTMAPPER_PASSARGS, \
+                _swarm
 	
 OneToManyMapper* _OneToManyMapper_New( ONETOMANYMAPPER_DEFARGS );
 
-void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm );
+void _OneToManyMapper_Init( void* mapper, IntegrationPointsSwarm* swarm );
 
 	void _OneToManyMapper_Delete( void* mapper );
 	void _OneToManyMapper_Print( void* mapper, Stream* stream );
@@ -99,6 +101,7 @@ void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm );
 		(OneToManyMapper*) Stg_Class_Copy( self, NULL, True, NULL, NULL )
 	void* _OneToManyMapper_Copy( const void* mapper, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap );
 	
+	void* _OneToManyMapper_DefaultNew( Name name );
 	void _OneToManyMapper_AssignFromXML( void* shape, Stg_ComponentFactory* cf, void* data );
 	void _OneToManyMapper_Build( void* mapper, void* data ) ;
 	void _OneToManyMapper_Initialise( void* mapper, void* data );
@@ -111,6 +114,6 @@ void _OneToManyMapper_Init( void* mapper, MaterialPointsSwarm* materialSwarm );
         double _OneToManyMapper_GetDoubleFromExtension(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
         double _OneToManyMapper_GetDoubleFromMaterial(void* mapper, void* intPoint, ExtensionInfo_Index extHandle, int offs);
 
-        OneToManyRef* OneToManyMapper_GetMaterialRef( void* mapper, void* intPoint );
+        void _OneToManyMapper_Map(void* mapper);
 
 #endif
