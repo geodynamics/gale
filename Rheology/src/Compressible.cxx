@@ -232,24 +232,25 @@ void _Compressible_AssembleElement(
 		     * constitutive matrix and combine them using their weights.
 		     */
 
-		    OneToManyRef *ref;
-		    MaterialPointsSwarm *matSwarm;
-		    int isComp = 0;
-		    int ii;
+                  abort();
+		    // OneToManyRef *ref;
+		    // MaterialPointsSwarm *matSwarm;
+		    // int isComp = 0;
+		    // int ii;
 
-		    matSwarm = ((OneToManyMapper*)((IntegrationPointsSwarm*)swarm)->mapper)->materialSwarm;
-		    ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
-		    for(ii = 0; ii < ref->numParticles; ii++) {
-			material = (RheologyMaterial*)MaterialPointsSwarm_GetMaterialAt(matSwarm, ref->particleInds[ii]);
-			if(!material->compressible)
-			    continue;
-			isComp++;
-			oneOnLambda += material->compressible->oneOnLambda;
-		    }
+		    // matSwarm = ((OneToManyMapper*)((IntegrationPointsSwarm*)swarm)->mapper)->materialSwarm;
+		    // ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
+		    // for(ii = 0; ii < ref->numParticles; ii++) {
+		    //     material = (RheologyMaterial*)MaterialPointsSwarm_GetMaterialAt(matSwarm, ref->particleInds[ii]);
+		    //     if(!material->compressible)
+		    //         continue;
+		    //     isComp++;
+		    //     oneOnLambda += material->compressible->oneOnLambda;
+		    // }
 
-		    if(((float)isComp)/((float)ref->numParticles) < 0.5)
-			continue;
-		    oneOnLambda /= ((double)ref->numParticles);
+		    // if(((float)isComp)/((float)ref->numParticles) < 0.5)
+		    //     continue;
+		    // oneOnLambda /= ((double)ref->numParticles);
 		}
 		else {
                   IntegrationPointsSwarm* NNswarm(swarm);

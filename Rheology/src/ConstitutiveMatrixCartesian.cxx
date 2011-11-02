@@ -299,29 +299,55 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
         * We're dealing with a one-to-many mapper. We will assemble each material point's
         * constitutive matrix and combine them using their weights.
         */
+       OneToManyMapper *mapper=(OneToManyMapper*)(((IntegrationPointsSwarm*)(self->integrationSwarm))->mapper);
+       IntegrationPointsSwarm* OneToMany_Swarm=mapper->swarm;
+       int OneToMany_cell=CellLayout_MapElementIdToCellId(OneToMany_Swarm->cellLayout,lElement_I);
+       int num_particles=OneToMany_Swarm->cellParticleCountTbl[OneToMany_cell];
 
-       OneToManyRef *ref;
-       double **matrixData;
-       unsigned int jj, kk;
+       double matrixData[self->columnSize][self->rowSize];
+       for(unsigned jj=0;jj<self->columnSize;++jj)
+         for(unsigned kk=0;kk<self->rowSize;++kk)
+           matrixData[jj][kk]=0;
 
-       matrixData = Memory_Alloc_2DArray( double, self->columnSize, self->rowSize, (Name)self->name );
-       memset(matrixData[0], 0, self->columnSize*self->rowSize*sizeof(double));
-       ref = OneToManyMapper_GetMaterialRef(((IntegrationPointsSwarm*)swarm)->mapper, particle);
-       for(int ii = 0; ii < ref->numParticles; ii++) {
-         /* Assemble this material point. */
-         ConstitutiveMatrix_AssembleMaterialPoint(
-                                                  constitutiveMatrix, lElement_I,
-                                                  ((OneToManyMapper*)((IntegrationPointsSwarm*)swarm)->mapper)->materialSwarm,
-                                                  ref->particleInds[ii]);
-         /* Add to cumulative matrix. */
-         for(jj = 0; jj < self->rowSize; jj++) {
-           for(kk = 0; kk < self->columnSize; kk++)
-             matrixData[jj][kk] += ref->weights[ii]*self->matrixData[jj][kk];
+       double total_weight(dim==2 ? 4 : 8);
+       for(int ii=0;ii<num_particles;++ii)
+         {
+           IntegrationPoint *OneToMany_particle=
+             (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_Swarm,
+                                                       OneToMany_cell,ii);
+
+           ConstitutiveMatrix_Assemble
+             (constitutiveMatrix,lElement_I,OneToMany_particle,OneToMany_Swarm);
+           
+           /* Add to cumulative matrix. */
+           
+           if(mapper->harmonic_average)
+             {
+               for(unsigned jj = 0; jj < self->rowSize; jj++)
+                 matrixData[jj][jj] += OneToMany_particle->weight/self->matrixData[jj][jj];
+             }
+           else
+             {
+               for(unsigned jj = 0; jj < self->rowSize; jj++)
+                 for(unsigned kk = 0; kk < self->columnSize; kk++)
+                   matrixData[jj][kk] += OneToMany_particle->weight*self->matrixData[jj][kk];
+             }
          }
-       }
        /* Copy matrix data and free temporary array. */
-       memcpy(self->matrixData[0], matrixData[0], self->columnSize*self->rowSize*sizeof(double));
-       Memory_Free(matrixData);
+       if(mapper->harmonic_average)
+         {
+           for(unsigned jj=0;jj<self->columnSize;++jj)
+             for(unsigned kk=0;kk<self->rowSize;++kk)
+               self->matrixData[jj][kk]=0;
+           for(unsigned jj=0;jj<self->columnSize;++jj)
+             self->matrixData[jj][jj]=total_weight/matrixData[jj][jj];
+         }
+       else
+         {
+           for(unsigned jj=0;jj<self->columnSize;++jj)
+             for(unsigned kk=0;kk<self->rowSize;++kk)
+               self->matrixData[jj][kk]=matrixData[jj][kk]/total_weight;
+         }
      }
      else {
        IntegrationPointsSwarm*
