@@ -44,6 +44,11 @@
 #include <string.h>
 #include <assert.h>
 
+#include "boost/filesystem.hpp"
+#include "boost/algorithm/string.hpp"
+
+boost::filesystem::path parse_json(const boost::filesystem::path &filename);
+
 /** Textual name of this class */
 const Type IO_Handler_Type = Type_Invalid;
 
@@ -351,37 +356,43 @@ Dictionary_Entry_Value* IO_Handler_DictSetAddValueWithSource(
 } /* IO_Handler_SetAddWithSource */
 
 Index IO_Handler_ReadAllFilesFromCommandLine( void* ioHandler, int argc, char* argv[], Dictionary* dictionary ) {
-	IO_Handler* self          = (IO_Handler*) ioHandler;
-	Stream*     errorStream   = Journal_Register( Error_Type, CURR_MODULE_NAME );
-	int       arg_I;
-	char*       filename;
-	char*       extension;
-	Bool        result;
-	Index       filesRead = 0;
+  IO_Handler* self          = (IO_Handler*) ioHandler;
+  Stream*     errorStream   = Journal_Register( Error_Type, CURR_MODULE_NAME );
+  Bool        result;
+  Index       filesRead = 0;
 
-	/* Loop over all the arguments from command line */
-	for ( arg_I = 1 ; arg_I < argc ; arg_I++ ) {
-		filename = argv[ arg_I ];
+  /* Loop over all the arguments from command line */
+  for(int arg_I = 1; arg_I < argc; arg_I++) {
+    boost::filesystem::path filename(argv[arg_I]);
 
-		/* Find extension of potential filename by finding the pointer to the last dot in the string */
-		extension = strrchr( filename, '.' );
+    if(!filename.has_extension())
+      continue;
 
-		/* Check if there was a '.' in the filename at all - if not, then bail */
-		if ( extension == NULL )
-			continue;
+    /* If json, convert it to xml.  If */
+    boost::filesystem::path json_xml_name;
+    if(boost::iequals(filename.extension().string(),".js")
+       || boost::iequals(filename.extension().string(),".json"))
+      {
+        json_xml_name=parse_json(filename);
+        Journal_Firewall(!json_xml_name.empty(),errorStream,
+                         "Error: Could not read input file %s. Exiting.\n",
+                         filename.c_str());
+        filename=json_xml_name;
+      }
+    else if(filename.extension()!=".xml")
+      continue;
 
-		/* Check if file has a ".xml" extension - if not, then bail */
-		if ( strcasecmp( extension, ".xml" ) != 0 )
-			continue;
-	
-		/* Read file */
-		result = IO_Handler_ReadAllFromFile( self, filename, dictionary );
-		Journal_Firewall( result, errorStream, 
-				"Error: %s could not read input file %s. Exiting.\n", argv[0], filename );
-		filesRead++;		
-	}
+    /* Read file */
+    result = IO_Handler_ReadAllFromFile( self, filename.c_str(), dictionary );
+    if(!json_xml_name.empty())
+      boost::filesystem::remove(json_xml_name);
+    Journal_Firewall( result, errorStream, 
+                      "Error: %s could not read input file %s. Exiting.\n",
+                      argv[0], filename.c_str() );
+    filesRead++;		
+  }
 
-	return filesRead;
+  return filesRead;
 }
 
 
