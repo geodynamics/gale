@@ -1,0 +1,26 @@
+import os
+Import('env')
+
+#
+# Need to make a copy because SCons uses the environment.
+# at it's final state, so StGermain ends up depending on
+# StgDomain, etc.
+#
+
+env = env.Clone()
+
+for root, dirs, files in os.walk("boost"):
+    env.Install('include/' + root, Glob(root + '/*.hpp'))
+
+env.Append(CPPPATH=env['build_dir'] + '/boost')
+
+fs_srcs = Glob('libs/filesystem/v3/src/*.cpp')
+fs_objs = env.SharedObject(fs_srcs)
+fs_l=env.StaticLibrary(env['build_dir'] + '/lib/boost_filesystem', fs_objs)
+env.Install(env['prefix'] + '/lib', fs_l)
+
+sys_srcs = Glob('libs/system/src/*.cpp')
+sys_objs = env.SharedObject(sys_srcs)
+sys_l=env.StaticLibrary(env['build_dir'] + '/lib/boost_system', sys_objs)
+env.Install(env['prefix'] + '/lib', sys_l)
+

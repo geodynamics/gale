@@ -73,6 +73,23 @@ env.Alias("install", env["prefix"])
 
 Export('env')
 
+SConscript('boost/SConscript',
+           variant_dir=env['build_dir'] + '/boost',
+           duplicate=0)
+env.Prepend(LIBS=['boost_filesystem','boost_system'])
+
+SConscript('json_spirit/SConscript',
+           variant_dir=env['build_dir'] + '/json_spirit',
+           duplicate=0)
+env.Prepend(LIBS=['json_spirit'])
+env.Prepend(CPPPATH=[env['build_dir'] + '/include/json_spirit'])
+
+SConscript('json_parser/SConscript',
+           variant_dir=env['build_dir'] + '/json_parser',
+           duplicate=0)
+env.Prepend(LIBS=['json_parser'])
+env.Prepend(CPPPATH=[env['build_dir'] + '/include/json_parser'])
+
 SConscript('muParser/SConscript',
            variant_dir=env['build_dir'] + '/muParser',
            duplicate=0)
@@ -124,7 +141,12 @@ if env['with_glucifer']:
 if env['static_libs']:
     env.Program('bin/Gale',
                 ['StGermain/src/main.cxx',
-                 File(env['build_dir'] + '/StGermain/stg_static_modules.cxx').abspath])
+                 File(env['build_dir']
+                      + '/StGermain/stg_static_modules.cxx').abspath])
+    # env.Program('bin/FlattenXML',
+    #             ['StGermain/Base/FlattenXML/src/main.cxx',
+    #              File(env['build_dir']
+    #                   + '/StGermain/stg_static_modules.cxx').abspath])
 
 # Adding in documentation.
 env.Alias("doc", None, env.Action(File("StGermain/script/createDocs.py").abspath))

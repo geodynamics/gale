@@ -1,0 +1,41 @@
+#!/usr/bin/make -f
+# -*- mode: makefile; coding: utf-8 -*-
+# Copyright © 2010, 2011 Jonas Smedegaard <dr@jones.dk>
+# Description: Main Debian packaging script for JSON Spirit
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-include /usr/share/cdbs/1/rules/upstream-tarball.mk
+include /usr/share/cdbs/1/class/cmake.mk
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/rules/utils.mk
+
+# Suppress optional build-dependencies
+CDBS_BUILD_DEPENDS_rules_upstream-tarball =
+CDBS_BUILD_DEPENDS_rules_utils_copyright-check =
+
+# Needed both by upstream build process and at runtime
+common-depends = libboost-dev
+
+CDBS_BUILD_DEPENDS += , $(common-depends), cmake
+CDBS_DEPENDS_ALL = $(common-depends)
+
+DEB_UPSTREAM_URL = http://www.codeproject.com/KB/recipes/JSON_Spirit
+DEB_UPSTREAM_TARBALL_BASENAME_MANGLE = s/-/_/g;s/_(?=\d)/_v/
+DEB_UPSTREAM_TARBALL_EXTENSION = zip
+DEB_UPSTREAM_TARBALL_SRCDIR = .
+
+DEB_UPSTREAM_TARBALL_MD5 = 0729870198528a28c21c5ee588d032a4
+
+DEB_INSTALL_EXAMPLES = json_*demo/*.cpp

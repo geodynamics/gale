@@ -1,0 +1,2 @@
+spirit: fix_start_end.cxx main.cxx print_xml.cxx fix_start_end.h print_xml.h add_components.cxx add_defaults.cxx
+	g++ fix_start_end.cxx main.cxx print_xml.cxx add_components.cxx add_defaults.cxx -o spirit -std=c++0x -ljson_spirit

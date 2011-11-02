@@ -1,0 +1,27 @@
+json-spirit (4.04-1) unstable; urgency=low
+
+  * New upstream release.
+  * Depend (not only build-depend) on libboost-dev.
+    Closes: bug#627875. Thanks to Ian Bruce.
+  * Drop patch 1000: Applied upstream.
+  * Extend copyright years of packaging.
+  * Update copyright file:
+    + Rewrite using draft 174 of DEP-5 format.
+    + Extend copyright years.
+    + Rewrap license fields at 72 chars, and shorten comments.
+  * Bump policy compliance to standards-version 3.9.2.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Wed, 25 May 2011 09:37:40 +0200
+
+json-spirit (4.03-2) unstable; urgency=low
+
+  * Add patch 1000 to install errors header.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Mon, 13 Dec 2010 16:02:56 +0100
+
+json-spirit (4.03-1) unstable; urgency=low
+
+  * Initial release.
+    Closes: bug#606943.
+
+ -- Jonas Smedegaard <dr@jones.dk>  Mon, 13 Dec 2010 14:04:30 +0100

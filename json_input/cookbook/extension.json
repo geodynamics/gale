@@ -1,0 +1,119 @@
+{
+    "plugins":
+    [
+        {
+            "Type": "Underworld_EulerDeform",
+            "Context":"context"
+        }
+    ],
+    "components":
+    {
+        "buoyancyForceTerm":
+        {
+            "Type": "BuoyancyForceTerm",
+            "ForceVector": "mom_force",
+            "Swarm": "gaussSwarm",
+            "gravity": "gravity"
+        },
+        "boxShape":
+        {
+            "Type": "Box",
+            "startX": "minX",
+            "endX": "maxX",
+            "startY": "minY",
+            "endY": "maxY",
+            "startZ": "minZ",
+            "endZ": "maxZ"
+        },
+        "backgroundViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "1.0"
+        },
+        "viscous":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "boxShape",
+            "density": "1.0",
+            "Rheology": [
+                "backgroundViscosity",
+                "storeViscosity",
+                "storeStress"
+            ]
+        }
+
+    },
+    "EulerDeform":
+    {
+        "systems": [
+            {
+                "mesh": "v-T-mesh",
+                "innerMesh": "pressure-mesh",
+                "remesher": "velocityRemesher",
+                "velocityField": "VelocityField",
+                "wrapTop": "True"
+            }
+        ]
+    },
+    "velocityBCs" :{
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "WallVC",
+                "wall": "left",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "type": "double",
+                        "value": "0.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "right",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "type": "double",
+                        "value": "1.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "bottom",
+                "variables": [
+                    {
+                        "name": "vy",
+                        "type": "double",
+                        "value": "0.0"
+                    }
+                ]
+            }
+        ]
+    },
+
+    "FieldVariablesToCheckpoint": [
+        "StrainRateInvariantField",
+        "VelocityField",
+        "PressureField"
+    ],
+    "timeIntegratorOrder": "1",
+    "maxTimeSteps": "0",
+    "outputPath": "./output",
+    "dim": "2",
+    "minX": "0.0f",
+    "minY": "0.0f",
+    "minZ": "0.0f",
+    "maxX": "2.0f",
+    "maxY": "0.35f",
+    "maxZ": "0.3f",
+    "nx": "16",
+    "ny": "4",
+    "nz": "4",
+    "particlesPerCell": "40",
+    "seed": "13",
+    "checkpointEvery": "1",
+    "gravity": "1.0"
+}

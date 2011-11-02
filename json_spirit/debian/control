@@ -1,0 +1,32 @@
+Source: json-spirit
+Section: libdevel
+Priority: optional
+Maintainer: Jonas Smedegaard <dr@jones.dk>
+Build-Depends: cdbs,
+ debhelper (>= 6),
+ dh-buildinfo,
+ libboost-dev,
+ cmake
+Standards-Version: 3.9.2
+Homepage: http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx
+Vcs-Git: git://git.debian.org/git/collab-maint/json-spirit
+Vcs-Browser: http://git.debian.org/?p=collab-maint/json-spirit.git
+
+Package: libjson-spirit-dev
+Architecture: any
+Depends: ${shlibs:Depends},
+ ${misc:Depends},
+ ${cdbs:Depends}
+Description: C++ JSON Parser/Generator implemented with Boost Spirit
+ JSON is a text file format similar to XML, but less verbose. It has
+ been called "XML lite".
+ .
+ JSON Spirit is a C++ library that reads and writes JSON files or
+ streams. It is written using the Boost Spirit parser generator. If you
+ are already using Boost, you can use JSON Spirit without any additional
+ dependencies.
+ .
+ Key features:
+  * supports ASCII or Unicode
+  * std::vector or std::map implementations for JSON Objects
+  * object library or header file only use
