@@ -61,19 +61,13 @@
 
 	extern const Type OneToManyMapper_Type;
 
-        // struct OneToManyRef {
-	//     int numParticles;
-	//     int *particleInds;
-	//     float *weights;
-        // };
-
 	/* OneToManyMapper information */
 	#define __OneToManyMapper \
 		__IntegrationPointMapper \
 		\
 		Stream*				errorStream; \
 		IntegrationPointsSwarm*		swarm; \
-		Index                           refHandle; /**< Extension handle to reference struct of material points */
+                Bool                            harmonic_average;
 
 	struct OneToManyMapper { __OneToManyMapper };
 
@@ -83,15 +77,16 @@
 
 	#define ONETOMANYMAPPER_DEFARGS \
                 INTEGRATIONPOINTMAPPER_DEFARGS, \
-                IntegrationPointsSwarm *_swarm
+                IntegrationPointsSwarm *_swarm, \
+                Bool _harmonic_average
 
 	#define ONETOMANYMAPPER_PASSARGS \
                 INTEGRATIONPOINTMAPPER_PASSARGS, \
-                _swarm
+                _swarm, _harmonic_average
 	
 OneToManyMapper* _OneToManyMapper_New( ONETOMANYMAPPER_DEFARGS );
 
-void _OneToManyMapper_Init( void* mapper, IntegrationPointsSwarm* swarm );
+void _OneToManyMapper_Init( void* mapper, IntegrationPointsSwarm* swarm, Bool harmonic_average );
 
 	void _OneToManyMapper_Delete( void* mapper );
 	void _OneToManyMapper_Print( void* mapper, Stream* stream );

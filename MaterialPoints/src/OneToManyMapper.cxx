@@ -62,6 +62,7 @@ OneToManyMapper* _OneToManyMapper_New( ONETOMANYMAPPER_DEFARGS ) {
 
 	result = (OneToManyMapper*)_IntegrationPointMapper_New( INTEGRATIONPOINTMAPPER_PASSARGS );
         result->swarm=_swarm;
+        result->harmonic_average=_harmonic_average;
 		
 	return result;
 }
@@ -98,15 +99,19 @@ void* _OneToManyMapper_DefaultNew( Name name ) {
   IntegrationPointMapper_GetDoubleFromExtension*
     _getDoubleFromMaterial = _OneToManyMapper_GetDoubleFromMaterial;
   IntegrationPointsSwarm *_swarm=NULL;
+  Bool _harmonic_average=True;
 
   return _OneToManyMapper_New( ONETOMANYMAPPER_PASSARGS );
 }
 
-void _OneToManyMapper_Init( void* mapper, IntegrationPointsSwarm* swarm ) {
+void _OneToManyMapper_Init( void* mapper,
+                            IntegrationPointsSwarm* swarm,
+                            Bool harmonic_average ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;
 
 	self->errorStream = Journal_MyStream( Error_Type, self );
 	self->swarm = swarm;
+	self->harmonic_average = harmonic_average;
 }
 
 void _OneToManyMapper_Delete( void* mapper ) {
@@ -135,14 +140,15 @@ void* _OneToManyMapper_Copy( const void* mapper, void* dest, Bool deep, Name nam
 void _OneToManyMapper_AssignFromXML( void* mapper, Stg_ComponentFactory* cf, void* data ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;
 	IntegrationPointsSwarm* swarm;
+        Bool harmonic_average;
 	
 	_IntegrationPointMapper_AssignFromXML( self, cf, data );
 
 	swarm =
           Stg_ComponentFactory_ConstructByKey(cf,self->name,"MappedSwarm",
                                               IntegrationPointsSwarm,True,data);
-
-	_OneToManyMapper_Init( self, swarm );
+        harmonic_average=Stg_ComponentFactory_GetBool(cf,self->name,"HarmonicAverage",True);
+	_OneToManyMapper_Init( self, swarm, harmonic_average );
 
 }
 
