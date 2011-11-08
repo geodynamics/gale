@@ -90,11 +90,11 @@ SConscript('json_parser/SConscript',
 env.Prepend(LIBS=['json_parser'])
 env.Prepend(CPPPATH=[env['build_dir'] + '/include/json_parser'])
 
-SConscript('muParser/SConscript',
-           variant_dir=env['build_dir'] + '/muParser',
+SConscript('muparserx/SConscript',
+           variant_dir=env['build_dir'] + '/muparserx',
            duplicate=0)
-env.Prepend(LIBS=['muparser'])
-env.Prepend(CPPPATH=[env['build_dir'] + '/include/muParser'])
+env.Prepend(LIBS=['muparserx'])
+env.Prepend(CPPPATH=[env['build_dir'] + '/include/muparserx'])
 
 SConscript('StGermain/SConscript',
            variant_dir=env['build_dir'] + '/StGermain',
