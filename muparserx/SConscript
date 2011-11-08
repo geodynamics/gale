@@ -1,0 +1,26 @@
+import os
+Import('env')
+
+#
+# Need to make a copy because SCons uses the environment.
+# at it's final state, so StGermain ends up depending on
+# StgDomain, etc.
+#
+
+env = env.Clone()
+
+#
+# Inside each project we will be accessing headers without the
+# project name as a build_dir, so we need to let SCons know how to
+# find those headers.
+#
+
+env.Append(CPPPATH=env['build_dir'] + '/include/muparserx')
+
+hdrs = env.Install('include/muparserx/', Glob('parser/*.h'))
+
+srcs = Glob('parser/*.cpp')
+objs = env.SharedObject(srcs)
+
+l=env.StaticLibrary(env['build_dir'] + '/lib/muparserx', objs)
+env.Install(env['prefix'] + '/lib', l)
