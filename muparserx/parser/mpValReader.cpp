@@ -51,13 +51,19 @@ MUP_NAMESPACE_START
   {
     stringstream_type stream(a_szExpr + a_iPos);
     float_type fVal(0);
-    std::streamoff iEnd(0);
 
     stream >> fVal;
-    iEnd = stream.tellg();   // Position after reading
-
-    if (iEnd==-1)
+    if(stream.fail())
       return false;
+
+    if(stream.eof())
+      {
+        a_Val=cmplx_type(fVal,0.0);
+        a_iPos=strlen(a_szExpr);
+        return true;
+      }
+
+    std::streamoff iEnd(stream.tellg());   // Position after reading
 
     a_iPos += (int)iEnd;
     
