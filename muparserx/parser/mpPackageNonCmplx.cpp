@@ -28,22 +28,39 @@ void PackageNonCmplx::AddToParser(ParserXBase *pParser)
   pParser->DefineFun(new FunSin());
   pParser->DefineFun(new FunCos());
   pParser->DefineFun(new FunTan());
-  pParser->DefineFun(new FunSinH());
-  pParser->DefineFun(new FunCosH());
-  pParser->DefineFun(new FunTanH());
+
   pParser->DefineFun(new FunASin());
   pParser->DefineFun(new FunACos());
   pParser->DefineFun(new FunATan());
+
+  pParser->DefineFun(new FunSinH());
+  pParser->DefineFun(new FunCosH());
+  pParser->DefineFun(new FunTanH());
+
   pParser->DefineFun(new FunASinH());
   pParser->DefineFun(new FunACosH());
   pParser->DefineFun(new FunATanH());
-  pParser->DefineFun(new FunLog());
+
   pParser->DefineFun(new FunLog10());
   pParser->DefineFun(new FunLog2());
-  pParser->DefineFun(new FunLn());
-  pParser->DefineFun(new FunExp());
+  pParser->DefineFun(new FunLog());
+  pParser->DefineFun(new FunLog1p());
+
+  pParser->DefineFun(new FunErf());
+  pParser->DefineFun(new FunErfc());
+
   pParser->DefineFun(new FunSqrt());
+  pParser->DefineFun(new FunSqrt1pm1());
+  pParser->DefineFun(new FunCbrt());
+
+  pParser->DefineFun(new FunExp());
+  pParser->DefineFun(new FunExpm1());
   pParser->DefineFun(new FunAbs());
+  pParser->DefineFun(new FunStep());
+  pParser->DefineFun(new FunFloor());
+  pParser->DefineFun(new FunCeil());
+
+  pParser->DefineFun(new FunHypot());
 
   // Operator callbacks
   pParser->DefineInfixOprt(new OprtSign());

@@ -49,9 +49,9 @@ MUP_NAMESPACE_START
       virtual IToken* Clone() const;                                       \
     }; 
 
-    MUP_UNARY_FUNC_DEF(FunTan)
-    MUP_UNARY_FUNC_DEF(FunCos)
     MUP_UNARY_FUNC_DEF(FunSin)
+    MUP_UNARY_FUNC_DEF(FunCos)
+    MUP_UNARY_FUNC_DEF(FunTan)
     // arcus functions
     MUP_UNARY_FUNC_DEF(FunASin)
     MUP_UNARY_FUNC_DEF(FunACos)
@@ -65,15 +65,31 @@ MUP_NAMESPACE_START
     MUP_UNARY_FUNC_DEF(FunACosH)
     MUP_UNARY_FUNC_DEF(FunATanH)
     // logarithm functions
-    MUP_UNARY_FUNC_DEF(FunLog)
     MUP_UNARY_FUNC_DEF(FunLog10)
     MUP_UNARY_FUNC_DEF(FunLog2)
-    MUP_UNARY_FUNC_DEF(FunLn)
+    MUP_UNARY_FUNC_DEF(FunLog)
+    MUP_UNARY_FUNC_DEF(FunLog1p)
+    // error functions
+    MUP_UNARY_FUNC_DEF(FunErf)
+    MUP_UNARY_FUNC_DEF(FunErfc)
     // square root
     MUP_UNARY_FUNC_DEF(FunSqrt)
+    MUP_UNARY_FUNC_DEF(FunSqrt1pm1)
+    MUP_UNARY_FUNC_DEF(FunCbrt)
+
     MUP_UNARY_FUNC_DEF(FunExp)
+    MUP_UNARY_FUNC_DEF(FunExpm1)
     MUP_UNARY_FUNC_DEF(FunAbs)
+    MUP_UNARY_FUNC_DEF(FunStep)
+    MUP_UNARY_FUNC_DEF(FunFloor)
+    MUP_UNARY_FUNC_DEF(FunCeil)
+
+    // This is really a binary function, but the signature is the
+    // same.
+    MUP_UNARY_FUNC_DEF(FunHypot)
+
 #undef MUP_UNARY_FUNC_DEF
+
 }  // namespace mu
 
 #endif
