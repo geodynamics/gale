@@ -182,7 +182,7 @@ MUP_NAMESPACE_START
     char_type type1 = GetType(),
               type2 = a_Val.GetType(); 
 
-    if (type1==type2 || IsScalar() && a_Val.IsScalar())
+    if (type1==type2 || (IsScalar() && a_Val.IsScalar()))
     {
       switch(GetType())
       {
@@ -227,7 +227,7 @@ MUP_NAMESPACE_START
       char_type type1 = GetType(),
                 type2 = a_Val.GetType(); 
 
-    if (type1==type2 || IsScalar() && a_Val.IsScalar())
+    if (type1==type2 || (IsScalar() && a_Val.IsScalar()))
     {
       switch(GetType())
       {
@@ -272,7 +272,7 @@ MUP_NAMESPACE_START
     char_type type1 = GetType(),
               type2 = a_Val.GetType(); 
 
-    if (type1==type2 || IsScalar() && a_Val.IsScalar())
+    if (type1==type2 || (IsScalar() && a_Val.IsScalar()))
     {
       switch(GetType())
       {
@@ -308,7 +308,7 @@ MUP_NAMESPACE_START
     char_type type1 = GetType(),
               type2 = a_Val.GetType(); 
 
-    if (type1==type2 || IsScalar() && a_Val.IsScalar())
+    if (type1==type2 || (IsScalar() && a_Val.IsScalar()))
     {
       switch(GetType())
       {
@@ -344,7 +344,7 @@ MUP_NAMESPACE_START
     char_type type1 = GetType(),
               type2 = a_Val.GetType(); 
 
-    if (type1==type2 || IsScalar() && a_Val.IsScalar())
+    if (type1==type2 || (IsScalar() && a_Val.IsScalar()))
     {
       switch(GetType())
       {
@@ -380,7 +380,7 @@ MUP_NAMESPACE_START
     char_type type1 = GetType(),
               type2 = a_Val.GetType(); 
 
-    if (type1==type2 || IsScalar() && a_Val.IsScalar())
+    if (type1==type2 || (IsScalar() && a_Val.IsScalar()))
     {
       switch(GetType())
       {

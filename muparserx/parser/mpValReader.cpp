@@ -51,9 +51,8 @@ MUP_NAMESPACE_START
   {
     stringstream_type stream(a_szExpr + a_iPos);
     float_type fVal(0);
-    std::streamoff iStart(0), iEnd(0);
+    std::streamoff iEnd(0);
 
-    iStart = stream.tellg(); // Record position before reading
     stream >> fVal;
     iEnd = stream.tellg();   // Position after reading
 

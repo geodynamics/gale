@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <sstream>
 #include "mpMatrixError.h"
+#include <algorithm>
 
 
 MUP_NAMESPACE_START
@@ -32,38 +33,38 @@ MUP_NAMESPACE_START
 
     //---------------------------------------------------------------------------------------------
     Matrix()
-      :m_nRows(1)
-      ,m_nCols(1)
-      ,m_eStorageScheme(mssROWS_FIRST)
+      :m_nCols(1)
+      ,m_nRows(1)
       ,m_vData(1)
+      ,m_eStorageScheme(mssROWS_FIRST)
     {}
 
     //---------------------------------------------------------------------------------------------
     Matrix(int nRows, const T &value = T())
-      :m_nRows(nRows)
-      ,m_nCols(1)
-      ,m_eStorageScheme(mssROWS_FIRST)
+      :m_nCols(1)
+      ,m_nRows(nRows)
       ,m_vData(m_nRows, value)
+      ,m_eStorageScheme(mssROWS_FIRST)
     {}
 
     //---------------------------------------------------------------------------------------------
     /* \brief Constructs a Matrix object representing a scalar value
     */
     Matrix(const T &v)
-      :m_nRows(1)
-      ,m_nCols(1)
-      ,m_eStorageScheme(mssROWS_FIRST)
+      :m_nCols(1)
+      ,m_nRows(1)
       ,m_vData(1, v)
+      ,m_eStorageScheme(mssROWS_FIRST)
     {}
 
     //---------------------------------------------------------------------------------------------
     /* \brief Constructs a Matrix object representing a vector
     */
     Matrix(const std::vector<T> &v)
-      :m_nRows(v.size())
-      ,m_nCols(1)
-      ,m_eStorageScheme(mssROWS_FIRST)
+      :m_nCols(1)
+      ,m_nRows(v.size())
       ,m_vData(v)
+      ,m_eStorageScheme(mssROWS_FIRST)
     {}
 
     //---------------------------------------------------------------------------------------------
@@ -71,19 +72,19 @@ MUP_NAMESPACE_START
     */
     template<size_t TSize>
     Matrix(T (&v)[TSize])
-      :m_nRows(TSize)
-      ,m_nCols(1)
-      ,m_eStorageScheme(mssROWS_FIRST)
+      :m_nCols(1)
+      ,m_nRows(TSize)
       ,m_vData(v, v + TSize)
+      ,m_eStorageScheme(mssROWS_FIRST)
     {}
 
     //---------------------------------------------------------------------------------------------
     template<size_t TRows, size_t TCols>
     Matrix(T (&v)[TRows][TCols])
-      :m_nRows(TRows)
-      ,m_nCols(TCols)
-      ,m_eStorageScheme(mssROWS_FIRST)
+      :m_nCols(TCols)
+      ,m_nRows(TRows)
       ,m_vData(TRows*TCols, 0)
+      ,m_eStorageScheme(mssROWS_FIRST)
     {
       for (int m=0; m<TRows; ++m)
       {
@@ -96,10 +97,10 @@ MUP_NAMESPACE_START
 
     //---------------------------------------------------------------------------------------------
     Matrix(int nRows, int nCols, const T &value = T())
-      :m_nRows(nRows)
-      ,m_nCols(nCols)
-      ,m_eStorageScheme(mssROWS_FIRST)
+      :m_nCols(nCols)
+      ,m_nRows(nRows)
       ,m_vData(m_nRows*m_nCols, value)
+      ,m_eStorageScheme(mssROWS_FIRST)
     {}
 
     //---------------------------------------------------------------------------------------------
@@ -357,7 +358,7 @@ MUP_NAMESPACE_START
         return *this;
 
       m_eStorageScheme = (m_eStorageScheme==mssROWS_FIRST) ? mssCOLS_FIRST : mssROWS_FIRST;
-      m_nRows ^= m_nCols ^= m_nRows ^= m_nCols;
+      std::swap(m_nRows,m_nCols);
 
       return *this;
     }

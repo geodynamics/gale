@@ -52,7 +52,6 @@ MUP_NAMESPACE_START
 
     virtual void Eval(ptr_val_type &ret, const ptr_val_type *a_pArg, int a_iArgc)
     {
-      ParserXBase &parser = *GetParent();
       *ret = 0;
     }
 
@@ -1280,7 +1279,6 @@ MUP_NAMESPACE_START
   //---------------------------------------------------------------------------
   int ParserTester::ThrowTest(const string_type &a_sExpr, int a_nErrc, int a_nPos)
   {
-    bool a_bFail = true;
     ParserTester::c_iCount++;
     
     try
@@ -1558,7 +1556,6 @@ MUP_NAMESPACE_START
                     if (v1.IsMatrix())
                     {
 
-                      bool bCheck = true;
                       for (int i=0; i<v1.GetRows(); ++i)
                       {
                         if (!Check(v1.At(i), v2.At(i)))
