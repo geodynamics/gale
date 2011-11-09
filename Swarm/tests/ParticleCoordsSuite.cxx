@@ -104,9 +104,9 @@ void ParticleCoordsSuite_TestLineParticle( ParticleCoordsSuiteData* data ) {
 		Stg_Class_Delete( variable_Register );
 
 		remove( "linearParticle.dat" );
+                stgMainDestroy( cf );
 	}
 
-	stgMainDestroy( cf );
 }
 
 void ParticleCoordsSuite( pcu_suite_t* suite ) {
