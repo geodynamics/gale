@@ -65,7 +65,6 @@
 	#define __OneToManyMapper \
 		__IntegrationPointMapper \
 		\
-		Stream*				errorStream; \
 		IntegrationPointsSwarm*		swarm; \
                 Bool                            harmonic_average;
 

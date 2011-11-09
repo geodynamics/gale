@@ -109,7 +109,6 @@ void _OneToManyMapper_Init( void* mapper,
                             Bool harmonic_average ) {
 	OneToManyMapper* self = (OneToManyMapper*)mapper;
 
-	self->errorStream = Journal_MyStream( Error_Type, self );
 	self->swarm = swarm;
 	self->harmonic_average = harmonic_average;
 }
