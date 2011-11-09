@@ -206,7 +206,14 @@ void _InnerWallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"name") );
 				
 			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"type") );
-			if (0 == strcasecmp(valType, "func"))
+			if (strlen(valType)==0 || 0==strcasecmp(valType, "equation"))
+			{
+                          self->_entryTbl[entry_I].value.type = VC_ValueType_Equation;
+                          /* This leaks memory */
+                          self->_entryTbl[entry_I].value.as.equation=
+                            StG_Strdup(Dictionary_Entry_Value_AsString(valueEntry));
+                        }
+			else if (0 == strcasecmp(valType, "func"))
 			{
 				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
 				Index	cfIndex;
@@ -268,12 +275,8 @@ void _InnerWallVC_ReadDictionary( void* variableCondition, void* dictionary ) {
 				self->_entryTbl[entry_I].value.as.typePtr = (void*) ( (ArithPointer)Dictionary_Entry_Value_AsUnsignedInt( valueEntry ));
 			}
 			else {
-				/* Assume double */
-				Journal_DPrintf( 
-					Journal_Register( InfoStream_Type, (Name)"myStream"  ), 
-					"Type to variable on variable condition not given, assuming double\n" );
-				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
-				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
+                          Journal_Firewall(False,Journal_Register(Error_Type,InnerWallVC_Type),
+                                           "Unknown type for InnerWallVC: %s\n",valType);
 			}
 		}
 	}
@@ -377,6 +380,10 @@ void _InnerWallVC_Print(void* innerWallVC, Stream* stream)
 				Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_CFIndex\n");
 				Journal_Printf( info, "\t\t\t\tasCFIndex: %u\n", self->_entryTbl[entry_I].value.as.typeCFIndex);
 				break;
+                        case VC_ValueType_Equation:
+                          Journal_Printf( info, "\t\t\t\ttype: VC_ValueType_Equation\n");
+                          Journal_Printf( info, "\t\t\t\tasEquation: %s\n", self->_entryTbl[entry_I].value.as.equation);
+                          break;
 			}
 		}
 	Journal_Printf( info, "\t_mesh (ptr): %p\n", self->_mesh);

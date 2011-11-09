@@ -78,5 +78,6 @@
 */
 	#include "Init.h"
 	#include "Finalise.h"
+        #include "Equation.h"
 	
 #endif /* __StgDomain_Utils_Utils_h__ */
