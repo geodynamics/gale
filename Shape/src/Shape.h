@@ -47,6 +47,7 @@
 	#include "Sphere.h"
 	#include "Everywhere.h"
 	#include "PolygonShape.h"
+	#include "EquationShape.h"
 	#include "Union.h"
 	#include "Intersection.h"
 	#include "PythonShape.h"

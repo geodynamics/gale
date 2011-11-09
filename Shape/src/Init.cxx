@@ -48,6 +48,7 @@ Bool StgDomainShape_Init( int* argc, char** argv[] ) {
 	Stg_ComponentRegister_Add( componentRegister, ConvexHull_Type, (Name)"0", _ConvexHull_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, Sphere_Type, (Name)"0", _Sphere_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, PolygonShape_Type, (Name)"0", _PolygonShape_DefaultNew  );
+	Stg_ComponentRegister_Add( componentRegister, EquationShape_Type, (Name)"0", _EquationShape_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, Union_Type, (Name)"0", _Union_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, Intersection_Type, (Name)"0", _Intersection_DefaultNew  );
 	Stg_ComponentRegister_Add( componentRegister, Cylinder_Type, (Name)"0", _Cylinder_DefaultNew  );
@@ -66,7 +67,8 @@ Bool StgDomainShape_Init( int* argc, char** argv[] ) {
 	RegisterParent( Everywhere_Type,                Stg_Shape_Type );
 	RegisterParent( ConvexHull_Type,                Stg_Shape_Type );
 	RegisterParent( Sphere_Type,                    Stg_Shape_Type );
-	RegisterParent( PolygonShape_Type,                   Stg_Shape_Type );
+	RegisterParent( PolygonShape_Type,              Stg_Shape_Type );
+	RegisterParent( EquationShape_Type,             Stg_Shape_Type );
 	RegisterParent( Union_Type,                     Stg_Shape_Type );
 	RegisterParent( Intersection_Type,              Stg_Shape_Type );
 	RegisterParent( Cylinder_Type,                  Stg_Shape_Type );

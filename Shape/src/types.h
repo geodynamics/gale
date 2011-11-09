@@ -48,7 +48,8 @@
 	typedef struct Everywhere                   Everywhere;
 	typedef struct Box                          Box;
 	typedef struct Sphere                       Sphere;
-	typedef struct PolygonShape                      PolygonShape;
+	typedef struct PolygonShape                 PolygonShape;
+	typedef struct EquationShape                EquationShape;
 	typedef struct Union                        Union;
 	typedef struct Intersection                 Intersection;
 	typedef struct ConvexHull                   ConvexHull;
