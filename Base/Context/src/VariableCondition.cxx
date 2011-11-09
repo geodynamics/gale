@@ -41,6 +41,10 @@
 #include "ConditionFunction_Register.h"
 #include "VariableCondition.h"
 
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
+
 #include <string.h>
 #include <assert.h>
 
@@ -203,6 +207,10 @@ void _VariableCondition_Print(void* variableCondition) {
 				case VC_ValueType_CFIndex:
 					Journal_Printf( variableConditionStream, "\t\t\ttype: VC_ValueType_CFIndex\n");
 					Journal_Printf( variableConditionStream, "\t\t\tasCFIndex: %u\n", self->valueTbl[val_I].as.typeCFIndex);
+					break;
+				case VC_ValueType_Equation:
+					Journal_Printf( variableConditionStream, "\t\t\t\ttype: VC_ValueType_Equation\n");
+					Journal_Printf( variableConditionStream, "\t\t\t\tasEquation: %s\n", self->valueTbl[val_I].as.equation);
 					break;
 			}
 		}
@@ -447,6 +455,20 @@ void VariableCondition_ApplyToIndex( void* variableCondition, Index localIndex, 
 		
 		switch (self->valueTbl[val_I].type)
 		{
+			case VC_ValueType_Equation:
+                          {
+                            FeVariable *feVariable=(FeVariable*)FieldVariable_Register_GetByName
+                              (((FiniteElementContext*)context)->fieldVariable_Register, "VelocityField");
+                            FeMesh* mesh=feVariable->feMesh;
+                            assert( mesh != NULL );
+                            double* coord = Mesh_GetVertex( mesh, self->indexTbl[index] );
+                            Variable_SetValueDouble(var, 
+                                                    self->indexTbl[index], 
+                                                    Equation_eval(coord,(DomainContext*)context,
+                                                                  self->valueTbl[val_I].as.equation));
+                          }
+                          break;
+                          
 			case VC_ValueType_Double:
 				Journal_Firewall( var->dataTypeCounts[0] == 1, errorStr,
 					"Error - in %s: while applying values for variable condition "

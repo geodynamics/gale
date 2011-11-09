@@ -67,6 +67,7 @@
 		void*		typePtr;
 		VariableCondition_Value_Array typeArray;
 		ConditionFunction_Index typeCFIndex;
+                char*           equation;
 	} VariableCondition_Value_AsType;
 	
 	#define __VariableCondition_Value \

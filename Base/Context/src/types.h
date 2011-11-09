@@ -76,7 +76,8 @@
 		VC_ValueType_Char,
 		VC_ValueType_Ptr,
 		VC_ValueType_DoubleArray,
-		VC_ValueType_CFIndex
+		VC_ValueType_CFIndex,
+		VC_ValueType_Equation
 	} VariableCondition_ValueType;
 	
 	typedef Index					VariableCondition_Index;
