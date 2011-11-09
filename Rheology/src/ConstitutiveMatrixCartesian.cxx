@@ -276,6 +276,27 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
 
    oneToMany = Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)->mapper, OneToManyMapper_Type);
 
+   if(Stg_Class_IsInstance(((IntegrationPointsSwarm*)self->integrationSwarm)
+                           ->mapper,
+                           NearestNeighborMapper_Type))
+     {
+       IntegrationPointsSwarm*
+         NNswarm(((NearestNeighborMapper*)(((IntegrationPointsSwarm*)self
+                                            ->integrationSwarm)->mapper))->swarm);
+       
+       Cell_Index NNcell_I=CellLayout_MapElementIdToCellId(NNswarm->cellLayout,
+                                                           lElement_I);
+       Particle_InCellIndex NNcellParticleCount=
+         NNswarm->cellParticleCountTbl[NNcell_I];
+       for(cParticle_I=0; cParticle_I<NNcellParticleCount; cParticle_I++)
+         {
+           particle = (IntegrationPoint*)Swarm_ParticleInCellAt(NNswarm,NNcell_I,
+                                                                cParticle_I);
+           ConstitutiveMatrix_Assemble(constitutiveMatrix, lElement_I,
+                                       particle, NNswarm);
+         }
+     }
+
    /* Loop over points to build Stiffness Matrix */
    for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
      particle = (IntegrationPoint*)Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
@@ -359,12 +380,6 @@ void _ConstitutiveMatrixCartesian_AssembleElement(
      }
 
      eta = self->matrixData[2][2];
-
-       // std::cout << "eta "
-       //           << lElement_I << " "
-       //           << cParticle_I << " "
-       //           << eta << " "
-       //           << "\n";
 
      /* Turn D Matrix into D~ Matrix by multiplying in the weight and the detJac (this is a shortcut for speed) */
      ConstitutiveMatrix_MultiplyByValue( constitutiveMatrix, detJac * particle->weight );
