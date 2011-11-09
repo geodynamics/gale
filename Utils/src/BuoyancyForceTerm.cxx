@@ -50,7 +50,6 @@
 #include <PICellerator/PopulationControl/PopulationControl.h>
 #include <PICellerator/Weights/Weights.h>
 #include <PICellerator/MaterialPoints/MaterialPoints.h>
-#include "muParser.h"
 
 #include "types.h"
 #include "BuoyancyForceTerm.h"
@@ -63,6 +62,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stddef.h>
+#include <sstream>
 
 static std::vector<std::string> densities, alphas;
 
@@ -359,14 +359,6 @@ void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
 	_ForceTerm_Destroy( forceTerm, data );
 }
 
-mu::value_type* BuoyancyForceTerm_AddVariable(const mu::char_type *a_szName,
-                                              void *a_pUserData)
-{
-  static std::list<mu::value_type> variables;
-  variables.push_front(0);
-  return &(*(variables.begin()));
-}
-
 void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
 	BuoyancyForceTerm*               self               = (BuoyancyForceTerm*) forceTerm;
 	IntegrationPoint*                particle;
@@ -476,16 +468,14 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		density_equation = densities[material_index];
                 if(!density_equation.empty())
                   {
-                    mu::Parser d;
-                    d.DefineVar("T",&temperature);
-                    d.DefineVar("p",&pressure);
-                    d.SetVarFactory(BuoyancyForceTerm_AddVariable, &d);
-                    d.SetExpr(density_equation);
-                    density=d.Eval();
+                    std::stringstream ss;
 
-                    Journal_Printf(Journal_MyStream(Info_Type,self),
-                                   "Density Equation T=%g p=%g density=%g\n",
-                                    temperature,pressure,density);
+                    ss << "T=" << temperature
+                       << "; p=" << pressure
+                       << "; " << density_equation;
+                    density=Equation_eval(coord,
+                                          (DomainContext *)(self->context),
+                                          ss.str());
                   }
                 else
                   {
@@ -497,15 +487,14 @@ void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVect
 		alpha_equation = alphas[material_index];
                 if(!alpha_equation.empty())
                   {
-                    mu::Parser d;
-                    d.DefineVar("T",&temperature);
-                    d.DefineVar("p",&pressure);
-                    d.SetVarFactory(BuoyancyForceTerm_AddVariable, &d);
-                    d.SetExpr(alpha_equation);
-                    alpha=d.Eval();
-                    Journal_PrintfL(Journal_MyStream(Debug_Type,self),3,
-                                    "Alpha Equation T=%g p=%g alpha=%g\n",
-                                    temperature,pressure,alpha);
+                    std::stringstream ss;
+
+                    ss << "T=" << temperature
+                       << "; p=" << pressure
+                       << "; " << density_equation;
+                    alpha=Equation_eval(coord,
+                                        (DomainContext *)(self->context),
+                                        ss.str());
                   }
                 else
                   {

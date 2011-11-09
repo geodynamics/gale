@@ -55,7 +55,6 @@
 #include <string>
 #include "HydrostaticTerm.h"
 #include "MaterialSwarmVariable.h"
-#include "muParser.h"
 
 #include <assert.h>
 #include <string.h>
@@ -350,27 +349,12 @@ double HydrostaticTerm_Temperature(void* forceTerm, Coord coord)
   return T;
 }
 
-mu::value_type* HydrostaticTerm_AddVariable(const mu::char_type *a_szName,
-                                            void *a_pUserData)
-{
-  static std::list<mu::value_type> variables;
-  variables.push_front(0);
-  return &(*(variables.begin()));
-}
-
 double HydrostaticTerm_Density( void* forceTerm, Coord coord)
 {
   HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
   if(self->density_equation!=NULL && strlen(self->density_equation)!=0)
     {
-      mu::Parser d;
-      d.DefineVar("x", coord); 
-      d.DefineVar("y", coord+1); 
-      d.DefineVar("z", coord+2); 
-      d.DefineVar("t", &(self->context->currentTime));
-      d.SetVarFactory(HydrostaticTerm_AddVariable, &d);
-      d.SetExpr(self->density_equation);
-      return d.Eval();
+      return Equation_eval(coord,(DomainContext*)(self->context),self->density_equation);
     }
   else
     {
@@ -418,14 +402,7 @@ double HydrostaticTerm_Pressure( void* forceTerm, Coord coord)
   HydrostaticTerm *self=(HydrostaticTerm *)forceTerm;
   if(self->pressure_equation!=NULL && strlen(self->pressure_equation)!=0)
     {
-      mu::Parser p;
-      p.DefineVar("x", coord); 
-      p.DefineVar("y", coord+1); 
-      p.DefineVar("z", coord+2); 
-      p.DefineVar("t", &(self->context->currentTime));
-      p.SetVarFactory(HydrostaticTerm_AddVariable, &p);
-      p.SetExpr(self->pressure_equation);
-      return p.Eval();
+      return Equation_eval(coord,(DomainContext*)(self->context),self->pressure_equation);
     }
   else
     {
