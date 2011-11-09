@@ -52,6 +52,7 @@
 const Type Mesh_HexType_Type = "Mesh_HexType";
 
 const int max_vertices(27);
+const int cube_vertices(8);
 
 /*----------------------------------------------------------------------------------------------------------------------------------
 ** Constructors
@@ -90,7 +91,7 @@ Mesh_HexType* _Mesh_HexType_New(  MESH_HEXTYPE_DEFARGS  ) {
 void _Mesh_HexType_Init( Mesh_HexType* self ) {
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
 
-	self->vertMap = AllocArray( unsigned, max_vertices );
+	self->vertMap = AllocArray( unsigned, cube_vertices );
 	self->inc = AllocArray( unsigned, max_vertices );
 	Mesh_HexType_SetVertexMap( self );
 
@@ -298,7 +299,7 @@ void Mesh_HexType_SetVertexMap( void* hexType ) {
 
   assert( self && Stg_CheckType( self, Mesh_HexType ) );
 
-  for( v_i = 0; v_i < max_vertices; v_i++ )
+  for( v_i = 0; v_i < cube_vertices; v_i++ )
     self->vertMap[v_i] = v_i;
 }
 
@@ -310,7 +311,7 @@ void Mesh_HexType_SetQ2Inds( void* hexType) {
   unsigned index_map[]={0,1,3,4,9,10,12,13};
 
   /* Set vertmap so that MinimumSeparation will work */
-  for(int i=0; i<max_vertices; i++)
+  for(int i=0; i<cube_vertices; i++)
     self->vertMap[i] = index_map[i];
 }
 
