@@ -359,170 +359,209 @@ void _BuoyancyForceTerm_Destroy( void* forceTerm, void* data ) {
 	_ForceTerm_Destroy( forceTerm, data );
 }
 
-void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
-	BuoyancyForceTerm*               self               = (BuoyancyForceTerm*) forceTerm;
-	IntegrationPoint*                particle;
-	Particle_InCellIndex             cParticle_I;
-	Particle_InCellIndex             cellParticleCount;
-	Element_NodeIndex                elementNodeCount;
-	Dimension_Index                  dim                = forceVector->dim;
-	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
-	FeMesh*              mesh               = forceVector->feVariable->feMesh;
-	Node_ElementLocalIndex           eNode_I;
-	Cell_Index                       cell_I;
-	ElementType*                     elementType;
-	Dof_Index                        nodeDofCount;
-	double                           gravity;
-	double                           detJac             = 0.0;
-	double                           factor;
-	double                           Ni[27];
-	double                           force;
-	double*                          xi;
-#if 0
-	BuoyancyForceTerm_MaterialExt*   materialExt;
-	Material*                        material;
-#endif
-	FeVariable*                      temperatureField   = self->temperatureField;
-	double                           temperature        = 0.0;
-	FeVariable*                      pressureField   = self->pressureField;
-	double                           pressure        = 0.0;
-        double                           background_density = 0.0;
-	double*				 gHat;
-	unsigned			d_i;
+void _BuoyancyForceTerm_AssembleElement(void* forceTerm,
+                                        ForceVector* forceVector,
+                                        Element_LocalIndex lElement_I,
+                                        double* elForceVec)
+{
+  BuoyancyForceTerm* self = (BuoyancyForceTerm*) forceTerm;
+  IntegrationPoint* particle;
+  Particle_InCellIndex cParticle_I;
+  Particle_InCellIndex cellParticleCount;
+  Element_NodeIndex elementNodeCount;
+  Dimension_Index dim = forceVector->dim;
+  IntegrationPointsSwarm* swarm=(IntegrationPointsSwarm*)self->integrationSwarm;
+  FeMesh* mesh = forceVector->feVariable->feMesh;
+  Node_ElementLocalIndex eNode_I;
+  Cell_Index cell_I;
+  ElementType* elementType;
+  Dof_Index nodeDofCount;
+  double gravity;
+  double detJac             = 0.0;
+  double factor;
+  double Ni[27];
+  double force;
+  double* xi;
+  FeVariable* temperatureField = self->temperatureField;
+  double temperature = 0.0;
+  FeVariable* pressureField = self->pressureField;
+  double pressure = 0.0;
+  double background_density = 0.0;
+  double* gHat;
+  unsigned d_i;
 
-	double totalWeight = 0.0;
-	double adjustFactor = 0.0;
-	double density;
-	double alpha;
-        std::string density_equation, alpha_equation;
+  double totalWeight = 0.0;
+  double adjustFactor = 0.0;
+  double density;
+  double alpha;
+  std::string density_equation, alpha_equation;
 
-	elementType       = FeMesh_GetElementType( mesh, lElement_I );
-	elementNodeCount  = elementType->nodeCount;
-	nodeDofCount      = dim;
-	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	cellParticleCount = swarm->cellParticleCountTbl[cell_I];
-	gHat		  = self->gHat;
+  elementType = FeMesh_GetElementType( mesh, lElement_I );
+  elementNodeCount = elementType->nodeCount;
+  nodeDofCount = dim;
+  cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+  cellParticleCount = swarm->cellParticleCountTbl[cell_I];
+  gHat = self->gHat;
 
-	/* adjust & adjustFactor -- 20060411 Alan
-	 *
-	 * The adjust decides whether an adjustFactor should be applied to the resulting factor.
-	 * If on, the total weight of the particles in the cell are scaled to the cell local volume.
-	 *
-	 * This is designed to be used when integrating with swarms which do not cover the whole domain
-	 * (ie - I used it to do dave.m's test of 1 swarm for blob, 1 swarm for background)
-	 */ 
-	if ( self->adjust ) {
-		for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-			particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
-			totalWeight += particle->weight;
-		}
-		adjustFactor = swarm->weights->cellLocalVolume / totalWeight;
-	}
-	else {
-		adjustFactor = 1.0;
-	}
+  /* adjust & adjustFactor -- 20060411 Alan
+   *
+   * The adjust decides whether an adjustFactor should be applied to
+   * the resulting factor.  If on, the total weight of the particles
+   * in the cell are scaled to the cell local volume.
+   *
+   * This is designed to be used when integrating with swarms which do
+   * not cover the whole domain (ie - I used it to do dave.m's test of
+   * 1 swarm for blob, 1 swarm for background)
+   */ 
+  if (self->adjust)
+    {
+      for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ )
+        {
+          particle=(IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,
+                                                             cParticle_I);
+          totalWeight += particle->weight;
+        }
+      adjustFactor = swarm->weights->cellLocalVolume / totalWeight;
+    }
+  else
+    {
+      adjustFactor = 1.0;
+    }
 
-	for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-          Coord coord;
-		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
-		xi       = particle->xi;
+  /* Use an average density and alpha for OneToMany mapper */
+  bool one_to_many=Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type);
+  if(one_to_many)
+    {
+      OneToManyMapper *mapper=(OneToManyMapper*)(swarm->mapper);
+      IntegrationPointsSwarm* OneToMany_swarm=mapper->swarm;
+      int OneToMany_cell=
+        CellLayout_MapElementIdToCellId(OneToMany_swarm->cellLayout,
+                                        lElement_I);
+      int num_particles=OneToMany_swarm->cellParticleCountTbl[OneToMany_cell];
 
-		detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, xi, dim );
-		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
+      for(int ii=0;ii<num_particles;++ii)
+        {
+          IntegrationPoint *OneToMany_particle=
+            (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_swarm,
+                                                      OneToMany_cell,ii);
+          density=IntegrationPointMapper_GetDoubleFromMaterial
+            (OneToMany_swarm->mapper, OneToMany_particle,
+             self->materialExtHandle,
+             offsetof(BuoyancyForceTerm_MaterialExt, density));
+          alpha = IntegrationPointMapper_GetDoubleFromMaterial
+            (OneToMany_swarm->mapper, OneToMany_particle,
+             self->materialExtHandle,
+             offsetof(BuoyancyForceTerm_MaterialExt, alpha));
+        }
+    }
 
-		/* Get parameters */
-		if(temperatureField) 
-                  FeVariable_InterpolateFromMeshLocalCoord
-                    (temperatureField, mesh, lElement_I, xi, &temperature);
+  for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
+    Coord coord;
+    particle=(IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,
+                                                       cParticle_I);
+    xi=particle->xi;
 
-		if(pressureField)
-                  FeVariable_InterpolateFromMeshLocalCoord
-                    (pressureField, mesh, lElement_I, xi, &pressure);
+    detJac=ElementType_JacobianDeterminant(elementType,mesh,lElement_I,xi,dim);
+    ElementType_EvaluateShapeFunctionsAt(elementType,xi,Ni);
 
-                if(self->hydrostaticTerm)
-                  {
-                    FeMesh_CoordLocalToGlobal(mesh, cell_I, xi, coord);
-                    background_density=
-                      HydrostaticTerm_Density(self->hydrostaticTerm,coord);
-                    if(pressureField)
-                      pressure+=HydrostaticTerm_Pressure(self->hydrostaticTerm,
-                                                         coord);
-                  }
+    /* Get parameters */
+    if(temperatureField) 
+      FeVariable_InterpolateFromMeshLocalCoord
+        (temperatureField, mesh, lElement_I, xi, &temperature);
 
-                /* Handle case where we are using gauss swarms with
-                   NearestNeighborMapper instead of a material
-                   swarm */
-                IntegrationPointsSwarm* NNswarm(swarm);
-                IntegrationPoint* NNparticle(particle);
-                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+    if(pressureField)
+      FeVariable_InterpolateFromMeshLocalCoord
+        (pressureField, mesh, lElement_I, xi, &pressure);
 
-                /* Get density and alpha */
-                unsigned int material_index=
-                  IntegrationPointMapper_GetMaterialIndexOn(NNswarm->mapper,
-                                                            NNparticle);
-                Journal_Firewall(material_index<densities.size()
-                                 && material_index<alphas.size(),
-                                 Journal_MyStream(Error_Type,self),
-                                 "Bad material index %d",material_index);
+    if(self->hydrostaticTerm)
+      {
+        FeMesh_CoordLocalToGlobal(mesh, cell_I, xi, coord);
+        background_density=
+          HydrostaticTerm_Density(self->hydrostaticTerm,coord);
+        if(pressureField)
+          pressure+=HydrostaticTerm_Pressure(self->hydrostaticTerm,
+                                             coord);
+      }
 
-		density_equation = densities[material_index];
-                if(!density_equation.empty())
-                  {
-                    std::stringstream ss;
+    if(!one_to_many)
+      {
+        /* Handle case where we are using gauss swarms with
+           NearestNeighborMapper instead of a material
+           swarm */
+        IntegrationPointsSwarm* NNswarm(swarm);
+        IntegrationPoint* NNparticle(particle);
+        NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
-                    ss << "T=" << temperature
-                       << "; p=" << pressure
-                       << "; " << density_equation;
-                    density=Equation_eval(coord,
-                                          (DomainContext *)(self->context),
-                                          ss.str());
-                  }
-                else
-                  {
-                    density = IntegrationPointMapper_GetDoubleFromMaterial
-                      (NNswarm->mapper, NNparticle, self->materialExtHandle,
-                       offsetof(BuoyancyForceTerm_MaterialExt, density));
-                  }
+        /* Get density and alpha */
+        unsigned int material_index=
+          IntegrationPointMapper_GetMaterialIndexOn(NNswarm->mapper,
+                                                    NNparticle);
+        Journal_Firewall(material_index<densities.size()
+                         && material_index<alphas.size(),
+                         Journal_MyStream(Error_Type,self),
+                         "Bad material index %d",material_index);
 
-		alpha_equation = alphas[material_index];
-                if(!alpha_equation.empty())
-                  {
-                    std::stringstream ss;
+        density_equation = densities[material_index];
+        if(!density_equation.empty())
+          {
+            std::stringstream ss;
 
-                    ss << "T=" << temperature
-                       << "; p=" << pressure
-                       << "; " << density_equation;
-                    alpha=Equation_eval(coord,
-                                        (DomainContext *)(self->context),
-                                        ss.str());
-                  }
-                else
-                  {
-                    alpha = IntegrationPointMapper_GetDoubleFromMaterial
-                      (NNswarm->mapper, NNparticle, self->materialExtHandle,
-                       offsetof(BuoyancyForceTerm_MaterialExt, alpha));
-                  }
+            ss << "T=" << temperature
+               << "; p=" << pressure
+               << "; " << density_equation;
+            density=Equation_eval(coord,
+                                  (DomainContext *)(self->context),
+                                  ss.str());
+          }
+        else
+          {
+            density = IntegrationPointMapper_GetDoubleFromMaterial
+              (NNswarm->mapper, NNparticle, self->materialExtHandle,
+               offsetof(BuoyancyForceTerm_MaterialExt, density));
+          }
 
-		/* Calculate Force */
-		gravity = BuoyancyForceTerm_CalcGravity(self,(Swarm*)NNswarm,
-                                                        lElement_I,NNparticle);
-                force=gravity*(density*(1.0-alpha*temperature)
-                               - background_density);
-		factor = detJac * particle->weight * adjustFactor * force;
+        alpha_equation = alphas[material_index];
+        if(!alpha_equation.empty())
+          {
+            std::stringstream ss;
 
-		/* Apply force in the correct direction */
-		for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) {
-			if( gHat ) {
-				for( d_i = 0; d_i < dim; d_i++ )
-					elForceVec[ eNode_I * nodeDofCount + d_i ] += gHat[d_i] * factor * Ni[ eNode_I ] ;
-			}
-			else {
-				elForceVec[ eNode_I * nodeDofCount + J_AXIS ] += -1.0 * factor * Ni[ eNode_I ] ;
+            ss << "T=" << temperature
+               << "; p=" << pressure
+               << "; " << density_equation;
+            alpha=Equation_eval(coord,
+                                (DomainContext *)(self->context),
+                                ss.str());
+          }
+        else
+          {
+            alpha = IntegrationPointMapper_GetDoubleFromMaterial
+              (NNswarm->mapper, NNparticle, self->materialExtHandle,
+               offsetof(BuoyancyForceTerm_MaterialExt, alpha));
+          }
+      }
+    /* Calculate Force */
+    gravity = BuoyancyForceTerm_CalcGravity(self,(Swarm*)swarm,lElement_I,
+                                            particle);
+    force=gravity*(density*(1.0-alpha*temperature)
+                   - background_density);
+    factor = detJac * particle->weight * adjustFactor * force;
 
-			}
-		}
-	}
-	
+    /* Apply force in the correct direction */
+    for(eNode_I=0; eNode_I<elementNodeCount; eNode_I++)
+      {
+        if(gHat)
+          {
+            for(d_i=0; d_i<dim; d_i++)
+              elForceVec[ eNode_I * nodeDofCount + d_i ] +=
+                gHat[d_i] * factor * Ni[ eNode_I ] ;
+          }
+        else
+          {
+            elForceVec[ eNode_I * nodeDofCount + J_AXIS ] +=
+              -1.0 * factor * Ni[ eNode_I ] ;
+          }
+      }
+  }
 }
 
 /* The default implementation is for the gravity to be constant. */
