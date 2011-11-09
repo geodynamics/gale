@@ -232,7 +232,8 @@ namespace {
       }
 
     std::string temp_str(direction + std::string("_type"));
-    type=Stg_ComponentFactory_GetString( cf, self->name, temp_str.c_str(), "");
+    type=Stg_ComponentFactory_GetString(cf,self->name,temp_str.c_str(),
+                                        "equation");
     temp_str=direction+std::string("_value");
 
     if(!strcasecmp(type,"double") || !strcasecmp(type,"float"))
@@ -241,6 +242,19 @@ namespace {
         self->_entryTbl[self->numEntries].DoubleValue =
           Stg_ComponentFactory_GetDouble( cf, self->name, temp_str.c_str(), 0.0);
         (self->numEntries)++;
+      }
+    else if (strlen(type)==0 || 0==strcasecmp(type, "equation"))
+      {
+        char *equation=Stg_ComponentFactory_GetString(cf,self->name,
+                                                      temp_str.c_str(),"");
+        if(strlen(equation)!=0)
+          {
+            self->_entryTbl[self->numEntries].type = StressBC_Equation;
+            /* This leaks memory */
+            self->_entryTbl[self->numEntries].equation =
+              StG_Strdup(equation);
+            (self->numEntries)++;
+          }
       }
     else if(!strcasecmp(type,"func"))
       {
@@ -271,7 +285,7 @@ namespace {
       {
         Stream* errorStr = Journal_Register( Error_Type, self->type );
         Journal_Firewall( 0, errorStr, "Error- in %s: While parsing "
-                          "definition of StressBC (applies to wall \"%s\"), the type of condition \"%s\"\nis not supported.  Supported types are \"double\" and \"function\".",
+                          "definition of StressBC (applies to wall \"%s\"), the type of condition \"%s\"\nis not supported.  Supported types are \"equation\", \"double\" and \"func\".",
                           __func__, WallEnumToStr[self->_wall],
                           type );
       }
@@ -412,6 +426,11 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                     {
                     case StressBC_Double:
                       stress=self->_entryTbl[entry_I].DoubleValue;
+                      break;
+                    case StressBC_Equation:
+                      stress=Equation_eval(global_coord,
+                                           (DomainContext*)(self->context),
+                                           self->_entryTbl[entry_I].equation);
                       break;
                     case StressBC_ConditionFunction:
                       cf=self->conFunc_Register->

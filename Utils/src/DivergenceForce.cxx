@@ -167,13 +167,22 @@ void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, 
 	_ForceTerm_AssignFromXML( self, cf, data );
 
 	domainShape =  Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "DomainShape", Stg_Shape,  True, data  ) ;
-        type = Stg_ComponentFactory_GetString( cf, self->name, "force_type", "");
+        type = Stg_ComponentFactory_GetString(cf, self->name, "force_type",
+                                              "equation");
 
         if(!strcasecmp(type,"double") || !strcasecmp(type,"float"))
           {
             force.type = StressBC_Double;
             force.DoubleValue =
               Stg_ComponentFactory_GetDouble( cf, self->name, "force_value", 0.0);
+          }
+        else if (strlen(type)==0 || 0==strcasecmp(type, "equation"))
+          {
+            force.type = StressBC_Equation;
+            /* This leaks memory */
+            force.equation =
+              StG_Strdup(Stg_ComponentFactory_GetString(cf,self->name,
+                                                        "force_value",""));
           }
         else if(!strcasecmp(type,"func"))
           {
@@ -199,19 +208,11 @@ void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, 
             }
             force.CFIndex = cfIndex;
           }
-        else if(strlen(type)==0)
-          {
-            Stream* errorStr = Journal_Register( Error_Type, self->type );
-            Journal_Printf( errorStr, "Error- in %s: While parsing "
-                            "definition of DivergenceForce, force_type is not specified.\nSupported types are \"double\" and \"func\".\n",
-                            __func__);
-            assert(0);
-          }
         else
           {
             Stream* errorStr = Journal_Register( Error_Type, self->type );
             Journal_Printf( errorStr, "Error- in %s: While parsing "
-                            "definition of DivergenceForce, the type of condition \"%s\"\nis not supported.  Supported types are \"double\" and \"func\".\n",
+                            "definition of DivergenceForce, the type of condition \"%s\"\nis not supported.  Supported types are \"equation\", \"double\" and \"func\".\n",
                             __func__, type );
             assert(0);
           }
@@ -282,6 +283,11 @@ void _DivergenceForce_AssembleElement( void* forceTerm,
                 {
                 case StressBC_Double:
                   force=self->force.DoubleValue;
+                  break;
+                case StressBC_Equation:
+                  force=Equation_eval(global_coord,
+                                      (DomainContext*)(self->context),
+                                      self->force.equation);
                   break;
                 case StressBC_ConditionFunction:
             

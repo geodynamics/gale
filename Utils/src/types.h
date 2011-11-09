@@ -62,6 +62,7 @@
 typedef enum
   {
     StressBC_Double,
+    StressBC_Equation,
     StressBC_ConditionFunction,
     StressBC_HydrostaticTerm
   } StressBC_Types;
@@ -73,6 +74,7 @@ typedef struct
   Index CFIndex;
   unsigned int direction;
   HydrostaticTerm *hydrostaticTerm;
+  char *equation;
 } StressBC_Entry;
 
 /* Wall types */
