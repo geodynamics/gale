@@ -30,6 +30,8 @@ boost::filesystem::path parse_json(const boost::filesystem::path &filename)
                 throw
                   std::runtime_error("The field 'outputPath' must be a string");
               xml_name=i->value_.get_str() / xml_name;
+              if(!boost::filesystem::exists(i->value_.get_str()))
+                boost::filesystem::create_directories(i->value_.get_str());
               break;
             }
         }
