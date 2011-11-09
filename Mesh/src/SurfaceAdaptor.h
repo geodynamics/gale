@@ -46,17 +46,6 @@
 
 	/** Virtual function types */
 
-	/** SurfaceAdaptor class contents */
-	typedef enum {
-		SurfaceAdaptor_SurfaceType_Wedge, 
-		SurfaceAdaptor_SurfaceType_Plateau, 
-		SurfaceAdaptor_SurfaceType_Topo_Data, 
-		SurfaceAdaptor_SurfaceType_Sine, 
-		SurfaceAdaptor_SurfaceType_Cosine, 
-		SurfaceAdaptor_SurfaceType_Cylinder,
-		SurfaceAdaptor_SurfaceType_Invalid
-	} SurfaceAdaptor_SurfaceType;
-
 	typedef struct {
 				/* these vectors represent things in the x-axis and z-axis */
               double	offs[2];
@@ -93,6 +82,7 @@
                 SurfaceAdaptor_Topo_DataInfo    topo_data;
 		SurfaceAdaptor_TrigInfo		trig;
 		SurfaceAdaptor_CylinderInfo	cylinder;
+                char *equation;
 	} SurfaceAdaptor_SurfaceInfo;
 
         typedef double (SurfaceAdaptor_DeformFunc)( SurfaceAdaptor_SurfaceInfo* self,
@@ -108,8 +98,6 @@
 		/* Virtual info */				\
 								\
 		/* SurfaceAdaptor info */			\
-		SurfaceAdaptor_SurfaceType	topSurfaceType;	\
-		SurfaceAdaptor_SurfaceType	bottomSurfaceType;	\
 		SurfaceAdaptor_SurfaceInfo	top_info;       \
 		SurfaceAdaptor_SurfaceInfo	bottom_info;    \
                 SurfaceAdaptor_DeformFunc       *topDeformFunc; \
@@ -161,6 +149,8 @@
 	** Private Member functions
 	*/
 
+	double SurfaceAdaptor_Equation( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
+				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 	double SurfaceAdaptor_Wedge( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
 				     unsigned* globalSize, unsigned vertex, unsigned* vertexInds );
 	double SurfaceAdaptor_Plateau( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 

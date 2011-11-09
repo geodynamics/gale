@@ -40,6 +40,7 @@
 #include <StgDomain/Geometry/Geometry.h>
 #include <StgDomain/Shape/Shape.h>
 #include <StgDomain/Mesh/Mesh.h>
+#include <StgDomain/Utils/Utils.h>
 
 #include "types.h"
 #include "shortcuts.h"
@@ -53,6 +54,7 @@
 #include "MeshAdaptor.h"
 #include "SurfaceAdaptor.h"
 #include "Remesher.h"
+#include <list>
 
 /* Textual name of this class */
 const Type SurfaceAdaptor_Type = "SurfaceAdaptor";
@@ -100,8 +102,6 @@ SurfaceAdaptor* _SurfaceAdaptor_New(  SURFACEADAPTOR_DEFARGS  ) {
 }
 
 void _SurfaceAdaptor_Init( SurfaceAdaptor* self ) {
-	self->topSurfaceType = SurfaceAdaptor_SurfaceType_Invalid;
-	self->bottomSurfaceType = SurfaceAdaptor_SurfaceType_Invalid;
 	memset( &self->top_info, 0, sizeof(SurfaceAdaptor_SurfaceInfo ));
 	memset( &self->bottom_info, 0, sizeof(SurfaceAdaptor_SurfaceInfo));
         self->topDeformFunc=self->bottomDeformFunc=NULL;
@@ -129,11 +129,10 @@ void _SurfaceAdaptor_Print( void* adaptor, Stream* stream ) {
 
 void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
                                            Name name,
-                                           SurfaceAdaptor_SurfaceType *surfaceType,
                                            Dictionary* dict,
                                            SurfaceAdaptor_SurfaceInfo *info,
                                            SurfaceAdaptor_DeformFunc **deformFunc,
-                                           char *surface);
+                                           const std::string &surface);
 
 void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, void* data ) {
 	SurfaceAdaptor*	self = (SurfaceAdaptor*)adaptor;
@@ -149,238 +148,182 @@ void _SurfaceAdaptor_AssignFromXML( void* adaptor, Stg_ComponentFactory* cf, voi
 	dict = Dictionary_Entry_Value_AsDictionary( Dictionary_Get( cf->componentDict, (Dictionary_Entry_Key)self->name )  );
 
         self->topDeformFunc=self->bottomDeformFunc=NULL;
-        char surface[100];
         _SurfaceAdaptor_AssignFromXML_Surface(cf,self->name,
-                                              &(self->topSurfaceType),
                                               dict,
                                               &(self->top_info),
                                               &(self->topDeformFunc),
-                                              strcpy(surface,"top"));
+                                              "top");
         _SurfaceAdaptor_AssignFromXML_Surface(cf,self->name,
-                                              &(self->bottomSurfaceType),
                                               dict,
                                               &(self->bottom_info),
                                               &(self->bottomDeformFunc),
-                                              strcpy(surface,"bottom"));
+                                              "bottom");
 }
 
 void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
                                            Name name,
-                                           SurfaceAdaptor_SurfaceType *surfaceType,
                                            Dictionary* dict,
                                            SurfaceAdaptor_SurfaceInfo *info,
                                            SurfaceAdaptor_DeformFunc **deformFunc,
-                                           char *surface)
+                                           const std::string &surface)
 {
-  char temp[100];
-  char *surfaceName;
-  strcpy(temp,surface);
+  std::string surfaceName;
   /* What kind of surface do we want? */
   surfaceName = 
-    Stg_ComponentFactory_GetString( cf, name,
-                                    (Dictionary_Entry_Key)strcat(temp,"SurfaceType"), ""  );
-  if( !strcmp( surfaceName, "wedge" ) ) {
-    *surfaceType = SurfaceAdaptor_SurfaceType_Wedge;
-    *deformFunc = SurfaceAdaptor_Wedge ;
-    strcpy(temp,surface);
-    info->wedge.offs[0] =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"BeginOffset"), 0.0  );
-    strcpy(temp,surface);
-    info->wedge.endOffs[0] =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"EndOffset"), 1.0  );
-    strcpy(temp,surface);
-    info->wedge.grad[0] = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"Gradient"), 0.5  );
-    /* get the parameters for the z-axis */
-    strcpy(temp,surface);
-    info->wedge.offs[1] = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"BeginOffsetZ"), 0.0  );
-    strcpy(temp,surface);
-    info->wedge.endOffs[1] = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"EndOffsetZ"), 1.0  );
-    strcpy(temp,surface);
-    info->wedge.grad[1] = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"GradientZ"), 0.5  );
-  }
-  else if( !strcmp( surfaceName, "plateau" ) ) {
-    *surfaceType = SurfaceAdaptor_SurfaceType_Plateau;
-    *deformFunc = SurfaceAdaptor_Plateau;
-    strcpy(temp,surface);
-    info->plateau.x1 =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"X1"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.x2 = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"X2"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.x3 = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"X3"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.x4 = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"X4"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.z1 = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"Z1"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.z2 = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"Z2"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.z3 = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"Z3"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.z4 = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"Z4"), 0.0 );
-    strcpy(temp,surface);
-    info->plateau.height =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"Height"), 0.0 );
-  }
-  else if( !strcmp( surfaceName, "topo_data" ) ) {
-    FILE *fp;
-    char* surfaceFileName;
-    int i,j,ii,jj;
-    *surfaceType = SurfaceAdaptor_SurfaceType_Topo_Data;
-    *deformFunc = SurfaceAdaptor_Topo_Data;
-    strcpy(temp,surface);
-    surfaceFileName =
-      Stg_ComponentFactory_GetString( cf, name,
-                                      strcat(temp,"SurfaceName"),
-                                      "ascii_topo" );
-    strcpy(temp,surface);
-    info->topo_data.nx =
-      Stg_ComponentFactory_GetInt( cf, name,
-                                   strcat(temp,"Nx"), 0 );
-    strcpy(temp,surface);
-    info->topo_data.nz = 
-      Stg_ComponentFactory_GetInt( cf, name,
-                                   strcat(temp,"Nz"), 1 );
-    strcpy(temp,surface);
-    info->topo_data.minX = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"MinX"), 0 );
-    strcpy(temp,surface);
-    info->topo_data.minZ = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"MinZ"), 0 );
-    strcpy(temp,surface);
-    info->topo_data.maxX = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"MaxX"), 0 );
-    strcpy(temp,surface);
-    info->topo_data.maxZ =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      strcat(temp,"MaxZ"), 0 );
-    info->topo_data.dx=
-      (info->topo_data.maxX-info->topo_data.minX)
-      /(info->topo_data.nx-1);
-    info->topo_data.dz=
-      (info->topo_data.maxZ-info->topo_data.minZ)
-      /(info->topo_data.nz-1);
-    info->topo_data.heights=
-      (double*)malloc(sizeof(double)*info->topo_data.nx
-                      *info->topo_data.nz);
-    fp=fopen(surfaceFileName,"r");
-    if(!fp)
-      {
-        printf("Can not open the file %s\n",surfaceFileName);
-        abort();
-      }
-    for(i=0;i<info->topo_data.nx;++i)
-      for(j=0;j<info->topo_data.nz;++j)
+    Stg_ComponentFactory_GetString(cf, name,
+                                   (surface+"SurfaceType").c_str(),"");
+  if(surfaceName.empty() || surfaceName=="equation")
+    {
+      char *equation=Stg_ComponentFactory_GetString(cf,name,(surface+"Equation").c_str(),"");
+      if(strlen(equation)!=0)
         {
-          float h;
-          fscanf(fp,"%d %d %f",&ii,&jj,&h);
-          info->topo_data.heights[ii+info->topo_data.nx*jj]=h;
+          *deformFunc = SurfaceAdaptor_Equation;
+          /* This will never get free'd */
+          info->equation=StG_Strdup(equation);
         }
-    fclose(fp);
-  }
-  else if( !strcmp( surfaceName, "sine" )
-           || !strcmp( surfaceName, "cosine" ) ) {
-    Dictionary_Entry_Value*	originList;
-
-    if( !strcmp( surfaceName, "sine" ) )
-      {
-        *surfaceType = SurfaceAdaptor_SurfaceType_Sine;
-        *deformFunc = SurfaceAdaptor_Sine;
-      }
-    else
-      {
-        *surfaceType = SurfaceAdaptor_SurfaceType_Cosine;
-        *deformFunc = SurfaceAdaptor_Cosine;
-      }
-    strcpy(temp,surface);
-    originList =
-      Dictionary_Get( dict, (Dictionary_Entry_Key)strcat(temp,"Origin") );
-    if( originList ) {
-      unsigned	nDims;
-      unsigned	d_i;
-
-      nDims = Dictionary_Entry_Value_GetCount( originList );
-      for( d_i = 0; d_i < nDims; d_i++  ) {
-        Dictionary_Entry_Value*	val;
-
-        val = Dictionary_Entry_Value_GetElement( originList, d_i );
-        info->trig.origin[d_i] = Dictionary_Entry_Value_AsDouble( val );
-      }
     }
-    else
-      memset( info->trig.origin, 0, sizeof(double) * 2 );
+  else if(surfaceName=="wedge")
+    {
+      *deformFunc = SurfaceAdaptor_Wedge ;
+      info->wedge.offs[0] =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"BeginOffset").c_str(),
+                                       0.0);
+      info->wedge.endOffs[0] =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"EndOffset").c_str(),
+                                       1.0);
+      info->wedge.grad[0] = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Gradient").c_str(),0.5);
+      /* get the parameters for the z-axis */
+      info->wedge.offs[1] = 
+        Stg_ComponentFactory_GetDouble(cf,name,
+                                       (surface+"BeginOffsetZ").c_str(),0.0);
+      info->wedge.endOffs[1] = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"EndOffsetZ").c_str(),
+                                       1.0);
+      info->wedge.grad[1] = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"GradientZ").c_str(),
+                                       0.5);
+                                     
+    }
+  else if(surfaceName=="plateau")
+    {
+      *deformFunc = SurfaceAdaptor_Plateau;
+      info->plateau.x1 =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"X1").c_str(), 0.0 );
+      info->plateau.x2 = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"X2").c_str(), 0.0 );
+      info->plateau.x3 = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"X3").c_str(), 0.0 );
+      info->plateau.x4 = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"X4").c_str(), 0.0 );
+      info->plateau.z1 = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Z1").c_str(), 0.0 );
+      info->plateau.z2 = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Z2").c_str(), 0.0 );
+      info->plateau.z3 = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Z3").c_str(), 0.0 );
+      info->plateau.z4 = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Z4").c_str(), 0.0 );
+      info->plateau.height =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Height").c_str(), 0.0 );
+    }
+  else if(surfaceName=="topo_data")
+    {
+      FILE *fp;
+      char* surfaceFileName;
+      int i,j,ii,jj;
+      *deformFunc = SurfaceAdaptor_Topo_Data;
+      surfaceFileName =
+        Stg_ComponentFactory_GetString(cf,name,(surface+"SurfaceName").c_str(),
+                                       "ascii_topo" );
+      info->topo_data.nx =
+        Stg_ComponentFactory_GetInt(cf,name,(surface+"Nx").c_str(),0);
+      info->topo_data.nz = 
+        Stg_ComponentFactory_GetInt(cf,name,(surface+"Nz").c_str(),1);
+      info->topo_data.minX = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"MinX").c_str(),0);
+      info->topo_data.minZ = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"MinZ").c_str(),0);
+      info->topo_data.maxX = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"MaxX").c_str(),0);
+      info->topo_data.maxZ =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"MaxZ").c_str(),0);
+      info->topo_data.dx=
+        (info->topo_data.maxX-info->topo_data.minX)/(info->topo_data.nx-1);
+      info->topo_data.dz=
+        (info->topo_data.maxZ-info->topo_data.minZ)/(info->topo_data.nz-1);
+      info->topo_data.heights=
+        (double*)malloc(sizeof(double)*info->topo_data.nx*info->topo_data.nz);
+      fp=fopen(surfaceFileName,"r");
+      if(!fp)
+        {
+          printf("Can not open the file %s\n",surfaceFileName);
+          abort();
+        }
+      for(i=0;i<info->topo_data.nx;++i)
+        for(j=0;j<info->topo_data.nz;++j)
+          {
+            float h;
+            fscanf(fp,"%d %d %f",&ii,&jj,&h);
+            info->topo_data.heights[ii+info->topo_data.nx*jj]=h;
+          }
+      fclose(fp);
+    }
+  else if(surfaceName=="sine" || surfaceName=="cosine")
+    {
+      Dictionary_Entry_Value*	originList;
 
-    strcpy(temp,surface);
-    info->trig.amp =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"Amplitude"), 1.0  );
-    strcpy(temp,surface);
-    info->trig.freq =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"Frequency"), 1.0 );
-  } else if( !strcmp( surfaceName, "cylinder" ) ) {
-    *surfaceType = SurfaceAdaptor_SurfaceType_Cylinder;
-    *deformFunc = SurfaceAdaptor_Cylinder ;
-    strcpy(temp,surface);
-    info->cylinder.origin[0] =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"X0"), 0.0  );
-    strcpy(temp,surface);
-    info->cylinder.origin[1] =
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"Y0"), 0.0  );
-    strcpy(temp,surface);
-    info->cylinder.r = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"Radius"), 0.0  );
-    strcpy(temp,surface);
-    info->cylinder.minX = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"MinX"),
-                                      info->cylinder.origin[0] - info->cylinder.r);
-    strcpy(temp,surface);
-    info->cylinder.maxX = 
-      Stg_ComponentFactory_GetDouble( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"MaxX"),
-                                      info->cylinder.origin[0] + info->cylinder.r);
-    strcpy(temp,surface);
-    info->cylinder.sign = 
-      Stg_ComponentFactory_GetBool( cf, name,
-                                      (Dictionary_Entry_Key)strcat(temp,"Sign"), True  );
-  }
+      if(surfaceName=="sine")
+        {
+          *deformFunc = SurfaceAdaptor_Sine;
+        }
+      else
+        {
+          *deformFunc = SurfaceAdaptor_Cosine;
+        }
+      originList=Dictionary_Get(dict,(surface+"Origin").c_str());
+      if( originList ) {
+        unsigned	nDims;
+        unsigned	d_i;
+
+        nDims = Dictionary_Entry_Value_GetCount( originList );
+        for( d_i = 0; d_i < nDims; d_i++  ) {
+          Dictionary_Entry_Value*	val;
+
+          val = Dictionary_Entry_Value_GetElement( originList, d_i );
+          info->trig.origin[d_i] = Dictionary_Entry_Value_AsDouble( val );
+        }
+      }
+      else
+        memset( info->trig.origin, 0, sizeof(double) * 2 );
+
+      info->trig.amp =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Amplitude").c_str(),1.0);
+      info->trig.freq =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Frequency").c_str(),1.0);
+    }
+  else if(surfaceName=="cylinder")
+    {
+      *deformFunc = SurfaceAdaptor_Cylinder ;
+      info->cylinder.origin[0] =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"X0").c_str(),0.0);
+      info->cylinder.origin[1] =
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Y0").c_str(),0.0);
+      info->cylinder.r = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"Radius").c_str(),0.0);
+      info->cylinder.minX = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"MinX").c_str(),
+                                       info->cylinder.origin[0]-info->cylinder.r);
+      info->cylinder.maxX = 
+        Stg_ComponentFactory_GetDouble(cf,name,(surface+"MaxX").c_str(),
+                                       info->cylinder.origin[0]+info->cylinder.r);
+      info->cylinder.sign = 
+        Stg_ComponentFactory_GetBool(cf,name,(surface+"Sign").c_str(),True);
+    }
   else
-    Journal_Firewall(!strcmp(surfaceName,""),Journal_Register( Error_Type, name ),
+    Journal_Firewall(surfaceName.empty(),Journal_Register( Error_Type, name ),
                      "Unknown type of surface for SurfaceAdaptor: %s\n",
-                     surfaceName);
+                     surfaceName.c_str());
 }
 
 void _SurfaceAdaptor_Build( void* adaptor, void* data ) {
@@ -472,9 +415,17 @@ void SurfaceAdaptor_Generate( void* adaptor, void* _mesh, void* data ) {
 ** Private Functions
 */
 
-double SurfaceAdaptor_Wedge( SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
-                             unsigned* globalSize, unsigned vertex,
-                             unsigned* vertexInds )
+double SurfaceAdaptor_Equation(SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
+                               unsigned* globalSize, unsigned vertex,
+                               unsigned* vertexInds )
+{
+  return Equation_eval(mesh->verts[vertex],(DomainContext*)(mesh->context),
+                       info->equation);
+}
+
+double SurfaceAdaptor_Wedge(SurfaceAdaptor_SurfaceInfo *info, Mesh* mesh, 
+                            unsigned* globalSize, unsigned vertex,
+                            unsigned* vertexInds )
 {
   if ( mesh->topo->nDims != 3 )
     {
