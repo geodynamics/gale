@@ -295,7 +295,7 @@ void _SurfaceAdaptor_AssignFromXML_Surface(Stg_ComponentFactory* cf,
         }
       }
       else
-        memset( info->trig.origin, 0, sizeof(double) * 2 );
+        memset( info->trig.origin, 0, sizeof(double) * 3 );
 
       info->trig.amp =
         Stg_ComponentFactory_GetDouble(cf,name,(surface+"Amplitude").c_str(),1.0);

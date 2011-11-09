@@ -48,9 +48,9 @@
 
 	typedef struct {
 				/* these vectors represent things in the x-axis and z-axis */
-              double	offs[2];
-              double  endOffs[2];
-              double	grad[2];
+              double	offs[3];
+              double  endOffs[3];
+              double	grad[3];
 	} SurfaceAdaptor_WedgeInfo;
 
 	typedef struct {
@@ -64,13 +64,13 @@
 	} SurfaceAdaptor_Topo_DataInfo;
 
 	typedef struct {
-		double	origin[2];
+		double	origin[3];
 		double	amp;
 		double	freq;
 	} SurfaceAdaptor_TrigInfo;
 
 	typedef struct {
-		double	origin[2];
+		double	origin[3];
                 double  minX, maxX;
 		double	r;
                 Bool    sign;
