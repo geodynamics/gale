@@ -289,11 +289,13 @@ void ConstitutiveMatrix_Assemble(
    MaterialPoint*          materialPoint;
 
    /* Big fat assumption!
-    * Because of Rheology framework vs PIC IP mapping change, ConstitutiveMatrix assumes that
-    * we are using a one-to-one mapping.
-    * This is because the Rheology stuff was made based on operating on MaterialPoints
-    * rather than IntegrationPoints even though its assembling. However it does require xi
-    * which we are passing from the integration point for speed (rather than re-computing it)
+    * Because of Rheology framework vs PIC IP mapping change,
+    * ConstitutiveMatrix assumes that we are using a one-to-one
+    * mapping.  This is because the Rheology stuff was made based on
+    * operating on MaterialPoints rather than IntegrationPoints even
+    * though its assembling. However it does require xi which we are
+    * passing from the integration point for speed (rather than
+    * re-computing it)
     *
     * _Init() firewalls this assumption.
     *
