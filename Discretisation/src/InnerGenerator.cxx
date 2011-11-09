@@ -184,12 +184,12 @@ void InnerGenerator_BuildTopology( InnerGenerator* self, FeMesh* mesh ) {
 	Mesh*		elMesh;
 	MeshTopology	*topo, *elTopo;
 	unsigned	nDims;
-	unsigned	nIncEls, *incEls;
+	unsigned	nIncEls, *incEls(NULL);
 	unsigned	nDomainEls;
 	Decomp		*elDecomp, *nodeDecomp;
 	Sync		*elSync, *nodeSync;
-	int		nLocals, *locals;
-	int		nRemotes, *remotes;
+	int		nLocals(0), *locals(NULL);
+	int		nRemotes(0), *remotes(NULL);
 	unsigned	global;
 	unsigned	e_i;
         int             l_i, r_i;
