@@ -2435,7 +2435,7 @@ void CartesianGenerator_ReadFromASCII( CartesianGenerator* self, Mesh* mesh, Nam
    int               proc_I;
 	Node_LocalIndex   lNode_I = 0;
 	Node_GlobalIndex  gNode_I = 0;
-	FILE*             inputFile;
+	FILE*             inputFile(NULL);
 	char              lineString[MAX_LINE_LENGTH];
 	int			      rank, nRanks;
 
