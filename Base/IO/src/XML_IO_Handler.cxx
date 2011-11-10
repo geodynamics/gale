@@ -679,7 +679,8 @@ Bool _XML_IO_Handler_ReadAllFromBuffer( void* xml_io_handler, Name buffer, Dicti
 	}	
 	
 	/* call parse nodes, starting on the first child */
-	_XML_IO_Handler_ParseNodes( self, rootElement, NULL, Dictionary_MergeType_Replace, NULL );
+	_XML_IO_Handler_ParseNodes(self,rootElement->xmlChildrenNode,NULL,
+                                   IO_Handler_DefaultMergeType, NULL );
 	
 	/* free memory */
 	if( self->currDoc )
