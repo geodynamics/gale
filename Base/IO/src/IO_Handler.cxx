@@ -43,11 +43,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <string>
 
 #include "boost/filesystem.hpp"
 #include "boost/algorithm/string.hpp"
 
-boost::filesystem::path parse_json(const boost::filesystem::path &filename);
+std::string parse_json(const boost::filesystem::path &filename);
 
 /** Textual name of this class */
 const Type IO_Handler_Type = Type_Invalid;
@@ -373,22 +374,24 @@ Index IO_Handler_ReadAllFilesFromCommandLine( void* ioHandler, int argc, char* a
     if(boost::iequals(filename.extension().string(),".js")
        || boost::iequals(filename.extension().string(),".json"))
       {
-        json_xml_name=parse_json(filename);
-        Journal_Firewall(!json_xml_name.empty(),errorStream,
+        std::string json_xml(parse_json(filename));
+        Journal_Firewall(!json_xml.empty(),errorStream,
                          "Error: Could not read input file %s. Exiting.\n",
                          filename.c_str());
-        filename=json_xml_name;
+        result=IO_Handler_ReadAllFromBuffer(self,json_xml.c_str(),dictionary);
       }
-    else if(filename.extension()!=".xml")
-      continue;
-
-    /* Read file */
-    result = IO_Handler_ReadAllFromFile( self, filename.c_str(), dictionary );
-    if(!json_xml_name.empty())
-      boost::filesystem::remove(json_xml_name);
-    Journal_Firewall( result, errorStream, 
-                      "Error: %s could not read input file %s. Exiting.\n",
-                      argv[0], filename.c_str() );
+    else if(filename.extension()==".xml")
+      {
+        /* Read file */
+        result = IO_Handler_ReadAllFromFile( self, filename.c_str(), dictionary );
+      }
+    else
+      {
+        continue;
+      }
+    Journal_Firewall(result,errorStream, 
+                     "Error: %s could not read input file %s. Exiting.\n",
+                     argv[0],filename.c_str());
     filesRead++;		
   }
 
