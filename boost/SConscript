@@ -10,14 +10,13 @@ Import('env')
 env = env.Clone()
 
 config_hpp=env.Install('include/boost','boost/config.hpp')
-missing_depends=[env['build_dir'] + '/include/boost/config/user.hpp',
-                 env['build_dir']
-                 + '/include/boost/config/select_compiler_config.hpp',
-                 env['build_dir']
-                 + '/include/boost/config/select_stdlib_config.hpp',
-                 env['build_dir']
-                 + '/include/boost/config/select_platform_config.hpp']
+missing_depends=[]
+for root, dirs, files in os.walk("boost"):
+    for d in dirs:
+        for f in Glob(root + '/' + d + '/*.hpp',strings=True):
+            missing_depends.append(env['build_dir'] + '/include/' + f)
 Depends(config_hpp,missing_depends)
+
 
 for root, dirs, files in os.walk("boost"):
     env.Install('include/' + root, Glob(root + '/*.hpp'))
