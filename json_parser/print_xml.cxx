@@ -5,6 +5,24 @@
 #include "print_xml.h"
 #include "fix_start_end.h"
 
+std::string fix_comparisons(const std::string &s)
+{
+  std::string result(s);
+  size_t i(result.find('<'));
+  while(i!=std::string::npos)
+    {
+      result.replace(i,1,"&lt;");
+      i=result.find('<',i+1);
+    }
+  i=result.find('<');
+  while(i!=std::string::npos)
+    {
+      result.replace(i,1,"&gt;");
+      i=result.find('>',i+1);
+    }
+  return result;
+}
+
 void print_xml(std::ostream &os, const std::string &name,
                const json_spirit::Value &o)
 {
@@ -13,7 +31,7 @@ void print_xml(std::ostream &os, const std::string &name,
     {
     case json_spirit::str_type:
       fix_start_end("param",name,start,end);
-      os << start << o.get_str() << end;
+      os << start << fix_comparisons(o.get_str()) << end;
       break;
     case json_spirit::bool_type:
       fix_start_end("param",name,start,end);
