@@ -47,7 +47,6 @@
         double AdvDiffResidualForceTerm_UpwindDiffusivity( 
 		AdvDiffResidualForceTerm* self, 
 		AdvectionDiffusionSLE* sle, 
-		Swarm* swarm, 
 		FeMesh* mesh, 
 		Element_LocalIndex lElement_I, 
 		Dimension_Index dim );

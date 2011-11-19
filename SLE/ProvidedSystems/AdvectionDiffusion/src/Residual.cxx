@@ -68,6 +68,7 @@ AdvDiffResidualForceTerm_New(Name name,
                              Stg_Component* sle, 
                              FeVariable* velocityField,
                              double defaultDiffusivity,
+                             Swarm* picSwarm,
                              void* materials_Register,
                              AdvDiffResidualForceTerm_UpwindParamFuncType
                              upwindFuncType )
@@ -77,7 +78,8 @@ AdvDiffResidualForceTerm_New(Name name,
   self->isConstructed = True;
   _ForceTerm_Init( self, context, forceVector, swarm, sle );
   _AdvDiffResidualForceTerm_Init(self,velocityField,defaultDiffusivity,
-                                 materials_Register,upwindFuncType );
+                                 picSwarm, materials_Register,upwindFuncType );
+  self->picSwarm=picSwarm;
 
   return self;
 }
@@ -171,6 +173,7 @@ void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle ){
 void _AdvDiffResidualForceTerm_Init(void* residual,
                                     FeVariable* velocityField,
                                     double defaultDiffusivity,
+                                    Swarm* picSwarm,
                                     void* materials_Register,
                                     AdvDiffResidualForceTerm_UpwindParamFuncType
                                     upwindFuncType)
@@ -181,6 +184,7 @@ void _AdvDiffResidualForceTerm_Init(void* residual,
   self->defaultDiffusivity = defaultDiffusivity;
   self->materials_Register  = materials_Register;
   self->upwindParamType = upwindFuncType;
+  self->picSwarm = picSwarm;
 }
 
 void _AdvDiffResidualForceTerm_Delete( void* residual ) {
@@ -220,6 +224,8 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 
 	velocityField = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityField", FeVariable, True, data  );
 	upwindParamFuncName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"UpwindXiFunction", "Exact"  );
+	Swarm *picSwarm = (Swarm*)Stg_ComponentFactory_ConstructByKey( cf, self->name, (Name)"picSwarm", IntegrationPointsSwarm, False, data  ) ;
+
 
 	if ( strcasecmp( upwindParamFuncName, "DoublyAsymptoticAssumption" ) == 0 )
 		upwindFuncType = DoublyAsymptoticAssumption;
@@ -234,6 +240,7 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 	materials_Register = ((PICelleratorContext*)(self->context))->materials_Register;
 
 	_AdvDiffResidualForceTerm_Init( self, velocityField, defaultDiffusivity,
+                                        picSwarm,
                                         materials_Register,
                                         upwindFuncType );
 }
@@ -250,6 +257,19 @@ void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
 	Stg_ComponentFactory*            cf;
 	char*                            name;
 
+        if(self->picSwarm)
+          {
+            swarm=(IntegrationPointsSwarm*)self->picSwarm;
+          }
+        else if(Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type))
+          {
+            swarm=((OneToManyMapper*)(swarm->mapper))->swarm;
+          }
+        else if(Stg_Class_IsInstance(swarm->mapper,NearestNeighborMapper_Type))
+          {
+            swarm=((NearestNeighborMapper*)(swarm->mapper))->swarm;
+          }
+            
 	cf = self->context->CF;
 
 	_ForceTerm_Build( self, data );
@@ -322,120 +342,172 @@ void _AdvDiffResidualForceTerm_Destroy( void* residual, void* data ) {
 	_ForceTerm_Destroy( self, data );
 }
 
-void _AdvDiffResidualForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elementResidual ) {
-	AdvDiffResidualForceTerm*  self               = Stg_CheckType( forceTerm, AdvDiffResidualForceTerm );
-	AdvectionDiffusionSLE*     sle                = Stg_CheckType( self->extraInfo, AdvectionDiffusionSLE );
-	Swarm*                     swarm              = self->integrationSwarm;
-	Particle_Index             lParticle_I;
-	Particle_Index             cParticle_I;
-	Particle_Index             cellParticleCount;
-	Cell_Index                 cell_I;    
-	IntegrationPoint*          particle;
-	FeVariable*                phiField           = sle->phiField;
-	Dimension_Index            dim                = forceVector->dim;
-	double                     velocity[3];
-	double                     phi, phiDot;
-	double                     detJac;
-	double*                    xi;
-	double                     totalDerivative, diffusionTerm;
-	double                     diffusivity         = self->defaultDiffusivity;
-	ElementType*               elementType         = FeMesh_GetElementType( phiField->feMesh, lElement_I );
-	Node_Index                 elementNodeCount    = elementType->nodeCount;
-	Node_Index                 node_I;
-	double                     factor;
+void _AdvDiffResidualForceTerm_AssembleElement(void* forceTerm,
+                                               ForceVector* forceVector,
+                                               Element_LocalIndex lElement_I,
+                                               double* elementResidual)
+{
+  AdvDiffResidualForceTerm* self=Stg_CheckType(forceTerm,
+                                               AdvDiffResidualForceTerm);
+  AdvectionDiffusionSLE* sle=Stg_CheckType(self->extraInfo,
+                                           AdvectionDiffusionSLE);
+  IntegrationPointsSwarm* swarm((IntegrationPointsSwarm*)(self->integrationSwarm));
+  Particle_Index             lParticle_I;
+  Particle_Index             cParticle_I;
+  Particle_Index             cellParticleCount;
+  Cell_Index                 cell_I;    
+  IntegrationPoint*          particle;
+  FeVariable*                phiField           = sle->phiField;
+  Dimension_Index            dim                = forceVector->dim;
+  double                     velocity[3];
+  double                     phi, phiDot;
+  double                     detJac;
+  double*                    xi;
+  double                     totalDerivative, diffusionTerm;
+  double                     diffusivity         = self->defaultDiffusivity;
+  ElementType* elementType=FeMesh_GetElementType(phiField->feMesh,lElement_I);
+  Node_Index                 elementNodeCount    = elementType->nodeCount;
+  Node_Index                 node_I;
+  double                     factor;
 
-	double**                   GNx;
-	double*                    phiGrad;
-	double*                    Ni;
-	double*                    SUPGNi;
-	double                     supgfactor;
-	double                     udotu, perturbation;
-	double                     upwindDiffusivity;
+  double**                   GNx;
+  double*                    phiGrad;
+  double*                    Ni;
+  double*                    SUPGNi;
+  double                     supgfactor;
+  double                     udotu, perturbation;
+  double                     upwindDiffusivity;
 
-	GNx     = self->GNx;
-	phiGrad = self->phiGrad;
-	Ni = self->Ni;
-	SUPGNi = self->SUPGNi;
+  if(self->picSwarm)
+    swarm=(IntegrationPointsSwarm*)(self->picSwarm);
+
+  GNx     = self->GNx;
+  phiGrad = self->phiGrad;
+  Ni = self->Ni;
+  SUPGNi = self->SUPGNi;
 	
-	upwindDiffusivity  = AdvDiffResidualForceTerm_UpwindDiffusivity( self, sle, swarm, phiField->feMesh, lElement_I, dim );
+  upwindDiffusivity=AdvDiffResidualForceTerm_UpwindDiffusivity(self,sle,
+                                                               phiField->feMesh,
+                                                               lElement_I,dim);
+  /* Use an average diffusivity for OneToMany mapper */
+  bool one_to_many=Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type);
+  if(one_to_many)
+    {
+      OneToManyMapper *mapper=(OneToManyMapper*)(swarm->mapper);
+      IntegrationPointsSwarm* OneToMany_swarm=mapper->swarm;
+      int OneToMany_cell=
+        CellLayout_MapElementIdToCellId(OneToMany_swarm->cellLayout,
+                                        lElement_I);
+      int num_particles=OneToMany_swarm->cellParticleCountTbl[OneToMany_cell];
 
-	/* Determine number of particles in element */
-	cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
+      double weight(0);
+      diffusivity=0;
+      for(int ii=0;ii<num_particles;++ii)
+        {
+          IntegrationPoint *OneToMany_particle=
+            (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_swarm,
+                                                      OneToMany_cell,ii);
+          weight+=OneToMany_particle->weight;
+          double temp = IntegrationPointMapper_GetDoubleFromMaterial
+            (OneToMany_swarm->mapper, OneToMany_particle,
+             self->materialExtHandle,
+             offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
+          diffusivity+=temp*OneToMany_particle->weight;
+        }
+      diffusivity/=weight;
+    }
+
+  /* Determine number of particles in element */
+  cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+  cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
 	
-	for ( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-		lParticle_I     = swarm->cellParticleTbl[cell_I][cParticle_I];
+  for(cParticle_I=0; cParticle_I<cellParticleCount; cParticle_I++)
+    {
+      lParticle_I=swarm->cellParticleTbl[cell_I][cParticle_I];
 
-		particle        = (IntegrationPoint*) Swarm_ParticleAt( swarm, lParticle_I );
-		xi              = particle->xi;
+      particle=(IntegrationPoint*) Swarm_ParticleAt(swarm,lParticle_I);
+      xi=particle->xi;
 		
-		/* Evaluate Shape Functions */
-		ElementType_EvaluateShapeFunctionsAt(elementType, xi, Ni);
+      /* Evaluate Shape Functions */
+      ElementType_EvaluateShapeFunctionsAt(elementType,xi,Ni);
 
-		/* Calculate Global Shape Function Derivatives */
-		ElementType_ShapeFunctionsGlobalDerivs( 
-			elementType,
-			phiField->feMesh, lElement_I,
-			xi, dim, &detJac, GNx );
+      /* Calculate Global Shape Function Derivatives */
+      ElementType_ShapeFunctionsGlobalDerivs(elementType,phiField->feMesh,
+                                             lElement_I,xi,dim,&detJac,GNx );
 		
-		/* Calculate Velocity */
-		FeVariable_InterpolateFromMeshLocalCoord( self->velocityField, phiField->feMesh, lElement_I, xi, velocity );
+      /* Calculate Velocity */
+      FeVariable_InterpolateFromMeshLocalCoord(self->velocityField,
+                                               phiField->feMesh,lElement_I,
+                                               xi,velocity);
 
-		/* Build the SUPG shape functions */
-		udotu = velocity[I_AXIS]*velocity[I_AXIS] + velocity[J_AXIS]*velocity[J_AXIS];
-		if(dim == 3) udotu += velocity[ K_AXIS ] * velocity[ K_AXIS ];
+      /* Build the SUPG shape functions */
+      udotu=velocity[I_AXIS]*velocity[I_AXIS]+velocity[J_AXIS]*velocity[J_AXIS];
+      if(dim==3)
+        udotu+=velocity[K_AXIS]*velocity[K_AXIS];
 
-		supgfactor = upwindDiffusivity / udotu;
-		for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
-			/* In the case of per diffusion - just build regular shape functions */
-			if ( fabs(upwindDiffusivity) < SUPG_MIN_DIFFUSIVITY ) {
-				SUPGNi[node_I] = Ni[node_I];
-				continue;
-			}
+      supgfactor = upwindDiffusivity / udotu;
+      for(node_I=0; node_I<elementNodeCount; node_I++)
+        {
+          /* In the case of per diffusion - just build regular shape functions */
+          if(fabs(upwindDiffusivity)<SUPG_MIN_DIFFUSIVITY)
+            {
+              SUPGNi[node_I] = Ni[node_I];
+              continue;
+            }
 			
-			perturbation = velocity[ I_AXIS ] * GNx[ I_AXIS ][ node_I ] + velocity[ J_AXIS ] * GNx[ J_AXIS ][ node_I ];
-			if (dim == 3)
-					perturbation = perturbation + velocity[ K_AXIS ] * GNx[ K_AXIS ][ node_I ];
+          perturbation=velocity[I_AXIS]*GNx[I_AXIS][node_I]
+            + velocity[J_AXIS]*GNx[J_AXIS][node_I];
+          if(dim==3)
+            perturbation=perturbation+velocity[K_AXIS]*GNx[K_AXIS][node_I];
 			
-			/* p = \frac{\bar \kappa \hat u_j w_j }{ ||u|| } -  Eq. 3.2.25 */
-			perturbation = supgfactor * perturbation;
+          /* p = \frac{\bar \kappa \hat u_j w_j }{ ||u|| } -  Eq. 3.2.25 */
+          perturbation = supgfactor * perturbation;
 			
-			SUPGNi[node_I] = Ni[node_I] + perturbation;
-		}  
+          SUPGNi[node_I] = Ni[node_I] + perturbation;
+        }  
 		
-		/* Calculate phi on particle */
-		_FeVariable_InterpolateNodeValuesToElLocalCoord( phiField, lElement_I, xi, &phi );
+      /* Calculate phi on particle */
+      _FeVariable_InterpolateNodeValuesToElLocalCoord(phiField,lElement_I,
+                                                      xi,&phi);
 
-		/* Calculate Gradients of Phi */
-		FeVariable_InterpolateDerivatives_WithGNx( phiField, lElement_I, GNx, phiGrad );
+      /* Calculate Gradients of Phi */
+      FeVariable_InterpolateDerivatives_WithGNx(phiField,lElement_I,GNx,phiGrad);
 
-		/* Calculate time derivative of phi */
-		_FeVariable_InterpolateNodeValuesToElLocalCoord( sle->phiDotField, lElement_I, xi, &phiDot );
+      /* Calculate time derivative of phi */
+      _FeVariable_InterpolateNodeValuesToElLocalCoord(sle->phiDotField,
+                                                      lElement_I,xi,&phiDot);
 		
-		/* Calculate total derivative (i.e. Dphi/Dt = \dot \phi + u . \grad \phi) */
-		totalDerivative = phiDot + StGermain_VectorDotProduct( velocity, phiGrad, dim );
+      /* Calculate total derivative
+         (i.e. Dphi/Dt = \dot \phi + u . \grad \phi) */
+      totalDerivative=phiDot+StGermain_VectorDotProduct(velocity,phiGrad,dim);
 
-		/* Get Diffusivity */
-                IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*)swarm);
-                IntegrationPoint* NNparticle(particle);
-                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+      if(!one_to_many)
+        {
+          /* Get Diffusivity */
+          IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*)swarm);
+          IntegrationPoint* NNparticle(particle);
+          NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
-		diffusivity = IntegrationPointMapper_GetDoubleFromMaterial
-                  (NNswarm->mapper, NNparticle, self->materialExtHandle,
-                   offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
+          diffusivity = IntegrationPointMapper_GetDoubleFromMaterial
+            (NNswarm->mapper, NNparticle, self->materialExtHandle,
+             offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
+        }
 
-		/* Add to element residual */
-		factor = particle->weight * detJac;
-		for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
-			/* Calculate Diffusion Term */
-			diffusionTerm = diffusivity * ( GNx[0][node_I] * phiGrad[0] + GNx[1][node_I] * phiGrad[1] );
-			if (dim == 3)
-				diffusionTerm += diffusivity * GNx[2][ node_I ] * phiGrad[2] ;
+      /* Add to element residual */
+      factor = particle->weight * detJac;
+      for(node_I=0; node_I<elementNodeCount; node_I++)
+        {
+          /* Calculate Diffusion Term */
+          diffusionTerm=
+            diffusivity*(GNx[0][node_I]*phiGrad[0]+GNx[1][node_I]*phiGrad[1]);
+                         
+          if(dim==3)
+            diffusionTerm+=diffusivity*GNx[2][node_I]*phiGrad[2];
 			
-			elementResidual[ node_I ] -=  factor * ( SUPGNi[ node_I ] * totalDerivative + diffusionTerm );
-		}
-	}
-	
+          elementResidual[node_I]-=
+            factor*(SUPGNi[node_I]*totalDerivative+diffusionTerm);
+      }
+    }
 }
 
 /* Virtual Function Implementations */

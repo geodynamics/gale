@@ -60,100 +60,104 @@
 
 /** AdvectionDiffusion_UpwindDiffusivity - See Brooks, Hughes 1982 Section 3.3 
  * All equations refer to this paper if not otherwise indicated */
-double AdvDiffResidualForceTerm_UpwindDiffusivity( 
-		AdvDiffResidualForceTerm* self, 
-		AdvectionDiffusionSLE* sle, 
-		Swarm* swarm, 
-		FeMesh* mesh, 
-		Element_LocalIndex lElement_I, 
-		Dimension_Index dim )
+double AdvDiffResidualForceTerm_UpwindDiffusivity(AdvDiffResidualForceTerm* self, 
+                                                  AdvectionDiffusionSLE* sle, 
+                                                  FeMesh* mesh, 
+                                                  Element_LocalIndex lElement_I, 
+                                                  Dimension_Index dim)
 {
-	FeVariable*                velocityField   = self->velocityField;
-	Coord                      xiElementCentre = {0.0,0.0,0.0};
-	double                     xiUpwind;
-	double                     velocityCentre[3];
-	double                     pecletNumber;
-	double                     lengthScale;
-	double                     upwindDiffusivity;
-	Dimension_Index            dim_I;
-	double*                    leastCoord;
-	double*                    greatestCoord;
-	Node_LocalIndex            nodeIndex_LeastValues, nodeIndex_GreatestValues;
-	unsigned                   *inc;
-	IArray*		 incArray;
+  FeVariable*                velocityField   = self->velocityField;
+  Coord                      xiElementCentre = {0.0,0.0,0.0};
+  double                     xiUpwind;
+  double                     velocityCentre[3];
+  double                     pecletNumber;
+  double                     lengthScale;
+  double                     upwindDiffusivity;
+  Dimension_Index            dim_I;
+  double*                    leastCoord;
+  double*                    greatestCoord;
+  Node_LocalIndex            nodeIndex_LeastValues, nodeIndex_GreatestValues;
+  unsigned                   *inc;
+  IArray*		 incArray;
 	
-	Cell_Index                 cell_I;
-	IntegrationPoint*          particle;
-	Particle_Index             lParticle_I;
-	double                     averageDiffusivity;
-	Particle_InCellIndex       cParticle_I;
-	Particle_InCellIndex       particleCount;
+  Cell_Index                 cell_I;
+  IntegrationPoint*          particle;
+  Particle_Index             lParticle_I;
+  Particle_InCellIndex       cParticle_I;
+  Particle_InCellIndex       particleCount;
 	
-	/* Compute the average diffusivity */
-	/* Find Number of Particles in Element */
-	cell_I = CellLayout_MapElementIdToCellId( self->integrationSwarm->cellLayout, lElement_I );
-	particleCount = self->integrationSwarm->cellParticleCountTbl[ cell_I ];
+  IntegrationPointsSwarm* swarm((IntegrationPointsSwarm*)(self->integrationSwarm));
+  if(self->picSwarm)
+    swarm=(IntegrationPointsSwarm*)(self->picSwarm);
 
-	/* Average diffusivity for element */
-        averageDiffusivity = 0.0;
-        for ( cParticle_I = 0 ; cParticle_I < particleCount ; cParticle_I++ ) {
-          lParticle_I = self->integrationSwarm->cellParticleTbl[cell_I][cParticle_I];
-          particle = (IntegrationPoint*) Swarm_ParticleAt( self->integrationSwarm, lParticle_I );
+  bool one_to_many=Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type);
+  if(one_to_many)
+    swarm=((OneToManyMapper*)(swarm->mapper))->swarm;
 
-          IntegrationPointsSwarm*
-            NNswarm((IntegrationPointsSwarm*)(self->integrationSwarm));
-          IntegrationPoint* NNparticle(particle);
-          NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+  /* Compute the average diffusivity */
+  /* Find Number of Particles in Element */
+  cell_I=CellLayout_MapElementIdToCellId(swarm->cellLayout,lElement_I);
+  particleCount=swarm->cellParticleCountTbl[cell_I];
 
-          averageDiffusivity +=
-            IntegrationPointMapper_GetDoubleFromMaterial(NNswarm->mapper, NNparticle, self->materialExtHandle,
-		    offsetof(AdvDiffResidualForceTerm_MaterialExt, diffusivity));
-        }
-        averageDiffusivity /= (double)particleCount;
+  double averageDiffusivity(0), weight(0);
+  for(cParticle_I=0; cParticle_I<particleCount; cParticle_I++)
+    {
+      lParticle_I=swarm->cellParticleTbl[cell_I][cParticle_I];
+      particle=(IntegrationPoint*) Swarm_ParticleAt(swarm,lParticle_I);
+                                                    
+
+      IntegrationPointsSwarm* NNswarm(swarm);
+      IntegrationPoint* NNparticle(particle);
+      NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+
+      double temp=IntegrationPointMapper_GetDoubleFromMaterial
+        (NNswarm->mapper,NNparticle,self->materialExtHandle,
+         offsetof(AdvDiffResidualForceTerm_MaterialExt,diffusivity));
+      averageDiffusivity+=temp*particle->weight;
+      weight+=particle->weight;
+    }
+  averageDiffusivity/=weight;
 	
-	if (sle->maxDiffusivity < averageDiffusivity)
-		sle->maxDiffusivity = averageDiffusivity;
-	
-	
-	
-	
-	
-	
-	/* Change Diffusivity if it is too small */
-	if ( averageDiffusivity < SUPG_MIN_DIFFUSIVITY ) 
-		averageDiffusivity = SUPG_MIN_DIFFUSIVITY;
-	
-	/* Calculate Velocity At Middle of Element - See Eq. 3.3.6 */
-	FeVariable_InterpolateFromMeshLocalCoord( velocityField, mesh, lElement_I, xiElementCentre, velocityCentre );
-	
-	/* Calculate Length Scales - See Fig 3.4 - ASSUMES BOX MESH TODO - fix */
-	incArray = self->incarray;
-	FeMesh_GetElementNodes( mesh, lElement_I, incArray );
-	inc = (unsigned*)IArray_GetPtr( incArray );
+  if(sle->maxDiffusivity<averageDiffusivity)
+    sle->maxDiffusivity=averageDiffusivity;
 	
 	
-	nodeIndex_LeastValues = inc[0];
-	nodeIndex_GreatestValues = (dim == 2) ? inc[3] : inc[7];
-	leastCoord    = Mesh_GetVertex( mesh, nodeIndex_LeastValues );
-	greatestCoord = Mesh_GetVertex( mesh, nodeIndex_GreatestValues );
+  /* Change Diffusivity if it is too small */
+  if(averageDiffusivity<SUPG_MIN_DIFFUSIVITY)
+    averageDiffusivity = SUPG_MIN_DIFFUSIVITY;
 	
-	upwindDiffusivity = 0.0;
-	for ( dim_I = 0 ; dim_I < dim ; dim_I++ ) {
-		lengthScale = greatestCoord[ dim_I ] - leastCoord[ dim_I ];
+  /* Calculate Velocity At Middle of Element - See Eq. 3.3.6 */
+  FeVariable_InterpolateFromMeshLocalCoord(velocityField,mesh,lElement_I,
+                                           xiElementCentre,velocityCentre);
+	
+  /* Calculate Length Scales - See Fig 3.4 - ASSUMES BOX MESH TODO - fix */
+  incArray = self->incarray;
+  FeMesh_GetElementNodes( mesh, lElement_I, incArray );
+  inc = (unsigned*)IArray_GetPtr( incArray );
+
+  nodeIndex_LeastValues = inc[0];
+  nodeIndex_GreatestValues = inc[IArray_GetSize(incArray)-1];
+  leastCoord    = Mesh_GetVertex( mesh, nodeIndex_LeastValues );
+  greatestCoord = Mesh_GetVertex( mesh, nodeIndex_GreatestValues );
+	
+  upwindDiffusivity = 0.0;
+  for(dim_I=0; dim_I<dim; dim_I++)
+    {
+      lengthScale=greatestCoord[dim_I]-leastCoord[dim_I];
 		
-		/* Calculate Peclet Number (alpha) - See Eq. 3.3.5 */
-		pecletNumber = velocityCentre[ dim_I ] * lengthScale / (2.0 * averageDiffusivity);
+      /* Calculate Peclet Number (alpha) - See Eq. 3.3.5 */
+      pecletNumber=velocityCentre[dim_I]*lengthScale/(2.0*averageDiffusivity);
 		
-		/* Calculate Upwind Local Coordinate - See Eq. 3.3.4 and (2.4.2, 3.3.1 and 3.3.2) */
-		xiUpwind = AdvDiffResidualForceTerm_UpwindParam( self, pecletNumber );
+      /* Calculate Upwind Local Coordinate - See Eq. 3.3.4 and (2.4.2,
+         3.3.1 and 3.3.2) */
+      xiUpwind=AdvDiffResidualForceTerm_UpwindParam(self,pecletNumber);
 		
-		/* Calculate Upwind Thermal Diffusivity - See Eq. 3.3.3  */
-		upwindDiffusivity += xiUpwind * velocityCentre[ dim_I ] * lengthScale;
-	}
-	upwindDiffusivity *= ISQRT15;         /* See Eq. 3.3.11 */
+      /* Calculate Upwind Thermal Diffusivity - See Eq. 3.3.3  */
+      upwindDiffusivity+=xiUpwind*velocityCentre[dim_I]*lengthScale;
+    }
+  upwindDiffusivity*=ISQRT15;         /* See Eq. 3.3.11 */
 	
-	
-	return upwindDiffusivity;
+  return upwindDiffusivity;
 }
 
 

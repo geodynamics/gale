@@ -72,6 +72,7 @@ typedef struct {
   ExtensionInfo_Index materialExtHandle; \
   void** diffusivitySwarmVariables; \
   Index materialSwarmCount; \
+  Swarm* picSwarm; \
   /* AdvDiffResidualForceTerm info */ \
   FeVariable* velocityField; \
   double defaultDiffusivity; \
@@ -91,6 +92,7 @@ AdvDiffResidualForceTerm_New(Name name,
                              Stg_Component* sle, 
                              FeVariable* velocityField,
                              double defaultDiffusivity,
+                             Swarm* picSwarm,
                              void* materials_Register,
                              AdvDiffResidualForceTerm_UpwindParamFuncType
                              upwindFuncType );
@@ -113,6 +115,7 @@ AdvDiffResidualForceTerm* _AdvDiffResidualForceTerm_New(  ADVDIFFRESIDUALFORCETE
 void _AdvDiffResidualForceTerm_Init(void* residual,
                                     FeVariable* velocityField,
                                     double defaultDiffusivity,
+                                    Swarm* picSwarm,
                                     void* materials_Register,
                                     AdvDiffResidualForceTerm_UpwindParamFuncType
                                     upwindFuncType );
