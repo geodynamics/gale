@@ -392,8 +392,8 @@ void _BuoyancyForceTerm_AssembleElement(void* forceTerm,
 
   double totalWeight = 0.0;
   double adjustFactor = 0.0;
-  double density;
-  double alpha;
+  double density(0);
+  double alpha(0);
   std::string density_equation, alpha_equation;
 
   elementType = FeMesh_GetElementType( mesh, lElement_I );
@@ -439,20 +439,27 @@ void _BuoyancyForceTerm_AssembleElement(void* forceTerm,
                                         lElement_I);
       int num_particles=OneToMany_swarm->cellParticleCountTbl[OneToMany_cell];
 
+      double weight(0);
       for(int ii=0;ii<num_particles;++ii)
         {
           IntegrationPoint *OneToMany_particle=
             (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_swarm,
                                                       OneToMany_cell,ii);
-          density=IntegrationPointMapper_GetDoubleFromMaterial
+          weight+=OneToMany_particle->weight;
+          double ttmp=IntegrationPointMapper_GetDoubleFromMaterial
             (OneToMany_swarm->mapper, OneToMany_particle,
              self->materialExtHandle,
              offsetof(BuoyancyForceTerm_MaterialExt, density));
-          alpha = IntegrationPointMapper_GetDoubleFromMaterial
+          density+=ttmp*OneToMany_particle->weight;
+
+          ttmp=IntegrationPointMapper_GetDoubleFromMaterial
             (OneToMany_swarm->mapper, OneToMany_particle,
              self->materialExtHandle,
              offsetof(BuoyancyForceTerm_MaterialExt, alpha));
+          alpha+=ttmp*OneToMany_particle->weight;
         }
+      density/=weight;
+      alpha/=weight;
     }
 
   for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {

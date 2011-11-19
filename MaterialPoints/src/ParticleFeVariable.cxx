@@ -241,49 +241,93 @@ void ParticleFeVariable_Update( void* materialFeVariable ) {
 	SolutionVector_UpdateSolutionOntoNodes( self->assemblyVector );
 }
 
-void ParticleFeVariable_AssembleElement( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) {
-	ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
-	ParticleFeVariable*        self              = Stg_CheckType( forceVector->feVariable, ParticleFeVariable );
-	IntegrationPointsSwarm*    swarm             = (IntegrationPointsSwarm*)forceTerm->integrationSwarm;
-	FeMesh*							mesh              = self->feMesh;
-	Element_NodeIndex          elementNodeCount  = FeMesh_GetElementNodeSize( mesh, lElement_I );
-	ElementType*               elementType       = FeMesh_GetElementType( mesh, lElement_I );
-	Cell_Index                 cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	Particle_InCellIndex       cellParticleCount;
-	Particle_InCellIndex       cParticle_I;
-	IntegrationPoint*          particle;
-	Node_Index                 node_I;
-	Dof_Index                  dofCount          = self->fieldComponentCount;
-	Dof_Index                  dof_I;
-	Dof_Index                  dim               = self->dim;
-	double                     shapeFunc[27], detJac;
-	double                     particleValue[9];
+void ParticleFeVariable_AssembleElement(void* _forceTerm,
+                                        ForceVector* forceVector,
+                                        Element_LocalIndex lElement_I,
+                                        double* elForceVector)
+{
+  ForceTerm*                 forceTerm         = (ForceTerm*) _forceTerm;
+  ParticleFeVariable* self=Stg_CheckType(forceVector->feVariable,
+                                         ParticleFeVariable);
+  IntegrationPointsSwarm* swarm=
+    (IntegrationPointsSwarm*)forceTerm->integrationSwarm;
+  FeMesh* mesh=self->feMesh;
+  Element_NodeIndex elementNodeCount=FeMesh_GetElementNodeSize(mesh,lElement_I);
+  ElementType* elementType=FeMesh_GetElementType(mesh,lElement_I);
+  Cell_Index cell_I=CellLayout_MapElementIdToCellId(swarm->cellLayout,
+                                                    lElement_I);
+  Particle_InCellIndex       cellParticleCount;
+  Particle_InCellIndex       cParticle_I;
+  IntegrationPoint*          particle;
+  Node_Index                 node_I;
+  Dof_Index                  dofCount          = self->fieldComponentCount;
+  Dof_Index                  dof_I;
+  Dof_Index                  dim               = self->dim;
+  double                     shapeFunc[27], detJac;
+  double                     particleValue[9];
 
-	cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
-	
-	for( cParticle_I = 0 ; cParticle_I < cellParticleCount; cParticle_I++ ) {
-		/* Find this particle in the element */
-		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
+  /* Use an average density for OneToMany mapper */
+  bool one_to_many=Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type);
+  if(one_to_many)
+    {
+      OneToManyMapper *mapper=(OneToManyMapper*)(swarm->mapper);
+      IntegrationPointsSwarm* OneToMany_swarm=mapper->swarm;
+      int OneToMany_cell=
+        CellLayout_MapElementIdToCellId(OneToMany_swarm->cellLayout,
+                                        lElement_I);
+      int num_particles=OneToMany_swarm->cellParticleCountTbl[OneToMany_cell];
 
-                /* Handle case where we are using gauss swarms with
-                   NearestNeighborMapper instead of a material
-                   swarm */
-                IntegrationPointsSwarm* NNswarm(swarm);
-                IntegrationPoint* NNparticle(particle);
-                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+      double weight(0);
+      for(int i=0;i<9;++i)
+        particleValue[i]=0;
+      for(int ii=0;ii<num_particles;++ii)
+        {
+          IntegrationPoint *OneToMany_particle=
+            (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_swarm,
+                                                      OneToMany_cell,ii);
+          weight+=OneToMany_particle->weight;
+          double temp[9];
+          ParticleFeVariable_ValueAtParticle(self,OneToMany_swarm,lElement_I,
+                                             OneToMany_particle,temp);
+          for(int i=0;i<9;++i)
+            particleValue[i]+=temp[i]*OneToMany_particle->weight;
+        }
+      for(int i=0;i<9;++i)
+        particleValue[i]/=weight;
+    }
 
-		ParticleFeVariable_ValueAtParticle( self, NNswarm, lElement_I, NNparticle, particleValue );
+  cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
+  for(cParticle_I=0; cParticle_I<cellParticleCount; cParticle_I++)
+    {
+      /* Find this particle in the element */
+      particle=(IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,
+                                                         cParticle_I);
 
-		/* get shape function and detJac */
-		ElementType_EvaluateShapeFunctionsAt( elementType, particle->xi, shapeFunc );
-		detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, particle->xi, dim );
+      if(!one_to_many)
+        {
+          /* Handle case where we are using gauss swarms with
+             NearestNeighborMapper instead of a material swarm */
+          IntegrationPointsSwarm* NNswarm(swarm);
+          IntegrationPoint* NNparticle(particle);
+          NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
-		for ( dof_I = 0 ; dof_I < dofCount ; dof_I++ ) {
-			for ( node_I = 0 ; node_I < elementNodeCount ; node_I++ ) {
-				elForceVector[ node_I * dofCount + dof_I ] += particle->weight * detJac * shapeFunc[ node_I ] * particleValue[ dof_I ]; 
-			}
-		}
-	}
+          ParticleFeVariable_ValueAtParticle(self,NNswarm,lElement_I,NNparticle,
+                                             particleValue);
+        }
+      /* get shape function and detJac */
+      ElementType_EvaluateShapeFunctionsAt(elementType,particle->xi,shapeFunc);
+      detJac=ElementType_JacobianDeterminant(elementType,mesh,lElement_I,
+                                             particle->xi,dim);
+
+      for(dof_I=0; dof_I<dofCount; dof_I++)
+        {
+          for(node_I=0; node_I<elementNodeCount; node_I++)
+            {
+              elForceVector[node_I*dofCount+dof_I]+=
+                particle->weight*detJac*shapeFunc[node_I]*particleValue[dof_I]; 
+            }
+        }
+    }
 }
 
 void ParticleFeVariable_AssembleElementShapeFunc( void* _forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVector ) {

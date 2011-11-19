@@ -268,90 +268,140 @@ void _BuoyancyForceTermThermoChem_Destroy( void* forceTerm, void* data ) {
 }
 
 
-void _BuoyancyForceTermThermoChem_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
-	BuoyancyForceTermThermoChem*               self               = (BuoyancyForceTermThermoChem*) forceTerm;
-	IntegrationPoint*                particle;
-	BuoyancyForceTermThermoChem_MaterialExt*   materialExt;
-	Particle_InCellIndex             cParticle_I;
-	Particle_InCellIndex             cellParticleCount;
-	Element_NodeIndex                elementNodeCount;
-	Dimension_Index                  dim                = forceVector->dim;
-	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
-	FeMesh*		                 mesh               = forceVector->feVariable->feMesh;
-	Node_ElementLocalIndex           eNode_I;
-	Cell_Index                       cell_I;
-	ElementType*                     elementType;
-	Dof_Index                        nodeDofCount;
-	double                           RaT;
-	double                           RaC;
-	double                           detJac             = 0.0;
-	double                           factor;
-	double                           Ni[27];
-	double                           force;
-	double*                          xi;
-	Material*                        material;
-	FeVariable*                      temperatureField   = self->temperatureField;
-	double                           temperature        = 0.0;
+void _BuoyancyForceTermThermoChem_AssembleElement(void* forceTerm,
+                                                  ForceVector* forceVector,
+                                                  Element_LocalIndex lElement_I,
+                                                  double* elForceVec)
+{
+  BuoyancyForceTermThermoChem* self=(BuoyancyForceTermThermoChem*) forceTerm;
+  IntegrationPoint*                particle;
+  BuoyancyForceTermThermoChem_MaterialExt*   materialExt;
+  Particle_InCellIndex             cParticle_I;
+  Particle_InCellIndex             cellParticleCount;
+  Element_NodeIndex                elementNodeCount;
+  Dimension_Index                  dim                = forceVector->dim;
+  IntegrationPointsSwarm* swarm=(IntegrationPointsSwarm*)self->integrationSwarm;
+  FeMesh* mesh=forceVector->feVariable->feMesh;
+  Node_ElementLocalIndex           eNode_I;
+  Cell_Index                       cell_I;
+  ElementType*                     elementType;
+  Dof_Index                        nodeDofCount;
+  double                           RaT;
+  double                           RaC;
+  double                           detJac             = 0.0;
+  double                           factor;
+  double                           Ni[27];
+  double                           force;
+  double*                          xi;
+  Material*                        material;
+  FeVariable*                      temperatureField   = self->temperatureField;
+  double                           temperature        = 0.0;
 
-	double totalWeight = 0.0;
-	double adjustFactor = 0.0;
+  double totalWeight = 0.0;
+  double adjustFactor = 0.0;
 
-	elementType       = FeMesh_GetElementType( mesh, lElement_I );
-	elementNodeCount  = elementType->nodeCount;
-	nodeDofCount      = dim;
-	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	cellParticleCount = swarm->cellParticleCountTbl[cell_I];
+  elementType       = FeMesh_GetElementType( mesh, lElement_I );
+  elementNodeCount  = elementType->nodeCount;
+  nodeDofCount      = dim;
+  cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+  cellParticleCount = swarm->cellParticleCountTbl[cell_I];
 
-	/* adjust & adjustFactor -- 20060411 Alan
-	 *
-	 * The adjust decides whether an adjustFactor should be applied to the resulting factor.
-	 * If on, the total weight of the particles in the cell are scaled to the cell local volume.
-	 *
-	 * This is designed to be used when integrating with swarms which do not cover the whole domain
-	 * (ie - I used it to do dave.m's test of 1 swarm for blob, 1 swarm for background)
-	 */ 
-	if ( self->adjust ) {
-		for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-			particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
-			totalWeight += particle->weight;
-		}
-		adjustFactor = swarm->weights->cellLocalVolume / totalWeight;
-	}
-	else {
-		adjustFactor = 1.0;
-	}
+  /* adjust & adjustFactor -- 20060411 Alan
+   *
+   * The adjust decides whether an adjustFactor should be applied to
+   * the resulting factor.  If on, the total weight of the particles
+   * in the cell are scaled to the cell local volume.
+   *
+   * This is designed to be used when integrating with swarms which do
+   * not cover the whole domain (ie - I used it to do dave.m's test of
+   * 1 swarm for blob, 1 swarm for background)
+   */ 
+  if ( self->adjust )
+    {
+      for(cParticle_I=0; cParticle_I<cellParticleCount; cParticle_I++)
+        {
+          particle=(IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,
+                                                             cParticle_I);
+          totalWeight+=particle->weight;
+        }
+      adjustFactor=swarm->weights->cellLocalVolume/totalWeight;
+    }
+  else
+    {
+      adjustFactor = 1.0;
+    }
 			
-	for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
-		xi       = particle->xi;
+  double density(0);
 
-		detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, xi, dim );
-		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
+  /* Use an average density for OneToMany mapper */
+  bool one_to_many=Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type);
+  if(one_to_many)
+    {
+      OneToManyMapper *mapper=(OneToManyMapper*)(swarm->mapper);
+      IntegrationPointsSwarm* OneToMany_swarm=mapper->swarm;
+      int OneToMany_cell=
+        CellLayout_MapElementIdToCellId(OneToMany_swarm->cellLayout,
+                                        lElement_I);
+      int num_particles=OneToMany_swarm->cellParticleCountTbl[OneToMany_cell];
 
-		/* Get parameters */
-		if ( temperatureField )
-			FeVariable_InterpolateFromMeshLocalCoord( temperatureField, mesh, lElement_I, xi, &temperature );
+      double weight(0);
+      for(int ii=0;ii<num_particles;++ii)
+        {
+          IntegrationPoint *OneToMany_particle=
+            (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_swarm,
+                                                      OneToMany_cell,ii);
+          weight+=OneToMany_particle->weight;
+          material = IntegrationPointsSwarm_GetMaterialOn(OneToMany_swarm,
+                                                          OneToMany_particle);
+          materialExt = (BuoyancyForceTermThermoChem_MaterialExt*)
+            ExtensionManager_Get(material->extensionMgr,material,
+                                 self->materialExtHandle );
+          density+=materialExt->density*OneToMany_particle->weight;
+        }
+      density/=weight;
+    }
 
-                IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*) swarm);
-                IntegrationPoint* NNparticle(particle);
-                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+  for(cParticle_I=0; cParticle_I<cellParticleCount; cParticle_I++)
+    {
+      particle=(IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,
+                                                         cParticle_I);
+      xi       = particle->xi;
 
-		material = IntegrationPointsSwarm_GetMaterialOn(NNswarm, NNparticle);
-		materialExt = (BuoyancyForceTermThermoChem_MaterialExt*)ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
+      detJac=ElementType_JacobianDeterminant(elementType,mesh,lElement_I,xi,dim);
+      ElementType_EvaluateShapeFunctionsAt(elementType,xi,Ni);
 
-		/* Calculate Force */
-		RaT = BuoyancyForceTermThermoChem_CalcRaT( self, (Swarm*)swarm, lElement_I, particle );
-		RaC = BuoyancyForceTermThermoChem_CalcRaC( self, (Swarm*)swarm, lElement_I, particle );
+      /* Get parameters */
+      if (temperatureField)
+        FeVariable_InterpolateFromMeshLocalCoord(temperatureField,mesh,
+                                                 lElement_I,xi,&temperature);
 
-		force =  ( RaT * temperature) - ( materialExt->density * RaC );
-		factor = detJac * particle->weight * adjustFactor * force;
+      if(!one_to_many)
+        {
+          IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*)swarm);
+          IntegrationPoint* NNparticle(particle);
+          NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
 
-		/* Apply force in verticle direction */
-		for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) { 		
-			elForceVec[ eNode_I * nodeDofCount + J_AXIS ] += factor * Ni[ eNode_I ] ;
-		}
-	}
-	
+          material = IntegrationPointsSwarm_GetMaterialOn(NNswarm,NNparticle);
+          materialExt = (BuoyancyForceTermThermoChem_MaterialExt*)
+            ExtensionManager_Get(material->extensionMgr,material,
+                                 self->materialExtHandle );
+          density=materialExt->density;
+        }
+      /* Calculate Force */
+      RaT=BuoyancyForceTermThermoChem_CalcRaT(self,(Swarm*)swarm,lElement_I,
+                                              particle);
+      RaC=BuoyancyForceTermThermoChem_CalcRaC(self,(Swarm*)swarm,lElement_I,
+                                              particle);
+
+      force=(RaT*temperature)-(density*RaC);
+      factor=detJac*particle->weight*adjustFactor*force;
+
+      /* Apply force in verticle direction */
+      for(eNode_I=0; eNode_I<elementNodeCount; eNode_I++)
+        { 		
+          elForceVec[eNode_I*nodeDofCount+J_AXIS]+=factor*Ni[eNode_I];
+        }
+    }
 }
 
 /* The default implementation is for the RaC to be constant. */

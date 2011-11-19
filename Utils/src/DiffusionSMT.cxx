@@ -226,77 +226,115 @@ void _DiffusionSMT_Destroy( void* matrixTerm, void* data ) {
 }
 
 
-void _DiffusionSMT_AssembleElement( 
-    void*                                              matrixTerm,
-    StiffnessMatrix*                                   stiffnessMatrix, 
-    Element_LocalIndex                                 lElement_I, 
-    SystemLinearEquations*                             sle,
-    FiniteElementContext*                              context,
-    double**                                           elStiffMat ) 
+void _DiffusionSMT_AssembleElement(void* matrixTerm,
+                                   StiffnessMatrix* stiffnessMatrix, 
+                                   Element_LocalIndex lElement_I, 
+                                   SystemLinearEquations* sle,
+                                   FiniteElementContext* context,
+                                   double** elStiffMat)
 {
-    DiffusionSMT*       self         = Stg_CheckType( matrixTerm, DiffusionSMT );
-    Swarm*                              swarm        = self->integrationSwarm;
-    FeVariable*                         variable1    = stiffnessMatrix->rowVariable;
-    Dimension_Index                     dim          = stiffnessMatrix->dim;
-    IntegrationPoint*                   currIntegrationPoint;
-    double*                             xi;
-    double                              weight;
-    Particle_InCellIndex                cParticle_I, cellParticleCount;
-    Index                               nodesPerEl;
-    Index                               i,j;
-    Dimension_Index                     dim_I;
-    double**                            GNx;
-    double                              detJac;
+  DiffusionSMT*       self         = Stg_CheckType(matrixTerm,DiffusionSMT);
+  IntegrationPointsSwarm* swarm=
+    (IntegrationPointsSwarm*)(self->integrationSwarm);
+  FeVariable*                         variable1 = stiffnessMatrix->rowVariable;
+  Dimension_Index                     dim          = stiffnessMatrix->dim;
+  IntegrationPoint*                   currIntegrationPoint;
+  double*                             xi;
+  double                              weight;
+  Particle_InCellIndex                cParticle_I, cellParticleCount;
+  Index                               nodesPerEl;
+  Index                               i,j;
+  Dimension_Index                     dim_I;
+  double**                            GNx;
+  double                              detJac;
 	
-    Cell_Index                          cell_I;
-    ElementType*                        elementType;
-    DiffusionSMT_MaterialExt*   materialExt;
-    Material*                        material;
+  Cell_Index                          cell_I;
+  ElementType*                        elementType;
+  DiffusionSMT_MaterialExt*   materialExt;
+  Material*                        material;
 	
-    /* Set the element type */
-    elementType = FeMesh_GetElementType( variable1->feMesh, lElement_I );
-    nodesPerEl = elementType->nodeCount;
+  /* Set the element type */
+  elementType = FeMesh_GetElementType( variable1->feMesh, lElement_I );
+  nodesPerEl = elementType->nodeCount;
 	
-    /* allocate */
-    GNx = Memory_Alloc_2DArray( double, dim, nodesPerEl, (Name)"GNx"  );
+  /* allocate */
+  GNx = Memory_Alloc_2DArray( double, dim, nodesPerEl, (Name)"GNx"  );
 	
-    cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-    cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
+  cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+  cellParticleCount = swarm->cellParticleCountTbl[ cell_I ];
 
-    /* Slap the laplacian together */
-    for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-		
-	currIntegrationPoint = (IntegrationPoint*)Swarm_ParticleInCellAt(
-	    swarm, cell_I, cParticle_I );
+  double diffusion(0);
 
-        IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*) swarm);
-        IntegrationPoint* NNparticle(currIntegrationPoint);
-        NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+  /* Use an average diffusion for OneToMany mapper */
+  bool one_to_many=Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type);
+  if(one_to_many)
+    {
+      OneToManyMapper *mapper=(OneToManyMapper*)(swarm->mapper);
+      IntegrationPointsSwarm* OneToMany_swarm=mapper->swarm;
+      int OneToMany_cell=
+        CellLayout_MapElementIdToCellId(OneToMany_swarm->cellLayout,
+                                        lElement_I);
+      int num_particles=OneToMany_swarm->cellParticleCountTbl[OneToMany_cell];
 
-	material = IntegrationPointsSwarm_GetMaterialOn(NNswarm,NNparticle);
+      double weight(0);
+      for(int ii=0;ii<num_particles;++ii)
+        {
+          IntegrationPoint *OneToMany_particle=
+            (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_swarm,
+                                                      OneToMany_cell,ii);
+          weight+=OneToMany_particle->weight;
+
+          material = IntegrationPointsSwarm_GetMaterialOn(OneToMany_swarm,
+                                                          OneToMany_particle);
                                                         
-	materialExt = (DiffusionSMT_MaterialExt*)ExtensionManager_Get(material->extensionMgr, material, self->materialExtHandle );
+          materialExt=(DiffusionSMT_MaterialExt*)
+            ExtensionManager_Get(material->extensionMgr,material,
+                                 self->materialExtHandle);
+          diffusion+=materialExt->diffusion*OneToMany_particle->weight;
+        }
+      diffusion/=weight;
+    }
 
-	xi = currIntegrationPoint->xi;
-	weight = currIntegrationPoint->weight;
+  /* Slap the laplacian together */
+  for(cParticle_I=0 ; cParticle_I<cellParticleCount; cParticle_I++)
+    {
+      currIntegrationPoint=
+        (IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,cParticle_I);
+
+      if(!one_to_many)
+        {
+          IntegrationPointsSwarm* NNswarm((IntegrationPointsSwarm*) swarm);
+          IntegrationPoint* NNparticle(currIntegrationPoint);
+          NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+
+          material = IntegrationPointsSwarm_GetMaterialOn(NNswarm,NNparticle);
+                                                        
+          materialExt=(DiffusionSMT_MaterialExt*)
+            ExtensionManager_Get(material->extensionMgr,material,
+                                 self->materialExtHandle);
+          diffusion=materialExt->diffusion;
+        }
+
+      xi = currIntegrationPoint->xi;
+      weight = currIntegrationPoint->weight;
 		
-	ElementType_ShapeFunctionsGlobalDerivs( 
-	    elementType,
-	    variable1->feMesh, lElement_I,
-	    xi, dim, &detJac, GNx );
+      ElementType_ShapeFunctionsGlobalDerivs(elementType,variable1->feMesh,
+                                             lElement_I,xi,dim,&detJac,GNx);
 
-	for( i=0; i<nodesPerEl; i++ ) {
-	    for( j=0; j<nodesPerEl; j++ ) {
-		for ( dim_I = 0; dim_I < dim ; dim_I++ ) { 
-		    elStiffMat[i][j] += 
-			materialExt->diffusion * detJac * weight * 
-			GNx[dim_I][i] * GNx[dim_I][j];
-		}
-	    }
-	}
+      for(i=0; i<nodesPerEl; i++)
+        {
+          for(j=0; j<nodesPerEl; j++)
+            {
+              for(dim_I=0; dim_I<dim; dim_I++)
+                { 
+                  elStiffMat[i][j]+=
+                    diffusion*detJac*weight*GNx[dim_I][i]*GNx[dim_I][j];
+                }
+            }
+        }
     }
 	
-    Memory_Free(GNx); 
+  Memory_Free(GNx); 
 }
 
 
