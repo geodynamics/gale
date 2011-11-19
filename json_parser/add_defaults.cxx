@@ -2,13 +2,7 @@
 #include <stdexcept>
 
 void add_components(json_spirit::Object &root,
-                    const json_spirit::Object &components,
-                    const std::string &enable, const bool &default_enable);
-void add_components(json_spirit::Object &root,
-                    const json_spirit::Object &components)
-{
-  add_components(root,components,"",true);
-}
+                    const json_spirit::Object &components);
 
 void add_defaults(json_spirit::Value &root)
 {
@@ -297,24 +291,6 @@ void add_defaults(json_spirit::Value &root)
     "    \"DofLayout\": \"pressureDofLayout\","
     "    \"LinkedDofInfo\": \"pressureLinkedDofs\""
     "},"
-    // "\"StressField\":"
-    // "{"
-    // "    \"Type\": \"StressField\","
-    // "    \"StrainRateField\": \"StrainRateField\","
-    // "    \"Context\": \"context\","
-    // "    \"ConstitutiveMatrix\": \"constitutiveMatrix\","
-    // "    \"Swarm\": \"gaussSwarm\","
-    // "    \"Mesh\": \"v-T-mesh\","
-    // "    \"IC\": \"stressICs\""
-    // "},"
-    // "\"ViscosityField\":"
-    // "{"
-    // "    \"Type\": \"ViscosityField\","
-    // "    \"Context\": \"context\","
-    // "    \"Swarm\": \"gaussSwarm\","
-    // "    \"Mesh\": \"v-T-mesh\","
-    // "    \"ConstitutiveMatrix\": \"constitutiveMatrix\""
-    // "},"
     "\"solutionVelocity\":"
     "{"
     "    \"Type\": \"SolutionVector\","
@@ -418,12 +394,148 @@ void add_defaults(json_spirit::Value &root)
     "}"
     "}");
 
-  json_spirit::Value toolbox, plugins, basic, stokes;
+  std::string thermal_components
+    ("{"
+     "\"temperature\":"
+     "{"
+     "\"Type\": \"MeshVariable\","
+     "\"Rank\": \"Scalar\","
+     "\"DataType\": \"Double\","
+     "\"mesh\": \"v-T-mesh\""
+     "},"
+     "\"temperatureBCs\":"
+     "{"
+     "\"Type\": \"CompositeVC\","
+     "\"Data\": \"v-T-mesh\""
+     "},"
+     "\"temperatureICs\":"
+     "{"
+     "\"Type\": \"CompositeVC\","
+     "\"Data\": \"v-T-mesh\""
+     "},"
+     "\"temperatureDofLayout\":"
+     "{"
+     "\"Type\": \"DofLayout\","
+     "\"mesh\": \"v-T-mesh\","
+     "\"BaseVariables\":"
+     "["
+     "\"temperature\""
+     "]"
+     "},"
+     "\"TemperatureField\":"
+     "{"
+     "\"Type\": \"FeVariable\","
+     "\"FEMesh\": \"v-T-mesh\","
+     "\"DofLayout\": \"temperatureDofLayout\","
+     "\"BC\": \"temperatureBCs\","
+     "\"IC\": \"temperatureICs\","
+     "\"LinkedDofInfo\": \"temperatureLinkedDofs\""
+     "},"
+     "\"TemperatureGradientsField\":"
+     "{"
+     "\"Type\": \"OperatorFeVariable\","
+     "\"Operator\": \"Gradient\","
+     "\"FeVariable\": \"TemperatureField\""
+     "},"
+
+     "\"displacement\":"
+     "{"
+     "\"Type\": \"MeshVariable\","
+     "\"Rank\": \"Vector\","
+     "\"DataType\": \"Double\","
+     "\"mesh\": \"v-T-mesh\","
+     "\"VectorComponentCount\": \"dim\","
+     "\"names\" : ["
+     "\"dx\","
+     "\"dy\","
+     "\"dz\""
+     "]"
+     "},"
+     "\"displacementBCs\":"
+     "{"
+     "\"Type\": \"CompositeVC\","
+     "\"Data\": \"v-T-mesh\""
+     "},"
+     "\"displacementICs\":"
+     "{"
+     "\"Type\": \"CompositeVC\","
+     "\"Data\": \"v-T-mesh\""
+     "},"
+     "\"displacementDofLayout\":"
+     "{"
+     "\"Type\": \"DofLayout\","
+     "\"mesh\": \"v-T-mesh\","
+     "\"BaseVariableCount\": \"dim\","
+     "\"BaseVariables\":"
+     "["
+     "\"dx\","
+     "\"dy\","
+     "\"dz\""
+     "]"
+     "},"
+     "\"DisplacementField\":"
+     "{"
+     "\"Type\": \"FeVariable\","
+     "\"FEMesh\": \"v-T-mesh\","
+     "\"DofLayout\": \"displacementDofLayout\","
+     "\"BC\": \"displacementBCs\","
+     "\"IC\": \"displacementICs\""
+     "},"
+
+     "\"residual\":"
+     "{"
+     "\"Type\": \"ForceVector\","
+     "\"FeVariable\": \"TemperatureField\""
+     "},"
+     "\"massMatrix\":"
+     "{"
+     "\"Type\": \"ForceVector\","
+     "\"FeVariable\": \"TemperatureField\""
+     "},"
+     "\"predictorMulticorrector\":"
+     "{"
+     "\"Type\": \"AdvDiffMulticorrector\""
+     "},"
+     "\"EnergyEqn\":"
+     "{"
+     "\"Type\": \"AdvectionDiffusionSLE\","
+     "\"SLE_Solver\": \"predictorMulticorrector\","
+     "\"Context\": \"context\","
+     "\"PhiField\": \"TemperatureField\","
+     "\"Residual\": \"residual\","
+     "\"MassMatrix\": \"massMatrix\","
+     "\"courantFactor\": \"0.25\""
+     "},"
+     "\"lumpedMassMatrixForceTerm\":"
+     "{"
+     "\"Type\": \"LumpedMassMatrixForceTerm\","
+     "\"Swarm\": \"gaussSwarm\","
+     "\"ForceVector\": \"massMatrix\""
+     "},"
+     "\"defaultResidualForceTerm\":"
+     "{"
+     "\"Type\": \"AdvDiffResidualForceTerm\","
+     "\"Swarm\": \"gaussSwarm\","
+     "\"ForceVector\": \"residual\","
+     "\"ExtraInfo\": \"EnergyEqn\","
+     "\"VelocityField\": \"VelocityField\","
+     "\"defaultDiffusivity\": \"defaultDiffusivity\","
+     "\"UpwindXiFunction\": \"Exact\""
+     "},"
+     "\"internalHeatingTerm\":"
+     "{"
+     "\"Type\": \"RadiogenicHeatingTerm\","
+     "\"ForceVector\": \"residual\","
+     "\"Swarm\": \"gaussSwarm\""
+     "}"
+     "}");
+
+  json_spirit::Value toolbox, plugins, basic, stokes, thermal;
   json_spirit::read_or_throw(toolbox_string,toolbox);
   json_spirit::read_or_throw(plugins_string,plugins);
   json_spirit::read_or_throw(basic_components,basic);
   json_spirit::read_or_throw(stokes_components,stokes);
-  // json_spirit::read_or_throw(thermal_components,thermal);
+  json_spirit::read_or_throw(thermal_components,thermal);
 
   json_spirit::Object &o(root.get_obj());
 
@@ -462,19 +574,32 @@ void add_defaults(json_spirit::Value &root)
 
   /* Add the standard components */
   /* First find the components */
+  json_spirit::Object::iterator components(o.end());
+  bool enable_thermal(false), enable_stokes(true);
   for(json_spirit::Object::iterator i=o.begin(); i!=o.end(); ++i)
     {
       if(i->name_=="components")
+        components=i;
+      else if(i->name_=="enable-stokes")
         {
-          if(i->value_.type()!=json_spirit::obj_type)
-            throw std::runtime_error("The field 'components' must be an object");
-          /* New components get prepended, so add in reverse order */
-          // add_components(i->value_.get_obj(),thermal.get_obj(),
-          //                "enable-thermal",false);
-          add_components(i->value_.get_obj(),stokes.get_obj(),
-                         "enable-stokes",true);
-          add_components(i->value_.get_obj(),basic.get_obj());
-          break;
+          if(i->value_.type()!=json_spirit::bool_type)
+            throw std::runtime_error("The field enable-stokes must be either"
+                                     "true or false (no quotes)");
+          enable_stokes=i->value_.get_bool();
+        }
+      else if(i->name_=="enable-thermal")
+        {
+          if(i->value_.type()!=json_spirit::bool_type)
+            throw std::runtime_error("The field enable-thermal must be either"
+                                     "true or false (no quotes)");
+          enable_thermal=i->value_.get_bool();
         }
     }
+
+  /* New components get prepended, so add in reverse order */
+  if(enable_thermal)
+    add_components(components->value_.get_obj(),thermal.get_obj());
+  if(enable_stokes)
+    add_components(components->value_.get_obj(),stokes.get_obj());
+  add_components(components->value_.get_obj(),basic.get_obj());
 }
