@@ -133,7 +133,7 @@ void _RadiogenicHeatingTerm_Build( void* forceTerm, void* data ) {
 
 		/* Get List of Heating Elements from material's dictionary */
 		list = Dictionary_Get( material->dictionary, (Dictionary_Entry_Key)"heatingElements" );
-                Journal_Firewall(list!=NULL,errorStream,"Every material must have a heatingElements term.\nThe material '%s' does not have one.",
+                Journal_Firewall(list!=NULL,errorStream,"Every material must have a heatingElements term.\nThe material '%s' does not have one.\n",
                                  material->name);
   		heatingElementCount = Dictionary_Entry_Value_GetCount( list  );
                 materialExt->heatingElementList = Memory_Alloc_Array( HeatingElement, heatingElementCount, "Heating Element" );
@@ -169,72 +169,129 @@ void _RadiogenicHeatingTerm_Destroy( void* forceTerm, void* data ) {
 }
 
 
-void _RadiogenicHeatingTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) {
-	RadiogenicHeatingTerm*               self               = (RadiogenicHeatingTerm*) forceTerm;
-	IntegrationPoint*                    particle;
-	RadiogenicHeatingTerm_MaterialExt*   materialExt;
-	Particle_InCellIndex                 cParticle_I;
-	Particle_InCellIndex                 cellParticleCount;
-	Element_NodeIndex                    elementNodeCount;
-	Dimension_Index                      dim                = forceVector->dim;
-	IntegrationPointsSwarm*              swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
-	FeMesh*       		             mesh               = forceVector->feVariable->feMesh;
-	Node_ElementLocalIndex               eNode_I;
-	Cell_Index                           cell_I;
-	ElementType*                         elementType;
-	double                               detJac             = 0.0;
-	double                               factor;
-	double                               Ni[27];
-	double                               radiogenicHeating;
-	double*                              xi;
-	Material*                            material;
-	double                               time               = self->context->currentTime;
-	HeatingElement*                      heatingElement;
-	Index                                heatingElementCount;
-	Index                                heatingElement_I;
+void _RadiogenicHeatingTerm_AssembleElement(void* forceTerm,
+                                            ForceVector* forceVector,
+                                            Element_LocalIndex lElement_I,
+                                            double* elForceVec)
+{
+  RadiogenicHeatingTerm*               self=(RadiogenicHeatingTerm*)forceTerm;
+  IntegrationPoint*                    particle;
+  RadiogenicHeatingTerm_MaterialExt*   materialExt;
+  Particle_InCellIndex                 cParticle_I;
+  Particle_InCellIndex                 cellParticleCount;
+  Element_NodeIndex                    elementNodeCount;
+  Dimension_Index                      dim                = forceVector->dim;
+  IntegrationPointsSwarm* swarm=(IntegrationPointsSwarm*)self->integrationSwarm;
+  FeMesh* mesh=forceVector->feVariable->feMesh;
+  Node_ElementLocalIndex               eNode_I;
+  Cell_Index                           cell_I;
+  ElementType*                         elementType;
+  double                               detJac             = 0.0;
+  double                               factor;
+  double                               Ni[27];
+  double                               radiogenicHeating(0);
+  double*                              xi;
+  Material*                            material;
+  double time=self->context->currentTime;
+  HeatingElement*                      heatingElement;
+  Index                                heatingElementCount;
+  Index                                heatingElement_I;
 
-	elementType       = FeMesh_GetElementType( mesh, lElement_I );
-	elementNodeCount  = elementType->nodeCount;
-	cell_I            = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
-	cellParticleCount = swarm->cellParticleCountTbl[cell_I];
+  elementType       = FeMesh_GetElementType( mesh, lElement_I );
+  elementNodeCount  = elementType->nodeCount;
+  cell_I = CellLayout_MapElementIdToCellId( swarm->cellLayout, lElement_I );
+  cellParticleCount = swarm->cellParticleCountTbl[cell_I];
 
-	for( cParticle_I = 0 ; cParticle_I < cellParticleCount ; cParticle_I++ ) {
-		particle = (IntegrationPoint*) Swarm_ParticleInCellAt( swarm, cell_I, cParticle_I );
+  /* Use an average heating for OneToMany mapper */
+  bool one_to_many=Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type);
+  if(one_to_many)
+    {
+      OneToManyMapper *mapper=(OneToManyMapper*)(swarm->mapper);
+      IntegrationPointsSwarm* OneToMany_swarm=mapper->swarm;
+      int OneToMany_cell=
+        CellLayout_MapElementIdToCellId(OneToMany_swarm->cellLayout,
+                                        lElement_I);
+      int num_particles=OneToMany_swarm->cellParticleCountTbl[OneToMany_cell];
 
-                /* Handle case where we are using gauss swarms with
-                   NearestNeighborMapper instead of a material
-                   swarm */
-                IntegrationPointsSwarm* NNswarm(swarm);
-                IntegrationPoint* NNparticle(particle);
-                NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
-                  
-		/* Get parameters */
-		material = IntegrationPointsSwarm_GetMaterialOn(NNswarm,NNparticle);
-		materialExt = (RadiogenicHeatingTerm_MaterialExt*)ExtensionManager_Get( material->extensionMgr, material, self->materialExtHandle );
+      double weight(0);
+      radiogenicHeating = 0.0;
+      for(int ii=0;ii<num_particles;++ii)
+        {
+          IntegrationPoint *OneToMany_particle=
+            (IntegrationPoint*)Swarm_ParticleInCellAt(OneToMany_swarm,
+                                                      OneToMany_cell,ii);
+          weight+=OneToMany_particle->weight;
+          /* Get parameters */
+          material = IntegrationPointsSwarm_GetMaterialOn(OneToMany_swarm,
+                                                          OneToMany_particle);
+          materialExt = (RadiogenicHeatingTerm_MaterialExt*)
+            ExtensionManager_Get(material->extensionMgr,material,
+                                 self->materialExtHandle);
 		
-		/* Check if this material has heating term */
-		heatingElementCount = materialExt->heatingElementCount;
-		if ( heatingElementCount == 0 )
-			continue;
+          /* Check if this material has heating term */
+          heatingElementCount = materialExt->heatingElementCount;
+          if(heatingElementCount==0)
+            continue;
 
-		/* Calculate Radiogenic Heating */
-		radiogenicHeating = 0.0;
-        	for ( heatingElement_I = 0 ; heatingElement_I < heatingElementCount ; heatingElement_I++ ) {
-			heatingElement = &materialExt->heatingElementList[ heatingElement_I ];
-	        	radiogenicHeating += heatingElement->Q * exp(-heatingElement->lambda * (time));
-		}
+          /* Calculate Radiogenic Heating */
+          for(heatingElement_I=0; heatingElement_I<heatingElementCount;
+              heatingElement_I++)
+            {
+              heatingElement=&materialExt->heatingElementList[heatingElement_I];
+              radiogenicHeating+=OneToMany_particle->weight
+                * heatingElement->Q*exp(-heatingElement->lambda*time);
+            }
+        }
+      radiogenicHeating/=weight;
+    }
 
-		/* Get Values to det integration */
-		xi  = particle->xi;
-		detJac = ElementType_JacobianDeterminant( elementType, mesh, lElement_I, xi, dim );
-		ElementType_EvaluateShapeFunctionsAt( elementType, xi, Ni );
+  for(cParticle_I=0; cParticle_I<cellParticleCount; cParticle_I++)
+    {
+      particle=(IntegrationPoint*)Swarm_ParticleInCellAt(swarm,cell_I,
+                                                         cParticle_I);
+      if(!one_to_many)
+        {
+          /* Handle case where we are using gauss swarms with
+             NearestNeighborMapper instead of a material
+             swarm */
+          IntegrationPointsSwarm* NNswarm(swarm);
+          IntegrationPoint* NNparticle(particle);
+          NearestNeighbor_Replace(&NNswarm,&NNparticle,lElement_I,dim);
+                  
+          /* Get parameters */
+          material = IntegrationPointsSwarm_GetMaterialOn(NNswarm,NNparticle);
+          materialExt = (RadiogenicHeatingTerm_MaterialExt*)
+            ExtensionManager_Get(material->extensionMgr,material,
+                                 self->materialExtHandle);
+		
+          /* Check if this material has heating term */
+          heatingElementCount = materialExt->heatingElementCount;
+          if(heatingElementCount==0)
+            continue;
 
-		/* Apply heating term */
-		factor = detJac * particle->weight * radiogenicHeating;
-		for( eNode_I = 0 ; eNode_I < elementNodeCount; eNode_I++ ) { 		
-			elForceVec[ eNode_I ] += factor * Ni[ eNode_I ] ;
-		}
-	}
+          /* Calculate Radiogenic Heating */
+          radiogenicHeating = 0.0;
+          for(heatingElement_I=0; heatingElement_I<heatingElementCount;
+              heatingElement_I++)
+            {
+              heatingElement=&materialExt->heatingElementList[heatingElement_I];
+              radiogenicHeating+=
+                heatingElement->Q*exp(-heatingElement->lambda*(time));
+            }
+        }
+
+      /* Get Values to det integration */
+      xi=particle->xi;
+      detJac=ElementType_JacobianDeterminant(elementType,mesh,lElement_I,xi,dim);
+      ElementType_EvaluateShapeFunctionsAt(elementType,xi,Ni);
+
+      /* Apply heating term */
+      factor=detJac*particle->weight*radiogenicHeating;
+      for(eNode_I=0; eNode_I<elementNodeCount; eNode_I++)
+        { 		
+          elForceVec[eNode_I]+=factor*Ni[eNode_I];
+        }
+    }
 }
 
 
