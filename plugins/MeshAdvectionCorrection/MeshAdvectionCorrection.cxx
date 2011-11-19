@@ -119,36 +119,38 @@ void MeshAdvectionCorrection_StoreCurrentVelocity( FeVariable *velocityField, do
 	}
 }
 
-void MeshAdvectionCorrection_EulerDeformCorrection( FeVariable *artDField, double *artVelocity, double dt ) {
-	/* save the purely artificial bit of the remeshing in the artVelocity */
-	FeMesh*      mesh = artDField->feMesh;
-	Dof_Index    dof  = artDField->fieldComponentCount;
-	double       artV[3], artD[3];
-	unsigned int numLocalNodes = FeMesh_GetNodeLocalSize( mesh );
-	Dof_Index    dof_I, lNode_I;
+void MeshAdvectionCorrection_EulerDeformCorrection(FeVariable *artDField,
+                                                   double *artVelocity,
+                                                   double dt)
+{
+  /* save the purely artificial bit of the remeshing in the artVelocity */
+  FeMesh*      mesh = artDField->feMesh;
+  Dof_Index    dof  = artDField->fieldComponentCount;
+  double       artV[3], artD[3];
+  unsigned int numLocalNodes = FeMesh_GetNodeLocalSize( mesh );
+  Dof_Index    dof_I, lNode_I;
 
-		/* INITIAL CONDITION: artV = 0 */
-	if( dt == 0 ) {
-		for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
-			for( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
-				artV[dof_I] = 0;
+  /* INITIAL CONDITION: artV = 0 */
+  if( dt == 0 ) {
+    for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
+      for( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
+        artV[dof_I] = 0;
 
-			memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
-		}
-		return;
-	}
+      memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
+    }
+    return;
+  }
 	
-	 /* GENERAL algorithm artV = -1*artD / dt. It's -ve because we 
-		* want to reverse the effects of the artificial displacement */
-	for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
-		FeVariable_GetValueAtNode( artDField, lNode_I, artD );
-		/* artV = artD / dt */
-		for( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
-			artV[dof_I] = -1*artD[dof_I] / dt;
+  /* GENERAL algorithm artV = -1*artD / dt. It's -ve because we 
+   * want to reverse the effects of the artificial displacement */
+  for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
+    FeVariable_GetValueAtNode( artDField, lNode_I, artD );
+    /* artV = artD / dt */
+    for( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
+      artV[dof_I] = -1*artD[dof_I] / dt;
 
-		memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
-	}
-
+    memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
+  }
 }
 
 void MeshAdvectionCorrection( void* sle, void* data ) {
@@ -196,36 +198,63 @@ void MeshAdvectionCorrection( void* sle, void* data ) {
 	Memory_Free( oldVelocity );
 }
 
-void _Underworld_MeshAdvectionCorrection_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	UnderworldContext*                                      context = 
-	Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data ); 
-	Underworld_MeshAdvectionCorrection_ContextExt*       plugin;
-   AdvectionDiffusionSLE* energySLE = (AdvectionDiffusionSLE* ) Stg_ComponentFactory_ConstructByName( cf, (Name)"EnergyEqn", UnderworldContext, True, data );
+void _Underworld_MeshAdvectionCorrection_AssignFromXML(void* component,
+                                                       Stg_ComponentFactory* cf,
+                                                       void* data)
+{
+  Codelet* ed=(Codelet*)component;
+  UnderworldContext* context=
+    Stg_ComponentFactory_ConstructByName(cf,(Name)"context",UnderworldContext,
+                                         True,data);
+  ed->context=(AbstractContext*)context;
 	
-	Journal_DFirewall( 
-		context!=NULL, 
-		Journal_Register( Error_Type, (Name)Underworld_MeshAdvectionCorrection_Type  ), 
-		"No context found\n" );
-	Journal_DFirewall( 
-		energySLE!=NULL, 
-		Journal_Register( Error_Type, (Name)Underworld_MeshAdvectionCorrection_Type  ), 
-		"The required energy SLE component has not been created or placed on the context.\n");	
+  Journal_DFirewall
+    (context!=NULL,
+     Journal_Register(Error_Type,
+                      (Name)Underworld_MeshAdvectionCorrection_Type),
+     "No context found\n");
 	
-	/* Add the extension to the context */
-	Underworld_MeshAdvectionCorrection_ContextExtHandle = ExtensionManager_Add( context->extensionMgr, (Name)Underworld_MeshAdvectionCorrection_Type, sizeof( Underworld_MeshAdvectionCorrection_ContextExt )  );
-	plugin = (Underworld_MeshAdvectionCorrection_ContextExt*)ExtensionManager_Get( 
-		context->extensionMgr, 
-		context, 
-		Underworld_MeshAdvectionCorrection_ContextExtHandle );
+  /* Add the extension to the context */
+  Underworld_MeshAdvectionCorrection_ContextExtHandle=
+    ExtensionManager_Add(context->extensionMgr,
+                         (Name)Underworld_MeshAdvectionCorrection_Type,
+                         sizeof(Underworld_MeshAdvectionCorrection_ContextExt));
+}
 
-	if( Stg_ComponentFactory_GetRootDictBool( cf, (Dictionary_Entry_Key)"MeshAdvectionCorrection_UseArtDisplacementField", False)  ) {
-		/* get the artificial displacement field */
-		plugin->artDisplacement = Stg_ComponentFactory_ConstructByName( cf, (Name)"ArtDisplacementField", FeVariable, True, data );
-	}
+void _Underworld_MeshAdvectionCorrection_Build(void* component, void* data)
+{
+  Codelet* ed=(Codelet*)component;
+  UnderworldContext* uwCtx=(UnderworldContext*)(ed->context);
 
-	/* Replace the energy SLE's execute with this one. Save the old value for use later. */
-	plugin->energySolverExecute = energySLE->_execute;
-	energySLE->_execute = MeshAdvectionCorrection;
+  assert(component);
+  assert(uwCtx);
+
+  Underworld_MeshAdvectionCorrection_ContextExt* plugin=
+    (Underworld_MeshAdvectionCorrection_ContextExt*)
+    ExtensionManager_Get(uwCtx->extensionMgr,uwCtx,
+                         Underworld_MeshAdvectionCorrection_ContextExtHandle);
+
+  AdvectionDiffusionSLE* energySLE=(AdvectionDiffusionSLE*)
+    Stg_ComponentFactory_ConstructByName(uwCtx->CF,(Name)"EnergyEqn",
+                                         AdvectionDiffusionSLE,True,data);
+	
+  Journal_DFirewall
+    (energySLE!=NULL, 
+     Journal_Register(Error_Type,
+                      (Name)Underworld_MeshAdvectionCorrection_Type),
+     "The required energy SLE component has not been created or placed"
+     "on the context.\n");
+
+  /* Replace the energy SLE's execute with this one. Save the old
+     value for use later. */
+  plugin->energySolverExecute = energySLE->_execute;
+  energySLE->_execute = MeshAdvectionCorrection;
+
+  /* Grab the ArtDisplacementField from the dictionary */
+  plugin->artDisplacement=
+    Stg_ComponentFactory_ConstructByName(uwCtx->CF,
+                                         (Name)"DisplacementField",FeVariable,
+                                         False,data);
 }
 
 /* This function will provide StGermain the abilty to instantiate (create) this codelet on demand. */
@@ -234,7 +263,7 @@ void* _Underworld_MeshAdvectionCorrection_DefaultNew( Name name  ) {
 			Underworld_MeshAdvectionCorrection_Type,
 			_Underworld_MeshAdvectionCorrection_DefaultNew,
 			_Underworld_MeshAdvectionCorrection_AssignFromXML, /* SQ NOTE: Used to be a construct extensions. */
-			_Codelet_Build,
+			_Underworld_MeshAdvectionCorrection_Build,
 			_Codelet_Initialise,
 			_Codelet_Execute,
 			_Codelet_Destroy,

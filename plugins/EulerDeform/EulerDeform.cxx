@@ -99,8 +99,6 @@ void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactor
 	/* Get the time integrator. */
 	edCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, (Name)"timeIntegrator", TimeIntegrator, True, data  );
 
-	/* Grab the ArtDisplacementField from the dictionary */
-	edCtx->artDField = Stg_ComponentFactory_ConstructByName( cf, (Name)"ArtDisplacementField", FeVariable, False, data  );
 }
 
 
@@ -125,6 +123,9 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 	if( !edDict  ) {
 		return;
 	}
+
+	/* Grab the ArtDisplacementField from the dictionary */
+	edCtx->artDField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)"DisplacementField", FeVariable, False, data  );
 
 	/* Read system list. */
 	sysLst = Dictionary_Entry_Value_GetMember( edDict, (Dictionary_Entry_Key)"systems" );
@@ -999,42 +1000,6 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
   }
 }
 
-
-void EulerDeform_InterpVar( FieldVariable* field, Variable* var, Mesh* mesh, double** newCrds ) {
-	double*		newVals;
-	unsigned	curValInd = 0;
-	unsigned	nLocalNodes;
-	unsigned	n_i, c_i;
-
-	assert( field );
-	/*assert( var );*/
-	assert( newCrds );
-
-	/* Allocate for new values. */
-	nLocalNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
-	newVals = Memory_Alloc_Array( double, field->fieldComponentCount * nLocalNodes, "EulerDeform_InterpVar::newVals" );
-
-	/* Interpolate using new node coordinates. */
-	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
-		InterpolationResult	res;
-
-		/* Interpolate the value. */
-		res = FieldVariable_InterpolateValueAt( field, newCrds[n_i], newVals + n_i * field->fieldComponentCount );
-		if( res == OTHER_PROC || res == OUTSIDE_GLOBAL ) {
-			FeVariable_GetValueAtNode( (FeVariable*)field, n_i, 
-						   newVals + n_i * field->fieldComponentCount );
-		}
-	}
-
-	/* Transfer the new values back to the variable. */
-	for( n_i = 0; n_i < nLocalNodes; n_i++ ) {
-	   for( c_i = 0; c_i < field->fieldComponentCount; c_i++ )
-	      DofLayout_SetValueDouble( ((FeVariable*)field)->dofLayout, n_i, c_i, newVals[curValInd++] );
-	}
-
-	/* Free the values array. */
-	FreeArray( newVals );
-}
 
 void EulerDeform_InternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim, int top );
 
