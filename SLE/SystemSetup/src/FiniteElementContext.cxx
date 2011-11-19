@@ -362,46 +362,50 @@ double _FiniteElementContext_GetDt( void* context ) {
 }
 
 double FiniteElementContext_CalcNewDt( void* context ) {
-	FiniteElementContext* self = (FiniteElementContext*)context;
+  FiniteElementContext* self = (FiniteElementContext*)context;
 
-	self->prevTimestepDt = self->dt;
+  self->prevTimestepDt = self->dt;
 	
-	if ( self->calcDtEP->hooks->count == 0 ) {
-		self->dt = 0.0;
-	}
-	else {
-		self->dt = _EntryPoint_Run_Class_Minimum_VoidPtr( self->calcDtEP, self );
-	}	
+  self->dt=Dictionary_GetDouble_WithDefault(self->dictionary,"dt",0.0);
+
+  if(self->dt==0)
+    {
+      if ( self->calcDtEP->hooks->count == 0 ) {
+        self->dt = 0.0;
+      }
+      else {
+        self->dt = _EntryPoint_Run_Class_Minimum_VoidPtr( self->calcDtEP, self );
+      }	
 		
-	if ( ( self->timeStep > 1 ) && ( self->limitTimeStepIncreaseRate == True ) ) {
-		double  maxAllowedDt = self->prevTimestepDt * ( 1 + self->maxTimeStepIncreasePercentage / 100 );
+      if ( ( self->timeStep > 1 ) && ( self->limitTimeStepIncreaseRate == True ) ) {
+        double  maxAllowedDt = self->prevTimestepDt * ( 1 + self->maxTimeStepIncreasePercentage / 100 );
 
-		if ( self->dt > maxAllowedDt ) {
-			int prevContextPrintingRank = Stream_GetPrintingRank( self->info );
-			/* We assume the dt calculation will be the same across all procs since its a global
-			  operation, so only print this once */
-			Stream_SetPrintingRank( self->info, 0 );
-			Journal_Printf( 
-				self->info, 
-				"In %s(): dt calculated was %g (time), but prev timestep's dt\n"
-				"was %g (time) and max allowed increase percentage is %.2f\n, thus limiting current\n"
-				"dt to %g (time).\n", 
-				__func__, 
-				self->dt, 
-				self->prevTimestepDt,
-				self->maxTimeStepIncreasePercentage, 
-				maxAllowedDt );
-			self->dt = maxAllowedDt;
-			Stream_SetPrintingRank( self->info, prevContextPrintingRank );
-		}
-	}
-
-        if( self->maxTimeStepSize > 0.0 ) {
-           if( self->dt > self->maxTimeStepSize )
-              self->dt = self->maxTimeStepSize;
+        if ( self->dt > maxAllowedDt ) {
+          int prevContextPrintingRank = Stream_GetPrintingRank( self->info );
+          /* We assume the dt calculation will be the same across all procs since its a global
+             operation, so only print this once */
+          Stream_SetPrintingRank( self->info, 0 );
+          Journal_Printf( 
+                         self->info, 
+                         "In %s(): dt calculated was %g (time), but prev timestep's dt\n"
+                         "was %g (time) and max allowed increase percentage is %.2f\n, thus limiting current\n"
+                         "dt to %g (time).\n", 
+                         __func__, 
+                         self->dt, 
+                         self->prevTimestepDt,
+                         self->maxTimeStepIncreasePercentage, 
+                         maxAllowedDt );
+          self->dt = maxAllowedDt;
+          Stream_SetPrintingRank( self->info, prevContextPrintingRank );
         }
-	
-	return self->dt;
+      }
+
+      if( self->maxTimeStepSize > 0.0 ) {
+        if( self->dt > self->maxTimeStepSize )
+          self->dt = self->maxTimeStepSize;
+      }
+    }
+  return self->dt;
 }
 
 
