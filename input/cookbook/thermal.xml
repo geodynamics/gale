@@ -524,6 +524,7 @@
       <param name="VelocityField">VelocityField</param>
       <param name="defaultDiffusivity">defaultDiffusivity</param>
       <param name="UpwindXiFunction">Exact</param>
+      <param name="picSwarm">picIntegrationPoints</param>
     </struct>
     <struct name="internalHeatingTerm">
       <param name="Type">RadiogenicHeatingTerm</param>
