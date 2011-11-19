@@ -37,23 +37,80 @@
             "startZ": "minZ",
             "endZ": "maxZ"
         },
+        "sphereShape":
+        {
+            "Type": "EquationShape",
+            "equation": ".1^2 - ((x-1)^2 + (y-.15)^2)"
+        },
+        "nonsphereShape":
+        {
+            "Type": "Intersection",
+            "shapes":
+            [
+                "boxShape",
+                "!sphereShape"
+            ]
+        },
         "backgroundViscosity":
         {
             "Type": "MaterialViscosity",
             "eta0": "1.0"
         },
+
+        "strainWeakening":
+        {
+            "Type": "StrainWeakening",
+            "TimeIntegrator": "timeIntegrator",
+            "MaterialPointsSwarm": "materialSwarm",
+            "softeningStrain": "0.1",
+            "initialDamageFraction": "0.0",
+            "initialDamageWavenumber": "0.5",
+            "initialDamageFactor": "0.5",
+            "healingRate": "0.0"
+        },
+        "yielding":
+        {
+            "Type": "DruckerPrager",
+            "PressureField": "PressureField",
+            "VelocityGradientsField": "VelocityGradientsField",
+            "MaterialPointsSwarm": "materialSwarm",
+            "Context": "context",
+            "StrainWeakening": "strainWeakening",
+            "StrainRateField": "StrainRateField",
+            "cohesion": "1.0",
+            "cohesionAfterSoftening": "0.0001",
+            "frictionCoefficient": "0.0",
+            "frictionCoefficientAfterSoftening": "0.0",
+            "minimumViscosity": "1.0e-4"
+        },
         "viscous":
         {
             "Type": "RheologyMaterial",
-            "Shape": "boxShape",
+            "Shape": "nonsphereShape",
             "density": "1.0",
             "Rheology": [
                 "backgroundViscosity",
+                "yielding",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "sphereViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "10.0"
+        },
+        "sphereViscous":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "sphereShape",
+            "density": "1.0",
+            "Rheology": [
+                "sphereViscosity",
                 "storeViscosity",
                 "storeStress"
             ]
         }
-
     },
     "velocityBCs" :{
         "type": "CompositeVC",

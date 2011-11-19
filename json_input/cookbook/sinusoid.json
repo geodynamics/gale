@@ -27,15 +27,9 @@
             "Swarm": "gaussSwarm",
             "gravity": "gravity"
         },
-        "boxShape":
+        "backgroundShape":
         {
-            "Type": "Box",
-            "startX": "minX",
-            "endX": "maxX",
-            "startY": "minY",
-            "endY": "maxY",
-            "startZ": "minZ",
-            "endZ": "maxZ"
+            "Type": "Everywhere"
         },
         "backgroundViscosity":
         {
@@ -45,15 +39,21 @@
         "viscous":
         {
             "Type": "RheologyMaterial",
-            "Shape": "boxShape",
+            "Shape": "backgroundShape",
             "density": "1.0",
             "Rheology": [
                 "backgroundViscosity",
                 "storeViscosity",
                 "storeStress"
             ]
+        },
+        "surfaceAdaptor":
+        {
+            "Type": "SurfaceAdaptor",
+            "mesh":"v-T-mesh",
+            "sourceGenerator": "v-T-mesh-generator",
+            "topEquation": "0.1*sin(2*pi*x)"
         }
-
     },
     "velocityBCs" :{
         "type": "CompositeVC",
@@ -74,7 +74,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "1.0"
+                        "value": "0.0"
                     }
                 ]
             },
@@ -100,12 +100,12 @@
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",
-    "minX": "0",
-    "minY": "0",
-    "minZ": "0",
-    "maxX": "2",
-    "maxY": "0.35",
-    "maxZ": "0.3",
+    "minX": "0.0f",
+    "minY": "0.0f",
+    "minZ": "0.0f",
+    "maxX": "2.0f",
+    "maxY": "0.35f",
+    "maxZ": "0.3f",
     "nx": "16",
     "ny": "4",
     "nz": "4",

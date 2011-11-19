@@ -37,6 +37,20 @@
             "startZ": "minZ",
             "endZ": "maxZ"
         },
+        "sphereShape":
+        {
+            "Type": "EquationShape",
+            "equation": ".1^2 - ((x-1)^2 + (y-.15)^2)"
+        },
+        "nonsphereShape":
+        {
+            "Type": "Intersection",
+            "shapes":
+            [
+                "boxShape",
+                "!sphereShape"
+            ]
+        },
         "backgroundViscosity":
         {
             "Type": "MaterialViscosity",
@@ -45,15 +59,30 @@
         "viscous":
         {
             "Type": "RheologyMaterial",
-            "Shape": "boxShape",
+            "Shape": "nonsphereShape",
             "density": "1.0",
             "Rheology": [
                 "backgroundViscosity",
                 "storeViscosity",
                 "storeStress"
             ]
+        },
+        "sphereViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "10.0"
+        },
+        "sphereViscous":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "sphereShape",
+            "density": "1.0",
+            "Rheology": [
+                "sphereViscosity",
+                "storeViscosity",
+                "storeStress"
+            ]
         }
-
     },
     "velocityBCs" :{
         "type": "CompositeVC",

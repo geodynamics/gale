@@ -26,34 +26,7 @@
             "ForceVector": "mom_force",
             "Swarm": "gaussSwarm",
             "gravity": "gravity"
-        },
-        "boxShape":
-        {
-            "Type": "Box",
-            "startX": "minX",
-            "endX": "maxX",
-            "startY": "minY",
-            "endY": "maxY",
-            "startZ": "minZ",
-            "endZ": "maxZ"
-        },
-        "backgroundViscosity":
-        {
-            "Type": "MaterialViscosity",
-            "eta0": "1.0"
-        },
-        "viscous":
-        {
-            "Type": "RheologyMaterial",
-            "Shape": "boxShape",
-            "density": "1.0",
-            "Rheology": [
-                "backgroundViscosity",
-                "storeViscosity",
-                "storeStress"
-            ]
         }
-
     },
     "velocityBCs" :{
         "type": "CompositeVC",
@@ -74,7 +47,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "1.0"
+                        "value": "0.0"
                     }
                 ]
             },

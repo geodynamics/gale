@@ -14,7 +14,9 @@
                 "innerMesh": "pressure-mesh",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",
-                "wrapTop": "True"
+                "wrapTop": "True",
+                "staticLeft" : "True",
+                "staticBottom" : "True"
             }
         ]
     },
@@ -64,7 +66,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "0.0"
+                        "value": "step(y-0.1)*step(0.2-y)"
                     }
                 ]
             },
@@ -74,7 +76,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "1.0"
+                        "value": "0.0"
                     }
                 ]
             },
@@ -83,8 +85,12 @@
                 "wall": "bottom",
                 "variables": [
                     {
+                        "name": "vx",
+                        "value": "step(x-0.9)*step(1.1-x)"
+                    },
+                    {
                         "name": "vy",
-                        "value": "0.0"
+                        "value": "-step(x-0.9)*step(1.1-x)"
                     }
                 ]
             }
@@ -100,12 +106,12 @@
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",
-    "minX": "0",
-    "minY": "0",
-    "minZ": "0",
-    "maxX": "2",
-    "maxY": "0.35",
-    "maxZ": "0.3",
+    "minX": "0.0f",
+    "minY": "0.0f",
+    "minZ": "0.0f",
+    "maxX": "2.0f",
+    "maxY": "0.35f",
+    "maxZ": "0.3f",
     "nx": "16",
     "ny": "4",
     "nz": "4",

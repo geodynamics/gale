@@ -14,7 +14,8 @@
                 "innerMesh": "pressure-mesh",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",
-                "wrapTop": "True"
+                "wrapTop": "True",
+                "staticBottom": "True"
             }
         ]
     },
@@ -53,7 +54,14 @@
                 "storeStress"
             ]
         }
-
+        ,"stressBC":
+        {
+            "Type": "StressBC",
+            "ForceVector": "mom_force",
+            "Swarm": "picIntegrationPoints",
+            "wall": "bottom",
+            "normal_value": "0.35-y"
+        }
     },
     "velocityBCs" :{
         "type": "CompositeVC",
@@ -65,6 +73,10 @@
                     {
                         "name": "vx",
                         "value": "0.0"
+                    },
+                    {
+                        "name": "vy",
+                        "value": "0.0"
                     }
                 ]
             },
@@ -75,13 +87,7 @@
                     {
                         "name": "vx",
                         "value": "1.0"
-                    }
-                ]
-            },
-            {
-                "type": "WallVC",
-                "wall": "bottom",
-                "variables": [
+                    },
                     {
                         "name": "vy",
                         "value": "0.0"
@@ -100,12 +106,12 @@
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",
-    "minX": "0",
-    "minY": "0",
-    "minZ": "0",
-    "maxX": "2",
-    "maxY": "0.35",
-    "maxZ": "0.3",
+    "minX": "0.0f",
+    "minY": "0.0f",
+    "minZ": "0.0f",
+    "maxX": "2.0f",
+    "maxY": "0.35f",
+    "maxZ": "0.3f",
     "nx": "16",
     "ny": "4",
     "nz": "4",

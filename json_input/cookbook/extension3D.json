@@ -27,15 +27,9 @@
             "Swarm": "gaussSwarm",
             "gravity": "gravity"
         },
-        "boxShape":
+        "backgroundShape":
         {
-            "Type": "Box",
-            "startX": "minX",
-            "endX": "maxX",
-            "startY": "minY",
-            "endY": "maxY",
-            "startZ": "minZ",
-            "endZ": "maxZ"
+            "Type": "Everywhere"
         },
         "backgroundViscosity":
         {
@@ -45,19 +39,54 @@
         "viscous":
         {
             "Type": "RheologyMaterial",
-            "Shape": "boxShape",
+            "Shape": "backgroundShape",
             "density": "1.0",
             "Rheology": [
                 "backgroundViscosity",
                 "storeViscosity",
                 "storeStress"
             ]
+        },
+        "surfaceAdaptor":
+        {
+            "Type": "SurfaceAdaptor",
+            "mesh":"v-T-mesh",
+            "sourceGenerator": "v-T-mesh-generator",
+            "topSurfaceType": "topo_data",
+            "topSurfaceName": "input/cookbook/test.topo",
+            "topNx": "32",
+            "topNz": "12",
+            "topMinX": "minX",
+            "topMaxX": "maxX",
+            "topMinZ": "minZ",
+            "topMaxZ": "maxZ",
+            
+            "bottomEquation": "x<1 ? -0.1*x : -0.1"
         }
-
     },
     "velocityBCs" :{
         "type": "CompositeVC",
         "vcList": [
+            {
+                "type": "WallVC",
+                "wall": "front",
+                "variables": [
+                    {
+                        "name": "vz",
+                        "value": "0.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "back",
+                "variables": [
+                    {
+                        "name": "vz",
+                        "value": "0.0"
+                    }
+                ]
+            },
             {
                 "type": "WallVC",
                 "wall": "left",
@@ -99,7 +128,7 @@
     "timeIntegratorOrder": "1",
     "maxTimeSteps": "10",
     "outputPath": "./output",
-    "dim": "2",
+    "dim": "3",
     "minX": "0",
     "minY": "0",
     "minZ": "0",

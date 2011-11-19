@@ -13,20 +13,12 @@
                 "mesh": "v-T-mesh",
                 "innerMesh": "pressure-mesh",
                 "remesher": "velocityRemesher",
-                "velocityField": "VelocityField",
-                "wrapTop": "True"
+                "velocityField": "VelocityField"
             }
         ]
     },
     "components":
     {
-        "buoyancyForceTerm":
-        {
-            "Type": "BuoyancyForceTerm",
-            "ForceVector": "mom_force",
-            "Swarm": "gaussSwarm",
-            "gravity": "gravity"
-        },
         "boxShape":
         {
             "Type": "Box",
@@ -47,41 +39,30 @@
             "Type": "RheologyMaterial",
             "Shape": "boxShape",
             "density": "1.0",
+            "alpha": "1.0",
+            "diffusivity": "0.0",
+            "heatingElements": [
+                {
+                    "Q": "0.0",
+                    "lambda": "1.0"
+                }
+            ],
             "Rheology": [
-                "backgroundViscosity",
-                "storeViscosity",
-                "storeStress"
+                "backgroundViscosity"
             ]
         }
-
     },
-    "velocityBCs" :{
+    "velocityICs":
+    {
         "type": "CompositeVC",
         "vcList": [
             {
-                "type": "WallVC",
-                "wall": "left",
-                "variables": [
-                    {
-                        "name": "vx",
-                        "value": "0.0"
-                    }
-                ]
-            },
-            {
-                "type": "WallVC",
-                "wall": "right",
-                "variables": [
+                "type": "AllNodesVC",
+                "variables":[
                     {
                         "name": "vx",
                         "value": "1.0"
-                    }
-                ]
-            },
-            {
-                "type": "WallVC",
-                "wall": "bottom",
-                "variables": [
+                    },
                     {
                         "name": "vy",
                         "value": "0.0"
@@ -90,24 +71,41 @@
             }
         ]
     },
+    "temperatureICs":
+    {
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "AllNodesVC",
+                "variables":[
+                    {
+                        "name": "temperature",
+                        "value": "(x<.375 || x>.625 || y<.375 || y>.625) ? 1 : 2"
+                        // "value": ".1^2 > ((x-.5)^2 + (y-.5)^2) ? 2 : 1"
+                    }
+                ]
+            }
+        ]
+    },
 
     "FieldVariablesToCheckpoint": [
-        "StrainRateInvariantField",
-        "VelocityField",
-        "PressureField"
+        "TemperatureField",
+        "VelocityField"
     ],
+    "enable-stokes": false,
+    "enable-thermal": true,
     "timeIntegratorOrder": "1",
-    "maxTimeSteps": "10",
+    "maxTimeSteps": "1",
     "outputPath": "./output",
     "dim": "2",
     "minX": "0",
     "minY": "0",
     "minZ": "0",
-    "maxX": "2",
-    "maxY": "0.35",
+    "maxX": "4",
+    "maxY": "1",
     "maxZ": "0.3",
-    "nx": "16",
-    "ny": "4",
+    "nx": "32",
+    "ny": "8",
     "nz": "4",
     "particlesPerCell": "40",
     "seed": "13",
