@@ -385,8 +385,8 @@
       <param name="ForceVector">mom_force</param>
       <param name="Swarm">picIntegrationPoints</param>
       <param name="wall">bottom</param>
-      <param name="y_type">double</param>
-      <param name="y_value">0.35</param>
+      <param name="normal_type">func</param>
+      <param name="normal_value">Equation1</param>
     </struct>
   </struct>
 
@@ -466,4 +466,5 @@
   </struct>
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
+  <param name="Equation1">0.35-y</param>
 </StGermainData>

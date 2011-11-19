@@ -147,14 +147,14 @@
       <param name="StrainRateField">StrainRateField</param>
       <param name="Context">context</param>
       <param name="ConstitutiveMatrix">constitutiveMatrix</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
       <param name="Mesh">mesh-Q2</param>
       <param name="IC">stressICs</param>
     </struct>
     <struct name="ViscosityField">
       <param name="Type">ViscosityField</param>
       <param name="Context">context</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
       <param name="Mesh">mesh-Q2</param>
       <param name="ConstitutiveMatrix">constitutiveMatrix</param>
     </struct>
@@ -172,10 +172,10 @@
       <param name="ParticleLayout">particleLayout</param>
       <param name="FeMesh">mesh-Q2</param>
       <param name="TimeIntegrator">timeIntegrator</param>
-      <param name="IntegrationPointMapper">nearestMapper</param>
+      <param name="IntegrationPointMapper">oneToManyMapper</param>
     </struct>
-    <struct name="nearestMapper">
-      <param name="Type">NearestNeighborMapper</param>
+    <struct name="oneToManyMapper">
+      <param name="Type">OneToManyMapper</param>
       <param name="IntegrationPointsSwarm">gaussSwarm</param>
       <param name="MappedSwarm">picIntegrationPoints</param>
     </struct>
@@ -328,7 +328,7 @@
       <param name="Type">BuoyancyForceTerm</param>
       <param name="ForceVector">mom_force</param>
       <param name="TemperatureField">TemperatureField</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
       <param name="gravity">gravity</param>
     </struct>
     <struct name="background">
@@ -496,7 +496,7 @@
     <struct name="internalHeatingTerm">
       <param name="Type">RadiogenicHeatingTerm</param>
       <param name="ForceVector">residual</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
     </struct>
   </struct>
 

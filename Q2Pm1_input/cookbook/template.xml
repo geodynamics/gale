@@ -147,14 +147,14 @@
       <param name="StrainRateField">StrainRateField</param>
       <param name="Context">context</param>
       <param name="ConstitutiveMatrix">constitutiveMatrix</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
       <param name="Mesh">mesh-Q2</param>
       <param name="IC">stressICs</param>
     </struct>
     <struct name="ViscosityField">
       <param name="Type">ViscosityField</param>
       <param name="Context">context</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
       <param name="Mesh">mesh-Q2</param>
       <param name="ConstitutiveMatrix">constitutiveMatrix</param>
     </struct>
@@ -327,7 +327,7 @@
     <struct name="buoyancyForceTerm">
       <param name="Type">BuoyancyForceTerm</param>
       <param name="ForceVector">mom_force</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
       <param name="gravity">gravity</param>
     </struct>
     <struct name="background">

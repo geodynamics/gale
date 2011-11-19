@@ -397,7 +397,10 @@
       <param name="totalInitialParticles">1</param>
       <list name="manualParticlePositions">
         <asciidata>
-          <columnDefinition name = "x" type="double"/>
+          <columnDefinition>
+            <param name="x"></param>
+            <param type="double"></param>
+          </columnDefinition>
           <columnDefinition name = "y" type="double"/>
           <columnDefinition name = "z" type="double"/>
           1.0 .1 .1
@@ -489,8 +492,8 @@
         <list name="variables">
           <struct>
             <param name="name">vx</param>
-            <param name="type">func</param>
-            <param name="value">Equation1</param>
+            <param name="type">equation</param>
+            <param name="value">r=hypot(x,y+3), step(3.35-r)*(y+3)</param>
           </struct>
         </list>
       </struct>
@@ -511,13 +514,13 @@
         <list name="variables">
           <struct>
             <param name="name">vy</param>
-            <param name="type">func</param>
-            <param name="value">Equation2</param>
+            <param name="type">equation</param>
+            <param name="value">r=hypot(x,y+3), -step(3.35-r)*x</param>
           </struct>
           <struct>
             <param name="name">vx</param>
-            <param name="type">func</param>
-            <param name="value">Equation1</param>
+            <param name="type">equation</param>
+            <param name="value">r=hypot(x,y+3), step(3.35-r)*(y+3)</param>
           </struct>
         </list>
       </struct>

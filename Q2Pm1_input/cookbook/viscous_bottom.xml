@@ -308,7 +308,7 @@
       <param name="tolerance">linearTolerance</param>
       <param name="monitor">false</param>
       <param name="maxIterations">5000</param>
-      <param name="minIterations">1</param>
+      <param name="minIterations">100</param>
     </struct>
     <struct name="stokesEqn">
       <param name="Type">Stokes_SLE</param>
@@ -328,7 +328,7 @@
     <struct name="buoyancyForceTerm">
       <param name="Type">BuoyancyForceTerm</param>
       <param name="ForceVector">mom_force</param>
-      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Swarm">gaussSwarm</param>
       <param name="gravity">gravity</param>
     </struct>
     <struct name="background">
@@ -385,8 +385,8 @@
       <param name="ForceVector">mom_force</param>
       <param name="Swarm">picIntegrationPoints</param>
       <param name="wall">bottom</param>
-      <param name="y_type">double</param>
-      <param name="y_value">0.35</param>
+      <param name="normal_type">func</param>
+      <param name="normal_value">Equation1</param>
     </struct>
   </struct>
 
@@ -453,7 +453,7 @@
           <struct>
             <param name="name">vx</param>
             <param name="type">double</param>
-            <param name="value">1.0</param>
+            <param name="value">0.0</param>
           </struct>
           <struct>
             <param name="name">vy</param>
@@ -466,4 +466,5 @@
   </struct>
   <param name="checkpointEvery">1</param>
   <param name="gravity">1.0</param>
+  <param name="Equation1">0.35-y</param>
 </StGermainData>
