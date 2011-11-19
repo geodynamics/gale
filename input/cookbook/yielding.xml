@@ -462,6 +462,7 @@
   <list name="FieldVariablesToCheckpoint">
     <param>VelocityField</param>
     <param>PressureField</param>
+    <param>StrainRateInvariantField</param>
   </list>
   <param name="timeIntegratorOrder">1</param>
   <param name="maxTimeSteps">10</param>
