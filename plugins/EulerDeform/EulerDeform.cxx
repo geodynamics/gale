@@ -151,9 +151,19 @@ void _Underworld_EulerDeform_Build( void* component, void* data ) {
 			/* Read contents. */
 			meshName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"mesh"  );
 			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)meshName, Mesh, True, data  );
-                        char *innerMeshName=Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"innerMesh"  );
-                        if(strcmp( innerMeshName, "" ) )
-                          sys->inner_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)innerMeshName, Mesh, True, data  );
+                        char *p_MeshName=Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"p-Mesh"  );
+                        if(strcmp( p_MeshName, "" ) )
+                          sys->p_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)p_MeshName, Mesh, True, data  );
+                        char *T_MeshName=Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"T-Mesh"  );
+                        if(strcmp( T_MeshName, "" ) )
+                          {
+                            Journal_Firewall(edCtx->artDField!=NULL,
+                                             Journal_Register(Error_Type,
+                                                              (Name)Underworld_EulerDeform_Type),
+                                             "In EulerDeform, if T-mesh is defined, then DisplacementField must also be defined.\n"
+                                             "Did you forget to enable the thermal components?\n");
+                            sys->T_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)T_MeshName, Mesh, True, data  );
+                          }
 			remesherName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"remesher"  );
 
 			if( strcmp( remesherName, "" ) )
@@ -848,9 +858,8 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     double**		newCrds;
     unsigned		nDomainNodes;
     unsigned		nDims;
-    unsigned		n_i, dof_i;
-    Grid *grid;
-    grid =
+    unsigned		n_i;
+    Grid *grid =
       *(Grid**)ExtensionManager_Get(sys->mesh->info, sys->mesh, 
                                     ExtensionManager_GetHandle( sys->mesh->info,
                                                                 "vertexGrid" ));
@@ -967,17 +976,18 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
      * displacements between newCrds and oldCrds.  This displacement
      * is currently used to correct the advDiffEqn's nodal velocity
      * input */
-    if( edCtx->artDField ) {
-      double artDis[3]; /* temporary displacement vector */
-
-      for( n_i = 0 ; n_i < nDomainNodes; n_i++ ) {
-        for( dof_i = 0 ; dof_i < nDims ; dof_i++ ) {
-          artDis[dof_i] = newCrds[n_i][dof_i] - oldCrds[n_i][dof_i];
-        }
-        FeVariable_SetValueAtNode( edCtx->artDField, n_i, artDis );
+    if(edCtx->artDField)
+      {
+        double artDis[3];
+        for(n_i = 0; n_i<nDomainNodes; n_i++)
+          {
+            for(unsigned dof_i = 0; dof_i<nDims; dof_i++)
+              {
+                artDis[dof_i] = newCrds[n_i][dof_i] - oldCrds[n_i][dof_i];
+              }
+            FeVariable_SetValueAtNode( edCtx->artDField, n_i, artDis );
+          }
       }
-        
-    }
 
     /* Swap back coordinates and free memory. */
     sys->mesh->verts = newCrds;
@@ -992,11 +1002,34 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     Mesh_Sync( sys->mesh );
     Mesh_DeformationUpdate( sys->mesh );
 
-    /* Reset the coordinates of the inner, discontinuous mesh */
+    /* Reset the coordinates of the pressure and T meshes. */
 
-    if(sys->inner_mesh!=NULL)
-      InnerGenerator_SetCoordinates((InnerGenerator*)(sys->inner_mesh->generator),
-                                    (FeMesh*)(sys->inner_mesh));
+    if(sys->p_mesh!=NULL)
+      InnerGenerator_SetCoordinates((InnerGenerator*)(sys->p_mesh->generator),
+                                    (FeMesh*)(sys->p_mesh));
+    if(sys->T_mesh!=NULL)
+      {
+        double** T_verts=sys->T_mesh->verts;
+        unsigned ijk[3];
+        Grid *v_grid =*(Grid**)
+          ExtensionManager_Get(sys->mesh->info,sys->mesh,
+                               ExtensionManager_GetHandle(sys->mesh->info,
+                                                          "vertexGrid"));
+        Grid *T_grid =*(Grid**)
+          ExtensionManager_Get(sys->T_mesh->info,sys->T_mesh,
+                               ExtensionManager_GetHandle(sys->T_mesh->info,
+                                                          "vertexGrid"));
+        unsigned num_T_nodes = FeMesh_GetNodeDomainSize(sys->T_mesh);
+        for(unsigned n_T=0;n_T<num_T_nodes;++n_T)
+          {
+            Grid_Lift(T_grid,n_T,ijk);
+            for(unsigned d=0;d<nDims;++d)
+              ijk[d]*=2;
+            unsigned n_v(Grid_Project(v_grid,ijk));
+            for(unsigned d=0;d<nDims;++d)
+              T_verts[n_T][d]=sys->mesh->verts[n_v][d];
+          }
+      }
   }
 }
 
