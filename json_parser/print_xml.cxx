@@ -50,7 +50,7 @@ void print_xml(std::ostream &os, const std::string &name,
       os << start << end;
       break;
     case json_spirit::obj_type:
-        fix_start_end("struct",name,start,end);
+      fix_start_end("struct",name,start,end);
       os << start;
       for(json_spirit::Object::const_iterator i=o.get_obj().begin();
           i!=o.get_obj().end(); ++i)
@@ -60,12 +60,35 @@ void print_xml(std::ostream &os, const std::string &name,
       os << end;
       break;
     case json_spirit::array_type:
-        fix_start_end("list",name,start,end);
+      fix_start_end("list",name,start,end);
       os << start;
-      for(json_spirit::Array::const_iterator i=o.get_array().begin();
-          i!=o.get_array().end(); ++i)
+      if(name=="manualParticlePositions")
         {
-          print_xml(os,*i);
+          os << "<asciidata>\n"
+             << "<columnDefinition name=\"x\" type=\"double\"/>\n"
+             << "<columnDefinition name=\"y\" type=\"double\"/>\n"
+             << "<columnDefinition name=\"z\" type=\"double\"/>\n";
+          for(json_spirit::Array::const_iterator i=o.get_array().begin();
+              i!=o.get_array().end(); ++i)
+            {
+              if(i->type()==json_spirit::int_type)
+                {
+                  os << i->get_int() << " ";
+                }
+              else
+                {
+                  os << i->get_real() << " ";
+                }
+            }
+          os << "</asciidata>\n";
+        }
+      else
+        {
+          for(json_spirit::Array::const_iterator i=o.get_array().begin();
+              i!=o.get_array().end(); ++i)
+            {
+              print_xml(os,*i);
+            }
         }
       os << end;
       break;
