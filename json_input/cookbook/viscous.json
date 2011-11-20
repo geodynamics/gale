@@ -10,8 +10,8 @@
     {
         "systems": [
             {
-                "mesh": "v-T-mesh",
-                "innerMesh": "pressure-mesh",
+                "mesh": "v-mesh",
+                "p-mesh": "p-mesh",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",
                 "wrapTop": "True"

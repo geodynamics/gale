@@ -10,8 +10,8 @@
     {
         "systems": [
             {
-                "mesh": "v-T-mesh",
-                "innerMesh": "pressure-mesh",
+                "mesh": "v-mesh",
+                "p-mesh": "p-mesh",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",
                 "wrapTop": "True"
@@ -50,8 +50,8 @@
         "surfaceAdaptor":
         {
             "Type": "SurfaceAdaptor",
-            "mesh":"v-T-mesh",
-            "sourceGenerator": "v-T-mesh-generator",
+            "mesh":"v-mesh",
+            "sourceGenerator": "v-mesh-generator",
             "topSurfaceType": "topo_data",
             "topSurfaceName": "input/cookbook/test.topo",
             "topNx": "32",

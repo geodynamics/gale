@@ -10,8 +10,8 @@
     {
         "systems": [
             {
-                "mesh": "v-T-mesh",
-                "innerMesh": "pressure-mesh",
+                "mesh": "v-mesh",
+                "p-mesh": "p-mesh",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",
                 "wrapTop": "True",
@@ -59,8 +59,8 @@
         "surfaceAdaptor":
         {
             "Type": "SurfaceAdaptor",
-            "mesh": "v-T-mesh",
-            "sourceGenerator": "v-T-mesh-generator",
+            "mesh": "v-mesh",
+            "sourceGenerator": "v-mesh-generator",
             "bottomEquation": "step(0.960468635615-x)*(-3 + sqrt(3.15*3.15 - x*x))"
         }
     },
@@ -125,9 +125,5 @@
     "particlesPerCell": "40",
     "seed": "13",
     "checkpointEvery": "1",
-    "gravity": "1.0",
-  "journal.info": "True",
-  "journal.debug": "True",
-  "journal-level.info": "2",
-  "journal-level.debug": "2"
+    "gravity": "1.0"
 }
