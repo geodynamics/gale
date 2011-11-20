@@ -457,9 +457,32 @@ void VariableCondition_ApplyToIndex( void* variableCondition, Index localIndex, 
 		{
 			case VC_ValueType_Equation:
                           {
-                            FeVariable *feVariable=(FeVariable*)FieldVariable_Register_GetByName
-                              (((FiniteElementContext*)context)->fieldVariable_Register, "VelocityField");
-                            FeMesh* mesh=feVariable->feMesh;
+                            Mesh* mesh;
+                            if(Stg_Class_IsInstance(var,MeshVariable_Type))
+                              {
+                                mesh=((MeshVariable*)var)->mesh;
+                              }
+                            else
+                              {
+                                FeVariable *feVariable;
+                                if(var->name==std::string("temperature"))
+                                  {
+                                    feVariable=(FeVariable*)
+                                      FieldVariable_Register_GetByName
+                                      (((FiniteElementContext*)context)
+                                       ->fieldVariable_Register,
+                                       "TemperatureField");
+                                  }
+                                else
+                                  {
+                                    feVariable=(FeVariable*)
+                                      FieldVariable_Register_GetByName
+                                      (((FiniteElementContext*)context)
+                                       ->fieldVariable_Register,
+                                       "VelocityField");
+                                  }
+                                mesh=(Mesh*)(feVariable->feMesh);
+                              }
                             assert( mesh != NULL );
                             double* coord = Mesh_GetVertex( mesh, self->indexTbl[index] );
                             Variable_SetValueDouble(var, 

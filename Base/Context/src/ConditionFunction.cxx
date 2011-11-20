@@ -177,10 +177,34 @@ void ConditionFunction_Apply(void* conditionFunction,
                              void* _context, void* result)
 {
   FiniteElementContext *context=(FiniteElementContext*)_context;
-  FeVariable *feVariable=(FeVariable*)FieldVariable_Register_GetByName
-    (context->fieldVariable_Register, "VelocityField");
+  Mesh* mesh;
+  Variable* var=context->variable_Register->_variable[var_I];
+  if(Stg_Class_IsInstance(var,MeshVariable_Type))
+    {
+      mesh=((MeshVariable*)var)->mesh;
+    }
+  else
+    {
+      FeVariable *feVariable;
+      if(var->name==std::string("temperature"))
+        {
+          feVariable=(FeVariable*)
+            FieldVariable_Register_GetByName
+            (((FiniteElementContext*)context)
+             ->fieldVariable_Register,
+             "TemperatureField");
+        }
+      else
+        {
+          feVariable=(FeVariable*)
+            FieldVariable_Register_GetByName
+            (((FiniteElementContext*)context)
+             ->fieldVariable_Register,
+             "VelocityField");
+        }
+      mesh=(Mesh*)(feVariable->feMesh);
+    }
 
-  FeMesh* mesh=feVariable->feMesh;
   assert( mesh != NULL );
   double* coord = Mesh_GetVertex( mesh, index );
   ConditionFunction_Apply(conditionFunction,coord,context,result);
