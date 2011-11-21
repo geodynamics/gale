@@ -117,11 +117,7 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(AdvDiffResidualForceTerm* self
       weight+=particle->weight;
     }
   averageDiffusivity/=weight;
-	
-  if(sle->maxDiffusivity<averageDiffusivity)
-    sle->maxDiffusivity=averageDiffusivity;
-	
-	
+
   /* Change Diffusivity if it is too small */
   if(averageDiffusivity<SUPG_MIN_DIFFUSIVITY)
     averageDiffusivity = SUPG_MIN_DIFFUSIVITY;

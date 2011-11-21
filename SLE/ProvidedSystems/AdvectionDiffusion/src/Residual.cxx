@@ -56,6 +56,7 @@
 #include <assert.h>
 #include <string.h>
 #include <stddef.h>
+#include <algorithm>
 
 /* Textual name of this class */
 const Type AdvDiffResidualForceTerm_Type = "AdvDiffResidualForceTerm";
@@ -245,70 +246,87 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
                                         upwindFuncType );
 }
 
-void _AdvDiffResidualForceTerm_Build( void* residual, void* data ) {
-	AdvDiffResidualForceTerm* self = (AdvDiffResidualForceTerm*)residual;
-	AdvDiffResidualForceTerm_MaterialExt*   materialExt;
-	Material_Index                   material_I;
-	Material*                        material;
-	Materials_Register*              materials_Register = (Materials_Register*)(self->materials_Register);
-	IntegrationPointsSwarm*          swarm              = (IntegrationPointsSwarm*)self->integrationSwarm;
-	MaterialPointsSwarm**            materialSwarms;
-	Index                            materialSwarm_I;
-	Stg_ComponentFactory*            cf;
-	char*                            name;
+void _AdvDiffResidualForceTerm_Build(void* residual, void* data)
+{
+  AdvDiffResidualForceTerm* self=(AdvDiffResidualForceTerm*)residual;
+  AdvDiffResidualForceTerm_MaterialExt* materialExt;
+  Material_Index material_I;
+  Material* material;
+  Materials_Register* materials_Register=
+    (Materials_Register*)(self->materials_Register);
+  IntegrationPointsSwarm* swarm=(IntegrationPointsSwarm*)self->integrationSwarm;
+  MaterialPointsSwarm** materialSwarms;
+  Index materialSwarm_I;
+  Stg_ComponentFactory* cf;
+  char* name;
 
-        if(self->picSwarm)
-          {
-            swarm=(IntegrationPointsSwarm*)self->picSwarm;
-          }
-        else if(Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type))
-          {
-            swarm=((OneToManyMapper*)(swarm->mapper))->swarm;
-          }
-        else if(Stg_Class_IsInstance(swarm->mapper,NearestNeighborMapper_Type))
-          {
-            swarm=((NearestNeighborMapper*)(swarm->mapper))->swarm;
-          }
+  if(self->picSwarm)
+    {
+      swarm=(IntegrationPointsSwarm*)self->picSwarm;
+    }
+  else if(Stg_Class_IsInstance(swarm->mapper,OneToManyMapper_Type))
+    {
+      swarm=((OneToManyMapper*)(swarm->mapper))->swarm;
+    }
+  else if(Stg_Class_IsInstance(swarm->mapper,NearestNeighborMapper_Type))
+    {
+      swarm=((NearestNeighborMapper*)(swarm->mapper))->swarm;
+    }
             
-	cf = self->context->CF;
+  cf = self->context->CF;
 
-	_ForceTerm_Build( self, data );
+  _ForceTerm_Build( self, data );
 
-	Stg_Component_Build( self->velocityField, data, False );
+  Stg_Component_Build( self->velocityField, data, False );
 
-	/* Sort out material extension stuff */
-	self->materialExtHandle = Materials_Register_AddMaterialExtension( 
-			self->materials_Register, 
-			self->type, 
-			sizeof(AdvDiffResidualForceTerm_MaterialExt) );
-	for ( material_I = 0 ; material_I < Materials_Register_GetCount( materials_Register ) ; material_I++) {
-		material = Materials_Register_GetByIndex( materials_Register, material_I );
-		materialExt = (AdvDiffResidualForceTerm_MaterialExt*)ExtensionManager_GetFunc( material->extensionMgr, material, self->materialExtHandle );
-
-		materialExt->diffusivity = Stg_ComponentFactory_GetDouble( cf, material->name,
-                                                                           (Dictionary_Entry_Key)"diffusivity",
-                                                                           self->defaultDiffusivity );
-	}
+  AdvectionDiffusionSLE*
+    sle=Stg_CheckType(self->extraInfo,AdvectionDiffusionSLE);
+                                           
+  /* Sort out material extension stuff */
+  self->materialExtHandle=
+    Materials_Register_AddMaterialExtension
+    (self->materials_Register, self->type,
+     sizeof(AdvDiffResidualForceTerm_MaterialExt));
+  for(material_I=0; material_I<Materials_Register_GetCount(materials_Register);
+      material_I++)
+    {
+      material=Materials_Register_GetByIndex(materials_Register,material_I);
+      materialExt=(AdvDiffResidualForceTerm_MaterialExt*)
+        ExtensionManager_GetFunc(material->extensionMgr,material,
+                                 self->materialExtHandle);
+      
+      materialExt->diffusivity=
+        Stg_ComponentFactory_GetDouble(cf,material->name,"diffusivity",
+                                       self->defaultDiffusivity);
+      sle->maxDiffusivity=std::max(sle->maxDiffusivity,materialExt->diffusivity);
+    }
 	
-	/* Create Swarm Variables of each material swarm this ip swarm is mapped against */
-	materialSwarms = IntegrationPointMapper_GetMaterialPointsSwarms(swarm->mapper, &(self->materialSwarmCount) );
-	self->diffusivitySwarmVariables = (void**)Memory_Alloc_Array( MaterialSwarmVariable*, self->materialSwarmCount, "DiffusivityVariables" );
+  /* Create Swarm Variables of each material swarm this ip swarm is
+     mapped against */
+  materialSwarms=
+    IntegrationPointMapper_GetMaterialPointsSwarms(swarm->mapper,
+                                                   &(self->materialSwarmCount));
+  self->diffusivitySwarmVariables=
+    (void**)Memory_Alloc_Array(MaterialSwarmVariable*,self->materialSwarmCount,
+                               "DiffusivityVariables");
 	
-	for ( materialSwarm_I = 0; materialSwarm_I < self->materialSwarmCount; ++materialSwarm_I ) {
-		name = Stg_Object_AppendSuffix( materialSwarms[materialSwarm_I], (Name)"Diffusivity"  );
-		self->diffusivitySwarmVariables[materialSwarm_I] = MaterialSwarmVariable_New( 
-				name,
-				(AbstractContext*)self->context,
-				materialSwarms[materialSwarm_I], 
-				1, 
-				(Materials_Register*)self->materials_Register, 
-				self->materialExtHandle, 
-				GetOffsetOfMember( *materialExt, diffusivity ) );
-		Memory_Free( name );
+  for(materialSwarm_I=0; materialSwarm_I<self->materialSwarmCount;
+      ++materialSwarm_I)
+    {
+      name=Stg_Object_AppendSuffix(materialSwarms[materialSwarm_I],
+                                   (Name)"Diffusivity");
+      self->diffusivitySwarmVariables[materialSwarm_I]=
+        MaterialSwarmVariable_New(name, (AbstractContext*)self->context,
+                                  materialSwarms[materialSwarm_I], 1,
+                                  (Materials_Register*)self->materials_Register,
+                                  self->materialExtHandle,
+                                  GetOffsetOfMember(*materialExt,diffusivity));
+      Memory_Free(name);
 
-		/* Build new Swarm Variables */
-		Stg_Component_Build( self->diffusivitySwarmVariables[materialSwarm_I], data, False );
-	}
+      /* Build new Swarm Variables */
+      Stg_Component_Build(self->diffusivitySwarmVariables[materialSwarm_I],
+                          data,False);
+    }
 }
 
 void _AdvDiffResidualForceTerm_Initialise( void* residual, void* data ) {

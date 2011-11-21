@@ -427,8 +427,6 @@ void _AdvectionDiffusionSLE_Initialise( void* sle, void* data ) {
 	/* Solution Vectors */
 	Stg_Component_Initialise( self->phiVector, data, False );
 	Stg_Component_Initialise( self->phiDotVector, data, False );
-
-	AdvectionDiffusionSLE_ResetStoredValues( self );
 }
 
 void _AdvectionDiffusionSLE_Execute(void* sle, void* _context)
@@ -439,9 +437,7 @@ void _AdvectionDiffusionSLE_Execute(void* sle, void* _context)
 	
   if(context->timeStep!=context->restartTimestep)
     {
-      AdvectionDiffusionSLE_ResetStoredValues(self);
       self->currentDt=dt;
-	
       _SystemLinearEquations_Execute(self,context);
     }
 }
@@ -451,14 +447,3 @@ Vec _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I ) {
 	AdvectionDiffusionSLE* self  = (AdvectionDiffusionSLE*) sle;
 	return self->residual->vector;
 }
-
-#define SMALL_VALUE 1.0e-99
-
-void AdvectionDiffusionSLE_ResetStoredValues( void* sle ) {
-	AdvectionDiffusionSLE* self  = (AdvectionDiffusionSLE*) sle;
-	
-	self->maxDiffusivity = SMALL_VALUE;
-}
-
-
-

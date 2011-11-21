@@ -53,49 +53,60 @@
 #include <string.h>
 
 
-double AdvectionDiffusionSLE_CalculateDt( void* advectionDiffusionSLE, FiniteElementContext* context ) {
-	AdvectionDiffusionSLE*     self   = (AdvectionDiffusionSLE*) advectionDiffusionSLE;
-	double                     advectionTimestep;
-	double                     diffusionTimestep;
-	double                     advectionTimestepGlobal;
-	double                     diffusionTimestepGlobal;
-	double                     timestep;
+double AdvectionDiffusionSLE_CalculateDt(void* advectionDiffusionSLE,
+                                         FiniteElementContext* context)
+{
+  AdvectionDiffusionSLE* self=(AdvectionDiffusionSLE*)advectionDiffusionSLE;
+  double advectionTimestep;
+  double diffusionTimestep;
+  double advectionTimestepGlobal;
+  double diffusionTimestepGlobal;
+  double timestep;
 	
-	Journal_DPrintf( self->debug, "In func: %s\n", __func__ );
+  Journal_DPrintf(self->debug, "In func: %s\n", __func__);
 	
-	/*  It would be useful to introduce a limit to the change of step in here ... to prevent timesteps
-		from becoming arbitrarily large in a single step */ 
+  /*  It would be useful to introduce a limit to the change of step in
+      here ... to prevent timesteps from becoming arbitrarily large in
+      a single step */ 
 	
-	/* Calculate Courant Number */
-	advectionTimestep = AdvectionDiffusionSLE_AdvectiveTimestep( self );
-	diffusionTimestep = AdvectionDiffusionSLE_DiffusiveTimestep( self );
+  /* Calculate Courant Number */
+  advectionTimestep = AdvectionDiffusionSLE_AdvectiveTimestep(self);
+  diffusionTimestep = AdvectionDiffusionSLE_DiffusiveTimestep(self);
 
-	MPI_Allreduce( &advectionTimestep, &advectionTimestepGlobal, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
-	MPI_Allreduce( &diffusionTimestep, &diffusionTimestepGlobal, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
+  MPI_Allreduce(&advectionTimestep,&advectionTimestepGlobal,1,MPI_DOUBLE,
+                MPI_MIN,MPI_COMM_WORLD);
+  MPI_Allreduce(&diffusionTimestep,&diffusionTimestepGlobal,1,MPI_DOUBLE,
+                MPI_MIN,MPI_COMM_WORLD);
 
-	Journal_DPrintf( self->debug, "%s Dominating. - Advective Timestep = %g - Diffusive Timestep = %g\n", 
-			advectionTimestepGlobal < diffusionTimestepGlobal ? "Advection" : "Diffusion",
-			advectionTimestepGlobal, diffusionTimestepGlobal);
+  Journal_DPrintf(self->debug,
+                  "%s Dominating. - Advective Timestep = %g - "
+                  "Diffusive Timestep = %g\n", 
+                  advectionTimestepGlobal < diffusionTimestepGlobal
+                  ? "Advection" : "Diffusion",
+                  advectionTimestepGlobal, diffusionTimestepGlobal);
 	
-	/* Calculate Time Step */
-	timestep = MIN( advectionTimestepGlobal, diffusionTimestepGlobal );
-
-	return timestep;
+  /* Calculate Time Step */
+  if(diffusionTimestep<0)
+    timestep=advectionTimestepGlobal;
+  else
+    timestep=std::min(advectionTimestepGlobal,diffusionTimestepGlobal);
+  return timestep;
 }
 
 
-double AdvectionDiffusionSLE_DiffusiveTimestep( void* advectionDiffusionSLE ) {
-	AdvectionDiffusionSLE*    self              = (AdvectionDiffusionSLE*) advectionDiffusionSLE;
-	double                    minSeparation;
-	double                    minSeparationEachDim[3];
+double AdvectionDiffusionSLE_DiffusiveTimestep(void* advectionDiffusionSLE)
+{
+  AdvectionDiffusionSLE* self=(AdvectionDiffusionSLE*) advectionDiffusionSLE;
+  double minSeparation;
+  double minSeparationEachDim[3];
 
-	Journal_DPrintf( self->debug, "In func: %s\n", __func__ );
+  Journal_DPrintf(self->debug,"In func: %s\n",__func__);
 	
-	FeVariable_GetMinimumSeparation( self->phiField, &minSeparation, minSeparationEachDim );
-
-	/* This is quite a conservative estimate */
-
-	return self->courantFactor * minSeparation * minSeparation / self->maxDiffusivity;
+  if(self->maxDiffusivity<=0)
+    return -1;
+  FeVariable_GetMinimumSeparation(self->phiField,&minSeparation,
+                                  minSeparationEachDim);
+  return self->courantFactor*minSeparation*minSeparation/self->maxDiffusivity;
 }
 
 

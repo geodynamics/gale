@@ -132,7 +132,5 @@
 	//Vector* _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I );
 	Vec _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I );
 
-	void AdvectionDiffusionSLE_ResetStoredValues( void* sle );
-
 #endif
 
