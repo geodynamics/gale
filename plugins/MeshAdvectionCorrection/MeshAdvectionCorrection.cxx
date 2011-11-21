@@ -69,40 +69,52 @@ typedef enum {
 	MINUS
 } CorrectionFlag;
 
-void MeshAdvectionCorrection_AddCorrection( FeVariable* velocityField, double* oldVelocity, double* artVelocity, CorrectionFlag flag ) {
-	/* This function offsets the VelocityField depending on the the flag:
-	 * if flag == ADD
-	 * 		velocity = oldVelocity
-	 * else {
-	 * 		if( artificalVelocity ) {	velocity = artVelocity }
-	 * 		else { velocity = (0,0) } 
-	 */
-	FeVariable*  self          = (FeVariable*)  velocityField;
-	FeMesh*      mesh          = self->feMesh;
-	int          lNodeCount    = FeMesh_GetNodeLocalSize( mesh );
-	int          dof           = self->fieldComponentCount;
-	double       oldV[3], artV[3], zero[3];
-	int lNode_I;
+void MeshAdvectionCorrection_AddCorrection(FeVariable* velocityField,
+                                           double* oldVelocity,
+                                           double* artVelocity,
+                                           CorrectionFlag flag)
+{
+  /* This function offsets the VelocityField depending on the the flag:
+   * if flag == ADD
+   * 		velocity = oldVelocity
+   * else {
+   * 		if( artificalVelocity ) {	velocity = artVelocity }
+   * 		else { velocity = (0,0) } 
+   */
+  FeVariable*  self          = (FeVariable*)  velocityField;
+  FeMesh*      mesh          = self->feMesh;
+  int          lNodeCount    = FeMesh_GetNodeLocalSize( mesh );
+  int          dof           = self->fieldComponentCount;
+  double       oldV[3], zero[3];
+  int lNode_I;
 
-	zero[0]=zero[1]=zero[2] = 0;
+  zero[0]=zero[1]=zero[2] = 0;
 
-	for( lNode_I = 0 ; lNode_I < lNodeCount ; lNode_I++ ) {
-
-		if ( flag == ADD ) {
-			/* velocity = stored values from oldVelocity */
-			memcpy( oldV, &oldVelocity[lNode_I*dof], dof*sizeof(double) );
-			FeVariable_SetValueAtNode( velocityField, lNode_I, oldV );
-		}
-		else {
-			if( artVelocity != 0 ) { /* use artificial velocity */
-				memcpy( artV, &artVelocity[lNode_I*dof], dof*sizeof(double) );
-				FeVariable_SetValueAtNode( velocityField, lNode_I, artV );
-			} else { /* just zero the velocity */
-				FeVariable_SetValueAtNode( velocityField, lNode_I, zero );
-			}
-		}
-
-	}
+  for( lNode_I = 0 ; lNode_I < lNodeCount ; lNode_I++ ) {
+    if(flag==ADD)
+      {
+        /* velocity = stored values from oldVelocity */
+        memcpy(oldV,&oldVelocity[lNode_I*dof],dof*sizeof(double));
+        FeVariable_SetValueAtNode(velocityField,lNode_I,oldV);
+      }
+    else
+      {
+        if(artVelocity!=0)
+          {
+            double v[3];
+            FeVariable_GetValueAtNode(velocityField,lNode_I,v);            
+            for(int i=0;i<dof;i++)
+              {
+                v[i]-=artVelocity[lNode_I*dof+i];
+              }
+            FeVariable_SetValueAtNode(velocityField,lNode_I,v);
+          }
+        else
+          { /* just zero the velocity */
+            FeVariable_SetValueAtNode(velocityField,lNode_I,zero);
+          }
+      }
+  }
 }
 
 void MeshAdvectionCorrection_StoreCurrentVelocity( FeVariable *velocityField, double *oldVelocity ) {
@@ -141,61 +153,70 @@ void MeshAdvectionCorrection_EulerDeformCorrection(FeVariable *artDField,
     return;
   }
 	
-  /* GENERAL algorithm artV = -1*artD / dt. It's -ve because we 
-   * want to reverse the effects of the artificial displacement */
-  for( lNode_I = 0 ; lNode_I < numLocalNodes ; lNode_I++ ) {
-    FeVariable_GetValueAtNode( artDField, lNode_I, artD );
-    /* artV = artD / dt */
-    for( dof_I = 0 ; dof_I < dof ; dof_I++ ) 
-      artV[dof_I] = -1*artD[dof_I] / dt;
-
-    memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
-  }
+  /* artV = artD / dt. */
+  for(lNode_I=0; lNode_I<numLocalNodes; lNode_I++)
+    {
+      FeVariable_GetValueAtNode( artDField, lNode_I, artD );
+      for(dof_I=0; dof_I<dof; dof_I++) 
+        artV[dof_I]= artD[dof_I]/dt;
+      memcpy(&artVelocity[lNode_I*dof],artV,dof*sizeof(double));
+    }
 }
 
-void MeshAdvectionCorrection( void* sle, void* data ) {
-	UnderworldContext*                                      context                 = (UnderworldContext*) data;
-	Underworld_MeshAdvectionCorrection_ContextExt*          plugin;
-	FeVariable*		velocityField 	= (FeVariable*) LiveComponentRegister_Get( context->CF->LCRegister, (Name)"VelocityField"  );
-	double dt = context->dt;
-	double *artVelocity, *oldVelocity;
-	int lNodeCount;
-	lNodeCount = FeMesh_GetNodeLocalSize( velocityField->feMesh );
+void MeshAdvectionCorrection(void* sle, void* data)
+{
+  UnderworldContext* context=(UnderworldContext*)data;
 
-	artVelocity = oldVelocity = NULL;
+  if(context->timeStep==context->restartTimestep)
+    return;
+  Underworld_MeshAdvectionCorrection_ContextExt* plugin;
+  FeVariable* velocityField=(FeVariable*)
+    LiveComponentRegister_Get(context->CF->LCRegister,(Name)"VelocityField");
+  double dt=context->dt;
+  double *artVelocity, *oldVelocity;
+  int lNodeCount;
+  lNodeCount = FeMesh_GetNodeLocalSize(velocityField->feMesh);
 
-	/* store the current velocity in oldVelocity */
-	oldVelocity = Memory_Alloc_Array( double, 
-			lNodeCount * velocityField->fieldComponentCount, 
-			"artificial nodal velocities" );
+  artVelocity=oldVelocity=NULL;
 
-	/* get the plugin from the context */
-	plugin = (Underworld_MeshAdvectionCorrection_ContextExt*)ExtensionManager_Get( 
-		context->extensionMgr, 
-		context, 
-		Underworld_MeshAdvectionCorrection_ContextExtHandle );
+  /* store the current velocity in oldVelocity */
+  oldVelocity=Memory_Alloc_Array(double, 
+                                 lNodeCount * velocityField->fieldComponentCount, 
+                                 "artificial nodal velocities");
 
-	MeshAdvectionCorrection_StoreCurrentVelocity( velocityField, oldVelocity );
+  /* get the plugin from the context */
+  plugin=(Underworld_MeshAdvectionCorrection_ContextExt*)
+    ExtensionManager_Get(context->extensionMgr, 
+                         context, 
+                         Underworld_MeshAdvectionCorrection_ContextExtHandle);
 
-	if( plugin->artDisplacement ) {
-		artVelocity = Memory_Alloc_Array( double, lNodeCount * velocityField->fieldComponentCount, "artificial nodal velocities" );
-		MeshAdvectionCorrection_EulerDeformCorrection( plugin->artDisplacement, artVelocity, dt );
-	}
+  MeshAdvectionCorrection_StoreCurrentVelocity(velocityField,oldVelocity);
 
-	/* Correct velocity and re-sync shadow space */
-	MeshAdvectionCorrection_AddCorrection( velocityField, oldVelocity, artVelocity, MINUS );
-	FeVariable_SyncShadowValues( velocityField );
+  if(plugin->artDisplacement)
+    {
+      artVelocity=
+        Memory_Alloc_Array(double,lNodeCount*velocityField->fieldComponentCount,
+                           "artificial nodal velocities");
+      MeshAdvectionCorrection_EulerDeformCorrection(plugin->artDisplacement,
+                                                    artVelocity,dt);
+    }
 
-	/* Solve Energy equation */
-	plugin->energySolverExecute( sle, context );
+  /* Correct velocity and re-sync shadow space */
+  MeshAdvectionCorrection_AddCorrection(velocityField,oldVelocity,artVelocity,
+                                        MINUS);
+  FeVariable_SyncShadowValues(velocityField);
 
-	/* Reverse correction and re-sync */
-	MeshAdvectionCorrection_AddCorrection( velocityField, oldVelocity, artVelocity, ADD );
-	FeVariable_SyncShadowValues( velocityField );
+  /* Solve Energy equation */
+  plugin->energySolverExecute(sle,context);
 
-	if( plugin->artDisplacement )
-		Memory_Free( artVelocity );
-	Memory_Free( oldVelocity );
+  /* Reverse correction and re-sync */
+  MeshAdvectionCorrection_AddCorrection(velocityField,oldVelocity,artVelocity,
+                                        ADD);
+  FeVariable_SyncShadowValues(velocityField);
+
+  if(plugin->artDisplacement)
+    Memory_Free(artVelocity);
+  Memory_Free(oldVelocity);
 }
 
 void _Underworld_MeshAdvectionCorrection_AssignFromXML(void* component,

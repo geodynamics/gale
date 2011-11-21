@@ -76,246 +76,344 @@ void* _Underworld_EulerDeform_DefaultNew( Name name ) {
 }
 
 
-void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data ) {
-	Codelet*					ed = (Codelet*)component;
-	UnderworldContext*	uwCtx;
-	EulerDeform_Context*	edCtx;
+void _Underworld_EulerDeform_AssignFromXML(void* component,
+                                           Stg_ComponentFactory* cf,
+                                           void* data)
+{
+  Codelet* ed=(Codelet*)component;
+  EulerDeform_Context* edCtx;
 
-	assert( component );
-	assert( cf );
+  assert(component);
+  assert(cf);
 
-	Journal_DPrintf( Underworld_Debug, "In: %s( void* )\n", __func__ );
+  Journal_DPrintf(Underworld_Debug, "In: %s( void* )\n", __func__);
 
-	/* Retrieve context. */
-	uwCtx = (UnderworldContext*)Stg_ComponentFactory_ConstructByName( cf, (Name)"context", UnderworldContext, True, data );
-	ed->context = (AbstractContext* )uwCtx;
+  UnderworldContext* uwCtx=(UnderworldContext*)
+    Stg_ComponentFactory_ConstructByName(cf,(Name)"context",UnderworldContext,
+                                         True,data);
+  ed->context=(AbstractContext*)uwCtx;
 
-	/* Create new context. */
-	EulerDeform_ContextHandle = ExtensionManager_Add( uwCtx->extensionMgr, (Name)Underworld_EulerDeform_Type, sizeof(EulerDeform_Context)  );
-	edCtx = (EulerDeform_Context*)ExtensionManager_Get( uwCtx->extensionMgr, uwCtx, EulerDeform_ContextHandle );
-	memset( edCtx, 0, sizeof(EulerDeform_Context) );
-	edCtx->ctx = (AbstractContext*)uwCtx;
+  /* Create new context. */
+  EulerDeform_ContextHandle=
+    ExtensionManager_Add(uwCtx->extensionMgr,(Name)Underworld_EulerDeform_Type,
+                         sizeof(EulerDeform_Context));
+  edCtx=(EulerDeform_Context*)ExtensionManager_Get(uwCtx->extensionMgr,
+                                                   uwCtx,
+                                                   EulerDeform_ContextHandle);
+  memset(edCtx,0,sizeof(EulerDeform_Context));
+  edCtx->ctx=(AbstractContext*)uwCtx;
 
-	/* Get the time integrator. */
-	edCtx->timeIntegrator = Stg_ComponentFactory_ConstructByName( cf, (Name)"timeIntegrator", TimeIntegrator, True, data  );
-
+  /* Get the time integrator. */
+  edCtx->timeIntegrator=
+    Stg_ComponentFactory_ConstructByName(cf,(Name)"timeIntegrator",
+                                         TimeIntegrator,True,data);
 }
 
 
-void _Underworld_EulerDeform_Build( void* component, void* data ) {
-	Codelet*						ed	= (Codelet*)component;
-	UnderworldContext*		uwCtx	= (UnderworldContext*)ed->context;
-	EulerDeform_Context*		edCtx;
-	Variable*					crdVar;
-	TimeIntegrand*			crdAdvector;
-	Stg_Component*				tiData[2];
-	unsigned						sys_i;
-	Dictionary_Entry_Value*	edDict;
-	Dictionary_Entry_Value*	sysLst;
+void _Underworld_EulerDeform_Build(void* component, void* data)
+{
+  Codelet* ed=(Codelet*)component;
+  UnderworldContext* uwCtx=(UnderworldContext*)ed->context;
+  EulerDeform_Context* edCtx;
+  Variable* crdVar;
+  TimeIntegrand* crdAdvector;
+  Stg_Component* tiData[2];
+  unsigned sys_i;
+  Dictionary_Entry_Value* edDict;
+  Dictionary_Entry_Value* sysLst;
 
-	assert( component );
-	assert( uwCtx );
+  assert(component);
+  assert(uwCtx);
 
-	edCtx = (EulerDeform_Context*)ExtensionManager_Get( uwCtx->extensionMgr, uwCtx, EulerDeform_ContextHandle );
+  edCtx=(EulerDeform_Context*)
+    ExtensionManager_Get(uwCtx->extensionMgr,uwCtx,EulerDeform_ContextHandle);
 
-	/* Get the dictionary. */
-	edDict = Dictionary_Get( uwCtx->dictionary, (Dictionary_Entry_Key)"EulerDeform" );
-	if( !edDict  ) {
-		return;
-	}
+  /* Get the dictionary. */
+  edDict=Dictionary_Get(uwCtx->dictionary,"EulerDeform");
+  if(!edDict)
+    return;
 
-	/* Grab the ArtDisplacementField from the dictionary */
-	edCtx->artDField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)"DisplacementField", FeVariable, False, data  );
+  /* Read system list. */
+  sysLst=Dictionary_Entry_Value_GetMember(edDict,"systems");
+  if(sysLst)
+    {
+      unsigned sys_i;
 
-	/* Read system list. */
-	sysLst = Dictionary_Entry_Value_GetMember( edDict, (Dictionary_Entry_Key)"systems" );
-	if( sysLst ) {
-		unsigned	sys_i;
+      /* Allocate for systems. */
+      edCtx->nSystems=Dictionary_Entry_Value_GetCount(sysLst);
+      edCtx->systems=Memory_Alloc_Array(EulerDeform_System,edCtx->nSystems,
+                                        "EulerDeform->systems");
+      memset(edCtx->systems,0,sizeof(EulerDeform_System)*edCtx->nSystems);
 
-		/* Allocate for systems. */
-		edCtx->nSystems = Dictionary_Entry_Value_GetCount( sysLst  );
-		edCtx->systems = Memory_Alloc_Array( EulerDeform_System, edCtx->nSystems, "EulerDeform->systems" );
-		memset( edCtx->systems, 0, sizeof(EulerDeform_System) * edCtx->nSystems );
+      for(sys_i=0; sys_i<edCtx->nSystems; sys_i++)
+        {
+          EulerDeform_System* sys=edCtx->systems+sys_i;
+          Dictionary* sysDict;
+          char* meshName;
+          char* remesherName;
+          char* name;
 
-		for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
-			EulerDeform_System*		sys = edCtx->systems + sys_i;
-			Dictionary*					sysDict;
-			char*							meshName;
-			char*							remesherName;
-			char*							name;
+          /* Get the dictionary for this system. */
+          sysDict=Dictionary_Entry_Value_AsDictionary
+            (Dictionary_Entry_Value_GetElement(sysLst,sys_i));
+          assert(sysDict);
 
-			/* Get the dictionary for this system. */
-			sysDict = Dictionary_Entry_Value_AsDictionary( Dictionary_Entry_Value_GetElement( sysLst, sys_i ) );
-			assert( sysDict );
+          /* Read contents. */
+          meshName=Dictionary_GetString(sysDict,"mesh");
+          sys->mesh=Stg_ComponentFactory_ConstructByName(uwCtx->CF,
+                                                         (Name)meshName,
+                                                         Mesh,True,data);
+          char *p_MeshName=Dictionary_GetString(sysDict,"p-Mesh");
+                                                
+          if(strcmp(p_MeshName,""))
+            sys->p_mesh=Stg_ComponentFactory_ConstructByName(uwCtx->CF,
+                                                             (Name)p_MeshName,
+                                                             Mesh,True,data);
 
-			/* Read contents. */
-			meshName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"mesh"  );
-			sys->mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)meshName, Mesh, True, data  );
-                        char *p_MeshName=Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"p-Mesh"  );
-                        if(strcmp( p_MeshName, "" ) )
-                          sys->p_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)p_MeshName, Mesh, True, data  );
-                        char *T_MeshName=Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"T-Mesh"  );
-                        if(strcmp( T_MeshName, "" ) )
-                          {
-                            Journal_Firewall(edCtx->artDField!=NULL,
-                                             Journal_Register(Error_Type,
-                                                              (Name)Underworld_EulerDeform_Type),
-                                             "In EulerDeform, if T-mesh is defined, then DisplacementField must also be defined.\n"
-                                             "Did you forget to enable the thermal components?\n");
-                            sys->T_mesh = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)T_MeshName, Mesh, True, data  );
-                          }
-			remesherName = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"remesher"  );
+          name=Dictionary_GetString(sysDict,"displacementField");
+                                    
+          if(strcmp(name, ""))
+            sys->dispField=
+              Stg_ComponentFactory_ConstructByName(uwCtx->CF,(Name)name,
+                                                   FeVariable,True,data);
+          else
+            sys->dispField=NULL;
 
-			if( strcmp( remesherName, "" ) )
-				sys->remesher = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)remesherName, Remesher, True, data  );
-			name = Dictionary_GetString( sysDict, (Dictionary_Entry_Key)"displacementField" );
+          char *T_MeshName=Dictionary_GetString(sysDict,"T-mesh");
+                                                
+          if(strcmp(T_MeshName,""))
+            {
+              Journal_Firewall
+                (sys->dispField!=NULL,
+                 Journal_Register(Error_Type,(Name)Underworld_EulerDeform_Type),
+                 "In EulerDeform, if T-mesh is defined, then DisplacementField must also be defined.\n"
+                 "Did you forget to enable the thermal components?\n");
+              sys->T_mesh=Stg_ComponentFactory_ConstructByName(uwCtx->CF,
+                                                               (Name)T_MeshName,
+                                                               Mesh,True,data);
+            }
 
-			if(strcmp(name, ""))
-			    sys->dispField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)name, FeVariable, True, data  );
-			else
-			    sys->dispField = NULL;
+          remesherName=Dictionary_GetString(sysDict,"remesher");
+                                            
+          if(strcmp(remesherName,""))
+            sys->remesher=
+              Stg_ComponentFactory_ConstructByName(uwCtx->CF,(Name)remesherName,
+                                                   Remesher,True,data);
 
-			sys->interval = Dictionary_GetInt_WithDefault( sysDict, (Dictionary_Entry_Key)"interval", -1  );
-			sys->wrapTop = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapTop", False  );
-			sys->wrapBottom = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapBottom", False  );
-			sys->wrapLeft = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"wrapLeft", False  );
-			/* This line is currently not working, have to manually set the velocity field name.
-				This should be fixed once this plugin has been converted to a component. */
-			/*sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)velFieldName, FieldVariable, True, data  );*/
-			sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)"VelocityField", FieldVariable, True, data  );
+          sys->interval=Dictionary_GetInt_WithDefault(sysDict,"interval",-1);
+                                          
+          sys->wrapTop=Dictionary_GetBool_WithDefault(sysDict,"wrapTop",False);
+          sys->wrapBottom=Dictionary_GetBool_WithDefault(sysDict,"wrapBottom",
+                                                         False);
+          sys->wrapLeft=Dictionary_GetBool_WithDefault(sysDict,"wrapLeft",
+                                                       False);
+          /* This line is currently not working, have to manually set
+             the velocity field name.  This should be fixed once this
+             plugin has been converted to a component. */
 
-			sys->staticTop = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticTop", False  );
-			sys->staticBottom = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticBottom", False  );
-			sys->staticLeft = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticLeft", False  );
-			sys->staticRight = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticRight", False  );
-			sys->staticFront = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticFront", False  );
-			sys->staticBack = Dictionary_GetBool_WithDefault( sysDict, (Dictionary_Entry_Key)"staticBack", False  );
+          /*sys->velField = Stg_ComponentFactory_ConstructByName( uwCtx->CF, (Name)velFieldName, FieldVariable, True, data  );*/
+          sys->velField=
+            Stg_ComponentFactory_ConstructByName(uwCtx->CF,
+                                                 (Name)"VelocityField",
+                                                 FieldVariable,True,data);
 
-			sys->staticLeftTop = Dictionary_GetBool_WithDefault( sysDict, "staticLeftTop", (sys->staticLeft && sys->staticTop)
-                                                                             ? True : False);
-			sys->staticRightTop = Dictionary_GetBool_WithDefault( sysDict, "staticRightTop", (sys->staticRight && sys->staticTop)
-                                                                             ? True : False );
-			sys->staticLeftTopFront = Dictionary_GetBool_WithDefault( sysDict, "staticLeftTopFront",
-                                                                                  (sys->staticLeft && sys->staticTop && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticRightTopFront = Dictionary_GetBool_WithDefault( sysDict, "staticRightTopFront",
-                                                                                   (sys->staticRight && sys->staticTop && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticLeftTopBack = Dictionary_GetBool_WithDefault( sysDict, "staticLeftTopBack",
-                                                                                  (sys->staticLeft && sys->staticTop && sys->staticBack)
-                                                                             ? True : False );
-			sys->staticRightTopBack = Dictionary_GetBool_WithDefault( sysDict, "staticRightTopBack",
-                                                                                   (sys->staticRight && sys->staticTop && sys->staticBack)
-                                                                             ? True : False );
+          sys->staticTop=Dictionary_GetBool_WithDefault(sysDict,"staticTop",
+                                                        False);
+          sys->staticBottom=Dictionary_GetBool_WithDefault(sysDict,
+                                                           "staticBottom",
+                                                           False);
+          sys->staticLeft=Dictionary_GetBool_WithDefault(sysDict,"staticLeft",
+                                                         False);
+          sys->staticRight=Dictionary_GetBool_WithDefault(sysDict,"staticRight",
+                                                          False);
+          sys->staticFront=Dictionary_GetBool_WithDefault(sysDict,"staticFront",
+                                                          False);
+          sys->staticBack=Dictionary_GetBool_WithDefault(sysDict,"staticBack",
+                                                         False);
 
-			sys->staticLeftBottom = Dictionary_GetBool_WithDefault( sysDict, "staticLeftBottom", (sys->staticLeft && sys->staticBottom)
-                                                                             ? True : False );
-			sys->staticRightBottom = Dictionary_GetBool_WithDefault( sysDict, "staticRightBottom", (sys->staticRight && sys->staticBottom)
-                                                                             ? True : False );
-			sys->staticLeftBottomFront = Dictionary_GetBool_WithDefault( sysDict, "staticLeftBottomFront",
-                                                                                  (sys->staticLeft && sys->staticBottom && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticRightBottomFront = Dictionary_GetBool_WithDefault( sysDict, "staticRightBottomFront",
-                                                                                   (sys->staticRight && sys->staticBottom && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticLeftBottomBack = Dictionary_GetBool_WithDefault( sysDict, "staticLeftBottomBack",
-                                                                                  (sys->staticLeft && sys->staticBottom && sys->staticBack)
-                                                                             ? True : False );
-			sys->staticRightBottomBack = Dictionary_GetBool_WithDefault( sysDict, "staticRightBottomBack",
-                                                                                   (sys->staticRight && sys->staticBottom && sys->staticBack)
-                                                                             ? True : False );
+          sys->staticLeftTop=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftTop",
+                                           (sys->staticLeft && sys->staticTop)
+                                           ? True : False);
+          sys->staticRightTop=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightTop",
+                                           (sys->staticRight && sys->staticTop)
+                                           ? True : False);
+          sys->staticLeftTopFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftTopFront",
+                                           (sys->staticLeft && sys->staticTop
+                                            && sys->staticFront)
+                                           ? True : False);
+          sys->staticRightTopFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightTopFront",
+                                           (sys->staticRight && sys->staticTop
+                                            && sys->staticFront)
+                                           ? True : False);
+          sys->staticLeftTopBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftTopBack",
+                                           (sys->staticLeft && sys->staticTop
+                                            && sys->staticBack)
+                                           ? True : False);
+          sys->staticRightTopBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightTopBack",
+                                           (sys->staticRight && sys->staticTop
+                                            && sys->staticBack)
+                                           ? True : False);
 
-			sys->staticLeftFront = Dictionary_GetBool_WithDefault( sysDict, "staticLeftFront", (sys->staticLeft && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticRightFront = Dictionary_GetBool_WithDefault( sysDict, "staticRightFront", (sys->staticRight && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticLeftBack = Dictionary_GetBool_WithDefault( sysDict, "staticLeftBack", (sys->staticLeft && sys->staticBack)
-                                                                             ? True : False );
-			sys->staticRightBack = Dictionary_GetBool_WithDefault( sysDict, "staticRightBack", (sys->staticRight && sys->staticBack)
-                                                                             ? True : False );
+          sys->staticLeftBottom=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftBottom",
+                                           (sys->staticLeft && sys->staticBottom)
+                                           ? True : False);
+          sys->staticRightBottom=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightBottom",
+                                           (sys->staticRight && sys->staticBottom)
+                                           ? True : False);
+          sys->staticLeftBottomFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftBottomFront",
+                                           (sys->staticLeft && sys->staticBottom
+                                            && sys->staticFront)
+                                           ? True : False);
+          sys->staticRightBottomFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightBottomFront",
+                                           (sys->staticRight && sys->staticBottom
+                                            && sys->staticFront)
+                                           ? True : False);
+          sys->staticLeftBottomBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftBottomBack",
+                                           (sys->staticLeft && sys->staticBottom
+                                            && sys->staticBack)
+                                           ? True : False);
+          sys->staticRightBottomBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightBottomBack",
+                                           (sys->staticRight && sys->staticBottom
+                                            && sys->staticBack)
+                                           ? True : False);
 
-			sys->staticTopFront = Dictionary_GetBool_WithDefault( sysDict, "staticTopFront", (sys->staticTop && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticBottomFront = Dictionary_GetBool_WithDefault( sysDict, "staticBottomFront", (sys->staticBottom && sys->staticFront)
-                                                                             ? True : False );
-			sys->staticTopBack = Dictionary_GetBool_WithDefault( sysDict, "staticTopBack", (sys->staticTop && sys->staticBack)
-                                                                             ? True : False );
-			sys->staticBottomBack = Dictionary_GetBool_WithDefault( sysDict, "staticBottomBack", (sys->staticBottom && sys->staticBack)
-                                                                             ? True : False );
+          sys->staticLeftFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftFront",
+                                           (sys->staticLeft && sys->staticFront)
+                                           ? True : False);
+          sys->staticRightFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightFront",
+                                           (sys->staticRight && sys->staticFront)
+                                           ? True : False);
+          sys->staticLeftBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticLeftBack",
+                                           (sys->staticLeft && sys->staticBack)
+                                           ? True : False);
+          sys->staticRightBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticRightBack",
+                                           (sys->staticRight && sys->staticBack)
+                                           ? True : False);
 
-			sys->floatLeftTop = Dictionary_GetBool_WithDefault( sysDict, "floatLeftTop", False );
-			sys->floatRightTop = Dictionary_GetBool_WithDefault( sysDict, "floatRightTop", False );
+          sys->staticTopFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticTopFront",
+                                           (sys->staticTop && sys->staticFront)
+                                           ? True : False);
+          sys->staticBottomFront=
+            Dictionary_GetBool_WithDefault(sysDict,"staticBottomFront",
+                                           (sys->staticBottom && sys->staticFront)
+                                           ? True : False);
+          sys->staticTopBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticTopBack",
+                                           (sys->staticTop && sys->staticBack)
+                                           ? True : False);
+          sys->staticBottomBack=
+            Dictionary_GetBool_WithDefault(sysDict,"staticBottomBack",
+                                           (sys->staticBottom && sys->staticBack)
+                                           ? True : False);
 
-			sys->staticSides = 
-                          (sys->staticLeft
-                           || sys->staticRight
-                           || sys->staticTop
-                           || sys->staticBottom
-                           || sys->staticFront
-                           || sys->staticBack
-                           || sys->staticLeftTop
-                           || sys->staticRightTop
-                           || sys->staticLeftTopFront
-                           || sys->staticRightTopFront
-                           || sys->staticLeftTopBack
-                           || sys->staticRightTopBack
-                           || sys->staticLeftBottom
-                           || sys->staticRightBottom
-                           || sys->staticLeftBottomFront
-                           || sys->staticRightBottomFront
-                           || sys->staticLeftBottomBack
-                           || sys->staticRightBottomBack
-                           || sys->staticLeftFront
-                           || sys->staticRightFront
-                           || sys->staticLeftBack
-                           || sys->staticRightBack
-                           || sys->staticTopFront
-                           || sys->staticBottomFront
-                           || sys->staticTopBack
-                           || sys->staticBottomBack)
-                          ? True : False;
+          sys->floatLeftTop=
+            Dictionary_GetBool_WithDefault(sysDict,"floatLeftTop",False);
+          sys->floatRightTop=
+            Dictionary_GetBool_WithDefault(sysDict,"floatRightTop",False);
+
+          sys->staticSides = 
+            (sys->staticLeft
+             || sys->staticRight
+             || sys->staticTop
+             || sys->staticBottom
+             || sys->staticFront
+             || sys->staticBack
+             || sys->staticLeftTop
+             || sys->staticRightTop
+             || sys->staticLeftTopFront
+             || sys->staticRightTopFront
+             || sys->staticLeftTopBack
+             || sys->staticRightTopBack
+             || sys->staticLeftBottom
+             || sys->staticRightBottom
+             || sys->staticLeftBottomFront
+             || sys->staticRightBottomFront
+             || sys->staticLeftBottomBack
+             || sys->staticRightBottomBack
+             || sys->staticLeftFront
+             || sys->staticRightFront
+             || sys->staticLeftBack
+             || sys->staticRightBack
+             || sys->staticTopFront
+             || sys->staticBottomFront
+             || sys->staticTopBack
+             || sys->staticBottomBack)
+            ? True : False;
 
 
-                        if(sys->staticRight && sys->wrapTop
-                           && !sys->staticRightTop)
-                          sys->x_right_coord =
-                            Dictionary_GetDouble( uwCtx->dictionary, "maxX");
+          if(sys->staticRight && sys->wrapTop
+             && !sys->staticRightTop)
+            sys->x_right_coord =
+              Dictionary_GetDouble( uwCtx->dictionary, "maxX");
 
-                        if(sys->staticLeft && sys->wrapTop
-                           && !sys->staticLeftTop)
-                          sys->x_left_coord =
-                            Dictionary_GetDouble( uwCtx->dictionary, "minX");
-                          
-		}
-	}
+          if(sys->staticLeft && sys->wrapTop
+             && !sys->staticLeftTop)
+            sys->x_left_coord =
+              Dictionary_GetDouble( uwCtx->dictionary, "minX");
+        }
+    }
 
-	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++  ) {
-		EulerDeform_System*	sys = edCtx->systems + sys_i;
+  for(sys_i=0; sys_i<edCtx->nSystems; sys_i++)
+    {
+      EulerDeform_System* sys=edCtx->systems+sys_i;
 
-		/* Create a time integrand for the mesh's coordinates. */
-		crdVar = EulerDeform_RegisterLocalNodeCoordsAsVariables( sys, uwCtx->variable_Register, NULL );
-		Stg_Component_Build( crdVar, data, False );
+      /* Create a time integrand for the mesh's coordinates. */
+      crdVar=
+        EulerDeform_RegisterLocalNodeCoordsAsVariables(sys,
+                                                       uwCtx->variable_Register,
+                                                       NULL);
+      Stg_Component_Build(crdVar,data,False);
 
-		tiData[0] = (Stg_Component*)sys->velField;
-		tiData[1] = (Stg_Component*)&sys->mesh->verts;
-		crdAdvector = TimeIntegrand_New( "EulerDeform_Velocity", (DomainContext*)uwCtx, edCtx->timeIntegrator, crdVar, 2, tiData, True
-			 /* Presume we need to allow fallback on edges of stretching mesh - PatrickSunter, 7 June 2006 */ );
-		crdAdvector->_calculateTimeDeriv = EulerDeform_TimeDeriv;
+      tiData[0] = (Stg_Component*)sys->velField;
+      tiData[1] = (Stg_Component*)&sys->mesh->verts;
+      crdAdvector = TimeIntegrand_New("EulerDeform_Velocity",
+                                      (DomainContext*)uwCtx,
+                                      edCtx->timeIntegrator, crdVar, 2,
+                                      tiData, True
+                                      /* Presume we need to allow
+                                         fallback on edges of
+                                         stretching mesh -
+                                         PatrickSunter, 7 June 2006 */ );
+      crdAdvector->_calculateTimeDeriv=EulerDeform_TimeDeriv;
 
-		/* Add to live component register... */
-		LiveComponentRegister_Add( uwCtx->CF->LCRegister, (Stg_Component*)crdAdvector );
-		Stg_Component_Build( crdAdvector, data, False );
-	}
+      /* Add to live component register... */
+      LiveComponentRegister_Add(uwCtx->CF->LCRegister,
+                                (Stg_Component*)crdAdvector);
+      Stg_Component_Build(crdAdvector,data,False);
+    }
 
-	if( edCtx->nSystems > 0 ) {
-		/* Insert the sync step. */
-          TimeIntegrator_PrependSetupEP( edCtx->timeIntegrator, "EulerDeform_IntegrationSetup", (void*)EulerDeform_IntegrationSetup, "EulerDeform", edCtx );
-	}
+  if(edCtx->nSystems>0)
+    {
+      /* Insert the sync step. */
+      TimeIntegrator_PrependSetupEP(edCtx->timeIntegrator,
+                                    "EulerDeform_IntegrationSetup",
+                                    (void*)EulerDeform_IntegrationSetup,
+                                    "EulerDeform",edCtx);
+    }
 
-	/* Insert the remesh step. Note that this should look for the surface process
-	   plugin's time integrator finish routine and ensure we enter the remesh step
-	   after that one but before the particle updating routines. */
-	TimeIntegrator_PrependFinishEP( edCtx->timeIntegrator, "EulerDeform_Execute", (void*)EulerDeform_Remesh, "EulerDeform", edCtx );
+  /* Insert the remesh step. Ideally this would look for the
+     surface process plugin's time integrator finish routine and
+     ensure we enter the remesh step after that one but before the
+     particle updating routines. */
+  TimeIntegrator_PrependFinishEP(edCtx->timeIntegrator,"EulerDeform_Execute",
+                                 (void*)EulerDeform_Remesh,"EulerDeform",edCtx);
 }
 
 
@@ -840,7 +938,12 @@ void EulerDeform_Remesh_Corner(Mesh *mesh, int corner, int inside,
 
 void EulerDeform_WrapSurface( EulerDeform_System* sys, double** oldCrds, int top );
 
-void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx ) {
+void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
+{
+  /* Do not remesh if this is the first step */
+  if(crdAdvector->context->timeStep==crdAdvector->context->restartTimestep)
+    return;
+
   Mesh_Algorithms	*tmpAlgs, *oldAlgs;
   unsigned	sys_i;
 
@@ -863,7 +966,7 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
       *(Grid**)ExtensionManager_Get(sys->mesh->info, sys->mesh, 
                                     ExtensionManager_GetHandle( sys->mesh->info,
                                                                 "vertexGrid" ));
-    /* Update the displacement field. */
+    /* Set the displacement field. */
     if(sys->dispField) {
       double disp[3];
       int num_verts, num_dims;
@@ -874,7 +977,7 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
       for(ii = 0; ii < num_verts; ii++) {
         FeVariable_GetValueAtNode(sys->dispField, ii, disp);
         for(jj = 0; jj < num_dims; jj++)
-          disp[jj] += sys->verts[ii*num_dims + jj] - sys->mesh->verts[ii][jj];
+          disp[jj] = sys->verts[ii*num_dims + jj] - sys->mesh->verts[ii][jj];
         FeVariable_SetValueAtNode(sys->dispField, ii, disp);
       }
     }
@@ -972,20 +1075,18 @@ void EulerDeform_Remesh( TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx 
     newCrds = sys->mesh->verts;
     sys->mesh->verts = oldCrds;
 
-    /* Create an artificial displacement field from the nodal
-     * displacements between newCrds and oldCrds.  This displacement
-     * is currently used to correct the advDiffEqn's nodal velocity
-     * input */
-    if(edCtx->artDField)
+    /* Update the displacement field for the remeshing. */
+    if(sys->dispField)
       {
-        double artDis[3];
+        double disp[3];
         for(n_i = 0; n_i<nDomainNodes; n_i++)
           {
+            FeVariable_GetValueAtNode(sys->dispField, n_i, disp);
             for(unsigned dof_i = 0; dof_i<nDims; dof_i++)
               {
-                artDis[dof_i] = newCrds[n_i][dof_i] - oldCrds[n_i][dof_i];
+                disp[dof_i] += newCrds[n_i][dof_i] - oldCrds[n_i][dof_i];
               }
-            FeVariable_SetValueAtNode( edCtx->artDField, n_i, artDis );
+            FeVariable_SetValueAtNode(sys->dispField, n_i, disp);
           }
       }
 
