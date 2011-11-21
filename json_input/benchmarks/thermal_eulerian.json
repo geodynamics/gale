@@ -4,10 +4,6 @@
         {
             "Type": "Underworld_EulerDeform",
             "Context":"context"
-        },
-        {
-            "Type": "Underworld_MeshAdvectionCorrection",
-            "Context":"context"
         }
     ],
     "EulerDeform":
