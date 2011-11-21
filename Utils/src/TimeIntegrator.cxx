@@ -267,6 +267,10 @@ void TimeIntegrator_UpdateClass( void* timeIntegrator, void* data ) {
 	TimeIntegrator*        self            = (TimeIntegrator*) timeIntegrator;
 	double wallTime,tmin,tmax;
 	
+        AbstractContext* context((AbstractContext*)data);
+        if(context->timeStep==context->restartTimestep)
+          return;
+
 	wallTime = MPI_Wtime();
 	Journal_RPrintf(self->info,"Time Integration\n");
 	self->_execute( self, data );
