@@ -431,17 +431,20 @@ void _AdvectionDiffusionSLE_Initialise( void* sle, void* data ) {
 	AdvectionDiffusionSLE_ResetStoredValues( self );
 }
 
-void _AdvectionDiffusionSLE_Execute( void* sle, void* _context ) {
-	AdvectionDiffusionSLE*     self  = (AdvectionDiffusionSLE*) sle;
-	FiniteElementContext*      context = (FiniteElementContext*) _context;
-	double                     dt      = context->dt;
+void _AdvectionDiffusionSLE_Execute(void* sle, void* _context)
+{
+  AdvectionDiffusionSLE* self=(AdvectionDiffusionSLE*)sle;
+  FiniteElementContext* context=(FiniteElementContext*)_context;
+  double dt=context->dt;
 	
-	AdvectionDiffusionSLE_ResetStoredValues( self );
-	self->currentDt = dt;
+  if(context->timeStep!=context->restartTimestep)
+    {
+      AdvectionDiffusionSLE_ResetStoredValues(self);
+      self->currentDt=dt;
 	
-	_SystemLinearEquations_Execute( self, context );
+      _SystemLinearEquations_Execute(self,context);
+    }
 }
-
 
 //Vector* _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I ) {
 Vec _AdvectionDiffusionSLE_GetResidual( void* sle, Index fv_I ) {
