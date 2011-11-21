@@ -53,5 +53,6 @@
 	void EulerDeform_WrapBottomSurface( EulerDeform_System* sys, double** oldCrds );
 
 	void EulerDeform_WrapLeftSurface( EulerDeform_System* sys, double** oldCrds );
+        void Underworld_EulerDeform_Advection_Correction(void* sle, void* data);
 
 #endif

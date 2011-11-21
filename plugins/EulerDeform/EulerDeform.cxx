@@ -50,29 +50,35 @@ const Type		Underworld_EulerDeform_Type = "EulerDeform";
 ExtensionInfo_Index	EulerDeform_ContextHandle;
 
 
-Index Underworld_EulerDeform_Register( PluginsManager* pluginsMgr ) {
-	return PluginsManager_Submit( pluginsMgr, Underworld_EulerDeform_Type, (Name)"0", _Underworld_EulerDeform_DefaultNew );
+Index Underworld_EulerDeform_Register(PluginsManager* pluginsMgr)
+{
+  return PluginsManager_Submit(pluginsMgr,Underworld_EulerDeform_Type,
+                               (Name)"0",_Underworld_EulerDeform_DefaultNew);
 }
 
+void* _Underworld_EulerDeform_DefaultNew(Name name)
+{
+  /* Variables set in this function */
+  SizeT _sizeOfSelf = sizeof(Codelet);
+  Type type = Underworld_EulerDeform_Type;
+  Stg_Class_DeleteFunction* _delete = _Codelet_Delete;
+  Stg_Class_PrintFunction* _print = _Codelet_Print;
+  Stg_Class_CopyFunction* _copy = _Codelet_Copy;
+  Stg_Component_DefaultConstructorFunction* _defaultConstructor =
+    _Underworld_EulerDeform_DefaultNew;
+  Stg_Component_ConstructFunction* _construct =
+    _Underworld_EulerDeform_AssignFromXML;
+  Stg_Component_BuildFunction* _build = _Underworld_EulerDeform_Build;
+  Stg_Component_InitialiseFunction* _initialise = _Codelet_Initialise;
+  Stg_Component_ExecuteFunction* _execute = _Codelet_Execute;
+  Stg_Component_DestroyFunction* _destroy = _Underworld_EulerDeform_Destroy;
 
-void* _Underworld_EulerDeform_DefaultNew( Name name ) {
-	/* Variables set in this function */
-	SizeT                                              _sizeOfSelf = sizeof(Codelet);
-	Type                                                      type = Underworld_EulerDeform_Type;
-	Stg_Class_DeleteFunction*                              _delete = _Codelet_Delete;
-	Stg_Class_PrintFunction*                                _print = _Codelet_Print;
-	Stg_Class_CopyFunction*                                  _copy = _Codelet_Copy;
-	Stg_Component_DefaultConstructorFunction*  _defaultConstructor = _Underworld_EulerDeform_DefaultNew;
-	Stg_Component_ConstructFunction*                    _construct = _Underworld_EulerDeform_AssignFromXML;
-	Stg_Component_BuildFunction*                            _build = _Underworld_EulerDeform_Build;
-	Stg_Component_InitialiseFunction*                  _initialise = _Codelet_Initialise;
-	Stg_Component_ExecuteFunction*                        _execute = _Codelet_Execute;
-	Stg_Component_DestroyFunction*                        _destroy = _Underworld_EulerDeform_Destroy;
-
-	/* Variables that are set to ZERO are variables that will be set either by the current _New function or another parent _New function further up the hierachy */
-	AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
-
-	return _Codelet_New(  CODELET_PASSARGS   );
+  /* Variables that are set to ZERO are variables that will be set
+     either by the current _New function or another parent _New
+     function further up the hierachy */
+  AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+  
+  return _Codelet_New(  CODELET_PASSARGS   );
 }
 
 
@@ -108,7 +114,6 @@ void _Underworld_EulerDeform_AssignFromXML(void* component,
     Stg_ComponentFactory_ConstructByName(cf,(Name)"timeIntegrator",
                                          TimeIntegrator,True,data);
 }
-
 
 void _Underworld_EulerDeform_Build(void* component, void* data)
 {
@@ -179,6 +184,25 @@ void _Underworld_EulerDeform_Build(void* component, void* data)
           else
             sys->dispField=NULL;
 
+          if(sys->dispField!=NULL)
+            {
+              AdvectionDiffusionSLE* energySLE=(AdvectionDiffusionSLE*)
+                Stg_ComponentFactory_ConstructByName(uwCtx->CF,(Name)"EnergyEqn",
+                                                     AdvectionDiffusionSLE,
+                                                     True,data);
+              Journal_DFirewall
+                (energySLE!=NULL, 
+                 Journal_Register(Error_Type,
+                                  (Name)Underworld_EulerDeform_Type),
+                 "The required energy SLE component has not been created "
+                 "or placed on the context.\n");
+
+              /* Replace the energy SLE's execute with this one. Save
+                 the old value for use later. */
+              sys->energySolverExecute = energySLE->_execute;
+              energySLE->_execute = Underworld_EulerDeform_Advection_Correction;
+            }
+
           char *T_MeshName=Dictionary_GetString(sysDict,"T-mesh");
                                                 
           if(strcmp(T_MeshName,""))
@@ -186,8 +210,7 @@ void _Underworld_EulerDeform_Build(void* component, void* data)
               Journal_Firewall
                 (sys->dispField!=NULL,
                  Journal_Register(Error_Type,(Name)Underworld_EulerDeform_Type),
-                 "In EulerDeform, if T-mesh is defined, then DisplacementField must also be defined.\n"
-                 "Did you forget to enable the thermal components?\n");
+                 "In EulerDeform, if T-mesh is defined, then displacementField must also be defined.\n");
               sys->T_mesh=Stg_ComponentFactory_ConstructByName(uwCtx->CF,
                                                                (Name)T_MeshName,
                                                                Mesh,True,data);
@@ -936,7 +959,7 @@ void EulerDeform_Remesh_Corner(Mesh *mesh, int corner, int inside,
     }
 }
 
-void EulerDeform_WrapSurface( EulerDeform_System* sys, double** oldCrds, int top );
+void EulerDeform_WrapSurface(EulerDeform_System* sys, double** oldCrds, int top);
 
 void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
 {
@@ -986,7 +1009,8 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
     
     /* Update all local coordinates. */
     for( n_i = 0; n_i < Mesh_GetLocalSize( sys->mesh, MT_VERTEX ); n_i++ )
-      memcpy( sys->mesh->verts[n_i], sys->verts + n_i * nDims, nDims * sizeof(double) );
+      memcpy( sys->mesh->verts[n_i], sys->verts + n_i * nDims,
+              nDims * sizeof(double));
     
     /* Revert side coordinates if required. */
     if( sys->staticSides ) {
@@ -1001,7 +1025,8 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
       
       /* Copy back coords. */
       for( ind_i = 0; ind_i < nInds; ind_i++ )
-        memcpy( sys->mesh->verts[inds[ind_i]], sys->sideCoords[ind_i], nDims * sizeof(double) );
+        memcpy( sys->mesh->verts[inds[ind_i]], sys->sideCoords[ind_i],
+                nDims * sizeof(double));
       FreeObject( tmpIndSet );
       FreeArray( sys->sideCoords );
       
@@ -1014,8 +1039,7 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
           if(sys->staticRight && !sys->staticRightTop && !sys->floatRightTop)
             {
               EulerDeform_Remesh_Corner(sys->mesh,grid->sizes[0]-1,
-                                        grid->sizes[0]-2,
-                                        sys->x_right_coord);
+                                        grid->sizes[0]-2,sys->x_right_coord);
             }
         }
 
@@ -1023,12 +1047,14 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
 
     /* If we have regular mesh algorithms specified, set the
        algorithms temporarily to an irregular method. */
-    if( !strcmp( sys->mesh->algorithms->type, "Mesh_RegularAlgorithms" ) && sys->remesher ) {
-      tmpAlgs = Mesh_Algorithms_New( "", edCtx->ctx );
-      oldAlgs = sys->mesh->algorithms;
-      sys->mesh->algorithms = NULL;
-      Mesh_SetAlgorithms( sys->mesh, tmpAlgs );
-    }
+    if( !strcmp( sys->mesh->algorithms->type, "Mesh_RegularAlgorithms")
+        && sys->remesher)
+      {
+        tmpAlgs = Mesh_Algorithms_New( "", edCtx->ctx );
+        oldAlgs = sys->mesh->algorithms;
+        sys->mesh->algorithms = NULL;
+        Mesh_SetAlgorithms( sys->mesh, tmpAlgs );
+      }
     else
       tmpAlgs = NULL;
 
@@ -1042,11 +1068,12 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
     }
 
     /* If a remesh interval is requested, check now. */
-    if( sys->interval > 0 && edCtx->ctx->timeStep % sys->interval > 0 ) {
-      Journal_Printf( Underworld_Info,
-                      "*** EulerDeform: Not remeshing this timestep.\n" );
-      continue;
-    }
+    if(sys->interval>0 && edCtx->ctx->timeStep % sys->interval>0)
+      {
+        Journal_Printf( Underworld_Info,
+                        "*** EulerDeform: Not remeshing this timestep.\n" );
+        continue;
+      }
     Journal_Printf( Underworld_Info, "*** EulerDeform: Remeshing.\n" );
 
     /* Shrink wrap the top/bottom surface. */
@@ -1135,466 +1162,550 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
 }
 
 
-void EulerDeform_InternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim, int top );
+void EulerDeform_InternalLoop(EulerDeform_System* sys,Grid* grm,
+                              double** oldCrds,unsigned* ijk,unsigned curDim,
+                              int top);
 
-void EulerDeform_WrapSurface( EulerDeform_System* sys, double** oldCrds, int top ) {
-	IJK	ijk;
-	Grid*	grm;
-	Mesh*	mesh;
-
-	assert( sys );
-	assert( oldCrds );
-
-	/* Loop over top internal surface. */
-	mesh = sys->mesh;
-	grm = *(Grid**)ExtensionManager_Get( mesh->info, mesh, 
-					     ExtensionManager_GetHandle( mesh->info, (Name)"vertexGrid" )  );
-	EulerDeform_InternalLoop( sys, grm, oldCrds, ijk, 0, top );
-}
-
-#if 0
-void EulerDeform_WrapLeftSurface( EulerDeform_System* sys, double** oldCrds ) {
-	IJK	ijk;
-	GRM	grm;
-
-	assert( sys );
-	assert( oldCrds );
-
-	/* Loop over top internal surface. */
-	RegMesh_Generalise( sys->mesh, &grm );
-	EulerDeform_LeftInternalLoop( sys, &grm, oldCrds, ijk, 0 );
-}
-#endif
-
-
-void _EulerDeform_TriBarycenter( double** tri, const double* pnt, double* dst ) {
-	double	a = tri[0][0] - tri[2][0];
-	double	b = tri[1][0] - tri[2][0];
-	double	c = tri[2][0] - pnt[0];
-	double	d = tri[0][1] - tri[2][1];
-	double	e = tri[1][1] - tri[2][1];
-	double	f = tri[2][1] - pnt[1];
-	double	g = tri[0][2] - tri[2][2];
-	double	h = tri[1][2] - tri[2][2];
-	double	i = tri[2][2] - pnt[2];
-
-	dst[0] = (b * (f + i) - c * (e + h)) / (a * (e + h) - b * (d + g));
-	dst[1] = (a * (f + i) - c * (d + g)) / (b * (d + g) - a * (e + h));
-	dst[2] = 1.0 - dst[0] - dst[1];
-}
-
-
-Bool _EulerDeform_QuadYInterp( double** crds, const double* pnt, double* val ) {
-	double*		modCrds[4];
-	double		modCrds0[2], modCrds1[2], modCrds2[2], modCrds3[2];
-	unsigned*	inds[2];
-	unsigned	inds0[3], inds1[3];
-	unsigned	inc[4];
-	double		modPnt[3];
-	unsigned	inside;
-	double		bc[3];
-
-	modCrds[0] = modCrds0;
-	modCrds[1] = modCrds1;
-	modCrds[2] = modCrds2;
-	modCrds[3] = modCrds3;
-	modCrds[0][0] = crds[0][0]; modCrds[0][1] = crds[0][2];
-	modCrds[1][0] = crds[1][0]; modCrds[1][1] = crds[1][2];
-	modCrds[2][0] = crds[2][0]; modCrds[2][1] = crds[2][2];
-	modCrds[3][0] = crds[3][0]; modCrds[3][1] = crds[3][2];
-	modPnt[0] = pnt[0]; modPnt[1] = pnt[2];
-
-	inds[0] = inds0;
-	inds[1] = inds1;
-	inds[0][0] = 0; inds[0][1] = 1; inds[0][2] = 2;
-	inds[1][0] = 1; inds[1][1] = 3; inds[1][2] = 2;
-	inc[0] = 0; inc[1] = 1; inc[2] = 2; inc[3] = 3;
-
-	if( Simplex_Search2D( modCrds, inc, 2, inds, 
-			      modPnt, bc, &inside ) )
-	{
-		*val = bc[0] * crds[inds[inside][0]][1] + bc[1] * crds[inds[inside][1]][1] + 
-			bc[2] * crds[inds[inside][2]][1];
-		return True;
-	}
-	else
-		return False;
-}
-
-
-Bool _EulerDeform_FindBarycenter1D( const double* crds, const double pnt, 
-				    double* bcs )
+void EulerDeform_WrapSurface(EulerDeform_System* sys,double** oldCrds,int top)
 {
-	assert( crds );
-	assert( bcs );
+  IJK	ijk;
+  Grid*	grm;
+  Mesh*	mesh;
 
-	bcs[1] = (pnt - crds[0])/(crds[1] - crds[0]);
-	bcs[0] = 1.0 - bcs[1];
+  assert( sys );
+  assert( oldCrds );
 
-	return (bcs[0] >= 0.0 && bcs[0] <= 1.0 && bcs[1] >= 0.0 && bcs[1] <= 1.0) ? True : False;
+  /* Loop over top internal surface. */
+  mesh = sys->mesh;
+  grm =
+    *(Grid**)ExtensionManager_Get(mesh->info,mesh, 
+                                  ExtensionManager_GetHandle(mesh->info,
+                                                             (Name)"vertexGrid"));
+  EulerDeform_InternalLoop(sys,grm,oldCrds,ijk,0,top);
+}
+
+void _EulerDeform_TriBarycenter(double** tri, const double* pnt, double* dst)
+{
+  double a = tri[0][0] - tri[2][0];
+  double b = tri[1][0] - tri[2][0];
+  double c = tri[2][0] - pnt[0];
+  double d = tri[0][1] - tri[2][1];
+  double e = tri[1][1] - tri[2][1];
+  double f = tri[2][1] - pnt[1];
+  double g = tri[0][2] - tri[2][2];
+  double h = tri[1][2] - tri[2][2];
+  double i = tri[2][2] - pnt[2];
+
+  dst[0] = (b * (f + i) - c * (e + h)) / (a * (e + h) - b * (d + g));
+  dst[1] = (a * (f + i) - c * (d + g)) / (b * (d + g) - a * (e + h));
+  dst[2] = 1.0 - dst[0] - dst[1];
 }
 
 
-Bool _EulerDeform_LineInterp(double** crds, const double* pnt, unsigned fromDim, unsigned toDim, 
-			      double* val ) {
-	double	bcCrds[2];
-	double	bcs[2];
+Bool _EulerDeform_QuadYInterp(double** crds, const double* pnt, double* val)
+{
+  double* modCrds[4];
+  double modCrds0[2], modCrds1[2], modCrds2[2], modCrds3[2];
+  unsigned* inds[2];
+  unsigned inds0[3], inds1[3];
+  unsigned inc[4];
+  double modPnt[3];
+  unsigned inside;
+  double bc[3];
 
-	assert( crds );
-	assert( val );
+  modCrds[0] = modCrds0;
+  modCrds[1] = modCrds1;
+  modCrds[2] = modCrds2;
+  modCrds[3] = modCrds3;
+  modCrds[0][0] = crds[0][0]; modCrds[0][1] = crds[0][2];
+  modCrds[1][0] = crds[1][0]; modCrds[1][1] = crds[1][2];
+  modCrds[2][0] = crds[2][0]; modCrds[2][1] = crds[2][2];
+  modCrds[3][0] = crds[3][0]; modCrds[3][1] = crds[3][2];
+  modPnt[0] = pnt[0]; modPnt[1] = pnt[2];
 
-	bcCrds[0] = crds[0][fromDim];
-	bcCrds[1] = crds[1][fromDim];
-	if( _EulerDeform_FindBarycenter1D( bcCrds, pnt[fromDim], bcs ) ) {
-		*val = bcs[0]*crds[0][toDim] + bcs[1]*crds[1][toDim];
-		return True;
-	}
+  inds[0] = inds0;
+  inds[1] = inds1;
+  inds[0][0] = 0; inds[0][1] = 1; inds[0][2] = 2;
+  inds[1][0] = 1; inds[1][1] = 3; inds[1][2] = 2;
+  inc[0] = 0; inc[1] = 1; inc[2] = 2; inc[3] = 3;
 
-	return False;
+  if( Simplex_Search2D( modCrds, inc, 2, inds, 
+                        modPnt, bc, &inside ) )
+    {
+      *val = bc[0] * crds[inds[inside][0]][1] + bc[1] * crds[inds[inside][1]][1] + 
+        bc[2] * crds[inds[inside][2]][1];
+      return True;
+    }
+  else
+    return False;
 }
 
 
-#if 0
-Bool _EulerDeform_QuadZInterp( double** crds, const double* pnt, double* val ) {
-	double		modCrds[4][3];
-	double		modPnt[3];
-	unsigned	inds[3];
-	double		bc[3];
+Bool _EulerDeform_FindBarycenter1D(const double* crds, const double pnt,
+                                   double* bcs)
+{
+  assert( crds );
+  assert( bcs );
 
-	modCrds[0][0] = crds[0][0]; modCrds[0][1] = crds[0][1]; modCrds[0][2] = 0.0;
-	modCrds[1][0] = crds[1][0]; modCrds[1][1] = crds[1][1]; modCrds[1][2] = 0.0;
-	modCrds[2][0] = crds[2][0]; modCrds[2][1] = crds[2][1]; modCrds[2][2] = 0.0;
-	modCrds[3][0] = crds[3][0]; modCrds[3][1] = crds[3][1]; modCrds[3][2] = 0.0;
-	modPnt[0] = pnt[0]; modPnt[1] = pnt[1]; modPnt[2] = 0.0;
+  bcs[1] = (pnt - crds[0])/(crds[1] - crds[0]);
+  bcs[0] = 1.0 - bcs[1];
 
-	if( _HexaEL_FindTriBarycenter( (const double**)modCrds, modPnt, bc, inds, INCLUSIVE_UPPER_BOUNDARY, NULL, 0 ) ) {
-		*val = bc[0]*crds[inds[0]][1] + bc[1]*crds[inds[1]][1] + bc[2]*crds[inds[2]][1];
-		return True;
-	}
-	else
-		return False;
+  return (bcs[0] >= 0.0 && bcs[0] <= 1.0 && bcs[1] >= 0.0 && bcs[1] <= 1.0)
+    ? True : False;
 }
-#endif
 
 
-void EulerDeform_InternalLoop( EulerDeform_System* sys, Grid* grm, double** oldCrds, unsigned* ijk, unsigned curDim, int top ) {
-	unsigned	nDims;
-	XYZ		newCrd, oldCrd;
-	double*		crds[4];
-	double		crds0[3], crds1[3], crds2[3], crds3[3];
-	unsigned	centerInd;
-	Mesh*		mesh;
-	unsigned	nLocalNodes;
-	unsigned	ind;
-        double          fudge_factor;
+Bool _EulerDeform_LineInterp(double** crds, const double* pnt,
+                             unsigned fromDim, unsigned toDim, double* val)
+{
+  double bcCrds[2];
+  double bcs[2];
+
+  assert(crds);
+  assert(val);
+
+  bcCrds[0] = crds[0][fromDim];
+  bcCrds[1] = crds[1][fromDim];
+  if(_EulerDeform_FindBarycenter1D(bcCrds, pnt[fromDim], bcs))
+    {
+      *val = bcs[0]*crds[0][toDim] + bcs[1]*crds[1][toDim];
+      return True;
+    }
+
+  return False;
+}
+
+void EulerDeform_InternalLoop(EulerDeform_System* sys, Grid* grm,
+                              double** oldCrds, unsigned* ijk,
+                              unsigned curDim, int top)
+{
+  unsigned nDims;
+  XYZ newCrd, oldCrd;
+  double* crds[4];
+  double crds0[3], crds1[3], crds2[3], crds3[3];
+  unsigned centerInd;
+  Mesh* mesh;
+  unsigned nLocalNodes;
+  unsigned ind;
+  double fudge_factor;
         
-        /* fudge_factor nudges the coordinate inside the mesh a little
-           to avoid failed interpolations */
-        fudge_factor=1.0e-10;
+  /* fudge_factor nudges the coordinate inside the mesh a little
+     to avoid failed interpolations */
+  fudge_factor=1.0e-10;
 
-	if( curDim < grm->nDims ) {
-		if( curDim == 1 ) {
-                        if(top) {
-                          ijk[1] = grm->sizes[curDim] - 1;
-                        }
-                        else {
-                          ijk[1]=0;
-                        }
-			EulerDeform_InternalLoop( sys, grm, oldCrds, ijk, curDim + 1, top );
-		}
-		else {
-			for( ijk[curDim] = 0; ijk[curDim] < grm->sizes[curDim]; ijk[curDim]++ ) {
-                          EulerDeform_InternalLoop( sys, grm, oldCrds, ijk, curDim + 1, top );
-			}
-		}
-	}
-	else {
-		if( grm->nDims == 2 ) {
-			mesh = sys->mesh;
-			nDims = Mesh_GetDimSize( mesh );
+  if(curDim<grm->nDims)
+    {
+      if(curDim==1)
+        {
+          if(top)
+            {
+              ijk[1]=grm->sizes[curDim] - 1;
+            }
+          else
+            {
+              ijk[1]=0;
+            }
+          EulerDeform_InternalLoop(sys,grm,oldCrds,ijk,curDim + 1,top);
+        }
+      else
+        {
+          for(ijk[curDim]=0; ijk[curDim]<grm->sizes[curDim]; ijk[curDim]++)
+            {
+              EulerDeform_InternalLoop(sys,grm,oldCrds,ijk,curDim + 1,top);
+            }
+        }
+    }
+  else
+    {
+      if(grm->nDims==2)
+        {
+          mesh = sys->mesh;
+          nDims = Mesh_GetDimSize( mesh );
 
-			crds[0] = crds0;
-			crds[1] = crds1;
-			nLocalNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+          crds[0] = crds0;
+          crds[1] = crds1;
+          nLocalNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
 
-			/* Skip corners. */
-			if( ijk[0] == 0 || ijk[0] == grm->sizes[0] - 1 ) {
-				return;
-			}
+          /* Skip corners. */
+          if(ijk[0]==0 || ijk[0]==grm->sizes[0] - 1)
+            {
+              return;
+            }
 
-			/* Get old and new coordinate. */
-			centerInd = Grid_Project( grm, ijk );
-			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, centerInd, &centerInd ) || centerInd >= nLocalNodes )
-				return;
+          /* Get old and new coordinate. */
+          centerInd = Grid_Project( grm, ijk );
+          if(!Mesh_GlobalToDomain(mesh,MT_VERTEX,centerInd,&centerInd)
+             || centerInd >= nLocalNodes)
+            return;
 
-			newCrd[0] = mesh->verts[centerInd][0];
-			newCrd[1] = mesh->verts[centerInd][1];
-			oldCrd[0] = oldCrds[centerInd][0];
-			oldCrd[1] = oldCrds[centerInd][1];
+          newCrd[0] = mesh->verts[centerInd][0];
+          newCrd[1] = mesh->verts[centerInd][1];
+          oldCrd[0] = oldCrds[centerInd][0];
+          oldCrd[1] = oldCrds[centerInd][1];
 
-			/* Are we left or right? */
-			if( newCrd[0] < oldCrd[0] ) {
-				ijk[0]--; ind = Grid_Project( grm, ijk ); ijk[0]++;
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
-				memcpy( crds[1], oldCrd, nDims * sizeof(double) );
-			}
-			else if( newCrd[0] > oldCrd[0] ) {
-				ijk[0]++; ind = Grid_Project( grm, ijk ); ijk[0]--;
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
-				memcpy( crds[0], oldCrd, nDims * sizeof(double) );
-			}
+          /* Are we left or right? */
+          if(newCrd[0]<oldCrd[0])
+            {
+              ijk[0]--; ind = Grid_Project( grm, ijk ); ijk[0]++;
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
+              memcpy( crds[1], oldCrd, nDims * sizeof(double) );
+            }
+          else if(newCrd[0]>oldCrd[0])
+            {
+              ijk[0]++; ind = Grid_Project( grm, ijk ); ijk[0]--;
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
+              memcpy( crds[0], oldCrd, nDims * sizeof(double) );
+            }
 
-                        if(newCrd[0]==oldCrd[0]) {
-                          mesh->verts[centerInd][1]=oldCrd[1];
-                        }
-                        else {
+          if(newCrd[0]==oldCrd[0])
+            {
+              mesh->verts[centerInd][1]=oldCrd[1];
+            }
+          else
+            {
 
-                          /* Interpolate. */
+              /* Interpolate. */
 #ifndef NDEBUG
-			assert( _EulerDeform_LineInterp(crds, newCrd, 0, 1, &mesh->verts[centerInd][1] ) );
+              assert(_EulerDeform_LineInterp(crds,newCrd,0,1,
+                                             &mesh->verts[centerInd][1]));
 #else
-			_EulerDeform_LineInterp(crds, newCrd, 0, 1, &mesh->verts[centerInd][1] );
+              _EulerDeform_LineInterp(crds,newCrd,0,1,
+                                      &mesh->verts[centerInd][1]);
 #endif
-                        if((mesh->verts[centerInd][1]>0) ^ top)
-                          {
-                            mesh->verts[centerInd][1] *= 1+fudge_factor;
-                          }
-                        else
-                          {
-                            mesh->verts[centerInd][1] *= 1-fudge_factor;
-                          }
-                        }
-		}
-		else if( grm->nDims == 3 ) {
-			mesh = sys->mesh;
-			nDims = Mesh_GetDimSize( mesh );
+              if((mesh->verts[centerInd][1]>0) ^ top)
+                {
+                  mesh->verts[centerInd][1] *= 1+fudge_factor;
+                }
+              else
+                {
+                  mesh->verts[centerInd][1] *= 1-fudge_factor;
+                }
+            }
+        }
+      else if(grm->nDims==3)
+        {
+          mesh = sys->mesh;
+          nDims = Mesh_GetDimSize( mesh );
 
-			crds[0] = crds0; crds[1] = crds1; crds[2] = crds2; crds[3] = crds3;
-			nLocalNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
+          crds[0] = crds0; crds[1] = crds1; crds[2] = crds2; crds[3] = crds3;
+          nLocalNodes = Mesh_GetLocalSize( mesh, MT_VERTEX );
 
-			/* Skip corners. */
-			if( (ijk[0] == 0 || ijk[0] == grm->sizes[0] - 1) && 
-			    (ijk[2] == 0 || ijk[2] == grm->sizes[2] - 1))
-			{
-				return;
-			}
+          /* Skip corners. */
+          if( (ijk[0] == 0 || ijk[0] == grm->sizes[0] - 1) && 
+              (ijk[2] == 0 || ijk[2] == grm->sizes[2] - 1))
+            {
+              return;
+            }
 
-			/* Get old and new coordinate. */
-			centerInd = Grid_Project( grm, ijk );
-			if( !Mesh_GlobalToDomain( mesh, MT_VERTEX, centerInd, &centerInd ) || centerInd >= nLocalNodes )
-				return;
+          /* Get old and new coordinate. */
+          centerInd = Grid_Project( grm, ijk );
+          if(!Mesh_GlobalToDomain(mesh,MT_VERTEX,centerInd,&centerInd)
+             || centerInd >= nLocalNodes)
+            return;
 
-			newCrd[0] = mesh->verts[centerInd][0];
-			newCrd[1] = mesh->verts[centerInd][1];
-			newCrd[2] = mesh->verts[centerInd][2];
-			oldCrd[0] = oldCrds[centerInd][0];
-			oldCrd[1] = oldCrds[centerInd][1];
-			oldCrd[2] = oldCrds[centerInd][2];
+          newCrd[0] = mesh->verts[centerInd][0];
+          newCrd[1] = mesh->verts[centerInd][1];
+          newCrd[2] = mesh->verts[centerInd][2];
+          oldCrd[0] = oldCrds[centerInd][0];
+          oldCrd[1] = oldCrds[centerInd][1];
+          oldCrd[2] = oldCrds[centerInd][2];
 
-			/* Handle internal nodes. */
-			if( ijk[0] > 0 && ijk[2] > 0 ) {
-				ijk[0]--; ijk[2]--; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
+          /* Handle internal nodes. */
+          if( ijk[0] > 0 && ijk[2] > 0 ) {
+            ijk[0]--;
+            ijk[2]--;
+            ind=Grid_Project(grm,ijk);
+            insist(Mesh_GlobalToDomain(mesh,MT_VERTEX,ind,&ind ), != 0);
+            memcpy(crds[0],oldCrds[ind],nDims*sizeof(double));
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
+            ijk[0]++;
+            ind=Grid_Project(grm,ijk);
+            insist(Mesh_GlobalToDomain(mesh,MT_VERTEX,ind,&ind), != 0);
+            memcpy(crds[1],oldCrds[ind],nDims*sizeof(double));
 
-				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
+            ijk[0]--;
+            ijk[2]++;
+            ind=Grid_Project(grm,ijk);
+            insist(Mesh_GlobalToDomain(mesh,MT_VERTEX,ind,&ind), != 0);
+            memcpy(crds[2],oldCrds[ind],nDims*sizeof(double));
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
+            ijk[0]++;
+            ind=Grid_Project(grm,ijk);
+            insist(Mesh_GlobalToDomain(mesh,MT_VERTEX,ind,&ind), != 0);
+            memcpy(crds[3],oldCrds[ind],nDims*sizeof(double));
 
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-                                  if((mesh->verts[centerInd][1]>0) ^ top)
-                                    {
-                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
-                                    }
-                                  else
-                                    {
-                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
-                                    }
-                                  return;
-				}
-			}
+            if(_EulerDeform_QuadYInterp(crds,newCrd,&mesh->verts[centerInd][1]))
+              {
+                if((mesh->verts[centerInd][1]>0) ^ top)
+                  {
+                    mesh->verts[centerInd][1] *= 1+fudge_factor;
+                  }
+                else
+                  {
+                    mesh->verts[centerInd][1] *= 1-fudge_factor;
+                  }
+                return;
+              }
+          }
 
-			if( ijk[0] > 0 && ijk[2] < grm->sizes[2] - 1 ) {
-				ijk[0]--; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
+          if(ijk[0]>0 && ijk[2]<grm->sizes[2] - 1 )
+            {
+              ijk[0]--;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]--;
+              ijk[2]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[2]--;
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-                                  if((mesh->verts[centerInd][1]>0) ^ top)
-                                    {
-                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
-                                    }
-                                  else
-                                    {
-                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
-                                    }
-                                  return;
-				}
-			}
+              ijk[2]--;
+              if(_EulerDeform_QuadYInterp(crds,newCrd,
+                                          &mesh->verts[centerInd][1]))
+                {
+                  if((mesh->verts[centerInd][1]>0) ^ top)
+                    {
+                      mesh->verts[centerInd][1] *= 1+fudge_factor;
+                    }
+                  else
+                    {
+                      mesh->verts[centerInd][1] *= 1-fudge_factor;
+                    }
+                  return;
+                }
+            }
 
-			if( ijk[0] < grm->sizes[0] - 1 && ijk[2] > 0 ) {
-				ijk[2]--; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
+          if(ijk[0]<grm->sizes[0]-1 && ijk[2]>0)
+            {
+              ijk[2]--;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]--;
+              ijk[2]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]--;
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-                                  if((mesh->verts[centerInd][1]>0) ^ top)
-                                    {
-                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
-                                    }
-                                  else
-                                    {
-                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
-                                    }
-                                  return;
-				}
-			}
+              ijk[0]--;
+              if(_EulerDeform_QuadYInterp(crds,newCrd,
+                                          &mesh->verts[centerInd][1]))
+                {
+                  if((mesh->verts[centerInd][1]>0) ^ top)
+                    {
+                      mesh->verts[centerInd][1] *= 1+fudge_factor;
+                    }
+                  else
+                    {
+                      mesh->verts[centerInd][1] *= 1-fudge_factor;
+                    }
+                  return;
+                }
+            }
 
-			if( ijk[0] < grm->sizes[0] - 1 && ijk[2] < grm->sizes[2] - 1 ) {
-				ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
+          if(ijk[0]<grm->sizes[0]-1 && ijk[2]<grm->sizes[2]-1)
+            {
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[0], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[1], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]--; ijk[2]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]--;
+              ijk[2]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[2], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]++; ind = Grid_Project( grm, ijk );
-				insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
-				memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
+              ijk[0]++;
+              ind=Grid_Project(grm,ijk);
+              insist( Mesh_GlobalToDomain( mesh, MT_VERTEX, ind, &ind ), != 0 );
+              memcpy( crds[3], oldCrds[ind], nDims * sizeof(double) );
 
-				ijk[0]--; ijk[2]--;
-				if( _EulerDeform_QuadYInterp( crds, newCrd, &mesh->verts[centerInd][1] ) ) {
-                                  if((mesh->verts[centerInd][1]>0) ^ top)
-                                    {
-                                      mesh->verts[centerInd][1] *= 1+fudge_factor;
-                                    }
-                                  else
-                                    {
-                                      mesh->verts[centerInd][1] *= 1-fudge_factor;
-                                    }
-                                  return;
-				}
-			}
-
-			assert( 0 );
-		}
-		else {
-			assert( 0 );
-		}
-	}
+              ijk[0]--;
+              ijk[2]--;
+              if(_EulerDeform_QuadYInterp(crds,newCrd,
+                                          &mesh->verts[centerInd][1]))
+                {
+                  if((mesh->verts[centerInd][1]>0) ^ top)
+                    {
+                      mesh->verts[centerInd][1] *= 1+fudge_factor;
+                    }
+                  else
+                    {
+                      mesh->verts[centerInd][1] *= 1-fudge_factor;
+                    }
+                  return;
+                }
+            }
+          assert(0);
+        }
+      else
+        {
+          assert( 0 );
+        }
+    }
 }
 
-#if 0
-void EulerDeform_LeftInternalLoop( EulerDeform_System* sys, GRM* grm, Coord* oldCrds, unsigned* ijk, unsigned curDim ) {
-	if( curDim < grm->nDims ) {
-		if( curDim == 0 ) {
-			ijk[0] = 0;
-			EulerDeform_LeftInternalLoop( sys, grm, oldCrds, ijk, curDim + 1 );
-		}
-		else {
-			for( ijk[curDim] = 1; ijk[curDim] < grm->nNodes[curDim] - 1; ijk[curDim]++ ) {
-				EulerDeform_LeftInternalLoop( sys, grm, oldCrds, ijk, curDim + 1 );
-			}
-		}
-	}
-	else {
-		if( grm->nDims == 2 ) {
-			XYZ		newCrd, oldCrd;
-			unsigned	centerInd;
-			Mesh*		mesh = sys->mesh;
+namespace {
+  void restore_velocity(FeVariable* velocityField, double* oldVelocity)
+  {
+    FeMesh* mesh=velocityField->feMesh;
+    int lNodeCount=FeMesh_GetNodeLocalSize(mesh);
+    int dof=velocityField->fieldComponentCount;
+    double oldV[3];
+    for(int lNode_I = 0; lNode_I<lNodeCount; lNode_I++)
+      {
+        memcpy(oldV,&oldVelocity[lNode_I*dof],dof*sizeof(double));
+        FeVariable_SetValueAtNode(velocityField,lNode_I,oldV);
+      }
+  }
 
-			/* Get old and new coordinate. */
-			GRM_Project( grm, ijk, &centerInd );
-			newCrd[0] = mesh->nodeCoord[centerInd][0];
-			newCrd[1] = mesh->nodeCoord[centerInd][1];
-			oldCrd[0] = oldCrds[centerInd][0];
-			oldCrd[1] = oldCrds[centerInd][1];
+  void add_correction(FeVariable* velocityField,
+                      double* artVelocity)
+  {
+    FeMesh* mesh=velocityField->feMesh;
+    int lNodeCount=FeMesh_GetNodeLocalSize(mesh);
+    int dof=velocityField->fieldComponentCount;
 
-			/* Are we above or below? */
-			if( newCrd[1] < oldCrd[1] ) {
-				XYZ		leftCrd;
-				unsigned	leftInd;
-				double		a0, a1;
+    for(int lNode_I=0; lNode_I<lNodeCount; lNode_I++)
+      {
+        double v[3];
+        FeVariable_GetValueAtNode(velocityField,lNode_I,v);            
+        for(int i=0;i<dof;i++)
+          {
+            v[i]-=artVelocity[lNode_I*dof+i];
+          }
+        FeVariable_SetValueAtNode(velocityField,lNode_I,v);
+      }
+  }
 
-				/* Get left old coord. */
-				ijk[1]--;
-				GRM_Project( grm, ijk, &leftInd );
-				ijk[1]++;
-				leftCrd[0] = oldCrds[leftInd][0];
-				leftCrd[1] = oldCrds[leftInd][1];
+  void store_current_velocity(FeVariable *velocityField, double *oldVelocity)
+  {
+    /* save the current values of the velocity field in the oldVelocity array */
+    FeMesh *mesh = velocityField->feMesh;
+    unsigned dof = velocityField->fieldComponentCount;
+    unsigned numLocalNodes = FeMesh_GetNodeLocalSize( mesh );
+    double vel[3];
 
-				/* Calc barycenter. */
-				a1 = (newCrd[1] - leftCrd[1]) / (oldCrd[1] - leftCrd[1]);
-				a0 = 1.0 - a1;
-				mesh->nodeCoord[centerInd][0] = (a0 * leftCrd[0] + a1 * oldCrd[0])*(1.0+1.0e-10);
-			}
-			else {
-				XYZ		rightCrd;
-				unsigned	rightInd;
-				double		a0, a1;
+    for(unsigned lNode_I=0; lNode_I<numLocalNodes; lNode_I++)
+      {
+        FeVariable_GetValueAtNode(velocityField,lNode_I,vel);
+        memcpy(&oldVelocity[lNode_I*dof],vel,dof*sizeof(double));
+      }
+  }
 
-				/* Get right old coord. */
-				ijk[1]++;
-				GRM_Project( grm, ijk, &rightInd );
-				ijk[1]--;
-				rightCrd[0] = oldCrds[rightInd][0];
-				rightCrd[1] = oldCrds[rightInd][1];
+  void compute_velocity_from_displacement(FeVariable *artDField,
+                                          double *artVelocity,
+                                          double dt)
+  {
+    /* save the purely artificial bit of the remeshing in the artVelocity */
+    FeMesh* mesh=artDField->feMesh;
+    Dof_Index dof=artDField->fieldComponentCount;
+    double artV[3], artD[3];
+    unsigned numLocalNodes=FeMesh_GetNodeLocalSize(mesh);
+    Dof_Index dof_I, lNode_I;
 
-				/* Calc barycenter. */
-				a1 = (newCrd[1] - oldCrd[1]) / (rightCrd[1] - oldCrd[1]);
-				a0 = 1.0 - a1;
-				mesh->nodeCoord[centerInd][0] = (a0 * oldCrd[0] + a1 * rightCrd[0])*(1.0+1.0e-10);
-			}
-		}
-		else if( grm->nDims == 3 ) {
-			assert( 0 );
-		}
-		else {
-			assert( 0 );
-		}
-	}
+    /* INITIAL CONDITION: artV = 0 */
+    if(dt==0)
+      {
+        for(lNode_I=0; lNode_I<numLocalNodes; lNode_I++)
+          {
+            for(dof_I=0; dof_I<dof; dof_I++) 
+              artV[dof_I]=0;
+
+            memcpy( &artVelocity[lNode_I*dof] , artV, dof*sizeof(double) );
+          }
+        return;
+      }
+	
+    /* artV = artD / dt. */
+    for(lNode_I=0; lNode_I<numLocalNodes; lNode_I++)
+      {
+        FeVariable_GetValueAtNode(artDField,lNode_I,artD);
+        for(dof_I=0; dof_I<dof; dof_I++) 
+          artV[dof_I]= artD[dof_I]/dt;
+        memcpy(&artVelocity[lNode_I*dof],artV,dof*sizeof(double));
+      }
+  }
 }
-#endif
 
+void Underworld_EulerDeform_Advection_Correction(void* sle, void* data)
+{
+  UnderworldContext* context=(UnderworldContext*)data;
 
+  if(context->timeStep==context->restartTimestep)
+    return;
+
+  EulerDeform_Context* edCtx=(EulerDeform_Context*)
+    ExtensionManager_Get(context->extensionMgr,context,
+                         EulerDeform_ContextHandle);
+
+  EulerDeform_System* sys;
+  for(unsigned sys_i=0; sys_i<edCtx->nSystems; sys_i++)
+    {
+      sys=edCtx->systems + sys_i;
+      if(sys->dispField)
+        break;
+    }
+
+  FeVariable* velocityField=(FeVariable*)
+    LiveComponentRegister_Get(context->CF->LCRegister,(Name)"VelocityField");
+  double dt=context->dt;
+  double *artVelocity(NULL), *oldVelocity(NULL);
+  int lNodeCount=FeMesh_GetNodeLocalSize(velocityField->feMesh);
+
+  /* store the current velocity in oldVelocity */
+  oldVelocity=Memory_Alloc_Array(double, 
+                                 lNodeCount * velocityField->fieldComponentCount, 
+                                 "artificial nodal velocities");
+
+  store_current_velocity(velocityField,oldVelocity);
+
+  artVelocity=
+    Memory_Alloc_Array(double,lNodeCount*velocityField->fieldComponentCount,
+                       "artificial nodal velocities");
+  compute_velocity_from_displacement(sys->dispField,artVelocity,dt);
+                                     
+  add_correction(velocityField,artVelocity);
+
+  FeVariable_SyncShadowValues(velocityField);
+
+  /* Solve Energy equation */
+  sys->energySolverExecute(sle,context);
+
+  /* Reverse correction and re-sync */
+  restore_velocity(velocityField,oldVelocity);
+  FeVariable_SyncShadowValues(velocityField);
+
+  Memory_Free(artVelocity);
+  Memory_Free(oldVelocity);
+}

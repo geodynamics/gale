@@ -39,6 +39,7 @@
 		Mesh*		T_mesh;
 		double*		verts;
 	        FeVariable*     dispField;
+                Stg_Component_ExecuteFunction* energySolverExecute;
 		Remesher*	remesher;
 		int             interval;
 		FieldVariable*	velField;
