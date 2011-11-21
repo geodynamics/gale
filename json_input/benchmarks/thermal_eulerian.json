@@ -14,7 +14,9 @@
     {
         "systems": [
             {
-                "mesh": "v-T-mesh",
+                "mesh": "v-mesh",
+                "T-mesh": "T-mesh",
+                "displacementField": "DisplacementField",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",
                 "staticLeft": "True",
@@ -68,11 +70,11 @@
                 "variables":[
                     {
                         "name": "vx",
-                        "value": "2.718281828"
+                        "value": "1.0"
                     },
                     {
                         "name": "vy",
-                        "value": "0"
+                        "value": "1.0"
                     }
                 ]
             }
