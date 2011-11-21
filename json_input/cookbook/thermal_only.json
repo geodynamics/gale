@@ -1,11 +1,4 @@
 {
-    "plugins":
-    [
-        {
-            "Type": "Underworld_EulerDeform",
-            "Context":"context"
-        }
-    ],
     "components":
     {
         "boxShape":
@@ -158,6 +151,7 @@
     },
 
     "FieldVariablesToCheckpoint": [
+        "VelocityField",
         "TemperatureField"
     ],
     "enable-stokes": false,

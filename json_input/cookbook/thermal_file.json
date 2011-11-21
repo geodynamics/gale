@@ -4,10 +4,6 @@
         {
             "Type": "Underworld_EulerDeform",
             "Context":"context"
-        },
-        {
-            "Type": "Underworld_MeshAdvectionCorrection",
-            "Context":"context"
         }
     ],
     "EulerDeform":
@@ -17,6 +13,7 @@
                 "mesh": "v-mesh",
                 "p-mesh": "p-mesh",
                 "T-mesh": "T-mesh",
+                "displacementField": "DisplacementField",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",
                 "wrapTop": "True"
