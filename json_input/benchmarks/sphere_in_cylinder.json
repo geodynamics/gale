@@ -85,6 +85,14 @@
                 "wall": "front",
                 "variables": [
                     {
+                        "name": "vx",
+                        "value": "0.0"
+                    },
+                    {
+                        "name": "vy",
+                        "value": "0.0"
+                    },
+                    {
                         "name": "vz",
                         "value": "0.0"
                     }
@@ -116,6 +124,14 @@
                 "variables": [
                     {
                         "name": "vx",
+                        "value": "0.0"
+                    },
+                    {
+                        "name": "vy",
+                        "value": "0.0"
+                    },
+                    {
+                        "name": "vz",
                         "value": "0.0"
                     }
                 ]
