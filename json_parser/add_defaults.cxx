@@ -378,6 +378,7 @@ void add_defaults(json_spirit::Value &root)
     "    \"PressureVector\": \"solutionPressure\","
     "    \"ForceVector\": \"mom_force\","
     "    \"ContinuityForceVector\": \"cont_force\","
+    "    \"nonLinearMinIterations\": \"nonLinearMinIterations\","
     "    \"nonLinearMaxIterations\": \"nonLinearMaxIterations\","
     "    \"nonLinearTolerance\": \"nonLinearTolerance\","
     "    \"makeConvergenceFile\": \"false\""
