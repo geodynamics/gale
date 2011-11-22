@@ -66,7 +66,6 @@ DivergenceForce* DivergenceForce_New(Name name,
                                      ForceVector* forceVector,
                                      Swarm* integrationSwarm,
                                      Stg_Shape* domainShape,
-                                     FeMesh* geometryMesh,
                                      StressBC_Entry force)
 {
 	DivergenceForce* self = (DivergenceForce*) _DivergenceForce_DefaultNew( name );
@@ -77,7 +76,6 @@ DivergenceForce* DivergenceForce_New(Name name,
 			forceVector,
 			integrationSwarm,
                         domainShape,
-                        geometryMesh,
                         force);
 
 	return self;
@@ -96,13 +94,12 @@ DivergenceForce* _DivergenceForce_New( DIVERGENCEFORCE_DEFARGS)
 }
 
 void _DivergenceForce_Init(DivergenceForce* self,
-                           Stg_Shape* domainShape, FeMesh *geometryMesh,
+                           Stg_Shape* domainShape,
                            StressBC_Entry force)
 {
   self->isConstructed    = True;
 
   self->domainShape=domainShape;
-  self->geometryMesh=geometryMesh;
   self->force=force;
 }
 
@@ -112,13 +109,12 @@ void DivergenceForce_InitAll(
 		ForceVector*                                        forceVector,
 		Swarm*                                              integrationSwarm,
                 Stg_Shape* domainShape,
-                FeMesh* geometryMesh,
                 StressBC_Entry force)
 {
 	DivergenceForce* self = (DivergenceForce*) forceTerm;
 
 	_ForceTerm_Init( self, context, forceVector, integrationSwarm, NULL );
-	_DivergenceForce_Init( self, domainShape, geometryMesh, force);
+	_DivergenceForce_Init( self, domainShape, force);
 }
 
 void _DivergenceForce_Delete( void* forceTerm ) {
@@ -159,7 +155,6 @@ void* _DivergenceForce_DefaultNew( Name name ) {
 void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* data ) {
 	DivergenceForce*          self             = (DivergenceForce*)forceTerm;
         Stg_Shape* domainShape=NULL;
-        FeMesh* geometryMesh=NULL;
         StressBC_Entry force;
         char *type;
 
@@ -217,9 +212,7 @@ void _DivergenceForce_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, 
             assert(0);
           }
         
-        geometryMesh=Stg_ComponentFactory_ConstructByKey(  cf,  self->name,  "GeometryMesh", FeMesh,  True, data  ) ;
-        
-	_DivergenceForce_Init( self, domainShape, geometryMesh, force);
+	_DivergenceForce_Init( self, domainShape, force);
 }
 
 void _DivergenceForce_Build( void* forceTerm, void* data ) {

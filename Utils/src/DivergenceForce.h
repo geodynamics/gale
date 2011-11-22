@@ -55,7 +55,6 @@
 		/* General info */ \
 		__ForceTerm \
 		Stg_Shape*                                 domainShape;    \
-                FeMesh*                                    geometryMesh; \
                 StressBC_Entry                             force;
 
 	struct DivergenceForce { __DivergenceForce };
@@ -78,7 +77,6 @@
 		ForceVector*                                        forceVector,
 		Swarm*                                              integrationSwarm,
                 Stg_Shape* domainShape,
-                FeMesh* geometryMesh,
                 StressBC_Entry force);
 
 	void _DivergenceForce_Delete( void* forceTerm );
