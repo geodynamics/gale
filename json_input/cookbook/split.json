@@ -1,11 +1,4 @@
 {
-    "plugins":
-    [
-        {
-            "Type": "Underworld_EulerDeform",
-            "Context":"context"
-        }
-    ],
     "EulerDeform":
     {
         "systems": [
@@ -53,7 +46,6 @@
                 "storeStress"
             ]
         }
-
     },
     "velocityBCs" :{
         "type": "CompositeVC",
@@ -64,7 +56,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "0.0"
+                        "value": "0"
                     }
                 ]
             },
@@ -88,7 +80,7 @@
                     },
                     {
                         "name": "vy",
-                        "value": "0.0"
+                        "value": "0"
                     }
                 ]
             }
@@ -104,12 +96,12 @@
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",
-    "minX": "0.0f",
-    "minY": "0.0f",
-    "minZ": "0.0f",
-    "maxX": "2.0f",
-    "maxY": "0.35f",
-    "maxZ": "0.3f",
+    "minX": "0",
+    "minY": "0",
+    "minZ": "0",
+    "maxX": "2",
+    "maxY": "0.35",
+    "maxZ": "0.3",
     "nx": "16",
     "ny": "4",
     "nz": "4",

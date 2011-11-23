@@ -4,15 +4,25 @@
         "systems": [
             {
                 "mesh": "v-mesh",
+                "p-mesh": "p-mesh",
                 "T-mesh": "T-mesh",
                 "displacementField": "DisplacementField",
                 "remesher": "velocityRemesher",
-                "velocityField": "VelocityField"
+                "velocityField": "VelocityField",
+                "wrapTop": "True"
             }
         ]
     },
     "components":
     {
+        "buoyancyForceTerm":
+        {
+            "Type": "BuoyancyForceTerm",
+            "ForceVector": "mom_force",
+            "Swarm": "gaussSwarm",
+            "gravity": "gravity",
+            "TemperatureField": "TemperatureField"
+        },
         "boxShape":
         {
             "Type": "Box",
@@ -23,58 +33,94 @@
             "startZ": "minZ",
             "endZ": "maxZ"
         },
-        "backgroundViscosity":
+        "sphereShape":
         {
-            "Type": "MaterialViscosity",
-            "eta0": "1.0"
+            "Type": "EquationShape",
+            "equation": ".1^2 - ((x-1)^2 + (y-.15)^2)"
+        },
+        "nonsphereShape":
+        {
+            "Type": "Intersection",
+            "shapes":
+            [
+                "boxShape",
+                "!sphereShape"
+            ]
+        },
+        "nonNewtonian":
+        {
+            "Type": "NonNewtonian",
+            "StrainRateInvariantField": "StrainRateInvariantField",
+            "TemperatureField": "TemperatureField",
+            "n": "3.4",
+            "T_0": "1.0",
+            "A": "1.0",
+            "refStrainRate": "0.01"
         },
         "viscous":
         {
             "Type": "RheologyMaterial",
-            "Shape": "boxShape",
+            "Shape": "nonsphereShape",
             "density": "1.0",
             "alpha": "1.0",
-            "diffusivity": "0.0",
+            "diffusivity": "1.0",
             "heatingElements": [
                 {
-                    "Q": "0.0",
+                    "Q": "1.0",
                     "lambda": "1.0"
                 }
             ],
             "Rheology": [
-                "backgroundViscosity"
+                "nonNewtonian",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "sphereViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "10.0"
+        },
+        "sphereViscous":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "sphereShape",
+            "density": "1.0",
+            "alpha": "10.0",
+            "diffusivity": "10.0",
+            "heatingElements": [
+                {
+                    "Q": "1000.0",
+                    "lambda": "10.0"
+                }
+            ],
+            "Rheology": [
+                "sphereViscosity",
+                "storeViscosity",
+                "storeStress"
             ]
         }
     },
-    "velocityICs":
-    {
-        "type": "CompositeVC",
-        "vcList": [
-            {
-                "type": "AllNodesVC",
-                "variables":[
-                    {
-                        "name": "vx",
-                        "value": ".3*x-0.2"
-                    },
-                    {
-                        "name": "vy",
-                        "value": "(x+.3)*(1.5-x)*y + (x-.15)*(0.7-x)"
-                    }
-                ]
-            }
-        ]
-    },
-    "temperatureBCs": {
+    "velocityBCs" :{
         "type": "CompositeVC",
         "vcList": [
             {
                 "type": "WallVC",
-                "wall": "top",
+                "wall": "left",
                 "variables": [
                     {
-                        "name": "temperature",
-                        "value": "1.0"
+                        "name": "vx",
+                        "value": "0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "right",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "value": "0.01"
                     }
                 ]
             },
@@ -83,11 +129,16 @@
                 "wall": "bottom",
                 "variables": [
                     {
-                        "name": "temperature",
-                        "value": "1.0"
+                        "name": "vy",
+                        "value": "0"
                     }
                 ]
-            },
+            }
+        ]
+    },
+    "temperatureBCs": {
+        "type": "CompositeVC",
+        "vcList": [
             {
                 "type": "WallVC",
                 "wall": "left",
@@ -107,6 +158,26 @@
                         "value": "1.0"
                     }
                 ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "top",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "1.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "bottom",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "2.0"
+                    }
+                ]
             }
         ]
     },
@@ -119,7 +190,7 @@
                 "variables":[
                     {
                         "name": "temperature",
-                        "value": "(x<.375 || x>.625 || y<.375 || y>.625) ? 1 : 2"
+                        "value": "1.0"
                     }
                 ]
             }
@@ -127,10 +198,11 @@
     },
 
     "FieldVariablesToCheckpoint": [
+        "StrainRateInvariantField",
+        "VelocityField",
         "TemperatureField",
-        "VelocityField"
+        "PressureField"
     ],
-    "enable-stokes": false,
     "enable-thermal": true,
     "timeIntegratorOrder": "1",
     "maxTimeSteps": "10",
@@ -139,11 +211,11 @@
     "minX": "0",
     "minY": "0",
     "minZ": "0",
-    "maxX": "1",
-    "maxY": "1",
+    "maxX": "2",
+    "maxY": "0.35",
     "maxZ": "0.3",
-    "nx": "8",
-    "ny": "8",
+    "nx": "16",
+    "ny": "4",
     "nz": "4",
     "particlesPerCell": "40",
     "seed": "13",

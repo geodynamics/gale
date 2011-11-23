@@ -1,11 +1,4 @@
 {
-    "plugins":
-    [
-        {
-            "Type": "Underworld_EulerDeform",
-            "Context":"context"
-        }
-    ],
     "EulerDeform":
     {
         "systems": [
@@ -37,7 +30,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "0.0"
+                        "value": "0"
                     }
                 ]
             },
@@ -47,7 +40,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "0.0"
+                        "value": "0"
                     }
                 ]
             },
@@ -57,7 +50,7 @@
                 "variables": [
                     {
                         "name": "vy",
-                        "value": "0.0"
+                        "value": "0"
                     }
                 ]
             }

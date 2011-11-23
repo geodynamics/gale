@@ -1,4 +1,18 @@
 {
+    "EulerDeform":
+    {
+        "systems": [
+            {
+                "mesh": "v-mesh",
+                "p-mesh": "p-mesh",
+                "T-mesh": "T-mesh",
+                "displacementField": "DisplacementField",
+                "remesher": "velocityRemesher",
+                "velocityField": "VelocityField",
+                "wrapTop": "True"
+            }
+        ]
+    },
     "components":
     {
         "boxShape":
@@ -154,8 +168,8 @@
         "VelocityField",
         "TemperatureField"
     ],
-    "enable-stokes": false,
     "enable-thermal": true,
+    "enable-stokes": false,
     "timeIntegratorOrder": "1",
     "maxTimeSteps": "10",
     "outputPath": "./output",
@@ -167,7 +181,7 @@
     "maxY": "0.35",
     "maxZ": "0.3",
     "nx": "16",
-    "ny": "8",
+    "ny": "4",
     "nz": "4",
     "particlesPerCell": "40",
     "seed": "13",
