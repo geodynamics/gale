@@ -51,7 +51,6 @@
         {
             "Type": "StressBC",
             "ForceVector": "mom_force",
-            "Swarm": "picIntegrationPoints",
             "wall": "bottom",
             "normal_value": "0.35-y"
         }

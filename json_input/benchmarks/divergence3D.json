@@ -111,7 +111,6 @@
         {
             "Type": "DivergenceForce",
             "ForceVector": "cont_force",
-            "Swarm": "gaussSwarm",
             "DomainShape": "boxShape",
             "force_value": "-3"
         }
