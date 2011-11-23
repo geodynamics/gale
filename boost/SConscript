@@ -13,13 +13,13 @@ config_hpp=env.Install('include/boost','boost/config.hpp')
 missing_depends=[]
 for root, dirs, files in os.walk("boost"):
     for d in dirs:
-        for f in Glob(root + '/' + d + '/*.hpp',strings=True):
+        for f in Glob(root + '/' + d + '/*.[ih]pp',strings=True):
             missing_depends.append(env['build_dir'] + '/include/' + f)
 Depends(config_hpp,missing_depends)
 
 
 for root, dirs, files in os.walk("boost"):
-    env.Install('include/' + root, Glob(root + '/*.hpp'))
+    env.Install('include/' + root, Glob(root + '/*.[ih]pp'))
 
 env.Append(CPPPATH=env['build_dir'] + '/boost')
 
