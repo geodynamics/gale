@@ -20,6 +20,10 @@ void add_defaults(json_spirit::Value &root)
     "    {"
     "        \"Type\": \"StgFEM_StandardConditionFunctions\","
     "        \"Context\": \"context\""
+    "    },"
+    "    {"
+    "        \"Type\": \"Underworld_EulerDeform\","
+    "        \"Context\": \"context\""
     "    }"
     "]}");
 
