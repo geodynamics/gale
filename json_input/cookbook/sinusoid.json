@@ -22,7 +22,8 @@
         },
         "backgroundShape":
         {
-            "Type": "Everywhere"
+            "Type": "EquationShape",
+            "equation": "1"
         },
         "backgroundViscosity":
         {
