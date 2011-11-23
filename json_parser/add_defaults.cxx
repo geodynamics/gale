@@ -558,12 +558,41 @@ void add_defaults(json_spirit::Value &root)
      "}"
      "}");
 
-  json_spirit::Value toolbox, plugins, basic, stokes, thermal;
+  std::string tracer_components
+    ("{"
+     "\"passiveSwarmMovementHandler\":"
+     "{"
+     "\"Type\": \"ParticleMovementHandler\""
+     "},"
+     "\"passiveTracerSwarm\":"
+     "{"
+     "\"Type\": \"MaterialPointsSwarm\","
+     "\"CellLayout\": \"cellLayout\","
+     "\"ParticleLayout\": \"pLayout\","
+     "\"FeMesh\": \"v-mesh\","
+     "\"ParticleCommHandlers\":"
+     "["
+     "\"passiveSwarmMovementHandler\""
+     "],"
+     "\"EscapedRoutine\": \"escapedRoutine\""
+     "},"
+     ""
+     "\"passiveTracerAdvect\":"
+     "{"
+     "\"Type\": \"SwarmAdvector\","
+     "\"Swarm\": \"passiveTracerSwarm\","
+     "\"TimeIntegrator\": \"timeIntegrator\","
+     "\"VelocityField\": \"VelocityField\""
+     "}"
+     "}");
+
+  json_spirit::Value toolbox, plugins, basic, stokes, thermal, tracers;
   json_spirit::read_or_throw(toolbox_string,toolbox);
   json_spirit::read_or_throw(plugins_string,plugins);
   json_spirit::read_or_throw(basic_components,basic);
   json_spirit::read_or_throw(stokes_components,stokes);
   json_spirit::read_or_throw(thermal_components,thermal);
+  json_spirit::read_or_throw(tracer_components,tracers);
 
   json_spirit::Object &o(root.get_obj());
 
@@ -603,7 +632,7 @@ void add_defaults(json_spirit::Value &root)
   /* Add the standard components */
   /* First find the components */
   json_spirit::Object::iterator components(o.end());
-  bool enable_thermal(false), enable_stokes(true);
+  bool enable_thermal(false), enable_stokes(true), enable_tracers(false);
   for(json_spirit::Object::iterator i=o.begin(); i!=o.end(); ++i)
     {
       if(i->name_=="components")
@@ -622,9 +651,18 @@ void add_defaults(json_spirit::Value &root)
                                      "true or false (no quotes)");
           enable_thermal=i->value_.get_bool();
         }
+      else if(i->name_=="enable-tracers")
+        {
+          if(i->value_.type()!=json_spirit::bool_type)
+            throw std::runtime_error("The field enable-tracers must be either"
+                                     "true or false (no quotes)");
+          enable_tracers=i->value_.get_bool();
+        }
     }
 
   /* New components get prepended, so add in reverse order */
+  if(enable_tracers)
+    add_components(components->value_.get_obj(),tracers.get_obj());
   if(enable_thermal)
     add_components(components->value_.get_obj(),thermal.get_obj());
   if(enable_stokes)
