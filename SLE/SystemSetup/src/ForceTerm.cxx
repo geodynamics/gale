@@ -146,7 +146,8 @@ void _ForceTerm_Print( void* forceTerm, Stream* stream ) {
 	_Stg_Component_Print( self, stream );
 	
 	/* ForceTerm info */
-	Journal_Printf( stream, "\tintegrationSwarm (ptr): %p\n", self->integrationSwarm );
+        if(self->integrationSwarm!=NULL)
+          Journal_Printf( stream, "\tintegrationSwarm (ptr): %p\n", self->integrationSwarm );
 	Journal_Printf( stream, "\textraInfo (ptr): %p\n", self->extraInfo );
 }
 
@@ -165,7 +166,7 @@ void* _ForceTerm_Copy( const void* forceTerm, void* dest, Bool deep, Name nameEx
 	newForceTerm = (ForceTerm*)_Stg_Component_Copy( self, dest, deep, nameExt, map );
 	
 	newForceTerm->extraInfo = self->extraInfo;
-	if( deep ) {
+	if(deep && self->integrationSwarm!=NULL) {
 		newForceTerm->integrationSwarm = (Swarm*)Stg_Class_Copy( self->integrationSwarm, NULL, deep, nameExt, map );
 	}
 	else {
@@ -192,7 +193,7 @@ void _ForceTerm_AssignFromXML( void* forceTerm, Stg_ComponentFactory* cf, void* 
 		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", FiniteElementContext, True, data  );
 
 	forceVector = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ForceVector", ForceVector, True, data  ) ;
-	swarm       = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, data  ) ;
+	swarm       = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, False, data  ) ;
 	extraInfo   = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ExtraInfo", Stg_Component, False, data  ) ;
 
 	_ForceTerm_Init( self, context, forceVector, swarm, extraInfo );
@@ -205,7 +206,8 @@ void _ForceTerm_Build( void* forceTerm, void* data ) {
 	Stream_IndentBranch( StgFEM_Debug );
 	
 	/* ensure integrationSwarm is built */
-	Stg_Component_Build( self->integrationSwarm, data, False );
+        if(self->integrationSwarm!=NULL)
+          Stg_Component_Build( self->integrationSwarm, data, False );
 	Stg_Component_Build( self->forceVector, data, False );
 
 	if ( self->extraInfo ) 
@@ -221,7 +223,8 @@ void _ForceTerm_Initialise( void* forceTerm, void* data ) {
 	Journal_DPrintf( self->debug, "In %s - for %s\n", __func__, self->name );
 	Stream_IndentBranch( StgFEM_Debug );
 
-	Stg_Component_Initialise( self->integrationSwarm, data, False );
+        if(self->integrationSwarm!=NULL)
+          Stg_Component_Initialise( self->integrationSwarm, data, False );
 	Stg_Component_Initialise( self->forceVector, data, False );
 	if ( self->extraInfo ) 
 		Stg_Component_Initialise( self->extraInfo, data, False );
@@ -233,13 +236,14 @@ void _ForceTerm_Execute( void* forceTerm, void* data ) {
 }
 
 void _ForceTerm_Destroy( void* forceTerm, void* data ) {
-	ForceTerm* self = (ForceTerm*)forceTerm;
+  ForceTerm* self = (ForceTerm*)forceTerm;
 
-	if ( self->extraInfo ) 
-      Stg_Component_Destroy( self->extraInfo, data, False );
+  if ( self->extraInfo ) 
+    Stg_Component_Destroy( self->extraInfo, data, False );
 
-   Stg_Component_Destroy( self->integrationSwarm, data, False );
-   Stg_Component_Destroy( self->forceVector, data, False );
+  if(self->integrationSwarm!=NULL)
+    Stg_Component_Destroy( self->integrationSwarm, data, False );
+  Stg_Component_Destroy( self->forceVector, data, False );
 }
 
 void ForceTerm_AssembleElement( 
