@@ -397,12 +397,15 @@
       <param name="totalInitialParticles">1</param>
       <list name="manualParticlePositions">
         <asciidata>
-          <columnDefinition>
-            <param name="x"></param>
-            <param type="double"></param>
+          <columnDefinition name="x">
+            <param name="type">double</param>
           </columnDefinition>
-          <columnDefinition name = "y" type="double"/>
-          <columnDefinition name = "z" type="double"/>
+          <columnDefinition name="y">
+            <param name="type">double</param>
+          </columnDefinition>
+          <columnDefinition name="z">
+            <param name="type">double</param>
+          </columnDefinition>
           1.0 .1 .1
           1.3 .1 .1
           1.6 .1 .1
