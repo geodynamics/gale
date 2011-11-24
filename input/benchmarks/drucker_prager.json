@@ -1,0 +1,174 @@
+{
+    "components":
+    {
+        "boxShape":
+        {
+            "Type": "Box",
+            "startX": "minX",
+            "endX": "maxX",
+            "startY": "minY",
+            "endY": "maxY",
+            "startZ": "minZ",
+            "endZ": "maxZ"
+        },
+        "inclusionShape":
+        {
+            "Type": "EquationShape",
+            "equation": "(.01)^2-(x*x+y*y)"
+        },
+        "backgroundShape":
+        {
+            "Type": "Intersection",
+            "shapes":[
+                "boxShape",
+                "!inclusionShape"
+            ]
+        },
+        "backgroundViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "1.0"
+        },
+        "inclusionViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "0.0001"
+        },
+        "strainWeakening":
+        {
+            "Type": "StrainWeakening",
+            "TimeIntegrator": "timeIntegrator",
+            "MaterialPointsSwarm": "materialSwarm",
+            "softeningStrain": "0.1",
+            "initialDamageFraction": "0.0",
+            "initialDamageWavenumber": "0.5",
+            "initialDamageFactor": "0.5",
+            "healingRate": "0.0"
+        },
+        "yielding":
+        {
+            "Type": "DruckerPrager",
+            "PressureField": "PressureField",
+            "VelocityGradientsField": "VelocityGradientsField",
+            "MaterialPointsSwarm": "materialSwarm",
+            "Context": "context",
+            "StrainWeakening": "strainWeakening",
+            "StrainRateField": "StrainRateField",
+            "cohesion": "cohesion",
+            "cohesionAfterSoftening": "cohesionAfterSoftening",
+            "frictionCoefficient": "frictionCoefficient",
+            "frictionCoefficientAfterSoftening": "frictionCoefficient",
+            "minimumViscosity": "minimumViscosity",
+            "maxStrainRate": "maxStrainRate"
+        },
+        "brittle":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "backgroundShape",
+            "Rheology": [
+                "backgroundViscosity",
+                "yielding",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "inclusion":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "inclusionShape",
+            "Rheology": [
+                "inclusionViscosity",
+                "storeViscosity",
+                "storeStress"
+            ]
+        }
+
+    },
+    "velocityBCs" :{
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "WallVC",
+                "wall": "top",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "value": "-x"
+                    },
+                    {
+                        "name": "vy",
+                        "value": "y"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "right",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "value": "-x"
+                    },
+                    {
+                        "name": "vy",
+                        "value": "y"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "left",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "value": "0.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "bottom",
+                "variables": [
+                    {
+                        "name": "vy",
+                        "value": "0.0"
+                    }
+                ]
+            }
+        ]
+    },
+
+    "FieldVariablesToCheckpoint": [
+        "StrainRateInvariantField",
+        "VelocityField",
+        "PressureField"
+    ],
+    "timeIntegratorOrder": "1",
+    "maxTimeSteps": "0",
+    "outputPath": "./output",
+    "dim": "2",
+    "minX": "0",
+    "minY": "0",
+    "minZ": "0",
+    "maxX": "1",
+    "maxY": "1",
+    "maxZ": "1",
+    "nx": "64",
+    "ny": "64",
+    "nz": "16",
+    "particlesPerCell": "40",
+    "seed": "13",
+    "checkpointEvery": "1",
+    "nonLinearTolerance": "1.0e-3",
+    "linearTolerance": "1,0e-7",
+    "nonLinearMinIterations": "100",
+    "cohesion": "1e-6",
+    "cohesionAfterSoftening": "1e-10",
+    "frictionCoefficient": "1.0",
+    // "minimumViscosity": "1e-4",
+    "maxStrainRate": "100",
+    "journal.info": "True",
+    "journal.debug": "True",
+    "journal-level.info": "1",
+    "journal-level.debug": "1"
+}

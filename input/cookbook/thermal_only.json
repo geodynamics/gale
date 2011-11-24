@@ -1,0 +1,190 @@
+{
+    "EulerDeform":
+    {
+        "systems": [
+            {
+                "mesh": "v-mesh",
+                "p-mesh": "p-mesh",
+                "T-mesh": "T-mesh",
+                "displacementField": "DisplacementField",
+                "remesher": "velocityRemesher",
+                "velocityField": "VelocityField",
+                "wrapTop": "True"
+            }
+        ]
+    },
+    "components":
+    {
+        "boxShape":
+        {
+            "Type": "Box",
+            "startX": "minX",
+            "endX": "maxX",
+            "startY": "minY",
+            "endY": "maxY",
+            "startZ": "minZ",
+            "endZ": "maxZ"
+        },
+        "sphereShape":
+        {
+            "Type": "EquationShape",
+            "equation": ".1^2 - ((x-1)^2 + (y-.15)^2)"
+        },
+        "nonsphereShape":
+        {
+            "Type": "Intersection",
+            "shapes":
+            [
+                "boxShape",
+                "!sphereShape"
+            ]
+        },
+        "backgroundViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "1.0"
+        },
+        "viscous":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "nonsphereShape",
+            "density": "1.0",
+            "alpha": "1.0",
+            "diffusivity": "1.0",
+            "heatingElements": [
+                {
+                    "Q": "1.0",
+                    "lambda": "1.0"
+                }
+            ],
+            "Rheology": [
+                "backgroundViscosity"
+            ]
+        },
+        "sphereViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "10.0"
+        },
+        "sphereViscous":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "sphereShape",
+            "density": "1.0",
+            "alpha": "10.0",
+            "diffusivity": "10.0",
+            "heatingElements": [
+                {
+                    "Q": "1000.0",
+                    "lambda": "10.0"
+                }
+            ],
+            "Rheology": [
+                "sphereViscosity"
+            ]
+        }
+    },
+    "velocityICs":
+    {
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "AllNodesVC",
+                "variables":[
+                    {
+                        "name": "vx",
+                        "value": "0.0"
+                    },
+                    {
+                        "name": "vy",
+                        "value": "0.0"
+                    }
+                ]
+            }
+        ]
+    },
+    "temperatureBCs": {
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "WallVC",
+                "wall": "left",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "1.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "right",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "1.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "top",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "1.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "bottom",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "2.0"
+                    }
+                ]
+            }
+        ]
+    },
+    "temperatureICs":
+    {
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "AllNodesVC",
+                "variables":[
+                    {
+                        "name": "temperature",
+                        "value": "1.0"
+                    }
+                ]
+            }
+        ]
+    },
+
+    "FieldVariablesToCheckpoint": [
+        "VelocityField",
+        "TemperatureField"
+    ],
+    "enable-thermal": true,
+    "enable-stokes": false,
+    "timeIntegratorOrder": "1",
+    "maxTimeSteps": "10",
+    "outputPath": "./output",
+    "dim": "2",
+    "minX": "0",
+    "minY": "0",
+    "minZ": "0",
+    "maxX": "2",
+    "maxY": "0.35",
+    "maxZ": "0.3",
+    "nx": "16",
+    "ny": "4",
+    "nz": "4",
+    "particlesPerCell": "40",
+    "seed": "13",
+    "checkpointEvery": "1",
+    "gravity": "1.0"
+}
