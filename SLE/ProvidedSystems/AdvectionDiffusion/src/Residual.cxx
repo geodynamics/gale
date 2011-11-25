@@ -369,7 +369,8 @@ void _AdvDiffResidualForceTerm_AssembleElement(void* forceTerm,
                                                AdvDiffResidualForceTerm);
   AdvectionDiffusionSLE* sle=Stg_CheckType(self->extraInfo,
                                            AdvectionDiffusionSLE);
-  IntegrationPointsSwarm* swarm((IntegrationPointsSwarm*)(self->integrationSwarm));
+  IntegrationPointsSwarm*
+    swarm((IntegrationPointsSwarm*)(self->integrationSwarm));
   Particle_Index             lParticle_I;
   Particle_Index             cParticle_I;
   Particle_Index             cellParticleCount;
