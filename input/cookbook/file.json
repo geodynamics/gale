@@ -20,15 +20,10 @@
             "Swarm": "gaussSwarm",
             "gravity": "gravity"
         },
-        "boxShape":
+        "backgroundShape":
         {
-            "Type": "Box",
-            "startX": "minX",
-            "endX": "maxX",
-            "startY": "minY",
-            "endY": "maxY",
-            "startZ": "minZ",
-            "endZ": "maxZ"
+            "Type": "EquationShape",
+            "equation": "1"
         },
         "backgroundViscosity":
         {
@@ -38,7 +33,7 @@
         "viscous":
         {
             "Type": "RheologyMaterial",
-            "Shape": "boxShape",
+            "Shape": "backgroundShape",
             "density": "1.0",
             "Rheology": [
                 "backgroundViscosity",
@@ -93,7 +88,6 @@
         "VelocityField",
         "PressureField"
     ],
-    "timeIntegratorOrder": "1",
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",

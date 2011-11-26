@@ -1,20 +1,4 @@
 {
-    "EulerDeform":
-    {
-        "systems": [
-            {
-                "mesh": "v-mesh",
-                "T-mesh": "T-mesh",
-                "displacementField": "DisplacementField",
-                "remesher": "velocityRemesher",
-                "velocityField": "VelocityField",
-                "staticLeft": "True",
-                "staticRight": "True",
-                "staticTop": "True",
-                "staticBottom": "True"
-            }
-        ]
-    },
     "components":
     {
         "boxShape":
@@ -123,7 +107,7 @@
                 "variables":[
                     {
                         "name": "temperature",
-                        "value": "(x<.375 || x>.625 || y<.375 || y>.625) ? 1 : 2"
+                        "value": "(x<.375 || x>1 || y<.375 || y>1) ? 1 : 2"
                     }
                 ]
             }

@@ -23,15 +23,10 @@
             "Swarm": "gaussSwarm",
             "gravity": "gravity"
         },
-        "boxShape":
+        "backgroundShape":
         {
-            "Type": "Box",
-            "startX": "minX",
-            "endX": "maxX",
-            "startY": "minY",
-            "endY": "maxY",
-            "startZ": "minZ",
-            "endZ": "maxZ"
+            "Type": "EquationShape",
+            "equation": "1"
         },
         "backgroundViscosity":
         {
@@ -41,7 +36,7 @@
         "viscous":
         {
             "Type": "RheologyMaterial",
-            "Shape": "boxShape",
+            "Shape": "backgroundShape",
             "density": "1.0",
             "Rheology": [
                 "backgroundViscosity",
@@ -60,7 +55,6 @@
         "pLayout":
         {
             "Type": "ManualParticleLayout",
-            "totalInitialParticles": "1",
             "manualParticlePositions": [
                 "asciidata",
                 ["x", "y"],
@@ -130,7 +124,6 @@
         "PressureField"
     ],
     "enable-tracers": true,
-    "timeIntegratorOrder": "1",
     "maxTimeSteps": "100",
     "outputPath": "./output",
     "dim": "2",

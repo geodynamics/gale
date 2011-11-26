@@ -153,9 +153,8 @@
     "maxX": "2",
     "maxY": "2",
     "maxZ": "2",
-    "nx": "4",
-    "ny": "4",
-    "nz": "4",
+    "nx": "16",
+    "ny": "16",
     "particlesPerCell": "40",
     "seed": "13",
     "checkpointEvery": "1"

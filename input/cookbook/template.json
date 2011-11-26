@@ -62,7 +62,6 @@
         "VelocityField",
         "PressureField"
     ],
-    "timeIntegratorOrder": "1",
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",

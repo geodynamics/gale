@@ -15,15 +15,10 @@
     },
     "components":
     {
-        "boxShape":
+        "backgroundShape":
         {
-            "Type": "Box",
-            "startX": "minX",
-            "endX": "maxX",
-            "startY": "minY",
-            "endY": "maxY",
-            "startZ": "minZ",
-            "endZ": "maxZ"
+            "Type": "EquationShape",
+            "equation": "1"
         },
         "sphereShape":
         {
@@ -35,7 +30,7 @@
             "Type": "Intersection",
             "shapes":
             [
-                "boxShape",
+                "backgroundShape",
                 "!sphereShape"
             ]
         },
@@ -46,19 +41,14 @@
         },
         "viscous":
         {
-            "Type": "RheologyMaterial",
+            "Type": "Material",
             "Shape": "nonsphereShape",
-            "density": "1.0",
-            "alpha": "1.0",
             "diffusivity": "1.0",
             "heatingElements": [
                 {
                     "Q": "1.0",
                     "lambda": "1.0"
                 }
-            ],
-            "Rheology": [
-                "backgroundViscosity"
             ]
         },
         "sphereViscosity":
@@ -68,19 +58,14 @@
         },
         "sphereViscous":
         {
-            "Type": "RheologyMaterial",
+            "Type": "Material",
             "Shape": "sphereShape",
-            "density": "1.0",
-            "alpha": "10.0",
             "diffusivity": "10.0",
             "heatingElements": [
                 {
                     "Q": "1000.0",
                     "lambda": "10.0"
                 }
-            ],
-            "Rheology": [
-                "sphereViscosity"
             ]
         }
     },
@@ -93,11 +78,11 @@
                 "variables":[
                     {
                         "name": "vx",
-                        "value": "0.0"
+                        "value": "0"
                     },
                     {
                         "name": "vy",
-                        "value": "0.0"
+                        "value": "0"
                     }
                 ]
             }
@@ -170,7 +155,6 @@
     ],
     "enable-thermal": true,
     "enable-stokes": false,
-    "timeIntegratorOrder": "1",
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",

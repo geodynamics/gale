@@ -23,15 +23,10 @@
             "gravity": "gravity",
             "TemperatureField": "TemperatureField"
         },
-        "boxShape":
+        "backgroundShape":
         {
-            "Type": "Box",
-            "startX": "minX",
-            "endX": "maxX",
-            "startY": "minY",
-            "endY": "maxY",
-            "startZ": "minZ",
-            "endZ": "maxZ"
+            "Type": "EquationShape",
+            "equation": "1"
         },
         "sphereShape":
         {
@@ -43,7 +38,7 @@
             "Type": "Intersection",
             "shapes":
             [
-                "boxShape",
+                "backgroundShape",
                 "!sphereShape"
             ]
         },
@@ -199,7 +194,6 @@
         "PressureField"
     ],
     "enable-thermal": true,
-    "timeIntegratorOrder": "1",
     "maxTimeSteps": "10",
     "outputPath": "./output",
     "dim": "2",
