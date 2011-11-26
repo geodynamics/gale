@@ -133,7 +133,7 @@ void add_defaults(json_spirit::Value &root)
     "\"timeIntegrator\":"
     "{"
     "    \"Type\": \"TimeIntegrator\","
-    "    \"order\": \"timeIntegratorOrder\","
+    "    \"order\": \"1\","
     "    \"simultaneous\": \"f\","
     "    \"Context\": \"context\""
     "},"
