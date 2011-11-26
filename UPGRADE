@@ -41,109 +41,22 @@ for general geodynamic modelling.  In particular, there is no longer a
 need for a HydrostaticTerm.
 
 If you want to upgrade to an existing input file to use Q2 P-1
-elements, follow these steps.
+elements, the simplest path is to convert it to JSON.  In particular,
+follow these steps
 
-1) Make the above changes.
+1) Make the above changes in the xml file.
 
-2) Replace the existing mesh-linear and linearMesh-generator
-components with Q2 and Pm1 analogs.
+2) Remove all traces of multigrid, mixedStabiliser, VTKOutput, and
+   HydrostaticTerm.
 
-    <struct name="mesh-Q2">
-      <param name="Type">FeMesh</param>
-      <param name="elementType">quadratic</param>
-    </struct>
-    <struct name="Q2Mesh-generator">
-      <param name="Type">C2Generator</param>
-      <param name="mesh">mesh-Q2</param>
-      <param name="dim">dim</param>
-      <param name="shadowDepth">shadowDepth</param>
-      <param name="regular">False</param>
-      <list name="size">
-        <param>elementResI</param>
-        <param>elementResJ</param>
-        <param>elementResK</param>
-      </list>
-      <list name="minCoord">
-        <param>minX</param>
-        <param>minY</param>
-        <param>minZ</param>
-      </list>
-      <list name="maxCoord">
-        <param>maxX</param>
-        <param>maxY</param>
-        <param>maxZ</param>
-      </list>
-    </struct>
-    <struct name="mesh-Pm1">
-      <param name="Type">FeMesh</param>
-      <param name="elementType">linear-inner</param>
-    </struct>
-    <struct name="Pm1Mesh-generator">
-      <param name="Type">InnerGenerator</param>
-      <param name="mesh">mesh-Pm1</param>
-      <param name="elementMesh">mesh-Q2</param>
-      <param name="dim">dim</param>
-      <param name="shadowDepth">shadowDepth</param>
-      <param name="regular">False</param>
-      <list name="size">
-        <param>elementResI</param>
-        <param>elementResJ</param>
-        <param>elementResK</param>
-      </list>
-      <list name="minCoord">
-        <param>minX</param>
-        <param>minY</param>
-        <param>minZ</param>
-      </list>
-      <list name="maxCoord">
-        <param>maxX</param>
-        <param>maxY</param>
-        <param>maxZ</param>
-      </list>
-    </struct>
+3) Remove the <import> and <plugins> sections.
 
-3) In the "pressure", "pressureDofLayout", and "PressureField"
-components, replace "mesh-linear" with "mesh-Pm1".
+4) Remove all of the default components.  That would be all of the
+   components listed in the old input file input/cookbook/template.xml
+   except buoyancyForceTerm.
 
-4) Everywhere else, replace "mesh-linear" with "mesh-Q2", and
-   "linearMesh-generator" with "Q2Mesh-generator".
-
-5) Replace "cellLayout", "particleLayout", "gaussSwarm",
-"gaussMapper", "backgroundLayout", "gaussMSwarmMovementHandler", and
-"gaussMaterialSwarm" with
-
-    <struct name="cellLayout">
-      <param name="Type">ElementCellLayout</param>
-      <param name="Mesh">mesh-Q2</param>
-    </struct>
-    <struct name="particleLayout">
-      <param name="Type">GaussParticleLayout</param>
-      <param name="gaussParticles">3</param>
-    </struct>
-    <struct name="gaussSwarm">
-      <param name="Type">IntegrationPointsSwarm</param>
-      <param name="CellLayout">cellLayout</param>
-      <param name="ParticleLayout">particleLayout</param>
-      <param name="FeMesh">mesh-Q2</param>
-      <param name="TimeIntegrator">timeIntegrator</param>
-      <param name="IntegrationPointMapper">nearestMapper</param>
-    </struct>
-    <struct name="nearestMapper">
-      <param name="Type">NearestNeighborMapper</param>
-      <param name="IntegrationPointsSwarm">gaussSwarm</param>
-      <param name="MappedSwarm">picIntegrationPoints</param>
-    </struct>
-
-6) Remove "elementCellLayout" and replace all references to
-"elementCellLayout" with "cellLayout".
-
-7) In "weights" change resolutionX, resolutionY, and resolutionZ from
-10 to 20.
-
-8) In everything but "nearestMapper" and "mapper", replace
-"picIntegrationPoints" with "gaussSwarm".
-
-9) Remove the "mixedStabiliser" component.
+5) If there is a reference to mesh-linear, change it to v-mesh,
+   p-mesh, or T-mesh as appropriate.
 
 10) If you are using EulerDeform, add
 
@@ -153,7 +66,7 @@ components, replace "mesh-linear" with "mesh-Pm1".
 
 11) Change "particlesPerCell" from 30 to 40.
 
-12) Remove all traces of VTKOutput.  Instead, add 
+12) Add 
 
   <list name="FieldVariablesToCheckpoint">
     <param>VelocityField</param>
@@ -162,14 +75,48 @@ components, replace "mesh-linear" with "mesh-Pm1".
   </list>
   <param name="checkpointEvery">1</param>
 
-13) Remove all references to HydrostaticTerm
 
-14) Remove multigrid components
+You should now have a much simpler XML file.  Now you can convert it
+component by component.  For example, a box shape
 
-That should give you a working input file.
+    <struct name="boxShape">
+      <param name="Type">Box</param>
+      <param name="startX">minX</param>
+      <param name="endX">maxX</param>
+      <param name="startY">minY</param>
+      <param name="endY">maxY</param>
+      <param name="startZ">minZ</param>
+      <param name="endZ">maxZ</param>
+    </struct>
 
-If you are looking at time dependent problems where the boundary
-deforms, you will probably need to include the EulerDeform plugin.
+becomes
+
+    "boxShape":
+    {
+      "Type": "Box",
+      "startX": "minX",
+      "endX": "maxX",
+      "startY": "minY",
+      "endY": "maxY",
+      "startZ": "minZ",
+      "endZ": "maxZ"
+    },
+
+A list, such as in a Rheology or boundary condition
+
+      <list name="Rheology">
+        <param>backgroundViscosity</param>
+        <param>storeViscosity</param>
+        <param>storeStress</param>
+      </list>
+
+becomes a JSON array
+
+      "Rheology": [
+        "backgroundViscosity",
+        "storeViscosity",
+        "storeStress"
+      ]
 
 
 Upgrading Gale from 1.5.0 to 1.6.0
