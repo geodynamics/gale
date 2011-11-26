@@ -1,11 +1,30 @@
-1.6.2
+2.0.0
 ----------------------------------
 
-* The main feature of this release is the inclusion of an equation
-  parser, allowing you to input initial conditions and boundary
-  conditions much more easily.  As a consequence, the existing
-  StandardConditionFunctions are no longer recommended, though they
-  will continue to work as before.
+* The main feature of this release is the support for Quadratic (Q2)
+  and discontinuous linear (P-1) elements.
+
+* JSON is the new recommended format for input files.  It works by
+  converting the JSON files to XML, so existing XML files will
+  continue to work with minor changes.  See the file UPGRADE for
+  details.
+
+* Gale now includes an equation parser, allowing you to input initial
+  conditions, boundary conditions, and shapes much more easily.  As a
+  consequence, the existing StandardConditionFunctions and most shapes
+  are no longer recommended, though they will continue to work as
+  before.
+
+* StressBC now explicitly applies either a shear or normal stress.
+  This also fixed a bug when applying a StressBC against a curved
+  boundary.
+
+* Thermal diffusion and advection benchmarks have been added.  These
+  benchmarks highlighted bugs with thermal evolution which have been
+  fixed.
+
+* VTKOutput has been deprecated.  Instead, you should use the XDMF
+  files, which work in Paraview and Visit.
 
 * The File input method for initial conditions and boundary conditions
   can now handle 2D and 3D input data.
@@ -20,6 +39,15 @@
 * Gale is little quieter when checkpointing is turned on.
 
 * A C++ compiler is now required to build.
+
+* The recommended visualization tool has been changed to Visit.
+
+* The generate_pvd utility has been removed.  Visit will automatically
+  create a movie from a series of XDMF files.
+
+* The vtk2csv.py script has been removed since it does not work with
+  the XDMF files.
+
 
 1.6.1
 ----------------------------------
