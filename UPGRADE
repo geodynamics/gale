@@ -1,12 +1,175 @@
 Upgrading Gale from 1.6 to 2.0
 ------------------------------
 
-There is no strict need to convert input files from 1.6 to 2.0.  All
-valid 1.6 input files should run without change in 2.0.  However, the
-Q2 P-1 elements supported in 2.0 are much more suitable for general
-geodynamic modelling.  In particular, there is no longer a need for a
-HydrostaticTerm.
+Gale 2.0 introduces a new JSON input file format.  However, there is
+no strict need to convert input files from 1.6 to 2.0.  XML input
+files, with minor modifications, will still work.
 
+One change is that you must specify normal or shear stress conditions
+for StressBC.  For example, in a StressBC component, instead of
+
+      <param name="y_type">double</param>
+      <param name="y_value">0.35</param>
+
+you would specify
+
+      <param name="normal_type">double</param>
+      <param name="normal_value">0.35</param>
+
+for normal stress and
+
+      <param name="shear_y_type">double</param>
+      <param name="shear_y_value">0.35</param>
+
+for shear stress.
+
+Another change is that you must add
+
+  <param name="picSwarm">picIntegrationPoints</param>
+
+to the "defaultResidualForceTerm" struct.
+
+Finally, in the past, if you did not specify a type for a value
+(e.g. "double" or "func"), Gale assumed the value was "double".  Gale
+now assumes the value is "equation", which means that you can not
+using symbolic names for variable (e.g. "minX" instead of "0").  If
+you need to use a symbolic name, specify the type as "double".
+
+Otherwise, all valid 1.6 input files should run without change in 2.0.
+However, the Q2 P-1 elements supported in 2.0 are much more suitable
+for general geodynamic modelling.  In particular, there is no longer a
+need for a HydrostaticTerm.
+
+If you want to upgrade to an existing input file to use Q2 P-1
+elements, follow these steps.
+
+1) Make the above changes.
+
+2) Replace the existing mesh-linear and linearMesh-generator
+components with Q2 and Pm1 analogs.
+
+    <struct name="mesh-Q2">
+      <param name="Type">FeMesh</param>
+      <param name="elementType">quadratic</param>
+    </struct>
+    <struct name="Q2Mesh-generator">
+      <param name="Type">C2Generator</param>
+      <param name="mesh">mesh-Q2</param>
+      <param name="dim">dim</param>
+      <param name="shadowDepth">shadowDepth</param>
+      <param name="regular">False</param>
+      <list name="size">
+        <param>elementResI</param>
+        <param>elementResJ</param>
+        <param>elementResK</param>
+      </list>
+      <list name="minCoord">
+        <param>minX</param>
+        <param>minY</param>
+        <param>minZ</param>
+      </list>
+      <list name="maxCoord">
+        <param>maxX</param>
+        <param>maxY</param>
+        <param>maxZ</param>
+      </list>
+    </struct>
+    <struct name="mesh-Pm1">
+      <param name="Type">FeMesh</param>
+      <param name="elementType">linear-inner</param>
+    </struct>
+    <struct name="Pm1Mesh-generator">
+      <param name="Type">InnerGenerator</param>
+      <param name="mesh">mesh-Pm1</param>
+      <param name="elementMesh">mesh-Q2</param>
+      <param name="dim">dim</param>
+      <param name="shadowDepth">shadowDepth</param>
+      <param name="regular">False</param>
+      <list name="size">
+        <param>elementResI</param>
+        <param>elementResJ</param>
+        <param>elementResK</param>
+      </list>
+      <list name="minCoord">
+        <param>minX</param>
+        <param>minY</param>
+        <param>minZ</param>
+      </list>
+      <list name="maxCoord">
+        <param>maxX</param>
+        <param>maxY</param>
+        <param>maxZ</param>
+      </list>
+    </struct>
+
+3) In the "pressure", "pressureDofLayout", and "PressureField"
+components, replace "mesh-linear" with "mesh-Pm1".
+
+4) Everywhere else, replace "mesh-linear" with "mesh-Q2", and
+   "linearMesh-generator" with "Q2Mesh-generator".
+
+5) Replace "cellLayout", "particleLayout", "gaussSwarm",
+"gaussMapper", "backgroundLayout", "gaussMSwarmMovementHandler", and
+"gaussMaterialSwarm" with
+
+    <struct name="cellLayout">
+      <param name="Type">ElementCellLayout</param>
+      <param name="Mesh">mesh-Q2</param>
+    </struct>
+    <struct name="particleLayout">
+      <param name="Type">GaussParticleLayout</param>
+      <param name="gaussParticles">3</param>
+    </struct>
+    <struct name="gaussSwarm">
+      <param name="Type">IntegrationPointsSwarm</param>
+      <param name="CellLayout">cellLayout</param>
+      <param name="ParticleLayout">particleLayout</param>
+      <param name="FeMesh">mesh-Q2</param>
+      <param name="TimeIntegrator">timeIntegrator</param>
+      <param name="IntegrationPointMapper">nearestMapper</param>
+    </struct>
+    <struct name="nearestMapper">
+      <param name="Type">NearestNeighborMapper</param>
+      <param name="IntegrationPointsSwarm">gaussSwarm</param>
+      <param name="MappedSwarm">picIntegrationPoints</param>
+    </struct>
+
+6) Remove "elementCellLayout" and replace all references to
+"elementCellLayout" with "cellLayout".
+
+7) In "weights" change resolutionX, resolutionY, and resolutionZ from
+10 to 20.
+
+8) In everything but "nearestMapper" and "mapper", replace
+"picIntegrationPoints" with "gaussSwarm".
+
+9) Remove the "mixedStabiliser" component.
+
+10) If you are using EulerDeform, add
+
+     <param name="innerMesh">mesh-Pm1</param>
+
+   to the EulerDeform struct.  Also remove the "fields" list.
+
+11) Change "particlesPerCell" from 30 to 40.
+
+12) Remove all traces of VTKOutput.  Instead, add 
+
+  <list name="FieldVariablesToCheckpoint">
+    <param>VelocityField</param>
+    <param>PressureField</param>
+    <param>StrainRateInvariantField</param>
+  </list>
+  <param name="checkpointEvery">1</param>
+
+13) Remove all references to HydrostaticTerm
+
+14) Remove multigrid components
+
+That should give you a working input file.
+
+If you are looking at time dependent problems where the boundary
+deforms, you will probably need to include the EulerDeform plugin.
 
 
 Upgrading Gale from 1.5.0 to 1.6.0
