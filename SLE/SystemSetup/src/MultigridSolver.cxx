@@ -558,10 +558,10 @@ void MultigridSolver_SetRestriction( void* matrixSolver, unsigned levelInd, void
 	//	Stg_Class_AddRef( R );
 }
 
-void MultigridSolver_SetProlongation( void* matrixSolver, unsigned levelInd, void* _P ) {
+void MultigridSolver_SetProlongation( void* matrixSolver, unsigned levelInd, void* PP ) {
 	MultigridSolver*	self 	= (MultigridSolver*)matrixSolver;
 	MultigridSolver_Level*	level;
-	Mat			P	= (Mat)_P;
+	Mat			P	= (Mat)PP;
 
 	assert( self && Stg_CheckType( self, MultigridSolver ) );
 	assert( levelInd < self->nLevels && levelInd > 0 );

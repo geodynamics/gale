@@ -362,10 +362,10 @@ void PETScMGSolver_SetRestriction( void* matrixSolver, unsigned levelInd, void* 
 	level->R = R;
 }
 
-void PETScMGSolver_SetProlongation( void* matrixSolver, unsigned levelInd, void* _P ) {
+void PETScMGSolver_SetProlongation( void* matrixSolver, unsigned levelInd, void* PP ) {
 	PETScMGSolver*		self 	= (PETScMGSolver*)matrixSolver;
 	PETScMGSolver_Level*	level;
-	Mat			P	= (Mat)_P;
+	Mat			P	= (Mat)PP;
 
 	assert( self && Stg_CheckType( self, PETScMGSolver ) );
 	assert( levelInd < self->nLevels && levelInd > 0 );
