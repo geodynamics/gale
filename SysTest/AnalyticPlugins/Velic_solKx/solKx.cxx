@@ -7,7 +7,7 @@ void _Velic_solKx(
 		const double pos[],
 		double _sigma,
 		double _m, int _n, 
-		double _B,
+		double BB,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[], double* viscosity );
 
@@ -51,7 +51,7 @@ void _Velic_solKx(
 		const double pos[],
 		double _sigma, /* density */
 		double _m, int _n, /* wavelength in z, wavenumber in x */
-		double _B, /* viscosity parameter */
+		double BB, /* viscosity parameter */
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[], double* viscosity )
 {
@@ -83,7 +83,7 @@ void _Velic_solKx(
 	/*************************************************************************/
 	/* rho = -sin(km*z)*cos(kn*x) */ 
 	Z = exp( 2.0 * B * x );
-	B = _B; /* viscosity parameter must be non-zero*/
+	B = BB; /* viscosity parameter must be non-zero*/
 	km = _m*M_PI; /* solution valid for km not zero -- should get trivial solution if km=0 */
 	n = _n; /* solution valid for n not zero */
 	kn = (double)_n*M_PI;

@@ -5,7 +5,7 @@
 
 void _Velic_solIA( 
 		const double pos[],
-		double _sigma, double _B, 
+		double _sigma, double BB, 
 		double _dx, double _x_0,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
@@ -44,7 +44,7 @@ int main( int argc, char **argv )
 
 void _Velic_solIA( 
 		const double pos[],
-		double _sigma, double _B, /* density, viscosity parameter */
+		double _sigma, double BB, /* density, viscosity parameter */
 		double _dx, double _x_0, /* width of dense column, centre of dense column */
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] )
@@ -80,7 +80,7 @@ void _Velic_solIA(
 	x0 = _x_0;  /* centre of dense column */
 	dx = _dx;  /* total width of dense column */
 	sigma = _sigma; /* density parameter */
-	B = _B; /* viscosity parameter */
+	B = BB; /* viscosity parameter */
 	/* viscosity = exp(2.0*B*z) */
 	/*************************************************************************/
 	/*************************************************************************/

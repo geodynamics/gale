@@ -28,7 +28,7 @@
 
 	void _Velic_solIA( 
 		const double pos[],
-		double _sigma, double _B, /* density, viscosity parameter */
+		double _sigma, double BB, /* density, viscosity parameter */
 		double _dx, double _x_0, /* width of dense column, centre of dense column */
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );

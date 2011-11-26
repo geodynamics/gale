@@ -66,7 +66,7 @@
 		const double pos[],
 		double _sigma, /* density */
 		double _km, int _n, /* wavelength in z, wavenumber in x */
-		double _B, /* viscosity parameter */
+		double BB, /* viscosity parameter */
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
 #endif

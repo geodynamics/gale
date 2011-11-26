@@ -6,7 +6,7 @@
 void _Velic_solI( 
 		const double pos[],
 		double _sigma,
-		double _B, double _x_c,
+		double BB, double _x_c,
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
 
@@ -46,7 +46,7 @@ int main( int argc, char **argv )
 void _Velic_solI( 
 		const double pos[],
 		double _sigma, /* density */
-		double _B, double _x_c, /* viscosity parameter, width of dense column */
+		double BB, double _x_c, /* viscosity parameter, width of dense column */
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] )
 {
@@ -80,7 +80,7 @@ void _Velic_solI(
 	/* "background" fluid has density of zero */
 	xc = _x_c;  /* centre of dense column */
 	sigma = _sigma; /* density parameter */
-	B = _B; /* viscosity parameter */
+	B = BB; /* viscosity parameter */
 	/* viscosity = exp(2.0*B*z) */
 	/*************************************************************************/
 	/*************************************************************************/

@@ -29,7 +29,7 @@
 	void _Velic_solI( 
 		const double pos[],
 		double _sigma, /* density */
-		double _B, double _x_c, /* viscosity parameter, width of dense column */
+		double BB, double _x_c, /* viscosity parameter, width of dense column */
 		double vel[], double* presssure, 
 		double total_stress[], double strain_rate[] );
 #endif
