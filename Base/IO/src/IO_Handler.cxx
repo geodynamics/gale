@@ -383,7 +383,7 @@ Index IO_Handler_ReadAllFilesFromCommandLine( void* ioHandler, int argc, char* a
     else if(filename.extension()==".xml")
       {
         /* Read file */
-        result = IO_Handler_ReadAllFromFile( self, filename.c_str(), dictionary );
+        result = IO_Handler_ReadAllFromFile( self, argv[arg_I], dictionary );
       }
     else
       {
