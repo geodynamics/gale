@@ -619,9 +619,9 @@ int compare_indexOnCPU(const void * _particleA, const void * _particleB){
         return -1;
 
 }
-int compare_ints(const void * _A, const void * _B){
+int compare_ints(const void * _A, const void * BB){
     int *A = (int *) _A;
-    int *B = (int *) _B;
+    int *B = (int *) BB;
     if(*A > *B) return 1; else return -1;
 }
 #if 0
