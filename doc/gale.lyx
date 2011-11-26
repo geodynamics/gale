@@ -413,8 +413,8 @@ Infrastructure
 
 \begin_layout Standard
 Particles are the fundamental object in Gale.
- Particles store all of the material properties, including density, strain,
- and thermal diffusivity.
+ Particles store all of the material properties, including density, integrated
+ strain, and thermal diffusivity.
  A logically regular finite element mesh is created at each time step.
  Material properties are interpolated from the particles to the mesh, and
  the Stokes equations are then solved on that mesh.
@@ -806,10 +806,7 @@ reference "sub:Uzawa-Algorithm"
 \end_inset
 
  for more details.
-\end_layout
-
-\begin_layout Standard
-For details on the existing rheologies, see Section 
+ For details on the existing rheologies, see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Materials"
@@ -817,14 +814,7 @@ reference "sec:Materials"
 \end_inset
 
 .
- To create your own rheology, see Chapter 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "cha:Modifying-Gale"
-
-\end_inset
-
- for guidance.
+ 
 \end_layout
 
 \begin_layout Subsection
@@ -896,7 +886,7 @@ Gale can use a few different types of finite elements to represent the solution.
 \begin_inset Formula $P_{-1}$
 \end_inset
 
-) elements for the pressure, and continuous (
+) elements for the pressure, and continuous linear (
 \begin_inset Formula $Q_{1}$
 \end_inset
 
@@ -907,11 +897,7 @@ Gale can use a few different types of finite elements to represent the solution.
 
 \begin_layout Standard
 If, for some reason, you wish use a different element type, Gale also supports
- continuous linear (
-\begin_inset Formula $Q_{1}$
-\end_inset
-
-) element and piecewise constant (
+ piecewise constant (
 \begin_inset Formula $P_{0}$
 \end_inset
 
@@ -978,14 +964,6 @@ reference "eq:continuity"
 \end_inset
 
  have different units.
- Equation 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:continuity"
-
-\end_inset
-
- has been divided by viscosity and multiplied by length.
  So, if you have a viscosity of 
 \begin_inset Formula $10^{25}Pa\cdot s$
 \end_inset
@@ -994,8 +972,8 @@ reference "eq:continuity"
 \begin_inset Formula $Pa\cdot s$
 \end_inset
 
-, the compressibility pressure term will become too small and the code will
- be unable to solve.
+, the numbers in the two equations will be too disparate and cause the solver
+ to fail.
  One workaround is to scale the units of time and mass (e.g., seconds and
  kg) so that the viscosities are around 1.
  So if the viscosities are around 
@@ -1123,8 +1101,8 @@ where
 \begin_inset Formula $G$
 \end_inset
 
- is the simple gradient operator, C is the artificial compressibility term,
- 
+ is the simple gradient operator, C is a compressibility term (if the material
+ is compressible), 
 \begin_inset Formula $f$
 \end_inset
 
@@ -1669,8 +1647,7 @@ geodynamics.org/cig/software/packages/long/gale/
 
 .
  Then you can run Gale from the command line or DOS prompt.
- CIG provides binaries for Linux, Mac OS X (10.4 or greater), and Windows
- (Vista and 7).
+ CIG provides binaries for Linux, Mac OS X, and Windows.
 \end_layout
 
 \begin_layout Section
@@ -1687,8 +1664,7 @@ System Requirements
 \end_layout
 
 \begin_layout Standard
-Gale works on a variety of computational platforms and has been tested on
- machines.
+Gale works on a variety of computational platforms.
  In order to build Gale, you must have a C++ compiler and the headers and
  development libraries for
 \end_layout
@@ -2120,7 +2096,7 @@ The Drucker-Prager rheology models a material that is rigid until the shear
 \begin_layout Enumerate
 This is a numerical process, so the viscosity may be set too low.
  If the viscosity is too low, then the material will slip too easily, and
- there may be problems with convergence.
+ there may be problems with numerical convergence.
 \end_layout
 
 \begin_layout Enumerate
@@ -2263,7 +2239,7 @@ In practice, both of these quantities may need to be set.
  on the surface, such as landslides.
  A maximum strain rate, in the mean time, will assist in ensuring that the
  code is convergent.
- Both of these parameters are used for the Geomod benchmarks (Sections 
+ Both of these parameters are used for the Geomod benchmark (Sections 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Geomod-2004"
@@ -2355,7 +2331,7 @@ Once that is done, enabling it is again just appending a few arguments to
 
 \begin_layout Standard
 Note that this is different from previous versions of Gale.
- Petsc changed the syntax for calling Mumps solvers.
+ PETSc changed the syntax for calling Mumps solvers.
  Also, Mumps changed the default amount of memory it allocates.
  This is not an issue for small simulations, but larger simulations can
  easily run out of memory.
@@ -2402,7 +2378,7 @@ You can append any number of modified parameters in one unbroken line (here
 \begin_inset Newline newline
 \end_inset
 
---elementResJ=64 --elementResK=64 --particlesPerCell=60 --dumpEvery=10
+--elementResJ=64 --elementResK=64 --particlesPerCell=60 --checkpointEvery=10
 \end_layout
 
 \begin_layout Subsection
@@ -2472,7 +2448,8 @@ Debugging Input Files
 
 \begin_layout Standard
 It can often happen that you set up an input file incorrectly and try to
- run it, but Gale never gets far enough to tell you what you did wrong.
+ run it, but Gale never gets far enough to clearly tell you what you did
+ wrong.
  The first thing you should do is to turn on verbose output as in Section
  
 \begin_inset CommandInset ref
@@ -2520,21 +2497,7 @@ The sample input files will produce a directory in which you will find a
  number of
 \color none
  files.
- The formats of these files are described fully in Appendix 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "cha:Output-File-Format"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-
-\color none
-There are a number of different options for visualizing the data.
- The easiest way is to use the XDMF files.
+ The easiest way to visualize results is to use the XDMF files.
  These files are in a standard, self-describing file format that can be
  easily visualized with several different visualization programs, e.g., ParaView
  
@@ -2566,13 +2529,12 @@ www.llnl.gov/visit
 
 \begin_layout Standard
 XDMF visualization files are created at the same time as checkpoints.
- So to change the frequency at which Gale outputs XDMF files, you can change
- the parameter 
+ So to change the frequency at which Gale outputs XDMF files, change the
+ parameter 
 \family typewriter
 checkpointEvery
 \family default
 .
- You can change the value to any number you choose.
 \end_layout
 
 \begin_layout Standard
@@ -2695,7 +2657,7 @@ Pseudocolor
 \family typewriter
 \series bold
 \color inherit
-FEM-Grid-v-T-mesh
+FEM_Grid_v-mesh
 \family default
 \series default
 \color none
@@ -2813,7 +2775,7 @@ Pseudocolor
 \family typewriter
 \series bold
 \color inherit
-FEM-Grid-pressure-mesh
+FEM_Grid_pressure-mesh
 \family default
 \series default
 \color none
@@ -2890,7 +2852,7 @@ Vector
 , then 
 \family typewriter
 \series bold
-FEM_Grid_v-T-mesh
+FEM_Grid_v-mesh
 \family default
 \series default
 , then 
@@ -2961,7 +2923,7 @@ Hide/Show
  Repeat this with 
 \family typewriter
 \series bold
-Pseudocolor - FEM_Grid_v-T-mesh/StrainRateField
+Pseudocolor - FEM_Grid_v-mesh/StrainRateField
 \family default
 \series default
  to see a clearer view of the velocity arrows.
@@ -3189,7 +3151,7 @@ Now you can look at the particles.
  Hide the velocity arrows by clicking on 
 \family typewriter
 \series bold
-Vector - FEM_Grid_v-T-mesh/VelocityField
+Vector - FEM_Grid_v-mesh/VelocityField
 \family default
 \series default
  and then the 
@@ -3904,7 +3866,7 @@ Then set the material's viscosity
 \begin_layout Standard
 Remember that Gale has no internal knowledge of units, so if you think of
  everything in cgs, then this implies a viscosity of 
-\begin_inset Formula $1\frac{g}{cm^{2}\, s}$
+\begin_inset Formula $1\frac{g}{cm\, s}$
 \end_inset
 
 .
@@ -4047,7 +4009,7 @@ from
 \end_layout
 
 \begin_layout LyX-Code
-”value”: ”0.0”
+”value”: ”0”
 \end_layout
 
 \begin_layout Standard
@@ -5114,14 +5076,7 @@ reference "fig:Strain-viscous-normal-stress"
 
 \end_inset
 
- shows the strain rate invariant and velocity (see Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Visualization-with-Visit"
-
-\end_inset
-
-).
+ shows the strain rate invariant and velocity.
  Notice that material is now flowing in from the bottom.
 \end_layout
 
@@ -8431,604 +8386,6 @@ Temperature and velocity for the power-law creep model
 \end_layout
 
 \begin_layout Chapter
-Geologic Example
-\end_layout
-
-\begin_layout Standard
-The previous chapter gave examples on how to make simple problems with simple
- parameters (e.g., length=1, viscosity=1).
- Scaling these input parameters to realistic values (e.g., length=1000km,
- viscosity=
-\begin_inset Formula $10^{26}$
-\end_inset
-
-) should be as easy as changing the various parameters to the right number.
- In practice, it can be quite difficult, because you may have to change
- many different parameters at once to ensure a stable solution.
- To make that transition easier, there is a sample input file in 
-\family typewriter
-input/examples/dike.json
-\family default
- which has a rough model of a magmatic dike 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Dike"
-
-\end_inset
-
-.
- A schematic of the simulation is shown in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Schematic-of-dike"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/dike.pdf
-	width 100col%
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Schematic-of-dike"
-
-\end_inset
-
-Schematic of dike example
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-The right and left sides are pulled at a constant rate.
- The region that is modeled is fixed, so material flows in from the bottom
- and out through the sides.
- The top layer is a low viscosity 'air' layer that flows in and out of the
- simulation as time progresses.
- The dike region is a region of constant divergence, so material is created
- there 
-\shape italic
-ab nihilo
-\shape default
-.
- This is to model a magma chamber that is fed from small channels from far
- away.
-\end_layout
-
-\begin_layout Standard
-There is also a nonlinear temperature gradient, going from 
-\begin_inset Formula $273^{\circ}$
-\end_inset
-
- K at the surface to 
-\begin_inset Formula $1473^{\circ}$
-\end_inset
-
- K at the bottom.
- The dike is set to 
-\begin_inset Formula $1500^{\circ}$
-\end_inset
-
- K.
- The temperature is fixed to the background and does not advect.
-\end_layout
-
-\begin_layout Standard
-The mantle is modeled with a temperature and strain dependent non-newtonian
- viscosity and a Drucker-Prager plasticity.
- 
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:dike-strain"
-
-\end_inset
-
- shows the integrated strain of a model after 100 steps.
- The resolution is 120
-\begin_inset Formula $\times$
-\end_inset
-
-36, and we used a direct solver on a laptop.
- There are three prominent faults which propagate out from the dike region.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/dike_strain.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:dike-strain"
-
-\end_inset
-
-Integrated strain for the dike model
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Chapter
-Modifying Gale
-\begin_inset CommandInset label
-LatexCommand label
-name "cha:Modifying-Gale"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Introduction
-\end_layout
-
-\begin_layout Standard
-If you wish to change material properties, here is a brief overview of how
- to modify the code.
- The following is currently lacking in many areas, but will be expanded
- and refined in future releases.
- 
-\end_layout
-
-\begin_layout Section
-Software Components of Gale
-\end_layout
-
-\begin_layout Standard
-Gale makes use of several physics libraries, including StGermain, StgFEM,
- PiCellerator, and UnderWorld.
- These are open-source finite element method libraries written by the Victorian
- Partnership for Advanced Computing (VPAC) and Louis Moresi's group at Monash
- University (see Fig 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Mapping-between-MicroFEM"
-
-\end_inset
-
-).
- Gale also makes use of PETSc, a suite of data structures and routines for
- the parallel solution of scientific applications modeled by partial differentia
-l equations.
- For parsing input files, Gale uses JSON Spirit (
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://www.codeproject.com/KB/recipes/JSON_Spirit.aspx
-\end_layout
-
-\end_inset
-
-).
- For various utilities, Gale uses Boost(
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-http://boost.org
-\end_layout
-
-\end_inset
-
-).
-\end_layout
-
-\begin_layout Subsection
-StGermain 
-\end_layout
-
-\begin_layout Standard
-StGermain 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-csd.vpac.org/twiki/bin/view/Stgermain/WebHome
-\end_layout
-
-\end_inset
-
- provides an infrastructure that can be used to create reusable, collaborative
- computational development environments.
- It aims to provide the efficiency and style of coding near that of traditional
- HPC as well as new techniques and methods in scientific computing.
- Effectively, it is the application of contemporary software engineering
- on multi-disciplinary computational research.
- In particular, StGermain can be used in the development of computational
- finite element codes.
- It permits the interchanging of numerical schemes without having to change
- the problem description or the constitutive rules utilized.
- It also allows numerical schemes and constitutive rules to be reused for
- different problems in different disciplines.
- Scientists can then switch to new computational technologies as they become
- available.
- StGermain also capitalizes on the resources invested in software development
- on a research project, rendering that software effectively reusable for
- subsequent projects.
- In turn, intellectual property, skills and adaptability of the recipients
- develop over time.
- 
-\end_layout
-
-\begin_layout Subsection
-PETSc
-\end_layout
-
-\begin_layout Standard
-PETSc 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-www-unix.mcs.anl.gov/petsc/petsc-as
-\end_layout
-
-\end_inset
-
-, the Portable, Extensible Toolkit for Scientific Computation, is a suite
- of data structures and routines for the uni- and parallel-processor solution
- of large-scale scientific application problems modeled by partial differential
- equations.
- It employs the MPI standard for all message-passing communication.
- 
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Mapping-between-MicroFEM"
-
-\end_inset
-
-Mapping between MicroFEM and Gale
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout LyX-Code
-
-\end_layout
-
-\begin_layout Plain Layout
-\noindent
-\align center
-\begin_inset Graphics
-	filename images/GALE_imag.eps
-	lyxscale 80
-	scale 80
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Subsection
-StgFEM 
-\end_layout
-
-\begin_layout Standard
-StgFEM 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-csd.vpac.org/twiki/bin/view/Stgfem/WebHome
-\end_layout
-
-\end_inset
-
- uses the StGermain philosophy of reusability and collaborative development
- to create a finite element problem composer in terms of both the linear
- system to be solved and the finite element discretization of the problem
- domain.
- The composition can be described in XML and could be represented in a network
- diagram with an appropriate tool.
- StgFEM describes finite element systems for various formulations in a manner
- that can allow the underlying numerics to be interchanged.
- 
-\end_layout
-
-\begin_layout Subsection
-PiCellerator 
-\end_layout
-
-\begin_layout Standard
-PICellerator 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-csd.vpac.org/twiki/bin/view/PICellerator/WebHome
-\end_layout
-
-\end_inset
-
- (Particle In Cellerator), a Lagrangian Integration Point Finite Element
- framework, is implemented as an integration scheme substitute for the default
- Gaussian scheme implemented in StgFEM.
- The PICellerator concept has since grown to become a general Lagrangian
- integration scheme framework and a Lagrangian constitutive rule framework.
- The PIC scheme is provided and other Arbitrary Lagrangian Eulerian schemes
- are in development.
- Constitutive rules are reusable across these schemes.
- 
-\end_layout
-
-\begin_layout Subsection
-UnderWorld 
-\end_layout
-
-\begin_layout Standard
-UnderWorld 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-wasabi.maths.monash.edu.au/twiki/view/Software/Underworld
-\end_layout
-
-\end_inset
-
- is a StGermain parallel modeling framework Geoscience research code which
- utilizes a Lagrangian particle-in-cell finite element scheme (the prototype
- of which is the Ellipsis code), visualized using gLucifer.
- UnderWorld (Monash University), StGermain (Victorian Partnership for Advanced
- Computing or VPAC) and gLucifer (Monash University) are under development
- as part of the Australian Computational Earth Systems Simulator (ACcESS),
- an Australian Government National Research Facility, a node of which is
- located at the Australian Crustal Research Centre (ACRC) at Monash University
- (Clayton Campus).
- 
-\end_layout
-
-\begin_layout Section
-System Description
-\end_layout
-
-\begin_layout Standard
-Gale uses StgFEM to formulate implicit finite element systems, with the
- bulk of the information placed in a stiffness matrix and a force vector.
- Depending on the type of solver used, there may be several matrices and
- vectors.
- The stiffness matrix class has a member whose purpose is to assemble the
- entire matrix.
- It does this through the use of 
-\begin_inset Quotes eld
-\end_inset
-
-stiffness matrix terms.
-\begin_inset Quotes erd
-\end_inset
-
- The 
-\family typewriter
-StiffnessMatrixTerm
-\family default
- class provides an interface through which the elemental contributions to
- the matrix may be influenced.
- In typical fluid flow systems, the majority of the physics is applied to
- the model through constitutive laws which modify the stiffness matrix to
- reflect certain physical situations.
- The 
-\family typewriter
-ConstitutiveMatrix
-\family default
- class inherits from 
-\family typewriter
-StiffnessMatrixTerm
-\family default
-, providing an interface tailored to implementing material-based continuum
- physics.
- 
-\end_layout
-
-\begin_layout Standard
-So, where does the actual physics take place? The answer is in the Rheology
- class, but first look at the PIC (particle-in-cell) scheme.
- There are a number of benefits to using a PIC scheme, but the main use
- is to store material properties on each particle.
- These properties can then be used to drive our constitutive laws, in turn
- modifying the produced stiffness matrices.
- For each defined material in the domain, there may be a number of associated
- rheological laws.
- Whenever an element in the system is assembled, each stiffness matrix term
- is evaluated, implying that the constitutive matrix will be evaluated for
- each element.
- For each particle internal to an element, the 
-\family typewriter
-ConstitutiveMatrix
-\family default
- class will evaluate all associated rheologies, each rheology modifying
- the constitutive matrix.
- 
-\end_layout
-
-\begin_layout Standard
-Modifying the constitutive matrix takes place in the form of viscosity values.
- In this, probably the simplest of rheological laws, the 
-\family typewriter
-ModifyConstitutiveMatrix
-\family default
- method simply sets a specific viscosity value for the current element/material
- point tuple.
- 
-\end_layout
-
-\begin_layout Section
-Sample Rheologies 
-\end_layout
-
-\begin_layout Subsection
-Simple Viscous 
-\end_layout
-
-\begin_layout Standard
-This excerpt is taken from the file 
-\family typewriter
-src/Underworld/Rheology/src/MaterialViscosity.c
-\family default
-.
- It has been inherited from the Rheology class and thus possesses a virtual
- method named 
-\end_layout
-
-\begin_layout LyX-Code
-
-\family typewriter
-MaterialViscosity_ModifyConstitutiveMatrix
-\family default
- 
-\end_layout
-
-\begin_layout Standard
-which has been overridden to set the viscosity in the constitutive matrix,
- as follows: 
-\end_layout
-
-\begin_layout LyX-Code
-void _MaterialViscosity_ModifyConstitutiveMatrix( 
-\end_layout
-
-\begin_layout LyX-Code
-   void*                rheology, 
-\end_layout
-
-\begin_layout LyX-Code
-   ConstitutiveMatrix*  constitutiveMatrix, 
-\end_layout
-
-\begin_layout LyX-Code
-   MaterialPointsSwarm* swarm,
-\end_layout
-
-\begin_layout LyX-Code
-   Element_LocalIndex   lElement_I,
-\end_layout
-
-\begin_layout LyX-Code
-   MaterialPoint*       materialPoint,
-\end_layout
-
-\begin_layout LyX-Code
-   Coord                xi )
-\end_layout
-
-\begin_layout LyX-Code
-{
-\end_layout
-
-\begin_layout LyX-Code
-   MaterialViscosity* self = (MaterialViscosity*)rheology;
-\end_layout
-
-\begin_layout LyX-Code
-   ConstitutiveMatrix_SetIsotropicViscosity( constitutiveMatrix,
-\end_layout
-
-\begin_layout LyX-Code
-                                             self->eta0 );
-\end_layout
-
-\begin_layout LyX-Code
-}
-\end_layout
-
-\begin_layout Standard
-The parameters passed to this method provide access to the rheology class's
- members/methods, the constitutive matrix, the swarm (material points),
- the index of the element currently being assembled, the material point
- currently being evaluated, and the material point's elemental coordinates.
-\end_layout
-
-\begin_layout Chapter
 \start_of_appendix
 Input File Format
 \begin_inset CommandInset label
@@ -9097,7 +8454,7 @@ input.xml
 Previous versions of Gale used XML as the input file format, and this scheme
  allows Gale to accept either JSON or XML as input.
  Existing XML input files will still work with minor modifications.
- See the file UPGRADE for details.
+ See the file UPGRADE for the details of these modifications.
 \end_layout
 
 \begin_layout Subsection
@@ -9442,7 +8799,7 @@ T-mesh
 \end_layout
 
 \begin_layout Standard
-In addition, The energy equation (
+In addition, the energy equation (
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "eq:energy"
@@ -9464,7 +8821,7 @@ displacementField
 \family typewriter
 DisplacementField
 \family default
- and Gale will make the necessary corrections.
+ and Gale will make the necessary corrections for advection.
 \end_layout
 
 \begin_layout Standard
@@ -9588,7 +8945,7 @@ DisplacementField
 \begin_inset Text
 
 \begin_layout Plain Layout
-
+-
 \end_layout
 
 \end_inset
@@ -10285,7 +9642,7 @@ reference "sub:Temperature-Boundary-Conditions"
 , and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Temperature-Initial-Conditions"
+reference "sec:Initial-Conditions"
 
 \end_inset
 
@@ -10538,7 +9895,7 @@ reference "sub:Temperature-Boundary-Conditions"
  and 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Temperature-Initial-Conditions"
+reference "sec:Initial-Conditions"
 
 \end_inset
 
@@ -10975,7 +10332,15 @@ gamma
 \end_layout
 
 \begin_layout Standard
-then the box will actually span from 1 to 2.
+then the box will actually span from 
+\begin_inset Formula $x=1$
+\end_inset
+
+ to 
+\begin_inset Formula $x=2$
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Standard
@@ -11829,19 +11194,30 @@ reference "sec:Temperature-components"
 \end_layout
 
 \begin_layout Standard
-You can also specify multiple radiogenic heating rates (Q) and radiogenic
- timescales (
+You can also specify multiple radiogenic heating rates (
+\family typewriter
+Q
+\family default
+) and radiogenic timescales (
+\family typewriter
+
 \begin_inset Formula $\lambda$
 \end_inset
 
+
+\family default
 ).
  This simulates the action of multiple radioactive materials with different
  half-lives.
- To enable this, you must provide a list of Qs and 
+ To enable this, you must provide a list of 
+\family typewriter
+Q
+\family default
+'s and 
 \begin_inset Formula $\lambda$
 \end_inset
 
-s.
+'s.
  For example, to specify two different radioactive species, add something
  like
 \end_layout
@@ -11887,7 +11263,7 @@ s.
 \end_layout
 
 \begin_layout Standard
-At a given time 
+At time 
 \begin_inset Formula $t$
 \end_inset
 
@@ -12481,7 +11857,11 @@ When setting the viscosity for the first solve, the strain rate has not
 \begin_layout Standard
 You may set maximum and minimum values for the resulting viscosity.
  If the temperature is greater than the melting temperature, then the viscosity
- is just set to the minimumViscosity.
+ is just set to 
+\family typewriter
+minViscosity
+\family default
+.
 \end_layout
 
 \begin_layout Standard
@@ -14417,7 +13797,7 @@ If you need to specify velocities for only part of the boundary (e.g., the
  left half moves at vx=1, the right half is unconstrained), then you should
  use a 
 \family typewriter
-ShapeVC
+MeshShapeVC
 \family default
  (see Section 
 \begin_inset CommandInset ref
@@ -14451,7 +13831,7 @@ reference "fig:Strain-deformed-bottom"
 \end_inset
 
 , where material flows in from the left and out through the bottom.
- There are three things that you must specify for this to work.
+ There are two things that you must specify for this to work.
 \end_layout
 
 \begin_layout Enumerate
@@ -14589,7 +13969,7 @@ StressBC
 \end_layout
 
 \begin_layout Standard
-You can also have a traction applied to the boundary by specifying 
+You can apply a shear stress to the boundary by specifying 
 \family typewriter
 x_value
 \family default
@@ -15804,7 +15184,7 @@ WallVC
  So if you wanted half of the boundary to move at a certain velocity, but
  wanted the other half unconstrained, you would use a 
 \family typewriter
-ShapeVC
+MeshShapeVC
 \family default
 .
 \end_layout
@@ -15843,10 +15223,10 @@ reference "sub:EulerDeform"
 \end_layout
 
 \begin_layout Section
-Temperature Initial Conditions
+Initial Conditions
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Temperature-Initial-Conditions"
+name "sec:Initial-Conditions"
 
 \end_inset
 
@@ -15856,10 +15236,10 @@ name "sec:Temperature-Initial-Conditions"
 \begin_layout Standard
 For temperature dependent problems, you need to set initial conditions for
  the temperature.
- Because we are ignoring inertial effects, the interior velocity is completely
- determined by the boundary conditions.
+ Also, for pure thermal problems, the velocity is not solved for, so it
+ must be set at the beginning.
  Setting initial conditions is similar to setting boundary conditions.
- The only difference is to change the condition type from 
+ In general, the only difference is changing the condition type from 
 \family typewriter
 WallVC
 \family default
@@ -16674,7 +16054,7 @@ In addition, the available functions are
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="34" columns="2">
+<lyxtabular version="3" rows="31" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -16923,6 +16303,30 @@ hyperbolic arctan
 \begin_inset Text
 
 \begin_layout Plain Layout
+sqrt(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Square root: 
+\begin_inset Formula $\sqrt{x}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 cbrt(x)
 \end_layout
 
@@ -16947,7 +16351,7 @@ cube root:
 \begin_inset Text
 
 \begin_layout Plain Layout
-copysign(x,y)
+sqrt1pm1(x)
 \end_layout
 
 \end_inset
@@ -16956,7 +16360,34 @@ copysign(x,y)
 \begin_inset Text
 
 \begin_layout Plain Layout
-return the value of x with the sign of y
+ 
+\begin_inset Formula $\sqrt{1+x}-1$
+\end_inset
+
+, optimised for when x is small
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+hypot(x,y)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\sqrt{x^{2}+y^{2}}$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -17007,7 +16438,7 @@ complementary error function
 \begin_inset Text
 
 \begin_layout Plain Layout
-expm1(x)
+log(x)
 \end_layout
 
 \end_inset
@@ -17016,53 +16447,11 @@ expm1(x)
 \begin_inset Text
 
 \begin_layout Plain Layout
-\begin_inset Formula $e^{x}-1$
-\end_inset
-
-, optimised for when x is small
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-hypot(x,y)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset Formula $\sqrt{x^{2}+y^{2}}$
+natural logarithm:
+\begin_inset Formula $\log\left(x\right)$
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-lgamma(x)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-natural log of the absolute value of the gamma function
 \end_layout
 
 \end_inset
@@ -17096,66 +16485,6 @@ log1p(x)
 \begin_inset Text
 
 \begin_layout Plain Layout
-remainder(x,y)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-the remainder of x/y
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-rint(x)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-round to the nearest int
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-gamma(x)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Gamma function
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
 log10(x)
 \end_layout
 
@@ -17179,7 +16508,7 @@ log10(x)
 \begin_inset Text
 
 \begin_layout Plain Layout
-ln(x)
+log2(x)
 \end_layout
 
 \end_inset
@@ -17188,8 +16517,7 @@ ln(x)
 \begin_inset Text
 
 \begin_layout Plain Layout
-natural logarithm:
-\begin_inset Formula $\log\left(x\right)$
+\begin_inset Formula $\log_{2}\left(x\right)$
 \end_inset
 
 
@@ -17226,6 +16554,29 @@ exp(x)
 \begin_inset Text
 
 \begin_layout Plain Layout
+expm1(x)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $e^{x}-1$
+\end_inset
+
+, optimised for when x is small
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 abs(x)
 \end_layout
 
@@ -17240,50 +16591,6 @@ Absolute value:
 \end_inset
 
 
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-sqrt(x)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Square root: 
-\begin_inset Formula $\sqrt{x}$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-sign(x)
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
--1 if x<0, +1 if x>0 and 0 if x==0
 \end_layout
 
 \end_inset
@@ -17314,7 +16621,7 @@ step(x)
 \begin_inset Text
 
 \begin_layout Plain Layout
-sum(x1,x2,x3,...)
+floor(x)
 \end_layout
 
 \end_inset
@@ -17323,7 +16630,11 @@ sum(x1,x2,x3,...)
 \begin_inset Text
 
 \begin_layout Plain Layout
-Sum of individual values: x1+x2+x3+...
+largest integer not greater than 
+\begin_inset Formula $x$
+\end_inset
+
+
 \end_layout
 
 \end_inset
@@ -17334,7 +16645,7 @@ Sum of individual values: x1+x2+x3+...
 \begin_inset Text
 
 \begin_layout Plain Layout
-avg(x1,x2,x3,...)
+ceil(x)
 \end_layout
 
 \end_inset
@@ -17343,7 +16654,31 @@ avg(x1,x2,x3,...)
 \begin_inset Text
 
 \begin_layout Plain Layout
-Average of all values: (x1+x2+x3+...)/num_values
+smallest integer not less than 
+\begin_inset Formula $x$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+sum(x1,x2,x3,...)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Sum of individual values: x1+x2+x3+...
 \end_layout
 
 \end_inset
@@ -17644,6 +16979,20 @@ b
  are difficult to compute or not valid for certain ranges.
 \end_layout
 
+\begin_layout Standard
+If you are unsure whether the equations you entered are producing the desired
+ numbers, you can turn on the verbose option (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Verbosity-Options"
+
+\end_inset
+
+).
+ This will output the equation that is being evaluated, the coordinates,
+ and the result.
+\end_layout
+
 \begin_layout Section
 File Input Data
 \end_layout
@@ -17752,8 +17101,28 @@ You can add tracer particles to the simulation to help you track where material
 \end_layout
 
 \begin_layout Standard
-To add tracers to your simulation, first set the initial position of the
- particles with a 
+To add tracers to your simulation, first enable tracers by adding the variable
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset Quotes sld
+\end_inset
+
+enable-tracers
+\begin_inset Quotes srd
+\end_inset
+
+: true,
+\end_layout
+
+\begin_layout Standard
+Note that there are no quotes around 
+\family typewriter
+true
+\family default
+.
+ Next set up the initial position of the tracers.
+ To put the tracers exactly where you want them, use a 
 \family typewriter
 ManualParticleLayout
 \family default
@@ -17962,8 +17331,8 @@ reference "sub:Variables"
 \end_inset
 
 ).
- This will print out more information than you need about the components,
- the solvers, and the number of iterations.
+ This will print out more information than you need about the equations,
+ components, solvers, and number of iterations.
  In addition, you can get even more information about the solvers from PETSc
  by appending 
 \begin_inset Quotes sld
@@ -17978,46 +17347,6 @@ reference "sub:Variables"
 \end_inset
 
  to the command line.
-\end_layout
-
-\begin_layout Chapter
-Output File Format
-\begin_inset CommandInset label
-LatexCommand label
-name "cha:Output-File-Format"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Gale outputs two types of files: HDF5 checkpointing files for restarting
- a run, and XDMF files which use those checkpoint files for visualization.
- XDMF files are understood by a wide variety of visualization programs,
- such as ParaView 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-paraview.org
-\end_layout
-
-\end_inset
-
- or VisIt 
-\begin_inset Flex URL
-status collapsed
-
-\begin_layout Plain Layout
-
-www.llnl.gov/visit
-\end_layout
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Chapter
@@ -18809,6 +18138,13 @@ Error in computed velocity vs.
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -18850,8 +18186,8 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/inclusion_setup.eps
-	scale 60
+	filename images/inclusion_setup.png
+	width 50col%
 
 \end_inset
 
@@ -18925,10 +18261,10 @@ v_{y} & = & \dot{\epsilon}x,
 
  is the radius.
  We have the boundaries at 80 times the radius of the inclusion, giving
- an error of about 0.01%, which is much smaller than the other errors we
- are looking at.
- Just to make sure, we did runs with the boundaries at 40 times the radius
- of the inclusion and got very similar results.
+ an error of about 0.01%.
+ This error dominates near the boundary, but near the inclusion other errors
+ dominate.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -19298,7 +18634,6 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/sinusoid_error.eps
-	scale 50
 
 \end_inset
 
@@ -19338,7 +18673,6 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/sinusoid_scaled_error.eps
-	scale 50
 
 \end_inset
 
@@ -19469,6 +18803,7 @@ linearTolerance
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -19496,7 +18831,6 @@ name "fig:Divergence_v_sri"
 
 Velocity and error in the strain rate invariant solution for the 2D Divergence
  benchmark.
- The variation in the strain rate invariant is uniformly small.
 \end_layout
 
 \end_inset
@@ -19511,6 +18845,7 @@ Velocity and error in the strain rate invariant solution for the 2D Divergence
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -19538,7 +18873,6 @@ name "fig:Divergence_v_sri3D"
 
 Velocity and error in the strain rate invariant solution for the 3D Divergence
  benchmark.
- The variation in the strain rate invariant is uniformly small.
 \end_layout
 
 \end_inset
@@ -19578,10 +18912,9 @@ T_{t=0}=\cos\left(\pi x\right)\sin\left(2\pi y\right).
 
 \end_inset
 
-The temperature on the bottom and top are fixed to zero, and on the left
- and right side left free.
- This implies that the boundary conditions on the side are that the derivative
- is zero 
+The temperature on the bottom and top are fixed to zero.
+ The temperature on the left and right side are left free, implying the
+ boundary conditions 
 \begin_inset Formula 
 \[
 \left.\frac{\partial T}{\partial x}\right|_{x=0,1}=0.
@@ -19589,7 +18922,7 @@ The temperature on the bottom and top are fixed to zero, and on the left
 
 \end_inset
 
-The complete solution simply decays with time 
+The complete solution decays with time 
 \begin_inset Formula 
 \[
 T=\exp\left(-\kappa\left(5\pi^{2}\right)t\right)\cos\left(\pi x\right)\sin\left(2\pi y\right),
@@ -19597,7 +18930,7 @@ T=\exp\left(-\kappa\left(5\pi^{2}\right)t\right)\cos\left(\pi x\right)\sin\left(
 
 \end_inset
 
- where 
+where 
 \begin_inset Formula $\kappa=1.7$
 \end_inset
 
@@ -19823,7 +19156,6 @@ v_{y} & = & (x+0.3)(1.5-x)y+(x-0.15)(0.7-x)
 \begin_layout Standard
 This velocity has been constructed such that the natural advection of the
  mesh will not be disturbed by the remesher.
- It also keeps the sides vertical.
  This means that the temperature field should not advect relative to the
  mesh.
  Figures 
@@ -19846,6 +19178,7 @@ reference "fig:Lagrange_advect_end"
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -19854,6 +19187,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/thermal_lagrangian_start.png
+	width 50col%
 
 \end_inset
 
@@ -19885,6 +19219,7 @@ Initial temperature and velocity of the lagrangian thermal advection benchmark.
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -19893,6 +19228,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/thermal_lagrangian_end.png
+	width 50page%
 
 \end_inset
 
@@ -19922,6 +19258,13 @@ Final temperature and velocity of the lagrangian thermal advection benchmark.
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -19934,7 +19277,7 @@ Eulerian Thermal Advection
 
 \begin_layout Standard
 This is another pure thermal benchmark.
- In contrast to the previous benchmark, the mesh is fixed and a temperature
+ In contrast to the previous benchmark, the mesh is fixed and the temperature
  is advected across the grid.
  The velocity is set to 
 \begin_inset Formula $v_{x}=1$
@@ -19996,6 +19339,7 @@ reference "fig:Euler_advect_high"
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -20004,6 +19348,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/thermal_eulear_start.png
+	width 50col%
 
 \end_inset
 
@@ -20035,6 +19380,7 @@ Initial temperature of the eulerian thermal advection benchmark.
 
 \begin_layout Standard
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -20043,6 +19389,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/thermal_eulear_low.png
+	width 50col%
 
 \end_inset
 
@@ -20079,6 +19426,7 @@ Temperature at
 
 
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -20087,6 +19435,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/thermal_eulear_medium.png
+	width 50col%
 
 \end_inset
 
@@ -20123,6 +19472,7 @@ Temperature at
 
 
 \begin_inset Float figure
+placement H
 wide false
 sideways false
 status open
@@ -20131,6 +19481,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/thermal_eulear_high.png
+	width 50col%
 
 \end_inset
 
@@ -20168,6 +19519,13 @@ Temperature at
 
 \end_layout
 
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
+\end_layout
+
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -20190,11 +19548,6 @@ reference "fig:Extension-model-setup"
  The right side and half of the bottom are translated to the right.
  This creates a velocity discontinuity at the center which is the initial
  seed for localization.
- Gale's implementation of this benchmark is in 
-\family typewriter
-input/benchmarks/extension.json
-\family default
-.
 \end_layout
 
 \begin_layout Standard
