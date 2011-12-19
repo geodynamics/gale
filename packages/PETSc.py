@@ -42,16 +42,17 @@ class PETSc(Package):
                     petscconf = None
 
             # Try looking for it the PETSc 3 uninstalled way.
-            try:
-                items = os.listdir(loc[0])
-                for i in items:
-                    i = os.path.join(loc[0], i)
-                    if os.path.isdir(i):
-                        if os.path.exists(os.path.join(i, 'conf', 'petscvariables')):
-                            self.arch = os.path.basename(i)
-                            break
-            except:
-                pass
+            if not self.arch:
+                try:
+                    items = os.listdir(loc[0])
+                    for i in items:
+                        i = os.path.join(loc[0], i)
+                        if os.path.isdir(i):
+                            if os.path.exists(os.path.join(i, 'conf', 'petscvariables')):
+                                self.arch = os.path.basename(i)
+                                break
+                except:
+                    pass
 
             # If we were able to find a architecture.
             if self.arch is not None:
@@ -80,6 +81,9 @@ class PETSc(Package):
         libs = ['petscsnes', 'petscksp', 'petscdm',
                 'petscmat', 'petscvec', 'petsc']
         lib_types = self.find_libraries(loc[2], libs)
+        if lib_types is None:
+            libs = ['petsc']
+            lib_types = self.find_libraries(loc[2], libs)
         if lib_types is not None:
 
             # Add basic environment.
