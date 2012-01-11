@@ -44,7 +44,7 @@ Copy the final link line, remove the -lxml2 flag, and add
 
   /usr/lib/libxml2.a /usr/lib/libz.a
 
-at the end.  You also need to staticly like libstdc++.  Symlink the
+at the end.  You also need to staticly link libstdc++.  Symlink the
 static libstdc++ into the build directory with the command
 
   ln -s `mpicxx -print-file-name=libstdc++.a` build/lib/
@@ -68,14 +68,18 @@ which are all libaries provided by the kernel.
 MAC
 ---
 
-On newer versions of OS X (>10.5), Open MPI is included with the OS.
-Do not use it.  I get runtime errors.  So you still need to build
-mpich.
+To build a version on 10.6 that works for both 10.5 and 10.6,
+configure HDF5 with
 
-However, veclib and libxml2 are standard on the Mac.  So when
-configuring Petsc, use the line
+  ./configure --enable-parallel --enable-production --enable-shared=no --prefix=/Users/walter/src/hdf5-bin CFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk" LDFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
 
-  ./configure --with-fortran=0 --with-x=0 --with-shared=0 --with-debugging=0
+When configuring Petsc,
+
+  ./configure --with-fortran=0 --with-x=0 --with-shared=0 --with-debugging=0 --CFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk" --LDFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+
+and when configuring Gale
+
+  ./configure.sh --with-debugging=0 --hdf5-dir=/Users/walter/src/hdf5-bin --cxxflags="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk" --linkflags="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
 
 When linking Gale, it will not find libz needed by hdf5.  So add 'z'
 to the list of libaries in config.cfg.  Running
