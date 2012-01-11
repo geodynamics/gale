@@ -13,6 +13,7 @@ options = [
     ('--lib-type', 'lib_type', 'Library type (shared or static)', 'static'),
     ('--cxx', 'CXX', 'C++ compiler', None),
     ('--cxxflags', 'CXXFLAGS', 'Flags for the C++ compiler', None),
+    ('--linkflags', 'LINKFLAGS', 'Flags for the linker', None),
     ('--with-glucifer', 'with_glucifer', 'Enable gLucifer', 0, 'int'),
     ('--with-hdf5', 'with_hdf5', 'Enable HDF5', 1, 'int'),
     ('--with-experimental', 'with_experimental', 'Enable Experimental Repository compile', os.path.isdir("Experimental"), 'int'),
