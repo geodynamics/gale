@@ -2149,7 +2149,7 @@ void FeVariable_SaveToFile( void* feVariable, Name filename, Bool saveCoords ) {
 		__func__, self->type, self->name, filename );
 		
 	for ( lNode_I = 0; lNode_I < FeMesh_GetNodeLocalSize( self->feMesh ); lNode_I++ ) {
-		gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
+                Node_GlobalIndex gNode_I = FeMesh_NodeDomainToGlobal( self->feMesh, lNode_I );
 		fprintf( outputFile, "%u ", gNode_I );
 		
 		/** If required, write the node coords to file */		
@@ -2441,7 +2441,7 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
       
 	/** Need to re-set the geometry here, in case we're loading from a checkpoint that had compression/squashing BCs,
 		and hence ended up with a smaller mesh than the original */
-	nDims = Mesh_GetDimSize( self->feMesh );
+	unsigned int nDims = Mesh_GetDimSize( self->feMesh );
 	while ( !feof(inputFile) ) {
 		fscanf( inputFile, "%u ", &gNode_I );
 		
