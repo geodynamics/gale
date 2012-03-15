@@ -534,7 +534,7 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
 	unsigned		nEls;
 	unsigned		nearVert;
 	unsigned		nInc, *inc;
-	unsigned		e_i, d_i, inc_i;
+	unsigned		e_i, inc_i;
 
 	assert( self );
 	assert( self->mesh );
@@ -549,8 +549,9 @@ Bool Mesh_Algorithms_SearchWithFullIncidence( void* algorithms, double* point,
 
 	/* If outside local range, immediately return false. */
 	Mesh_GetDomainCoordRange( mesh, minCrd, maxCrd );
-	for( d_i = 0; d_i < nDims; d_i++ ) {
-		if( point[d_i] < minCrd[d_i] || point[d_i] > maxCrd[d_i] )
+	for( unsigned d_i = 0; d_i < nDims; d_i++ ) {
+          if( point[d_i] < minCrd[d_i] - (maxCrd[d_i]-minCrd[d_i])*0.1
+              || point[d_i] > maxCrd[d_i] + (maxCrd[d_i]-minCrd[d_i])*0.1 )
 			return False;
 	}
 
