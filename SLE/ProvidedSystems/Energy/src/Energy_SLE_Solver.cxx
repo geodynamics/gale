@@ -55,7 +55,7 @@
 /* Textual name of this class */
 const Type Energy_SLE_Solver_Type = "Energy_SLE_Solver";
 
-PetscTruth Energy_SLE_HasNullSpace( Mat A );
+PetscBool Energy_SLE_HasNullSpace( Mat A );
 
 void* Energy_SLE_Solver_DefaultNew( Name name ) {
 	/* Variables set in this function */
@@ -118,11 +118,11 @@ void _Energy_SLE_Solver_Delete( void* sle ) {
 	Energy_SLE_Solver* self = (Energy_SLE_Solver*)sle;
 
 	//FreeObject( self->matrixSolver );
-	KSPDestroy( self->matrixSolver );
+	KSPDestroy( &self->matrixSolver );
 
 	if( self->residual != PETSC_NULL ) {
 		//FreeObject( self->residual );
-		VecDestroy( self->residual );
+		VecDestroy( &self->residual );
 	}
 }
 
@@ -217,7 +217,7 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 	Energy_SLE_Solver*     self       = (Energy_SLE_Solver*)sleSolver;
 	SystemLinearEquations* sle        = (SystemLinearEquations*) standardSLE;
 	Iteration_Index        iterations;
-        PetscTruth isNull;
+        PetscBool isNull;
         MatNullSpace nsp;
 
 	
@@ -259,7 +259,7 @@ void _Energy_SLE_Solver_Solve( void* sleSolver, void* standardSLE ) {
 	VecAYPX( self->residual, -1.0, ((ForceVector**)sle->forceVectors->data)[0]->vector );
 
         if(isNull)
-            MatNullSpaceDestroy(nsp);
+            MatNullSpaceDestroy(&nsp);
 }
 
 
@@ -269,11 +269,11 @@ Vec _Energy_SLE_GetResidual( void* sleSolver, Index fv_I ) {
 	return self->residual;
 }
 
-PetscTruth Energy_SLE_HasNullSpace( Mat A ) {
+PetscBool Energy_SLE_HasNullSpace( Mat A ) {
     PetscInt N;
     PetscScalar sum;
     PetscReal nrm;
-    PetscTruth isNull;
+    PetscBool isNull;
     Vec r, l;
 
     MatGetVecs(A, &r, &l); /* l = A r */
@@ -290,8 +290,8 @@ PetscTruth Energy_SLE_HasNullSpace( Mat A ) {
     else
 	isNull = PETSC_FALSE;
 
-    VecDestroy(l);
-    VecDestroy(r);
+    VecDestroy(&l);
+    VecDestroy(&r);
 
     return isNull;
 }

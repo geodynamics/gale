@@ -561,7 +561,7 @@ void _StiffnessMatrix_Destroy( void* stiffnessMatrix, void* data ) {
 	StiffnessMatrix* self = (StiffnessMatrix*)stiffnessMatrix;
 	
 	Journal_DPrintf( self->debug, "In %s - for matrix %s\n", __func__, self->name );
-	MatDestroy( self->matrix );
+	MatDestroy( &self->matrix );
 	FreeObject( self->stiffnessMatrixTermList );
 	FreeArray( self->_assembleStiffnessMatrixEPName );
 	FreeArray( self->diagonalNonZeroIndices );
@@ -1353,7 +1353,7 @@ void StiffMatAssLog_Delete( struct StiffMatAss_Log** _log )
 void StiffMatAssLog_Init( struct StiffMatAss_Log *log, const char type_name[] )
 {
 	if( log->ass_type != NULL ) free( log->ass_type );
-	asprintf( &log->ass_type, "%s", type_name );
+	Stg_asprintf( &log->ass_type, "%s", type_name );
 	
 	/* reset timers and counter */
 	log->total_TIME                           = 0.0;
@@ -2717,7 +2717,7 @@ void StiffnessMatrix_RefreshMatrix( StiffnessMatrix* self ) {
 	} 
  	else { */
 		if( self->matrix != PETSC_NULL )
-			MatDestroy( self->matrix );
+			MatDestroy( &self->matrix );
 
 		MatCreate( self->comm, &self->matrix );
 		MatSetSizes( self->matrix, self->rowLocalSize, self->colLocalSize, PETSC_DETERMINE, PETSC_DETERMINE );

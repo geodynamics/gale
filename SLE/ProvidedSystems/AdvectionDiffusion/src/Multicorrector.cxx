@@ -103,7 +103,7 @@ void _AdvDiffMulticorrector_Delete(void* solver)
   AdvDiffMulticorrector* self = (AdvDiffMulticorrector*)solver;
 
   //FreeObject(self->matrixSolver);
-  KSPDestroy(self->matrixSolver);
+  KSPDestroy(&self->matrixSolver);
 
   _SLE_Solver_Delete(self);
 }
@@ -259,7 +259,7 @@ void _AdvDiffMulticorrector_Solve(void* solver, void* _sle)
     }
   
   /* Clean Up */
-  VecDestroy(deltaPhiDot);
+  VecDestroy(&deltaPhiDot);
 }
 
 void ViewPETScVector(Vec vec, Stream* stream)

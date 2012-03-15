@@ -217,11 +217,11 @@ void _Stokes_SLE_UzawaSolver_Build( void* solver, void* stokesSLE ) {
 	else 
 		self->pcSolver = PETSC_NULL;
 
-	if( self->pTempVec != PETSC_NULL ) VecDestroy( self->pTempVec );
-	if( self->rVec != PETSC_NULL )     VecDestroy( self->rVec );
-	if( self->sVec != PETSC_NULL )     VecDestroy( self->sVec );
-	if( self->fTempVec != PETSC_NULL ) VecDestroy( self->fTempVec );
-	if( self->vStarVec != PETSC_NULL ) VecDestroy( self->vStarVec );
+	if( self->pTempVec != PETSC_NULL ) VecDestroy( &self->pTempVec );
+	if( self->rVec != PETSC_NULL )     VecDestroy( &self->rVec );
+	if( self->sVec != PETSC_NULL )     VecDestroy( &self->sVec );
+	if( self->fTempVec != PETSC_NULL ) VecDestroy( &self->fTempVec );
+	if( self->vStarVec != PETSC_NULL ) VecDestroy( &self->vStarVec );
 
  	Journal_DPrintfL( self->debug, 2, "Allocate the auxillary vectors pTemp, r, s, fTemp and vStar.\n" ); 
 	VecDuplicate( sle->pSolnVec->vector, &self->pTempVec );
@@ -272,15 +272,15 @@ void _Stokes_SLE_UzawaSolver_Destroy( void* solver, void* data ) {
 
 	Stream_IndentBranch( StgFEM_Debug );
 	Journal_DPrintfL( self->debug, 2, "Destroying Solver contexts.\n" );
-	KSPDestroy( self->velSolver );
-	KSPDestroy( self->pcSolver );
+	KSPDestroy( &self->velSolver );
+	KSPDestroy( &self->pcSolver );
 
 	Journal_DPrintfL( self->debug, 2, "Destroying temporary solver vectors.\n" );
-	if( self->pTempVec != PETSC_NULL ) VecDestroy( self->pTempVec );
-	if( self->rVec != PETSC_NULL )     VecDestroy( self->rVec );
-	if( self->sVec != PETSC_NULL )     VecDestroy( self->sVec );
-	if( self->fTempVec != PETSC_NULL ) VecDestroy( self->fTempVec );
-	if( self->vStarVec != PETSC_NULL ) VecDestroy( self->vStarVec );
+	if( self->pTempVec != PETSC_NULL ) VecDestroy( &self->pTempVec );
+	if( self->rVec != PETSC_NULL )     VecDestroy( &self->rVec );
+	if( self->sVec != PETSC_NULL )     VecDestroy( &self->sVec );
+	if( self->fTempVec != PETSC_NULL ) VecDestroy( &self->fTempVec );
+	if( self->vStarVec != PETSC_NULL ) VecDestroy( &self->vStarVec );
 	Stream_UnIndentBranch( StgFEM_Debug );
    _SLE_Solver_Destroy( self, data );
 

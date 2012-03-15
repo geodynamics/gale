@@ -138,7 +138,7 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 	ForceVector*					massMatrix;
 	Vec								expectedMatrix;
 	PetscViewer						viewer;
-	PetscTruth						flg;
+	PetscBool						flg;
 	LumpedMassMatrixForceTerm*	massMatrixForceTerm;
 	Particle_InCellIndex			particlesPerDim[] = {2,2,2};
 	char								expected_file[PCU_PATH_MAX];
@@ -231,12 +231,14 @@ void LumpedMassMatrixSuite_TestLumpedMassMatrix( LumpedMassMatrixSuiteData* data
 		ForceVector_Assemble( massMatrix );
 
 		PetscViewerCreate( MPI_COMM_WORLD, &viewer );
-		PetscViewerSetType( viewer, PETSC_VIEWER_BINARY );
+		PetscViewerSetType( viewer, PETSCVIEWERBINARY );
 
 		pcu_filename_expected( "testLumpedMassMatrix.expected", expected_file );
 		PetscViewerBinaryOpen( MPI_COMM_WORLD, expected_file, FILE_MODE_READ, &viewer );
 	
-		VecLoad( viewer, VECMPI, &expectedMatrix );	
+                VecCreate( MPI_COMM_WORLD, &expectedMatrix);
+                VecSetType( expectedMatrix, VECMPI );
+		VecLoad( expectedMatrix, viewer );	
 
 		/* Try out optimised one */
 		VecSet( massMatrix->vector, 0.0 );

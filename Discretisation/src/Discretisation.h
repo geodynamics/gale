@@ -60,7 +60,7 @@
 	#include <petscvec.h>
 	#include <petscmat.h>
 	#include <petscksp.h>
-	#include <petscmg.h>
+	#include <petscpcmg.h>
 	#include <petscsnes.h>
 	#include "PETScErrorChecking.h"
 

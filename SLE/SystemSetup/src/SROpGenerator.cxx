@@ -145,8 +145,9 @@ void _SROpGenerator_Destroy( void* srOpGenerator, void* data ) {
 }
 
 Bool SROpGenerator_HasExpired( void* srOpGenerator ) {
+#ifndef NDEBUG
 	SROpGenerator*	self = (SROpGenerator*)srOpGenerator;
-
+#endif
 	assert( self && Stg_CheckType( self, SROpGenerator ) );
 
 	return False;
@@ -713,9 +714,9 @@ PetscErrorCode _VecGetOwnershipRanges( Vec X, PetscInt **_ranges )
 
   *_ranges = ranges;
 
-  VecScatterDestroy( scat );
-  VecDestroy( out );
-  VecDestroy( all );
+  VecScatterDestroy( &scat );
+  VecDestroy( &out );
+  VecDestroy( &all );
 
  
   PetscFunctionReturn(0);
@@ -762,7 +763,7 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
    PetscInt sr,er, sc,ec, row_idx;
    Vec vec_o_nnz, vec_d_nnz;
    PetscScalar *v;
-   PetscTruth is_seq;
+   PetscBool is_seq;
    PetscInt p, proc_owner, *rranges,*cranges;
    MPI_Comm comm;
    PetscMPIInt nproc,rank;  
@@ -833,8 +834,8 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
       _VecGetOwnershipRanges( L, &rranges );
       _VecGetOwnershipRanges( R, &cranges );
 
-      VecDestroy( L );
-      VecDestroy( R );
+      VecDestroy( &L );
+      VecDestroy( &R );
     }
   
    PetscMalloc( sizeof(PetscInt)*(er-sr), &o_nnz );
@@ -1029,8 +1030,8 @@ Mat SROpGenerator_SimpleFinestLevel( SROpGenerator *self ) {
 
    Stg_Class_Delete(offsGrid);
 
-   VecDestroy( vec_o_nnz );
-   VecDestroy( vec_d_nnz );
+   VecDestroy( &vec_o_nnz );
+   VecDestroy( &vec_d_nnz );
    PetscFree( o_nnz );
    PetscFree( d_nnz );
    PetscFree( rranges );
@@ -1137,8 +1138,8 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
       _VecGetOwnershipRanges( L, &row_ranges );
       _VecGetOwnershipRanges( R, &col_ranges );
 
-      VecDestroy( L );
-      VecDestroy( R );
+      VecDestroy( &L );
+      VecDestroy( &R );
     }
 
 
@@ -1302,8 +1303,8 @@ Mat SROpGenerator_SimpleCoarserLevel( SROpGenerator *self, int level ) {
    Stg_Class_Delete( grid[1] );
    Stg_Class_Delete( offsGrid );
 
-   VecDestroy( vec_o_nnz );
-   VecDestroy( vec_d_nnz );
+   VecDestroy( &vec_o_nnz );
+   VecDestroy( &vec_d_nnz );
    PetscFree( o_nnz );
    PetscFree( d_nnz );
    PetscFree( row_ranges );

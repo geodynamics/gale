@@ -226,7 +226,7 @@ void PETScMGSolver_SetComm( void* matrixSolver, MPI_Comm comm ) {
 	//PETScMatrixSolver_SetComm( self, comm );
 	self->mgData->comm = comm;
 	if( self->mgData->ksp )
-		KSPDestroy( self->mgData->ksp );
+		KSPDestroy( &self->mgData->ksp );
 	KSPCreate( comm, &self->mgData->ksp );
 
 	if( self->pure )
@@ -358,7 +358,7 @@ void PETScMGSolver_SetRestriction( void* matrixSolver, unsigned levelInd, void* 
 	//if( level->R )
 	//	Stg_Class_RemoveRef( level->R );
 	if( level->R != PETSC_NULL )
-		MatDestroy( level->R );
+		MatDestroy( &level->R );
 	level->R = R;
 }
 
@@ -379,7 +379,7 @@ void PETScMGSolver_SetProlongation( void* matrixSolver, unsigned levelInd, void*
 	//if( level->P )
 	//	Stg_Class_RemoveRef( level->P );
 	if( level->P != PETSC_NULL ) {
-		MatDestroy( level->P );
+		MatDestroy( &level->P );
 		if(level->P == level->R)
 		    level->R = PETSC_NULL;
 	}
@@ -570,7 +570,7 @@ void PETScMGSolver_UpdateWorkVectors( PETScMGSolver* self ) {
 
 		if( l_i > 0 && (!level->workRes || /*Vector_GetLocalSize( level->workRes )*/vecSize != size) ) {
 			if( level->workRes )
-				VecDestroy( level->workRes );
+				VecDestroy( &level->workRes );
 			//	FreeObject( level->workRes );
 			//Vector_Duplicate( self->curSolution, (void**)&level->workRes );
 			//Vector_SetLocalSize( level->workRes, size );
@@ -592,7 +592,7 @@ void PETScMGSolver_UpdateWorkVectors( PETScMGSolver* self ) {
 			VecGetLocalSize( level->workSol, &vecSize );
                     if( !level->workSol || /*Vector_GetLocalSize( level->workSol )*/vecSize != size ) {
 				if( level->workSol )
-					VecDestroy( level->workSol );
+					VecDestroy( &level->workSol );
 				//	FreeObject( level->workSol );
 				//Vector_Duplicate( self->curSolution, (void**)&level->workSol );
 				//Vector_SetLocalSize( level->workSol, size );
@@ -613,7 +613,7 @@ void PETScMGSolver_UpdateWorkVectors( PETScMGSolver* self ) {
 			VecGetLocalSize( level->workRHS, &vecSize );
                     if( !level->workRHS || /*Vector_GetLocalSize( level->workRHS )*/vecSize != size ) {
 				if( level->workRHS )
-					VecDestroy( level->workRHS );
+					VecDestroy( &level->workRHS );
 				//	FreeObject( level->workRHS );
 				//Vector_Duplicate( self->curSolution, (void**)&level->workRHS );
 				//Vector_SetLocalSize( level->workRHS, size );
@@ -640,7 +640,7 @@ void PETScMGSolver_UpdateSolvers( PETScMGSolver* self ) {
 	PC			levelPC;
 	PetscErrorCode		ec;
 	unsigned		l_i;
-	PetscTruth              smoothers_differ, flag;
+	PetscBool              smoothers_differ, flag;
 	PetscMPIInt             size;
         MPI_Comm                comm;
 
@@ -654,7 +654,7 @@ void PETScMGSolver_UpdateSolvers( PETScMGSolver* self ) {
 	ec = PCMGSetType( pc, PC_MG_MULTIPLICATIVE );
 	CheckPETScError( ec );
 
-	ec=PetscOptionsGetTruth( PETSC_NULL, "-pc_mg_different_smoothers", &smoothers_differ, &flag ); CheckPETScError(ec);
+	ec=PetscOptionsGetBool( PETSC_NULL, "-pc_mg_different_smoothers", &smoothers_differ, &flag ); CheckPETScError(ec);
 
 	ec=PetscObjectGetComm( (PetscObject)pc, &comm ); CheckPETScError(ec);
 	MPI_Comm_size( comm, &size );
@@ -734,8 +734,8 @@ void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
 			Stg_Class_RemoveRef( level->A );
 		*/
 		if( level->R != PETSC_NULL && level->R != level->P )
-                    MatDestroy( level->R );
-		if( level->P != PETSC_NULL ) MatDestroy( level->P );
+                    MatDestroy( &level->R );
+		if( level->P != PETSC_NULL ) MatDestroy( &level->P );
 /*
 		if( level->A != PETSC_NULL ) MatDestroy( level->A );
 */
@@ -744,11 +744,11 @@ void PETScMGSolver_DestructLevels( PETScMGSolver* self ) {
 		//FreeObject( level->workSol );
 		//FreeObject( level->workRHS );
                 if( level->workRes )
-                    VecDestroy( level->workRes );
+                    VecDestroy( &level->workRes );
                 if( level->workSol )
-                    VecDestroy( level->workSol );
+                    VecDestroy( &level->workSol );
                 if( level->workRHS )
-                    VecDestroy( level->workRHS );
+                    VecDestroy( &level->workRHS );
 	}
 
 	KillArray( self->levels );

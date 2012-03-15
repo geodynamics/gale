@@ -286,12 +286,12 @@ void _Stokes_SLE_PenaltySolver_Solve( void* solver,void* stokesSLE ) {
 	VecAXPY( hVec, negOne, hTempVec );    /* hTemp = H - hTemp   : hTemp = H - Div v */
 	MatMult( C_InvMat, hTempVec, pVec );  /* p = CInv hTemp      : p = CInv ( H - Div v ) */
 	
-	if( kHat != PETSC_NULL )     MatDestroy( kHat );
-	if( fTempVec != PETSC_NULL ) VecDestroy( fTempVec );
-	if( hTempVec != PETSC_NULL ) VecDestroy( hTempVec );
-	if( diagC != PETSC_NULL )    VecDestroy( diagC );
-	if( sles_v != PETSC_NULL )   KSPDestroy( sles_v );
-	if( GTrans != PETSC_NULL )   MatDestroy( GTrans );
+	if( kHat != PETSC_NULL )     MatDestroy( &kHat );
+	if( fTempVec != PETSC_NULL ) VecDestroy( &fTempVec );
+	if( hTempVec != PETSC_NULL ) VecDestroy( &hTempVec );
+	if( diagC != PETSC_NULL )    VecDestroy( &diagC );
+	if( sles_v != PETSC_NULL )   KSPDestroy( &sles_v );
+	if( GTrans != PETSC_NULL )   MatDestroy( &GTrans );
 }
 
 

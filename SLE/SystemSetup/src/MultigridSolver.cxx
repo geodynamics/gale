@@ -223,7 +223,7 @@ void MultigridSolver_SetComm( void* matrixSolver, MPI_Comm comm ) {
 	self->mgData->comm = comm;
 
 	if( self->mgData->ksp != PETSC_NULL )
-		KSPDestroy( self->mgData->ksp );
+		KSPDestroy( &self->mgData->ksp );
 	KSPCreate( comm, &self->mgData->ksp );
 }
 
@@ -573,7 +573,7 @@ void MultigridSolver_SetProlongation( void* matrixSolver, unsigned levelInd, voi
 	//if( level->P )
 	//	Stg_Class_RemoveRef( level->P );
 	if( level->P != PETSC_NULL )
-		MatDestroy( level->P );
+		MatDestroy( &level->P );
 	level->P = P;
 	//if( P )
 	//	Stg_Class_AddRef( P );
@@ -592,12 +592,12 @@ void MultigridSolver_SetLevelDownSolver( void* matrixSolver, unsigned levelInd, 
 		self->solversChanged = True;
 	if( level->downSolver ) {
 	//	Stg_Class_RemoveRef( level->downSolver );
-		if( level->downSolver->ksp != PETSC_NULL )         KSPDestroy( level->downSolver->ksp );
-		if( level->downSolver->matrix != PETSC_NULL )      MatDestroy( level->downSolver->matrix );
-		if( level->downSolver->inversion != PETSC_NULL )   MatDestroy( level->downSolver->inversion );
-		if( level->downSolver->residual != PETSC_NULL )    VecDestroy( level->downSolver->residual );
-		if( level->downSolver->curRHS != PETSC_NULL )      VecDestroy( level->downSolver->curRHS );
-		if( level->downSolver->curSolution != PETSC_NULL ) VecDestroy( level->downSolver->curSolution );
+		if( level->downSolver->ksp != PETSC_NULL )         KSPDestroy( &level->downSolver->ksp );
+		if( level->downSolver->matrix != PETSC_NULL )      MatDestroy( &level->downSolver->matrix );
+		if( level->downSolver->inversion != PETSC_NULL )   MatDestroy( &level->downSolver->inversion );
+		if( level->downSolver->residual != PETSC_NULL )    VecDestroy( &level->downSolver->residual );
+		if( level->downSolver->curRHS != PETSC_NULL )      VecDestroy( &level->downSolver->curRHS );
+		if( level->downSolver->curSolution != PETSC_NULL ) VecDestroy( &level->downSolver->curSolution );
 		free( level->downSolver );
 	}
 	level->downSolver = (MGSolver_PETScData*)solver;
@@ -628,12 +628,12 @@ void MultigridSolver_SetLevelUpSolver( void* matrixSolver, unsigned levelInd, vo
 		self->solversChanged = True;
 	if( level->upSolver ) {
 	//	Stg_Class_RemoveRef( level->downSolver );
-		if( level->upSolver->ksp != PETSC_NULL )         KSPDestroy( level->upSolver->ksp );
-		if( level->upSolver->matrix != PETSC_NULL )      MatDestroy( level->upSolver->matrix );
-		if( level->upSolver->inversion != PETSC_NULL )   MatDestroy( level->upSolver->inversion );
-		if( level->upSolver->residual != PETSC_NULL )    VecDestroy( level->upSolver->residual );
-		if( level->upSolver->curRHS != PETSC_NULL )      VecDestroy( level->upSolver->curRHS );
-		if( level->upSolver->curSolution != PETSC_NULL ) VecDestroy( level->upSolver->curSolution );
+		if( level->upSolver->ksp != PETSC_NULL )         KSPDestroy( &level->upSolver->ksp );
+		if( level->upSolver->matrix != PETSC_NULL )      MatDestroy( &level->upSolver->matrix );
+		if( level->upSolver->inversion != PETSC_NULL )   MatDestroy( &level->upSolver->inversion );
+		if( level->upSolver->residual != PETSC_NULL )    VecDestroy( &level->upSolver->residual );
+		if( level->upSolver->curRHS != PETSC_NULL )      VecDestroy( &level->upSolver->curRHS );
+		if( level->upSolver->curSolution != PETSC_NULL ) VecDestroy( &level->upSolver->curSolution );
 		free( level->upSolver );
 	}
 	level->upSolver = (MGSolver_PETScData*)solver;
@@ -871,12 +871,12 @@ void MultigridSolver_UpdateSolvers( MultigridSolver* self ) {
 
 			if( l_i == self->nLevels - 1 )
 				//MatrixSolver_SetUseInitialSolution( level->downSolver, True );
-				KSPSetInitialGuessNonzero( level->downSolver->ksp, (PetscTruth)True );
+				KSPSetInitialGuessNonzero( level->downSolver->ksp, (PetscBool)True );
 			else
 				//MatrixSolver_SetUseInitialSolution( level->downSolver, False );
-				KSPSetInitialGuessNonzero( level->downSolver->ksp, (PetscTruth)False );
+				KSPSetInitialGuessNonzero( level->downSolver->ksp, (PetscBool)False );
 			//MatrixSolver_SetUseInitialSolution( level->upSolver, True );
-			KSPSetInitialGuessNonzero( level->upSolver->ksp, (PetscTruth)True );
+			KSPSetInitialGuessNonzero( level->upSolver->ksp, (PetscBool)True );
 		}
 	}
 
@@ -909,7 +909,7 @@ void MultigridSolver_UpdateMatrices( MultigridSolver* self ) {
 			//if( mat ) {
 			if( mat != PETSC_NULL ) {
 				//KillObject( mat );
-				MatDestroy( mat );
+				MatDestroy( &mat );
 			}
 			MultigridSolver_RestrictMatrix( self, self->levels + l_i + 1, &mat );
 			level->A = mat;
@@ -985,7 +985,7 @@ void MultigridSolver_UpdateOps( MultigridSolver* self ) {
 			//Stg_Class_AddRef( level->P );
 		}
 		else
-			MatDestroy( pOps[l_i] );
+			MatDestroy( &pOps[l_i] );
 			//Stg_Class_RemoveRef( pOps[l_i] );
 
 
@@ -995,7 +995,7 @@ void MultigridSolver_UpdateOps( MultigridSolver* self ) {
 			//Stg_Class_AddRef( level->R );
 		}
 		else
-			MatDestroy( rOps[l_i] );
+			MatDestroy( &rOps[l_i] );
 			//Stg_Class_RemoveRef( rOps[l_i] );
 	}
 
@@ -1026,7 +1026,7 @@ void MultigridSolver_UpdateWorkVectors( MultigridSolver* self ) {
 			//Vector_Duplicate( self->curSolution, (void**)&level->workSol );
 			//Vector_SetLocalSize( level->workSol, rowSize );
 			if( level->workSol != PETSC_NULL )
-				VecDestroy( level->workSol );
+				VecDestroy( &level->workSol );
 			VecCreate( self->mgData->comm, &level->workSol );
 			VecSetSizes( level->workSol, rowSize, PETSC_DECIDE );
 			VecSetFromOptions( level->workSol );
@@ -1045,7 +1045,7 @@ void MultigridSolver_UpdateWorkVectors( MultigridSolver* self ) {
 			//Vector_Duplicate( self->curSolution, (void**)&level->workRHS );
 			//Vector_SetLocalSize( level->workRHS, rowSize );
 			if( level->workRHS != PETSC_NULL )
-				VecDestroy( level->workRHS );
+				VecDestroy( &level->workRHS );
 			VecCreate( self->mgData->comm, &level->workRHS );
 			VecSetSizes( level->workRHS, rowSize, PETSC_DECIDE );
 			VecSetFromOptions( level->workRHS );
@@ -1077,11 +1077,11 @@ MGSolver_PETScData* MultigridSolver_CreateOuterSolver( MultigridSolver* self, Ma
 	KSPGetPC( outerSolver->ksp, &pc );
 	PCSetType( pc, PCSOR );
 	if( outerSolver->matrix != PETSC_NULL )
-		MatDestroy( outerSolver->matrix );
+		MatDestroy( &outerSolver->matrix );
 	outerSolver->matrix = matrix;
 	KSPSetOperators( outerSolver->ksp, matrix, matrix, DIFFERENT_NONZERO_PATTERN );
 	KSPSetTolerances( outerSolver->ksp, PETSC_DEFAULT, PETSC_DEFAULT, PETSC_DEFAULT, (PetscInt)3 );
-	KSPSetInitialGuessNonzero( outerSolver->ksp, (PetscTruth)True );
+	KSPSetInitialGuessNonzero( outerSolver->ksp, (PetscBool)True );
 	KSPSetNormType( outerSolver->ksp, (KSPNormType)MultigridSolver_NormType_Preconditioned );
 
 	return outerSolver;
@@ -1108,7 +1108,7 @@ MGSolver_PETScData* MultigridSolver_CreateSmoother( MultigridSolver* self, Mat m
 	KSPGetPC( smoother->ksp, &pc );
 	PCSetType( pc, PCSOR );
 	if( smoother->matrix != PETSC_NULL )
-		MatDestroy( smoother->matrix );
+		MatDestroy( &smoother->matrix );
 	smoother->matrix = matrix;
 	KSPSetOperators( smoother->ksp, matrix, matrix, DIFFERENT_NONZERO_PATTERN );
 
@@ -1176,37 +1176,37 @@ void MultigridSolver_DestructLevels( MultigridSolver* self ) {
 		if( level->downSolver ) {
 			//Stg_Class_RemoveRef( MatrixSolver_GetMatrix( level->downSolver ) );
 			//Stg_Class_RemoveRef( level->downSolver );
-			if( level->downSolver->ksp != PETSC_NULL )         KSPDestroy( level->downSolver->ksp );
-			if( level->downSolver->matrix != PETSC_NULL )      MatDestroy( level->downSolver->matrix );
-			if( level->downSolver->inversion != PETSC_NULL )   MatDestroy( level->downSolver->inversion );
-			if( level->downSolver->residual != PETSC_NULL )    VecDestroy( level->downSolver->residual );
-			if( level->downSolver->curRHS != PETSC_NULL )      VecDestroy( level->downSolver->curRHS );
-			if( level->downSolver->curSolution != PETSC_NULL ) VecDestroy( level->downSolver->curSolution );
+			if( level->downSolver->ksp != PETSC_NULL )         KSPDestroy( &level->downSolver->ksp );
+			if( level->downSolver->matrix != PETSC_NULL )      MatDestroy( &level->downSolver->matrix );
+			if( level->downSolver->inversion != PETSC_NULL )   MatDestroy( &level->downSolver->inversion );
+			if( level->downSolver->residual != PETSC_NULL )    VecDestroy( &level->downSolver->residual );
+			if( level->downSolver->curRHS != PETSC_NULL )      VecDestroy( &level->downSolver->curRHS );
+			if( level->downSolver->curSolution != PETSC_NULL ) VecDestroy( &level->downSolver->curSolution );
 			free( level->downSolver );
 		}
 		if( level->upSolver ) {
 			//Stg_Class_RemoveRef( MatrixSolver_GetMatrix( level->upSolver ) );
 			//Stg_Class_RemoveRef( level->upSolver );
-			if( level->upSolver->ksp != PETSC_NULL )         KSPDestroy( level->upSolver->ksp );
-			if( level->upSolver->matrix != PETSC_NULL )      MatDestroy( level->upSolver->matrix );
-			if( level->upSolver->inversion != PETSC_NULL )   MatDestroy( level->upSolver->inversion );
-			if( level->upSolver->residual != PETSC_NULL )    VecDestroy( level->upSolver->residual );
-			if( level->upSolver->curRHS != PETSC_NULL )      VecDestroy( level->upSolver->curRHS );
-			if( level->upSolver->curSolution != PETSC_NULL ) VecDestroy( level->upSolver->curSolution );
+			if( level->upSolver->ksp != PETSC_NULL )         KSPDestroy( &level->upSolver->ksp );
+			if( level->upSolver->matrix != PETSC_NULL )      MatDestroy( &level->upSolver->matrix );
+			if( level->upSolver->inversion != PETSC_NULL )   MatDestroy( &level->upSolver->inversion );
+			if( level->upSolver->residual != PETSC_NULL )    VecDestroy( &level->upSolver->residual );
+			if( level->upSolver->curRHS != PETSC_NULL )      VecDestroy( &level->upSolver->curRHS );
+			if( level->upSolver->curSolution != PETSC_NULL ) VecDestroy( &level->upSolver->curSolution );
 			free( level->upSolver );
 		}
 		if( level->R != PETSC_NULL )
 			//Stg_Class_RemoveRef( level->R );
-			MatDestroy( level->R );
+			MatDestroy( &level->R );
 		if( level->P != PETSC_NULL )
 			//Stg_Class_RemoveRef( level->P );
-			MatDestroy( level->P );
+			MatDestroy( &level->P );
 		if( level->workRHS != PETSC_NULL )
 			//Stg_Class_RemoveRef( level->workRHS );
-			VecDestroy( level->workRHS );
+			VecDestroy( &level->workRHS );
 		if( level->workSol != PETSC_NULL )
 			//Stg_Class_RemoveRef( level->workSol );
-			VecDestroy( level->workSol );
+			VecDestroy( &level->workSol );
 	}
 
 	KillArray( self->levels );
@@ -1216,12 +1216,12 @@ void MultigridSolver_DestructLevels( MultigridSolver* self ) {
 
 	/* Temporary. */
 	//KillObject( self->outerSolver );
-	if( self->outerSolver->ksp )         KSPDestroy( self->outerSolver->ksp );
-	if( self->outerSolver->matrix )      MatDestroy( self->outerSolver->matrix );
-	if( self->outerSolver->inversion )   MatDestroy( self->outerSolver->inversion );
-	if( self->outerSolver->residual )    VecDestroy( self->outerSolver->residual );
-	if( self->outerSolver->curRHS )      VecDestroy( self->outerSolver->curRHS );
-	if( self->outerSolver->curSolution ) VecDestroy( self->outerSolver->curSolution );
+	if( self->outerSolver->ksp )         KSPDestroy( &self->outerSolver->ksp );
+	if( self->outerSolver->matrix )      MatDestroy( &self->outerSolver->matrix );
+	if( self->outerSolver->inversion )   MatDestroy( &self->outerSolver->inversion );
+	if( self->outerSolver->residual )    VecDestroy( &self->outerSolver->residual );
+	if( self->outerSolver->curRHS )      VecDestroy( &self->outerSolver->curRHS );
+	if( self->outerSolver->curSolution ) VecDestroy( &self->outerSolver->curSolution );
 	free( self->outerSolver );
 }
 

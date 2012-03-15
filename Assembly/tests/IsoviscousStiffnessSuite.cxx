@@ -76,9 +76,12 @@ void IsoviscousStiffness2D( IsoviscousStiffnessData* data ) {
 	Journal_Printf( infoStream, "Checking with file '%s'\n", filename );
 
 	pcu_filename_expected( filename, expected_file );
-	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
+	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ,
+                               &expViewer );
 
-	MatLoad( expViewer, MATAIJ, &expected );
+        MatCreate( context->communicator, &expected );
+        MatSetType( expected, MATAIJ );
+	MatLoad( expected, expViewer );
 
 	MatNorm( expected, NORM_FROBENIUS, &matrixNorm );
 	assert( matrixNorm != 0 );

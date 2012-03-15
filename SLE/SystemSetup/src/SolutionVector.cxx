@@ -253,7 +253,7 @@ void _SolutionVector_Destroy( void* solutionVector, void* data ) {
 
 	//FreeObject( self->vector );
 	if( self->vector != PETSC_NULL )
-		VecDestroy( self->vector );
+		VecDestroy( &self->vector );
 }
 
 void SolutionVector_ApplyBCsToVariables( void* solutionVector, void* data ) {

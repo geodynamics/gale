@@ -164,7 +164,7 @@ int GenerateEquationNumbering(
 	int			NX, int NY, int NZ,
 	int			nlocal, int g_node_id[],
 	int			dof, int nglobal,
-	PetscTruth	periodic_x, PetscTruth periodic_y, PetscTruth periodic_z,
+	PetscBool	periodic_x, PetscBool periodic_y, PetscBool periodic_z,
 	int			npx, int npy, int npz,
 	int			periodic_x_gnode_id[], int periodic_y_gnode_id[], int periodic_z_gnode_id[],
 	int			eqnums[], int *neqnums );
@@ -2624,7 +2624,7 @@ int GenerateEquationNumbering(
 		int NX, int NY, int NZ,
 		int nlocal, int g_node_id[],
 		int dof, int nglobal,
-		PetscTruth periodic_x, PetscTruth periodic_y, PetscTruth periodic_z,
+		PetscBool periodic_x, PetscBool periodic_y, PetscBool periodic_z,
 		int npx, int npy, int npz,
 		int periodic_x_gnode_id[], int periodic_y_gnode_id[], int periodic_z_gnode_id[],
 		int eqnums[], int *neqnums );
@@ -2718,7 +2718,7 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
       GenerateEquationNumbering( vGrid->sizes[0], vGrid->sizes[1], 1,
 				 nLocals, locals,
 				 nDofs, Mesh_GetGlobalSize( self->feMesh, (MeshTopology_Dim)0 ),
-				 (PetscTruth)periodic[0], (PetscTruth)periodic[1], (PetscTruth)False,
+				 (PetscBool)periodic[0], (PetscBool)periodic[1], (PetscBool)False,
 				 nPeriodicInds[0], nPeriodicInds[1], 0,
 				 periodicInds[0], periodicInds[1], NULL,
 				 dstArray[0], &nEqNums );
@@ -2727,7 +2727,7 @@ void FeEquationNumber_BuildWithDave( FeEquationNumber* self ) {
       GenerateEquationNumbering( vGrid->sizes[0], vGrid->sizes[1], vGrid->sizes[2],
 				 nLocals, locals,
 				 nDofs, Mesh_GetGlobalSize( self->feMesh, (MeshTopology_Dim)0 ),
-				 (PetscTruth)periodic[0], (PetscTruth)periodic[1], (PetscTruth)periodic[2],
+				 (PetscBool)periodic[0], (PetscBool)periodic[1], (PetscBool)periodic[2],
 				 nPeriodicInds[0], nPeriodicInds[1], nPeriodicInds[2],
 				 periodicInds[0], periodicInds[1], periodicInds[2],
 				 dstArray[0], &nEqNums );
@@ -2881,7 +2881,7 @@ int GenerateEquationNumbering(
 		int NX, int NY, int NZ,
 		int nlocal, int g_node_id[],
 		int dof, int nglobal,
-		PetscTruth periodic_x, PetscTruth periodic_y, PetscTruth periodic_z,
+		PetscBool periodic_x, PetscBool periodic_y, PetscBool periodic_z,
 		int npx, int npy, int npz,
 		int periodic_x_gnode_id[], int periodic_y_gnode_id[], int periodic_z_gnode_id[],
 		int eqnums[], int *neqnums )
@@ -2917,7 +2917,7 @@ int GenerateEquationNumbering(
 	ierr = MPI_Comm_size(PETSC_COMM_WORLD,&size);CHKERRQ(ierr);
 	
 	if( dof>=10 ) {
-		SETERRQ(PETSC_ERR_SUP, "Max allowable degrees of freedom per node = 10. Change static size" );
+          SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_SUP, "Max allowable degrees of freedom per node = 10. Change static size" );
 	}
 	
 	
@@ -2970,7 +2970,8 @@ int GenerateEquationNumbering(
 	for( i=0; i<nlocal; i++ ) {
 		_g_node_id[i] = g_node_id[i]; 
 	}
-	ISCreateGeneralWithArray( PETSC_COMM_WORLD, nlocal, _g_node_id, &is_gnode );
+	ISCreateGeneral( PETSC_COMM_WORLD, nlocal, _g_node_id,
+                         PETSC_USE_POINTER, &is_gnode );
 	VecScatterCreate( g_ownership, is_gnode, local_ownership, PETSC_NULL, &vscat_ownership );
 	
 	
@@ -3006,7 +3007,7 @@ int GenerateEquationNumbering(
 	}
 	total = spanx*spany*spanz;
 	if( total!=global_eqnum_count ) {
-		SETERRQ(PETSC_ERR_SUP, "Something stinks. Computed global size for nodes does not match expected" );
+          SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_SUP, "Something stinks. Computed global size for nodes does not match expected" );
 	}
 	
 	
@@ -3058,7 +3059,8 @@ int GenerateEquationNumbering(
 	VecSetSizes( local_eqnum, PETSC_DECIDE, number_to_fetch);
 	VecSetFromOptions( local_eqnum );
 	
-	ISCreateGeneralWithArray( PETSC_COMM_SELF, number_to_fetch, to_fetch, &is_eqnum );
+	ISCreateGeneral( PETSC_COMM_SELF, number_to_fetch, to_fetch,
+                         PETSC_USE_POINTER, &is_eqnum );
 	VecScatterCreate( global_eqnum, is_eqnum, local_eqnum, PETSC_NULL, &vscat_eqnum );
 	
 	VecSet( local_eqnum, -6699 );
@@ -3099,9 +3101,9 @@ int GenerateEquationNumbering(
 		offset = _seq_offset_list[ rank ];
 		VecRestoreArray( seq_offset_list, &_seq_offset_list );
 	}
-	VecScatterDestroy(vscat_offset);
-	VecDestroy(offset_list);
-	VecDestroy(seq_offset_list);
+	VecScatterDestroy(&vscat_offset);
+	VecDestroy(&offset_list);
+	VecDestroy(&seq_offset_list);
 	
 	/* PetscPrintf( PETSC_COMM_SELF, "[%d]: offset = %d \n", rank, offset ); */
 	
@@ -3157,7 +3159,8 @@ int GenerateEquationNumbering(
 		VecSetSizes( mapped, PETSC_DECIDE, npx*dof );
 		VecSetFromOptions( mapped );
 		
-		ISCreateGeneralWithArray( PETSC_COMM_SELF, npx*dof, from, &is_from );
+		ISCreateGeneral( PETSC_COMM_SELF, npx*dof, from,
+                                 PETSC_USE_POINTER, &is_from );
 		VecScatterCreate( global_eqnum, is_from, mapped, PETSC_NULL, &vscat_p );
 		
 		_VecScatterBeginEnd( vscat_p, global_eqnum, mapped, INSERT_VALUES, SCATTER_FORWARD );
@@ -3170,9 +3173,9 @@ int GenerateEquationNumbering(
 		VecAssemblyBegin(global_eqnum);
 		VecAssemblyEnd(global_eqnum);
 		
-		VecScatterDestroy( vscat_p );
-		ISDestroy( is_from );
-		VecDestroy( mapped );
+		VecScatterDestroy( &vscat_p );
+		ISDestroy( &is_from );
+		VecDestroy( &mapped );
 		PetscFree( from );
 		PetscFree( to );
 	}
@@ -3211,7 +3214,8 @@ int GenerateEquationNumbering(
 		VecSetSizes( mapped, PETSC_DECIDE, npy*dof );
 		VecSetFromOptions( mapped );
 		
-		ISCreateGeneralWithArray( PETSC_COMM_SELF, npy*dof, from, &is_from );
+		ISCreateGeneral( PETSC_COMM_SELF, npy*dof, from,
+                                 PETSC_USE_POINTER, &is_from );
 		VecScatterCreate( global_eqnum, is_from, mapped, PETSC_NULL, &vscat_p );
 		
 		_VecScatterBeginEnd( vscat_p, global_eqnum, mapped, INSERT_VALUES, SCATTER_FORWARD );
@@ -3224,9 +3228,9 @@ int GenerateEquationNumbering(
 		VecAssemblyBegin(global_eqnum);
 		VecAssemblyEnd(global_eqnum);
 		
-		VecScatterDestroy( vscat_p );
-		ISDestroy( is_from );
-		VecDestroy( mapped );
+		VecScatterDestroy( &vscat_p );
+		ISDestroy( &is_from );
+		VecDestroy( &mapped );
 		PetscFree( from );
 		PetscFree( to );
 	}
@@ -3264,7 +3268,8 @@ int GenerateEquationNumbering(
 		VecSetSizes( mapped, PETSC_DECIDE, npz*dof );
 		VecSetFromOptions( mapped );
 		
-		ISCreateGeneralWithArray( PETSC_COMM_SELF, npz*dof, from, &is_from );
+		ISCreateGeneral( PETSC_COMM_SELF, npz*dof, from,
+                                 PETSC_USE_POINTER, &is_from );
 		VecScatterCreate( global_eqnum, is_from, mapped, PETSC_NULL, &vscat_p );
 		
 		_VecScatterBeginEnd( vscat_p, global_eqnum, mapped, INSERT_VALUES, SCATTER_FORWARD );
@@ -3277,9 +3282,9 @@ int GenerateEquationNumbering(
 		VecAssemblyBegin(global_eqnum);
 		VecAssemblyEnd(global_eqnum);
 		
-		VecScatterDestroy( vscat_p );
-		ISDestroy( is_from );
-		VecDestroy( mapped );
+		VecScatterDestroy( &vscat_p );
+		ISDestroy( &is_from );
+		VecDestroy( &mapped );
 		PetscFree( from );
 		PetscFree( to );
 	}
@@ -3310,7 +3315,9 @@ int GenerateEquationNumbering(
 			}
 		}
 		
-		ISCreateGeneralWithArray( PETSC_COMM_SELF, nlocal*dof, all_my_eqnum_index, &is_all_my_eqnums );
+		ISCreateGeneral( PETSC_COMM_SELF, nlocal*dof,
+                                 all_my_eqnum_index, PETSC_USE_POINTER,
+                                 &is_all_my_eqnums );
 		VecCreate( PETSC_COMM_SELF, &all_my_eqnums );
 		VecSetSizes( all_my_eqnums, PETSC_DECIDE, nlocal*dof );
 		VecSetFromOptions( all_my_eqnums );
@@ -3323,9 +3330,9 @@ int GenerateEquationNumbering(
 		}
 		VecRestoreArray( all_my_eqnums, &_all_my_eqnums );
 		
-		VecScatterDestroy( vscat_p );
-		VecDestroy( all_my_eqnums );
-		ISDestroy( is_all_my_eqnums );
+		VecScatterDestroy( &vscat_p );
+		VecDestroy( &all_my_eqnums );
+		ISDestroy( &is_all_my_eqnums );
 		PetscFree( all_my_eqnum_index );
 	}
 	
@@ -3337,17 +3344,17 @@ int GenerateEquationNumbering(
 	VecRestoreArray( local_ownership, &_local_ownership );
 	
 	
-	VecDestroy( g_ownership );
-	VecDestroy( local_ownership );
+	VecDestroy( &g_ownership );
+	VecDestroy( &local_ownership );
 	PetscFree( _g_node_id );
-	ISDestroy( is_gnode );
-	VecScatterDestroy( vscat_ownership );
+	ISDestroy( &is_gnode );
+	VecScatterDestroy( &vscat_ownership );
 	
-	VecDestroy( global_eqnum );
-	VecDestroy( local_eqnum );
+	VecDestroy( &global_eqnum );
+	VecDestroy( &local_eqnum );
 	PetscFree( to_fetch );
-	ISDestroy( is_eqnum );
-	VecScatterDestroy( vscat_eqnum );
+	ISDestroy( &is_eqnum );
+	VecScatterDestroy( &vscat_eqnum );
 	
 	return 0;
 }

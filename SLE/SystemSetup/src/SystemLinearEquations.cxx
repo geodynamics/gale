@@ -516,10 +516,10 @@ void _SystemLinearEquations_Destroy( void* sle, void* _context ) {
 
 	Memory_Free( self->optionsPrefix );
 
-	VecDestroy( self->X );
-	VecDestroy( self->F );
-	MatDestroy( self->A );
-	MatDestroy( self->J );
+	VecDestroy( &self->X );
+	VecDestroy( &self->F );
+	MatDestroy( &self->A );
+	MatDestroy( &self->J );
 
 	/* Free the the MG handles. */
 	FreeArray( self->mgHandles );
@@ -678,7 +678,7 @@ void SystemLinearEquations_NewtonInitialise( void* _context, void* data ) {
 
 	/* don't assume that a snes is being used for initial guess, check for this!!! */
 	if( oldSnes && context->timeStep == 0 && !sle->linearSolveInitGuess )
-		SNESDestroy( oldSnes );
+		SNESDestroy( &oldSnes );
 
 	SNESCreate( sle->comm, &snes );
 
@@ -710,7 +710,7 @@ void SystemLinearEquations_NewtonFinalise( void* _context, void* data ) {
 
 	sle->_updateOldFields( &sle->X, context );
 	
-	SNESDestroy( snes );	
+	SNESDestroy( &snes );	
 }
 
 void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
@@ -721,7 +721,7 @@ void SystemLinearEquations_NewtonMFFDExecute( void* sle, void* _context ) {
 
 	/* creates the nonlinear solver */
 	if( self->nlSolver != PETSC_NULL )
-		SNESDestroy( self->nlSolver );
+		SNESDestroy( &self->nlSolver );
 	SNESCreate( self->comm, &self->nlSolver );
 	SNESSetFunction( self->nlSolver, F, self->_buildF, _context );
 
@@ -902,7 +902,7 @@ void SystemLinearEquations_NonLinearExecute( void* sle, void* _context ) {
 
 	Stream_UnIndentBranch( StgFEM_Debug );
 
-	VecDestroy( previousVector );
+	VecDestroy( &previousVector );
 	
 	/*Set all the printout variables */
         if( solver->totalnumnonlinearits ) {
@@ -1164,7 +1164,7 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   PetscReal snes_ttol, snes_rtol, snes_abstol, snes_xtol;
   PetscInt  snes_maxits;
 
-  PetscTruth monitor_flg;
+  PetscBool monitor_flg;
 
   /* setup temporary some vectors */
   solver->_getSolution( self, solver, &Xstar );
@@ -1266,10 +1266,10 @@ void SystemLinearEquations_PicardExecute( void *sle, void *_context )
   if (monitor_flg==PETSC_TRUE)
     PetscPrintf( PETSC_COMM_WORLD, "Nonlinear solve converged due to %s \n", SNESConvergedReasons[snes_reason] );
 
-  VecDestroy( X );
-  VecDestroy( F );
-  VecDestroy( Y );
-  VecDestroy( delta_X );
+  VecDestroy( &X );
+  VecDestroy( &F );
+  VecDestroy( &Y );
+  VecDestroy( &delta_X );
 
 }
 
