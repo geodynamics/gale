@@ -17,6 +17,7 @@ const Type BaseRecoveryFeVar_Type = "BaseRecoveryFeVar";
 void* _BaseRecoveryFeVar_DefaultNew( Name name ) {
   /* this is an abstract call so this function should never be called */
 	assert(0);
+        return NULL;
 }
 BaseRecoveryFeVar* _BaseRecoveryFeVar_New(  BASERECOVERYFEVAR_DEFARGS  ) 
 {

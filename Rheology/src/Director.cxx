@@ -475,7 +475,6 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 	double*                  normal;
 	MaterialPoint*           materialPoint = (MaterialPoint*) Swarm_ParticleAt( materialPointsSwarm, lParticle_I );
 	Director_ParticleExt*    particleExt;
-	InterpolationResult      result;
 
 	/* Get particle extension info - this will contain vector with director */
 	particleExt = (Director_ParticleExt*) ExtensionManager_Get( materialPointsSwarm->particleExtensionMgr,
@@ -489,7 +488,11 @@ Bool _Director_TimeDerivative( void* director, Index lParticle_I, double* timeDe
 
 	normal     = particleExt->director;
 
-	result = FieldVariable_InterpolateValueAt( self->velGradField, materialPoint->coord, velGrad );
+#ifdef DEBUG
+	InterpolationResult      result;
+	result = 
+#endif
+          FieldVariable_InterpolateValueAt( self->velGradField, materialPoint->coord, velGrad );
 	/* if in debug mode, perform some tests */
 #ifdef DEBUG
 	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(velGrad[0]) || isinf(velGrad[1]) || 

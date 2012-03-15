@@ -441,11 +441,8 @@ void _Underworld_EulerDeform_Build(void* component, void* data)
 
 
 void _Underworld_EulerDeform_Destroy( void* component, void* data ) {
-	Codelet*					ed	= (Codelet*)component;
-	UnderworldContext*	uwCtx = (UnderworldContext*)ed->context;
-
 	assert( component );
-	assert( uwCtx );
+	assert( (UnderworldContext*)((Codelet*)component)->context );
 
 	/* Clear the lot. */
 	/* TODO */

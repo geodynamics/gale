@@ -392,10 +392,8 @@ void _Underworld_HRS_Erosion_Build( void* codelet, void* data ) {
 }
 
 void _Underworld_HRS_Erosion_Destroy( void* codelet, void* data ) {
-	UnderworldContext*	UnderworldCtx = (UnderworldContext*)data;
-
 	assert( codelet );
-	assert( UnderworldCtx );
+	assert( (UnderworldContext*)data );
 
 	/* Clear the lot. */
 	/* TODO */
