@@ -73,7 +73,7 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
 
-	MatLoad( expViewer, MATAIJ, &expected );
+	MatLoad( expected, expViewer );
 
 	/* 
 		 To view the expected and computed matricies uncomment this
@@ -101,8 +101,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D( ViscousSuiteData* data ) {
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
-   PetscViewerDestroy( expViewer );
-   MatDestroy( expected);
+   PetscViewerDestroy( &expViewer );
+   MatDestroy( &expected);
 	stgMainDestroy( cf );
 }
 
@@ -155,7 +155,7 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D( ViscousSuiteData* data ) {
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
 
-	MatLoad( expViewer, MATAIJ, &expected );
+	MatLoad( expected, expViewer );
 
 	/* 
 		 To view the expected and computed matricies uncomment this
@@ -183,8 +183,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D( ViscousSuiteData* data ) {
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
-   PetscViewerDestroy( expViewer );
-   MatDestroy( expected);
+   PetscViewerDestroy( &expViewer );
+   MatDestroy( &expected);
 	stgMainDestroy( cf );
 }
 
@@ -237,7 +237,7 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
 
-	MatLoad( expViewer, MATAIJ, &expected );
+	MatLoad( expected, expViewer );
 	/* 
 		 To view the expected and computed matricies uncomment this
 	PetscViewerASCIIOpen(context->communicator, "numerical.dat",&currViewer);
@@ -264,8 +264,8 @@ void ViscousSuite_MaterialViscosityStiffnessMatrix2D( ViscousSuiteData* data ) {
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
-   PetscViewerDestroy( expViewer );
-   MatDestroy( expected);
+   PetscViewerDestroy( &expViewer );
+   MatDestroy( &expected);
 	stgMainDestroy( cf );
 }
 
@@ -318,7 +318,7 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) 
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
 
-	MatLoad( expViewer, MATAIJ, &expected );
+	MatLoad( expected, expViewer );
 
 	/* 
 		 To view the expected and computed matricies uncomment this
@@ -346,8 +346,8 @@ void ViscousSuite_ArrheniusStiffnessMatrix2D_DualMesh( ViscousSuiteData* data ) 
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
-   PetscViewerDestroy( expViewer );
-   MatDestroy( expected);
+   PetscViewerDestroy( &expViewer );
+   MatDestroy( &expected);
 	stgMainDestroy( cf );
 }
 
@@ -400,7 +400,7 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* 
 	pcu_filename_expected( filename, expected_file );
 	PetscViewerBinaryOpen( context->communicator, expected_file, FILE_MODE_READ, &expViewer );
 
-	MatLoad( expViewer, MATAIJ, &expected );
+	MatLoad( expected, expViewer );
 
 	/* 
 		 To view the expected and computed matricies uncomment this
@@ -428,8 +428,8 @@ void ViscousSuite_FrankKamenetskiiStiffnessMatrix2D_DualMesh( ViscousSuiteData* 
 		if( err == -1 ) printf("Error in %s, can't delete the input.xml\n", __func__);
 	}
 
-   PetscViewerDestroy( expViewer );
-   MatDestroy( expected);
+   PetscViewerDestroy( &expViewer );
+   MatDestroy( &expected);
 	stgMainDestroy( cf );
 }
 
