@@ -50,7 +50,10 @@ void _NewClass_Init( void* _self ) {
 }
 
 void _NewClass_Destruct( void* _self ) {
-   NewClass* self = Class_Cast( _self, NewClass );
+#ifndef NDEBUG
+   NewClass* self = 
+#endif
+     Class_Cast( _self, NewClass );
 
 #ifndef NDEBUG
    if( ((NewClass*)self)->curAllocd != 0 ) {
