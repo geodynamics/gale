@@ -487,8 +487,6 @@ void _FiniteElementContext_SaveMesh( void* context ) {
 #ifndef WRITE_HDF5
 void _FiniteElementContext_DumpMeshAscii( void* context, FeMesh* feMesh ) {
    FiniteElementContext*   self = (FiniteElementContext*) context;
-   FieldVariable*    fieldVar = NULL;
-	FeVariable*       feVar = NULL;
 	Mesh* 			   mesh;
 	int 			      rank, nRanks;  
 	FILE*			      outputFile;

@@ -1949,9 +1949,9 @@ void FeVariable_SaveToFile( void* feVariable, Name filename, Bool saveCoords ) {
    Stream*           errorStr = Journal_Register( Error_Type, (Name)self->type  );
    const int         FINISHED_WRITING_TAG = 100;
    int               confirmation = 0;
-   MeshGenerator*    theGenerator;
    
 #ifdef WRITE_HDF5
+   MeshGenerator*    theGenerator;
    hid_t             file, fileSpace, fileData;
    hid_t             memSpace;
    hsize_t           start[2], count[2], size[2];
@@ -2198,9 +2198,9 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
 	unsigned		       nRanks;
 	Bool               savedCoords = False;
 	Stream*            errorStr = Journal_Register( Error_Type, (Name)self->type  );
-   MeshGenerator*    theGenerator;
 	
 #ifdef READ_HDF5
+   MeshGenerator*    theGenerator;
    hid_t                   file, fileSpace, fileData, error;
    unsigned                totalNodes, ii, noffset;
    hid_t                   memSpace;
@@ -2211,10 +2211,9 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
 #else
    unsigned          uTemp;  
    double            temp[3];  
-   int               count = 0;     
    char               lineString[MAX_LINE_LENGTH_DEFINE];
-	const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
-   int               offset, n;
+   const unsigned int MAX_LINE_LENGTH = MAX_LINE_LENGTH_DEFINE;
+   unsigned int               offset, n;
 #endif   	
 
 	MPI_Comm_rank( comm, (int*)&rank );
@@ -2426,6 +2425,7 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
    fgets( lineString, MAX_LINE_LENGTH, inputFile );
    
    sscanf( lineString, "%u%n ", &uTemp, &offset );
+   unsigned int count = 0;     
    while( sscanf( lineString + offset, "%lf%n ", &temp[0], &n ) )
    {
       offset += n;
@@ -2439,9 +2439,9 @@ void FeVariable_ReadFromFile( void* feVariable, Name filename ) {
     
    rewind( inputFile );
       
-	/** Need to re-set the geometry here, in case we're loading from a checkpoint that had compression/squashing BCs,
-		and hence ended up with a smaller mesh than the original */
-	unsigned int nDims = Mesh_GetDimSize( self->feMesh );
+	/** Need to re-set the geometry here, in case we're loading
+            from a checkpoint that had compression/squashing BCs, and
+            hence ended up with a smaller mesh than the original */
 	while ( !feof(inputFile) ) {
 		fscanf( inputFile, "%u ", &gNode_I );
 		

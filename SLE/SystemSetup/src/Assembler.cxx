@@ -321,7 +321,6 @@ void Assembler_LoopMatrixElement( void* assembler, unsigned element ) {
 
 void Assembler_LoopMatrixDiagonal( void* assembler ) {
 	Assembler*		self = (Assembler*)assembler;
-	unsigned		nDims;
 	FeVariable		*rowVar;
 	FeMesh			*rowMesh;
 	FeEquationNumber	*rowEqNum;
@@ -339,7 +338,7 @@ void Assembler_LoopMatrixDiagonal( void* assembler ) {
 	rowEqNum = rowVar->eqNum;			assert( rowEqNum );
 	rowMesh = rowVar->feMesh;
 	rowDofs = rowVar->dofLayout;			assert( rowDofs );
-	nDims = Mesh_GetDimSize( rowMesh );		assert( nDims );
+	assert(Mesh_GetDimSize( rowMesh ));
 	nRowNodes = FeMesh_GetNodeLocalSize( rowMesh );
 	assert( rowEqNum->destinationArray );
 	assert( rowDofs->dofCounts );

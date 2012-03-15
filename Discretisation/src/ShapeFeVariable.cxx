@@ -121,11 +121,8 @@ void _ShapeFeVariable_Print( void* _shapeFeVariable, Stream* stream ) {
 }
 
 void* _ShapeFeVariable_Copy( const void* shapeFeVariable, void* dest, Bool deep, Name nameExt, PtrMap* ptrMap ) {
-	/* ShapeFeVariable*	self = (ShapeFeVariable*)shapeFeVariable; */
-	ShapeFeVariable* newShapeFeVariable;
-	
-	assert(0);
-	return (void*)newShapeFeVariable;
+	abort();
+	return NULL;
 }
 
 void _ShapeFeVariable_AssignFromXML( void* shapeFeVariable, Stg_ComponentFactory* cf, void* data ) {

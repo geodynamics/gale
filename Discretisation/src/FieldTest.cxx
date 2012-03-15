@@ -629,10 +629,10 @@ void FieldTest_BuildErrField( void* fieldTest, Index field_I ) {
 }
 
 void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name referenceSolnName, Name referenceSolnPath, DomainContext* context ) {
+#ifdef READ_HDF5
 	FeMesh*			feMesh			= feVariable->feMesh;
 	char*			filename;
 	unsigned		nx = 0, ny = 0, nz = 0, total;
-	unsigned		lineNum = 0;
 	double			resolution[3];
 	double*			coord;
 	Index			node_I, dim_I;
@@ -653,14 +653,11 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	double 			a1, b1, c1;
 	double 			a2, b2, c2;
 	double 			m0, m1, m2, m3, m4, m5, m6;
-#ifdef READ_HDF5
 	hid_t			inputFile;
 	hid_t 			dataSet, memSpace, dataSpace;
 	hsize_t 		start[2], count[2], hSize;
-#endif
 	int 			sizes[3];
 	double* 		data;
-	int 			dataPos = 0;
 
 	Stg_Component_Initialise( feMesh,     context, False );
 	Stg_Component_Initialise( feVariable, context, False );
@@ -669,7 +666,6 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 													  /* .  h5  \0 */
 	filename = Memory_Alloc_Array_Unnamed( char, strlen(referenceSolnPath) + strlen(referenceSolnName) + 1 + 2 + 1 );
 	sprintf( filename, "%s%s.h5", referenceSolnPath, referenceSolnName );
-#ifdef READ_HDF5
 	inputFile = H5Fopen( filename, H5F_ACC_RDONLY, H5P_DEFAULT );
 #if H5_VERS_MAJOR == 1 && H5_VERS_MINOR < 8
 	dataSet = H5Dopen( inputFile, "/size" );
@@ -706,12 +702,12 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	count[0] = 1;
 	count[1] = nDims + dofAtEachNodeCount;
 	H5Sselect_hyperslab( dataSpace, H5S_SELECT_SET, start, NULL, count, NULL );
-	for( lineNum = 0; lineNum < total; lineNum++ ) {
+	for( unsigned lineNum = 0; lineNum < total; lineNum++ ) {
 		start[0] = lineNum;
 		H5Sselect_hyperslab( dataSpace, H5S_SELECT_SET, start, NULL, count, NULL );
 		H5Dread( dataSet, H5T_NATIVE_DOUBLE, memSpace, dataSpace, H5P_DEFAULT, data );
 
-      dataPos  = 0;
+                int dataPos  = 0;
 		posx[lineNum] = data[dataPos++];
 		posy[lineNum] = data[dataPos++];
 		if( nDims == 3 ) posz[lineNum] = data[dataPos++];
@@ -723,7 +719,6 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	H5Sclose( memSpace );
 	H5Sclose( dataSpace );
 	H5Dclose( dataSet );
-#endif
 	Memory_Free( data );
 
 	resolution[0] = posx[1]  - posx[0];
@@ -854,7 +849,6 @@ void FieldTest_LoadReferenceSolutionFromFile( FeVariable* feVariable, Name refer
 	if( nDims == 3 ) Memory_Free( posz );
 	Memory_Free( variables );
 
-#ifdef READ_HDF5
 	H5Fclose( inputFile );
 #endif
 }

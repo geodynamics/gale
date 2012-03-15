@@ -658,11 +658,23 @@ void OperatorFeVariable_BinaryValueAtNodeFunc( void* feVariable, Node_DomainInde
 	/* field variables are using different meshes, so interpolate the values of each based on the global coord */
 	else {  
 		coord = Mesh_GetVertex( self->feMesh, dNode_I );
-		assert( Mesh_SearchElements( field0->feMesh, coord, &field0Element ) );
+#ifndef NDEBUG
+                Bool found=
+#endif
+		Mesh_SearchElements( field0->feMesh, coord, &field0Element);
+#ifndef NDEBUG
+                assert(found);
+#endif
 		FeMesh_CoordGlobalToLocal( field0->feMesh, field0Element, coord, field0LocalCoord );
 		FeVariable_InterpolateWithinElement( field0, field0Element, field0LocalCoord, fieldValue0 );
 		
-		assert( Mesh_SearchElements( field1->feMesh, coord, &field1Element ) ); 
+#ifndef NDEBUG
+		found=
+#endif
+                Mesh_SearchElements( field1->feMesh, coord, &field1Element);
+#ifndef NDEBUG
+                assert(found);
+#endif
 		FeMesh_CoordGlobalToLocal( field1->feMesh, field1Element, coord, field1LocalCoord );
 		FeVariable_InterpolateWithinElement( field1, field1Element, field1LocalCoord, fieldValue1 );
 	}
