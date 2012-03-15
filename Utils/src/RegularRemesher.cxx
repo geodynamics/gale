@@ -499,10 +499,10 @@ void _RegularRemesher_Remesh( void* _self ) {
       }
       VecRestoreArray( x, &soln );
 
-      KSPDestroy( ksp );
-      MatDestroy( A );
-      VecDestroy( b );
-      VecDestroy( x );
+      KSPDestroy( &ksp );
+      MatDestroy( &A );
+      VecDestroy( &b );
+      VecDestroy( &x );
 
 
 #if 0
