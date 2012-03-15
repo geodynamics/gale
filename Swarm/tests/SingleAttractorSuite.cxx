@@ -79,7 +79,6 @@ void SingleAttractorSuite_Teardown( SingleAttractorSuiteData* data ) {
 
 void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) {
 	Dictionary*					dictionary;
-	Dictionary*					componentDict;
 	Stg_ComponentFactory*	cf;
 	Swarm*						swarm = NULL;
 	Particle						particle;
@@ -101,8 +100,7 @@ void SingleAttractorSuite_TestSingleAttractor( SingleAttractorSuiteData* data ) 
 
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
-	componentDict = Dictionary_GetDictionary( dictionary, "components" );
-	assert( componentDict );
+	assert( Dictionary_GetDictionary( dictionary, "components" ) );
 
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 

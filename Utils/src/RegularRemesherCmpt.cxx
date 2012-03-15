@@ -191,9 +191,7 @@ void _RegularRemesherCmpt_Build( void* remesher, void* data ) {
 
 
 void _RegularRemesherCmpt_Initialise( void* remesher, void* data ) {
-   RegularRemesherCmpt*	self = (RegularRemesherCmpt*)remesher;
-
-   assert( self );
+   assert( (RegularRemesherCmpt*)remesher );
 }
 
 

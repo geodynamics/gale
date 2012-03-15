@@ -70,7 +70,6 @@ void SwarmDumpAndLoadSuite_Teardown( SwarmDumpAndLoadSuiteData* data ) {
 }
 
 void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data ) {
-   int                     ii;
    Swarm*                  swarm;
    Swarm*                  newSwarm = NULL;
    Swarm*                  swarmList[1];
@@ -80,7 +79,6 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    FileParticleLayout*     fileParticleLayout = NULL;
    char                    input_file[PCU_PATH_MAX];
    char                    output_file[PCU_PATH_MAX];
-   char                    filenameTemp[PCU_PATH_MAX];   
    double                  diffSumX, diffSumY, diffSumZ;
    double                  totSumX, totSumY, totSumZ;
    double                  gdiffSumX, gdiffSumY, gdiffSumZ;
@@ -172,8 +170,9 @@ void SwarmDumpAndLoadSuite_TestSwarmDumpAndLoad( SwarmDumpAndLoadSuiteData* data
    /* remove files */
    if( data->rank == 0 ){
 #ifdef READ_HDF5
-         for(ii = 0 ; ii < data->nProcs ; ii++){
+         for(int ii = 0 ; ii < data->nProcs ; ii++){
             /* get the swarm checkpointing filename */
+           char filenameTemp[PCU_PATH_MAX];   
             if(data->nProcs == 1)
                sprintf( filenameTemp, "%s.h5", output_file );
             else 

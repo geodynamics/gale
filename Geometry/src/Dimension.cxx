@@ -39,19 +39,19 @@ void Dimension_3DTo1D_3_Func( Index dim0, Index dim1, Index dim2,
 		Index dim0Size, Index dim1Size, Index dim2Size, 
 		Index* outputIndexPtr )
 {		
-	Index dimSizes[3];
-	dimSizes[0] = (dim0Size) ? (dim0Size) : 1;
-	dimSizes[1] = (dim1Size) ? (dim1Size) : 1;
-	dimSizes[2] = (dim2Size) ? (dim2Size) : 1;
-	
 	#if DEBUG 
 	{
-		Stream* dimensionError = Journal_Register( Error_Type, (Name)"DimensionMacros" );
-		Journal_Firewall( (dim0 < dimSizes[0] ), dimensionError, "Error: Given coordinate[0] value %d >= "
-			"regionSize[0] %d\n", dim0, dimSizes[0] );
-		Journal_Firewall( (dim1 < dimSizes[1]), dimensionError, "Error: Given coordinate[1] value %d >= "
-			"regionSize[1] %d\n", dim1, dimSizes[1] );
-		Journal_Firewall( (dim2 < dimSizes[2]), dimensionError, "Error: Given coordinate[2] value %d >= "
+          Index dimSizes[3];
+          dimSizes[0] = (dim0Size) ? (dim0Size) : 1;
+          dimSizes[1] = (dim1Size) ? (dim1Size) : 1;
+          dimSizes[2] = (dim2Size) ? (dim2Size) : 1;
+	
+          Stream* dimensionError = Journal_Register( Error_Type, (Name)"DimensionMacros" );
+          Journal_Firewall( (dim0 < dimSizes[0] ), dimensionError, "Error: Given coordinate[0] value %d >= "
+                            "regionSize[0] %d\n", dim0, dimSizes[0] );
+          Journal_Firewall( (dim1 < dimSizes[1]), dimensionError, "Error: Given coordinate[1] value %d >= "
+                            "regionSize[1] %d\n", dim1, dimSizes[1] );
+          Journal_Firewall( (dim2 < dimSizes[2]), dimensionError, "Error: Given coordinate[2] value %d >= "
 			"regionSize[2] %d\n", dim2, dimSizes[2] );
 	}	
 	#endif

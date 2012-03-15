@@ -129,7 +129,6 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 	Name					dataTypeName = NULL;
 	Name					rankName = NULL;
 	void*					variableRegister = NULL;
-	void*					pointerRegister = NULL;
 	Name*					names = NULL;
 	Stream*				error = Journal_Register( Error_Type, (Name)self->type );
 	Mesh*					mesh;
@@ -149,8 +148,7 @@ void _MeshVariable_AssignFromXML( void* meshVariable, Stg_ComponentFactory* cf, 
 	/* Grab Registers */
 	variableRegister = context->variable_Register;
 	assert( variableRegister );
-	pointerRegister = context->pointer_Register;
-	assert( pointerRegister  );
+	assert( context->pointer_Register  );
 
 	/* Construct the mesh. */
 	mesh = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"mesh", Mesh, True, data  );

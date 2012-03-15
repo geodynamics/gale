@@ -81,7 +81,6 @@ void ShadowSyncSuite_Teardown( ShadowSyncSuiteData* data ) {
 void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	DomainContext*					context = NULL;
 	Dictionary*						dictionary;
-	Dictionary*						componentDict;
 	Stg_ComponentFactory*		cf;
 	Swarm*							swarm = NULL;
 	Particle							particle;
@@ -105,8 +104,7 @@ void ShadowSyncSuite_TestShadowSync( ShadowSyncSuiteData* data ) {
 	dictionary = context->dictionary;
 	Journal_ReadFromDictionary( dictionary );
 	Dictionary_Add( dictionary, (Dictionary_Entry_Key)"procToWatch", Dictionary_Entry_Value_FromUnsignedInt( procToWatch )  );
-	componentDict = Dictionary_GetDictionary( dictionary, "components" );
-	assert( componentDict );
+	assert( Dictionary_GetDictionary( dictionary, "components" ) );
 
 	KeyCall( context, context->constructExtensionsK, EntryPoint_VoidPtr_CallCast* )( KeyHandle(context,context->constructExtensionsK), context );
 

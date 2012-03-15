@@ -213,12 +213,9 @@ void _SwarmDump_Initialise( void* swarmDump, void* data ) {
 void _SwarmDump_Execute( void* swarmDump, void* data ) {
         SwarmDump*            self                = (SwarmDump*)     swarmDump;
         AbstractContext*  context             = Stg_CheckType( data, AbstractContext );
-        Particle_Index    particleLocalCount;
-        SizeT             particleSize;
         Index             swarm_I;
         Swarm*            swarm;
         Stream*           debug = Journal_Register( Debug_Type, (Name)self->type  );
-        Processor_Index   rank_I;
 
         Journal_DPrintf( debug, "Proc %d: beginning Swarm binary checkpoint in %s():\n", self->swarmList[0]->myRank, __func__ );
         Stream_Indent( debug );
@@ -231,8 +228,6 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
                 swarmSaveFileNamePart1 = Context_GetCheckPointWritePrefixString( context );
 
                 swarm = self->swarmList[ swarm_I ];
-                particleLocalCount = swarm->particleLocalCount;
-                particleSize = (SizeT) swarm->particleExtensionMgr->finalSize;
 
                 if ( self->newFileEachTime )
                     Stg_asprintf( &swarmSaveFileNamePart2, "%s/%s.%05d", swarmSaveFileNamePart1, swarm->name, context->timeStep );
@@ -249,11 +244,13 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
                 #endif
                  
                 #ifdef DEBUG
-                   for ( rank_I = 0; rank_I < swarm->nProc; rank_I++ ) {
+                   for (Processor_Index rank_I = 0; rank_I < swarm->nProc; rank_I++ ) {
                            if ( swarm->myRank == rank_I ) {
-                                   Journal_DPrintf( debug, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
-                                           "each (= %g bytes total) to file %s\n", swarm->myRank, swarm->name, particleLocalCount,
-                                           particleSize, (float)(particleLocalCount * particleSize), swarmSaveFileName );
+                             SizeT particleSize = (SizeT) swarm->particleExtensionMgr->finalSize;
+                             Particle_Index particleLocalCount = swarm->particleLocalCount;
+                             Journal_DPrintf( debug, "Proc %d: for swarm \"%s\", dumping its %u particles of size %u bytes "
+                                              "each (= %g bytes total) to file %s\n", swarm->myRank, swarm->name, particleLocalCount,
+                                              particleSize, (float)(particleLocalCount * particleSize), swarmSaveFileName );
                            }       
                            MPI_Barrier( swarm->comm );
                    }
@@ -262,6 +259,8 @@ void _SwarmDump_Execute( void* swarmDump, void* data ) {
                 #ifdef WRITE_HDF5
                    SwarmDump_DumpToHDF5( self, swarm, swarmSaveFileName );
                 #else
+                   SizeT particleSize = (SizeT) swarm->particleExtensionMgr->finalSize;
+                   Particle_Index particleLocalCount = swarm->particleLocalCount;
                    BinaryStream_WriteAllProcessors( swarmSaveFileName, swarm->particles, particleSize, (SizeT) particleLocalCount, swarm->comm );
                 #endif
                 Memory_Free( swarmSaveFileName );

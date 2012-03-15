@@ -156,10 +156,7 @@ void _Remesher_Initialise( void* remesher, void* data ) {
 }
 
 void _Remesher_Execute( void* remesher, void* data ) {
-   Remesher*	self = (Remesher*)remesher;
-
-
-   assert( self );
+   assert( (Remesher*)remesher );
 }
 
 void _Remesher_Destroy( void* remesher, void* data ) {

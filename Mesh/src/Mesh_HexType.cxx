@@ -970,7 +970,6 @@ Bool Mesh_HexType_ElementHasPoint1DWithIncidence( Mesh_HexType* self, unsigned e
 						  MeshTopology_Dim* dim, unsigned* ind )
 {
 	Mesh*		mesh;
-	unsigned	nInc;
 	const int*	inc;
 
 	assert( self && Stg_CheckType( self, Mesh_HexType ) );
@@ -982,9 +981,8 @@ Bool Mesh_HexType_ElementHasPoint1DWithIncidence( Mesh_HexType* self, unsigned e
 
 	mesh = self->mesh;
 	Mesh_GetIncidence( mesh, MT_EDGE, elInd, MT_VERTEX, self->incArray );
-	nInc = IArray_GetSize( self->incArray );
+	assert(2 == IArray_GetSize( self->incArray ));
 	inc = IArray_GetPtr( self->incArray );
-	assert( nInc == 2 );
 
 	if( point[0] > *Mesh_GetVertex( mesh, inc[self->vertMap[0]] ) && 
 	    point[0] < *Mesh_GetVertex( mesh, inc[self->vertMap[1]] ) )

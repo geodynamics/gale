@@ -115,9 +115,11 @@ void _Mesh_CentroidType_Print( void* centroidType, Stream* stream ) {
 }
 
 void Mesh_CentroidType_Update( void* centroidType ) {
+#ifndef NDEBUG
 	Mesh_CentroidType*	self = (Mesh_CentroidType*)centroidType;
 
 	assert( self && Stg_CheckType( self, Mesh_CentroidType ) );
+#endif
 }
 
 Bool Mesh_CentroidType_ElementHasPoint( void* centroidType, unsigned elInd, double* point, 

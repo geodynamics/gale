@@ -177,11 +177,8 @@ void Mesh_RegularAlgorithms_Update( void* algorithms ) {
 Bool _Mesh_RegularAlgorithms_Search( void* algorithms, void* _mesh, double* point, 
 				     MeshTopology_Dim* dim, unsigned* ind )
 {
-	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
-	Mesh*			mesh = (Mesh*)_mesh;
-
-	assert( self );
-	assert( mesh );
+	assert( (Mesh_RegularAlgorithms*)algorithms );
+	assert( (Mesh*)_mesh );
 	assert( dim );
 	assert( ind );
 
@@ -234,11 +231,8 @@ double _Mesh_RegularAlgorithms_GetMinimumSeparation( void* algorithms, void* _me
 }
 
 void _Mesh_RegularAlgorithms_GetLocalCoordRange( void* algorithms, void* _mesh, double* min, double* max ) {
-	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
-	Mesh*			mesh = (Mesh*)_mesh;
-
-	assert( self );
-	assert( mesh );
+	assert( (Mesh_RegularAlgorithms*)algorithms );
+	assert( (Mesh*)_mesh );
 	assert( min );
 	assert( max );
 
@@ -247,11 +241,8 @@ void _Mesh_RegularAlgorithms_GetLocalCoordRange( void* algorithms, void* _mesh, 
 }
 
 void _Mesh_RegularAlgorithms_GetDomainCoordRange( void* algorithms, void* _mesh, double* min, double* max ) {
-	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
-	Mesh*			mesh = (Mesh*)_mesh;
-
-	assert( self );
-	assert( mesh );
+	assert( (Mesh_RegularAlgorithms*)algorithms );
+	assert( (Mesh*)_mesh );
 	assert( min );
 	assert( max );
 
@@ -260,11 +251,8 @@ void _Mesh_RegularAlgorithms_GetDomainCoordRange( void* algorithms, void* _mesh,
 }
 
 void _Mesh_RegularAlgorithms_GetGlobalCoordRange( void* algorithms, void* _mesh, double* min, double* max ) {
-	Mesh_RegularAlgorithms*	self = (Mesh_RegularAlgorithms*)algorithms;
-	Mesh*			mesh = (Mesh*)_mesh;
-
-	assert( self );
-	assert( mesh );
+	assert( (Mesh_RegularAlgorithms*)algorithms );
+	assert( (Mesh*)_mesh );
 	assert( min );
 	assert( max );
 

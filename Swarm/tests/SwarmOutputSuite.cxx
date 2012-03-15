@@ -96,7 +96,6 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 
 	if( data->rank == procToWatch ) {
 		Dictionary*					dictionary;
-		Dictionary*					componentDict;
 		Stg_ComponentFactory*	cf;
 		DomainContext*				context;
 		char							input_file[PCU_PATH_MAX];
@@ -115,8 +114,7 @@ void SwarmOutputSuite_TestSwarmOutput( SwarmOutputSuiteData* data ) {
 		ContextEP_Append( context, AbstractContext_EP_Dt, SwarmOutputSuite_Dt );
 		ContextEP_Append( context, AbstractContext_EP_Step, SwarmOutputSuite_MoveParticles );
 
-		componentDict = Dictionary_GetDictionary( dictionary, "components" );
-		assert( componentDict );
+		assert( Dictionary_GetDictionary( dictionary, "components" ) );
 
 		AbstractContext_Dump( context );
 		Stg_Component_Execute( context, 0, False );

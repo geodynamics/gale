@@ -318,8 +318,9 @@ void _SwarmShapeVC_Build(  void* variableCondition, void* data ) {
 /****************** VariableCondition Virtual Functions ******************/
 void _SwarmShapeVC_BuildSelf(  void* variableCondition, void* data /* for build phase */ ) {
 	SwarmShapeVC*         	self    = (SwarmShapeVC*)variableCondition;
+#ifndef NDEBUG
 	AbstractContext* 	context = (AbstractContext*) data;
-
+#endif
 	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
 
 	/* dave - 06.08.07 */

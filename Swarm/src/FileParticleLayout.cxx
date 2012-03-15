@@ -332,9 +332,9 @@ void _FileParticleLayout_SetInitialCounts( void* particleLayout, void* _swarm ) 
 
 void _FileParticleLayout_InitialiseParticles( void* particleLayout, void* _swarm ) {
    FileParticleLayout*    self  = (FileParticleLayout*)particleLayout;
-   Swarm                 *swarm = (Swarm*)_swarm;
    
 #ifdef READ_HDF5
+   Swarm                 *swarm = (Swarm*)_swarm;
    SwarmVariable*         swarmVar;
    Index                  swarmVar_I;
    char                   dataSpaceName[1024];

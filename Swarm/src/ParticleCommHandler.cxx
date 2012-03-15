@@ -152,6 +152,7 @@ void* _ParticleCommHandler_Copy( const void* particleCommHandler, void* dest, Bo
 	// TODO: put back in.
 	assert(0);
 
+        return NULL;
 }
 
 void _ParticleCommHandler_AssignFromXML( void* pCommHandler, Stg_ComponentFactory* cf, void* data ){
