@@ -96,7 +96,9 @@ class PETSc(Package):
                 from distutils import sysconfig
                 vars = {}
                 sysconfig.parse_makefile(petscconf, vars)
-                flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
+                flags = ''
+                if 'PACKAGES_LIBS' in vars:
+                    flags = sysconfig.expand_makefile_vars(vars['PACKAGES_LIBS'], vars)
             
                 # Static libs? i.e. no shared libs. Must also do this if we are
                 # linking static libraries.
