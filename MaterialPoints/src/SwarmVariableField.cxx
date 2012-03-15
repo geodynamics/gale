@@ -126,7 +126,6 @@ void* _SwarmVariableField_DefaultNew( Name name ) {
 
 void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentFactory* cf, void* data ) {
 	SwarmVariableField*		self = (SwarmVariableField*)swarmVariableField;
-	IntegrationPointsSwarm*	integrationSwarm;
 	Variable_Register*		variable_Register;
    Name			            swarmVarName;
    MaterialPointsSwarm*	   materialSwarm;
@@ -138,8 +137,7 @@ void _SwarmVariableField_AssignFromXML( void* swarmVariableField, Stg_ComponentF
 	swarmVarName = Stg_ComponentFactory_GetString( cf, self->name, (Dictionary_Entry_Key)"swarmVariable", ""  );
 
 	materialSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"MaterialSwarm", MaterialPointsSwarm, True, data  );
-	integrationSwarm = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", IntegrationPointsSwarm, True, NULL );
-	assert( integrationSwarm  );
+	assert(Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Swarm", IntegrationPointsSwarm, True, NULL ));
 
 	_SwarmVariableField_Init( self, variable_Register, swarmVarName, materialSwarm );
 }
