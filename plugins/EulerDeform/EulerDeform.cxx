@@ -184,13 +184,19 @@ void _Underworld_EulerDeform_Build(void* component, void* data)
           else
             sys->dispField=NULL;
 
+          AdvectionDiffusionSLE* energySLE=(AdvectionDiffusionSLE*)
+            Stg_ComponentFactory_ConstructByName(uwCtx->CF,(Name)"EnergyEqn",
+                                                 AdvectionDiffusionSLE,
+                                                 False,data);
+          Journal_Firewall(!(energySLE!=NULL && sys->dispField==NULL),
+                           Journal_Register(Error_Type,
+                                            (Name)Underworld_EulerDeform_Type),
+                           "If you enable thermal evolution, you need to add"
+                           "a displacement field to EulerDeform\n");
+
           if(sys->dispField!=NULL)
             {
-              AdvectionDiffusionSLE* energySLE=(AdvectionDiffusionSLE*)
-                Stg_ComponentFactory_ConstructByName(uwCtx->CF,(Name)"EnergyEqn",
-                                                     AdvectionDiffusionSLE,
-                                                     True,data);
-              Journal_DFirewall
+              Journal_Firewall
                 (energySLE!=NULL, 
                  Journal_Register(Error_Type,
                                   (Name)Underworld_EulerDeform_Type),
@@ -201,19 +207,6 @@ void _Underworld_EulerDeform_Build(void* component, void* data)
                  the old value for use later. */
               sys->energySolverExecute = energySLE->_execute;
               energySLE->_execute = Underworld_EulerDeform_Advection_Correction;
-            }
-
-          char *T_MeshName=Dictionary_GetString(sysDict,"T-mesh");
-                                                
-          if(strcmp(T_MeshName,""))
-            {
-              Journal_Firewall
-                (sys->dispField!=NULL,
-                 Journal_Register(Error_Type,(Name)Underworld_EulerDeform_Type),
-                 "In EulerDeform, if T-mesh is defined, then displacementField must also be defined.\n");
-              sys->T_mesh=Stg_ComponentFactory_ConstructByName(uwCtx->CF,
-                                                               (Name)T_MeshName,
-                                                               Mesh,True,data);
             }
 
           remesherName=Dictionary_GetString(sysDict,"remesher");
@@ -1127,34 +1120,11 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
     Mesh_Sync( sys->mesh );
     Mesh_DeformationUpdate( sys->mesh );
 
-    /* Reset the coordinates of the pressure and T meshes. */
+    /* Reset the coordinates of the pressure meshes. */
 
     if(sys->p_mesh!=NULL)
       InnerGenerator_SetCoordinates((InnerGenerator*)(sys->p_mesh->generator),
                                     (FeMesh*)(sys->p_mesh));
-    if(sys->T_mesh!=NULL)
-      {
-        double** T_verts=sys->T_mesh->verts;
-        unsigned ijk[3];
-        Grid *v_grid =*(Grid**)
-          ExtensionManager_Get(sys->mesh->info,sys->mesh,
-                               ExtensionManager_GetHandle(sys->mesh->info,
-                                                          "vertexGrid"));
-        Grid *T_grid =*(Grid**)
-          ExtensionManager_Get(sys->T_mesh->info,sys->T_mesh,
-                               ExtensionManager_GetHandle(sys->T_mesh->info,
-                                                          "vertexGrid"));
-        unsigned num_T_nodes = FeMesh_GetNodeDomainSize(sys->T_mesh);
-        for(unsigned n_T=0;n_T<num_T_nodes;++n_T)
-          {
-            Grid_Lift(T_grid,n_T,ijk);
-            for(unsigned d=0;d<nDims;++d)
-              ijk[d]*=2;
-            unsigned n_v(Grid_Project(v_grid,ijk));
-            for(unsigned d=0;d<nDims;++d)
-              T_verts[n_T][d]=sys->mesh->verts[n_v][d];
-          }
-      }
   }
 }
 
