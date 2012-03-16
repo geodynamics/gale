@@ -715,12 +715,12 @@ InterpolationResult _FeVariable_InterpolateValueAt( void* variable, double* glob
 	}
 	else if ( retValue == SHADOW ) {
 		if ( False == self->shadowValuesSynchronised ) {
-			Stream* warningStr = Journal_Register( Error_Type, (Name)self->type  );
-			Journal_Printf( warningStr, "Warning - in %s: user asking to interpolate a value at "
-				"coord (%g,%g,%g), which is in shadow space, but "
-				"FeVariable_SyncShadowValues() hasn't been called yet.\n", 
-				__func__, globalCoord[0], globalCoord[1], globalCoord[2] );
-			return retValue;		
+                  Journal_Firewall( 0, Journal_Register( Error_Type, (Name)self->type  ),
+                                    "Error - in %s: rying to interpolate %s at "
+                                    "(%g,%g,%g), which is in shadow space, but "
+                                    "FeVariable_SyncShadowValues() hasn't been called yet.\n", 
+                                    __func__, self->name, globalCoord[0], globalCoord[1], globalCoord[2] );
+                  return retValue;		
 		}
 		/** Now interpolate the value at that coordinate, using shape functions */
 		self->_interpolateWithinElement( self, elementCoordIn, elLocalCoord, value );
