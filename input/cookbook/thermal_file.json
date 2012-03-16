@@ -5,7 +5,6 @@
             {
                 "mesh": "v-mesh",
                 "p-mesh": "p-mesh",
-                "T-mesh": "T-mesh",
                 "displacementField": "DisplacementField",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField",

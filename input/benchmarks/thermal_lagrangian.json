@@ -4,7 +4,6 @@
         "systems": [
             {
                 "mesh": "v-mesh",
-                "T-mesh": "T-mesh",
                 "displacementField": "DisplacementField",
                 "remesher": "velocityRemesher",
                 "velocityField": "VelocityField"
