@@ -832,7 +832,8 @@ void _AbstractContext_Execute_Hook( void* _context ) {
 				AbstractContext_Dump( self );
 		}	
 		if ( self->checkpointEvery ) {
-			if ( self->timeStep % self->checkpointEvery == 0 ){
+			if ( self->timeStep % self->checkpointEvery == 0
+                             && self->timeStep!=self->restartTimestep ){
 				AbstractContext_Save( self );
          }
 		}	
