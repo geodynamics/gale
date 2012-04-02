@@ -733,7 +733,7 @@ void _FiniteElementContext_DumpMeshHDF5( void* context, FeMesh* mesh ) {
       Journal_Firewall( 
          file >= 0, 
          errorStr,
-         "Error in %s for %s '%s' - Cannot open file %s.\n", 
+         "Error in %s for %s '%s' - Can not open file %s.\n", 
          __func__, 
          self->type, 
          self->name, 
