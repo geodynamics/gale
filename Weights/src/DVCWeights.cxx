@@ -274,7 +274,7 @@ void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct p
         if(cells[cell_num0].p == -1){//if cell unowned then claim cell
             /* This is the bit needed for mallocing */
             /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
-            if( count > bchain->new_claimed_cells_malloced - 1 ){
+            if( count >= bchain->new_claimed_cells_malloced - 1 ){
                 temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
                 bchain->new_claimed_cells = temp;
                 bchain->new_claimed_cells_malloced += DVC_INC;
@@ -303,10 +303,23 @@ void _DVCWeights_ClaimCells(struct chain **bbchain,struct cell **ccells,struct p
         
                 dist1 = _DVCWeights_DistanceTest(x0,y0,z0,x1,y1,z1,x2,y2,z2);
                 if(dist1 > 0.0){
-                    bchain->new_claimed_cells[count] = cell_num0;
-                    bchain->numclaimed++;
-                    count++;
-                    cells[cell_num0].p = p_i;// this cell is now owned by particle p_i
+                  if( count >= bchain->new_claimed_cells_malloced - 1 ){
+                    temp = (int *)realloc( bchain->new_claimed_cells,
+                                           (bchain->new_claimed_cells_malloced
+                                            + DVC_INC)*sizeof(int) );
+                    bchain->new_claimed_cells = temp;
+                    bchain->new_claimed_cells_malloced += DVC_INC;
+                    temp = (int *)realloc( bchain->new_bound_cells,
+                                           (bchain->new_bound_cells_malloced
+                                            + DVC_INC)*sizeof(int) );
+                    bchain->new_bound_cells = temp;
+                    bchain->new_bound_cells_malloced += DVC_INC;      
+                  }
+                  bchain->new_claimed_cells[count] = cell_num0;
+                  bchain->numclaimed++;
+                  count++;
+                  cells[cell_num0].p = p_i;// this cell is now owned
+                                           // by particle p_i
                 }
             }//if
         }//else
@@ -332,7 +345,7 @@ void _DVCWeights_ClaimCells2D(struct chain **bbchain,struct cell2d **ccells,stru
         if(cells[cell_num0].p == -1){//if cell unowned then claim cell
             /* This is the bit needed for mallocing */
             /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
-            if( count > bchain->new_claimed_cells_malloced - 1 ){
+            if( count >= bchain->new_claimed_cells_malloced - 1 ){
                 temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
                 bchain->new_claimed_cells = temp;
                 bchain->new_claimed_cells_malloced += DVC_INC;
@@ -358,10 +371,23 @@ void _DVCWeights_ClaimCells2D(struct chain **bbchain,struct cell2d **ccells,stru
         
                 dist1 = _DVCWeights_DistanceTest2D(x0,y0,x1,y1,x2,y2);
                 if(dist1 > 0.0){
+                  if( count >= bchain->new_claimed_cells_malloced - 1 ){
+                    temp = (int *)realloc( bchain->new_claimed_cells,
+                                           (bchain->new_claimed_cells_malloced
+                                            + DVC_INC)*sizeof(int) );
+                    bchain->new_claimed_cells = temp;
+                    bchain->new_claimed_cells_malloced += DVC_INC;
+                    temp = (int *)realloc( bchain->new_bound_cells,
+                                           (bchain->new_bound_cells_malloced
+                                            + DVC_INC)*sizeof(int) );
+                    bchain->new_bound_cells = temp;
+                    bchain->new_bound_cells_malloced += DVC_INC;      
+                  }
                     bchain->new_claimed_cells[count] = cell_num0;
                     bchain->numclaimed++;
                     count++;
-                    cells[cell_num0].p = p_i;// this cell is now owned by particle p_i
+                    cells[cell_num0].p = p_i;// this cell is now owned
+                                             // by particle p_i
                 }
             }//if
         }//else
@@ -419,7 +445,7 @@ void _DVCWeights_UpdateBchain(struct chain **bbchain,struct cell **ccells,int p_
                 if(cells[cell_num1].p != p_i && cells[cell_num1].done != 1){
                     /* This is the bit needed for mallocing */     
                     /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
-                    if( count > bchain->new_bound_cells_malloced - 1 ){
+                    if( count >= bchain->new_bound_cells_malloced - 1 ){
                         temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
                         bchain->new_claimed_cells = temp;
                         bchain->new_claimed_cells_malloced += DVC_INC;
@@ -470,7 +496,7 @@ void _DVCWeights_UpdateBchain2D(struct chain **bbchain,struct cell2d **ccells,in
                 if(cells[cell_num1].p != p_i && cells[cell_num1].done != 1){
                     /* This is the bit needed for mallocing */     
                     /* do a test here to see if we need to realloc bchain->new_claimed_cells and bchain->new_bound_cells */
-                    if( count > bchain->new_bound_cells_malloced - 1 ){
+                    if( count >= bchain->new_bound_cells_malloced - 1 ){
                         temp = (int *)realloc( bchain->new_claimed_cells, (bchain->new_claimed_cells_malloced + DVC_INC)*sizeof(int) );
                         bchain->new_claimed_cells = temp;
                         bchain->new_claimed_cells_malloced += DVC_INC;
