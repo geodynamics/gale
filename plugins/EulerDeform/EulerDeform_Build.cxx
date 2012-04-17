@@ -316,14 +316,14 @@ void EulerDeform_Build(void* component, void* data)
             sys->static_left_coord =
               Dictionary_GetDouble( uwCtx->dictionary, "minX");
 
-          if(sys->staticFront && sys->wrapTop
-             && !sys->staticTopFront)
-            sys->static_front_coord =
-              Dictionary_GetDouble( uwCtx->dictionary, "minZ");
-
           if(sys->staticBack && sys->wrapTop
              && !sys->staticTopBack)
             sys->static_back_coord =
+              Dictionary_GetDouble( uwCtx->dictionary, "minZ");
+
+          if(sys->staticFront && sys->wrapTop
+             && !sys->staticTopFront)
+            sys->static_front_coord =
               Dictionary_GetDouble( uwCtx->dictionary, "maxZ");
         }
     }

@@ -107,17 +107,8 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
       
       /* Copy back coords. */
       for( ind_i = 0; ind_i < nInds; ind_i++ )
-        {
-          std::cout << "side "
-                    << ind_i << " "
-                    << inds[ind_i] << " "
-                    << sys->sideCoords[ind_i][0] << " "
-                    << sys->sideCoords[ind_i][1] << " "
-                    << sys->sideCoords[ind_i][2] << " "
-                    << "\n";
         memcpy( sys->mesh->verts[inds[ind_i]], sys->sideCoords[ind_i],
                 nDims * sizeof(double));
-        }
       FreeObject( tmpIndSet );
       FreeArray( sys->sideCoords );
       
@@ -136,12 +127,12 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
             }
           if(sys->staticFront && !sys->staticTopFront)
             {
-              EulerDeform_Remesh_Corner(sys->mesh,0,1,sys->static_front_coord,2,1,0);
+              EulerDeform_Remesh_Corner(sys->mesh,grid->sizes[2]-1,
+                                        grid->sizes[2]-2,sys->static_front_coord,2,1,0);
             }
           if(sys->staticBack && !sys->staticTopBack)
             {
-              EulerDeform_Remesh_Corner(sys->mesh,grid->sizes[2]-1,
-                                        grid->sizes[2]-2,sys->static_back_coord,2,1,0);
+              EulerDeform_Remesh_Corner(sys->mesh,0,1,sys->static_back_coord,2,1,0);
             }
         }
 
@@ -196,25 +187,9 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
     for( n_i = 0; n_i < nDomainNodes; n_i++ )
       memcpy( oldCrds[n_i], sys->mesh->verts[n_i], nDims * sizeof(double) );
 
-    for( n_i = 0; n_i < nDomainNodes; n_i++ )
-      std::cout << "coord "
-                << n_i << " "
-                << sys->mesh->verts[n_i][0] << " "
-                << sys->mesh->verts[n_i][1] << " "
-                << sys->mesh->verts[n_i][2] << " "
-                << "\n";
-
     /* Remesh the system. */
     Stg_Component_Execute( sys->remesher, NULL, True );
     Mesh_Sync( sys->mesh );
-
-    for( n_i = 0; n_i < nDomainNodes; n_i++ )
-      std::cout << "Before "
-                << n_i << " "
-                << sys->mesh->verts[n_i][0] << " "
-                << sys->mesh->verts[n_i][1] << " "
-                << sys->mesh->verts[n_i][2] << " "
-                << "\n";
 
     /* Swap old coordinates back in temporarily. */
     newCrds = sys->mesh->verts;
