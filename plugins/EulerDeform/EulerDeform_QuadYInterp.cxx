@@ -44,7 +44,61 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+void _EulerDeform_TriBarycenter(double** tri, const double* pnt, double* dst)
+{
+  double a = tri[0][0] - tri[2][0];
+  double b = tri[1][0] - tri[2][0];
+  double c = tri[2][0] - pnt[0];
+  double d = tri[0][1] - tri[2][1];
+  double e = tri[1][1] - tri[2][1];
+  double f = tri[2][1] - pnt[1];
+  double g = tri[0][2] - tri[2][2];
+  double h = tri[1][2] - tri[2][2];
+  double i = tri[2][2] - pnt[2];
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+  dst[0] = (b * (f + i) - c * (e + h)) / (a * (e + h) - b * (d + g));
+  dst[1] = (a * (f + i) - c * (d + g)) / (b * (d + g) - a * (e + h));
+  dst[2] = 1.0 - dst[0] - dst[1];
+}
+
+
+Bool _EulerDeform_QuadYInterp(double** crds, const double* pnt, double* val)
+{
+  double* modCrds[4];
+  double modCrds0[2], modCrds1[2], modCrds2[2], modCrds3[2];
+  unsigned* inds[2];
+  unsigned inds0[3], inds1[3];
+  unsigned inc[4];
+  double modPnt[3];
+  unsigned inside;
+  double bc[3];
+
+  modCrds[0] = modCrds0;
+  modCrds[1] = modCrds1;
+  modCrds[2] = modCrds2;
+  modCrds[3] = modCrds3;
+  modCrds[0][0] = crds[0][0]; modCrds[0][1] = crds[0][2];
+  modCrds[1][0] = crds[1][0]; modCrds[1][1] = crds[1][2];
+  modCrds[2][0] = crds[2][0]; modCrds[2][1] = crds[2][2];
+  modCrds[3][0] = crds[3][0]; modCrds[3][1] = crds[3][2];
+  modPnt[0] = pnt[0]; modPnt[1] = pnt[2];
+
+  inds[0] = inds0;
+  inds[1] = inds1;
+  inds[0][0] = 0; inds[0][1] = 1; inds[0][2] = 2;
+  inds[1][0] = 1; inds[1][1] = 3; inds[1][2] = 2;
+  inc[0] = 0; inc[1] = 1; inc[2] = 2; inc[3] = 3;
+
+  if( Simplex_Search2D( modCrds, inc, 2, inds, 
+                        modPnt, bc, &inside ) )
+    {
+      *val = bc[0] * crds[inds[inside][0]][1]
+        + bc[1] * crds[inds[inside][1]][1]
+        + bc[2] * crds[inds[inside][2]][1];
+      return True;
+    }
+  else
+    return False;
+}
+
 

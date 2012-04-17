@@ -44,7 +44,9 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
-
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+Index Underworld_EulerDeform_Register(PluginsManager* pluginsMgr)
+{
+  return PluginsManager_Submit(pluginsMgr,Underworld_EulerDeform_Type,
+                               (Name)"0",EulerDeform_DefaultNew);
+}
 

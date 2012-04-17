@@ -29,15 +29,15 @@
 	extern Name	EULERDEFORM_PLUGIN_TAG;
 
 
-	Index Underworld_EulerDeform_Register( PluginsManager* pluginsMgr );
+	Index EulerDeform_Register( PluginsManager* pluginsMgr );
 
-	void* _Underworld_EulerDeform_DefaultNew( Name name );
+	void* EulerDeform_DefaultNew( Name name );
 
-	void _Underworld_EulerDeform_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
+	void EulerDeform_AssignFromXML( void* component, Stg_ComponentFactory* cf, void* data );
 
-	void _Underworld_EulerDeform_Build( void* component, void* data );
+	void EulerDeform_Build( void* component, void* data );
 
-	void _Underworld_EulerDeform_Destroy( void* component, void* data );
+	void EulerDeform_Destroy( void* component, void* data );
 
 	Variable* EulerDeform_RegisterLocalNodeCoordsAsVariables( EulerDeform_System* sys, void* _variable_Register, 
 								  Variable** variableList );
@@ -53,6 +53,27 @@
 	void EulerDeform_WrapBottomSurface( EulerDeform_System* sys, double** oldCrds );
 
 	void EulerDeform_WrapLeftSurface( EulerDeform_System* sys, double** oldCrds );
-        void Underworld_EulerDeform_Advection_Correction(void* sle, void* data);
+        void EulerDeform_Advection_Correction(void* sle, void* data);
+        IndexSet* EulerDeform_CreateStaticSet(EulerDeform_System* sys);
+        void EulerDeform_Advection_Correction(void* sle, void* data);
+        void EulerDeform_InternalLoop(EulerDeform_System* sys, Grid* grm,
+                                      double** oldCrds, unsigned* ijk,
+                                      unsigned curDim, const bool &top);
+        Bool _EulerDeform_QuadYInterp(double** crds, const double* pnt, double* val);
+        Bool _EulerDeform_LineInterp(double** crds, const double &pnt,
+                                     unsigned fromDim, unsigned toDim, double* val);
+        void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx);
+        void EulerDeform_Remesh_Corner(Mesh *mesh, const int &corner, const int &inside,
+                                       const double &side_coord, const int &boundary_dim,
+                                       const int &height_dim, const int &tangent_dim);
+        void EulerDeform_WrapSurface(EulerDeform_System* sys,double** oldCrds,
+                                     const bool &top);
+        void EulerDeform_FloatLeftTop(EulerDeform_System* sys, Grid *grid,
+                                      double** crds);
+        void EulerDeform_FloatRightTop(EulerDeform_System* sys, Grid *grid,
+                                       double** crds);
+        Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv );
+        void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context );
 
+        const Type Underworld_EulerDeform_Type = "EulerDeform";
 #endif

@@ -84,8 +84,10 @@
 
 		Bool		staticSides;
 		double**	sideCoords;
-                double          x_right_coord;
-                double          x_left_coord;
+                double          static_right_coord;
+                double          static_left_coord;
+                double          static_front_coord;
+                double          static_back_coord;
 	};
 
 #endif

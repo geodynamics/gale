@@ -44,7 +44,22 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+void EulerDeform_WrapSurface(EulerDeform_System* sys,double** oldCrds,
+                             const bool &top)
+{
+  IJK	ijk;
+  Grid*	grm;
+  Mesh*	mesh;
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+  assert( sys );
+  assert( oldCrds );
+
+  /* Loop over top internal surface. */
+  mesh = sys->mesh;
+  grm =
+    *(Grid**)ExtensionManager_Get(mesh->info,mesh, 
+                                  ExtensionManager_GetHandle(mesh->info,
+                                                             (Name)"vertexGrid"));
+  EulerDeform_InternalLoop(sys,grm,oldCrds,ijk,0,top);
+}
 

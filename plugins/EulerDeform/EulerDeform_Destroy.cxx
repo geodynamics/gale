@@ -44,7 +44,10 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+void EulerDeform_Destroy( void* component, void* data ) {
+	assert( component );
+	assert( (UnderworldContext*)((Codelet*)component)->context );
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
-
+	/* Clear the lot. */
+	/* TODO */
+}

@@ -44,7 +44,39 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+extern ExtensionInfo_Index EulerDeform_ContextHandle;
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+void EulerDeform_AssignFromXML(void* component,
+                               Stg_ComponentFactory* cf,
+                               void* data)
+{
+  Codelet* ed=(Codelet*)component;
+  EulerDeform_Context* edCtx;
+
+  assert(component);
+  assert(cf);
+
+  Journal_DPrintf(Underworld_Debug, "In: %s( void* )\n", __func__);
+
+  UnderworldContext* uwCtx=(UnderworldContext*)
+    Stg_ComponentFactory_ConstructByName(cf,(Name)"context",UnderworldContext,
+                                         True,data);
+  ed->context=(AbstractContext*)uwCtx;
+
+  /* Create new context. */
+  EulerDeform_ContextHandle=
+    ExtensionManager_Add(uwCtx->extensionMgr,(Name)Underworld_EulerDeform_Type,
+                         sizeof(EulerDeform_Context));
+  edCtx=(EulerDeform_Context*)ExtensionManager_Get(uwCtx->extensionMgr,
+                                                   uwCtx,
+                                                   EulerDeform_ContextHandle);
+  memset(edCtx,0,sizeof(EulerDeform_Context));
+  edCtx->ctx=(AbstractContext*)uwCtx;
+
+  /* Get the time integrator. */
+  edCtx->timeIntegrator=
+    Stg_ComponentFactory_ConstructByName(cf,(Name)"timeIntegrator",
+                                         TimeIntegrator,True,data);
+}
+
 

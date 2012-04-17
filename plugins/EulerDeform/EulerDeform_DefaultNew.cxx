@@ -44,7 +44,31 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+extern ExtensionInfo_Index EulerDeform_ContextHandle;
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+void* EulerDeform_DefaultNew(Name name)
+{
+  /* Variables set in this function */
+  SizeT _sizeOfSelf = sizeof(Codelet);
+  Type type = Underworld_EulerDeform_Type;
+  Stg_Class_DeleteFunction* _delete = _Codelet_Delete;
+  Stg_Class_PrintFunction* _print = _Codelet_Print;
+  Stg_Class_CopyFunction* _copy = _Codelet_Copy;
+  Stg_Component_DefaultConstructorFunction* _defaultConstructor =
+    EulerDeform_DefaultNew;
+  Stg_Component_ConstructFunction* _construct =
+    EulerDeform_AssignFromXML;
+  Stg_Component_BuildFunction* _build = EulerDeform_Build;
+  Stg_Component_InitialiseFunction* _initialise = _Codelet_Initialise;
+  Stg_Component_ExecuteFunction* _execute = _Codelet_Execute;
+  Stg_Component_DestroyFunction* _destroy = EulerDeform_Destroy;
+
+  /* Variables that are set to ZERO are variables that will be set
+     either by the current _New function or another parent _New
+     function further up the hierachy */
+  AllocationType  nameAllocationType = NON_GLOBAL /* default value NON_GLOBAL */;
+  
+  return _Codelet_New(  CODELET_PASSARGS   );
+}
+
 

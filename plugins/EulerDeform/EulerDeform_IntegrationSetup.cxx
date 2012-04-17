@@ -44,7 +44,54 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+void EulerDeform_IntegrationSetup( void* _timeIntegrator, void* context ) {
+	EulerDeform_Context*	edCtx = (EulerDeform_Context*)context;
+	unsigned					sys_i;
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+	FeVariable_SyncShadowValues( edCtx->systems[0].velField );
+
+	/* 
+	** We'll need to store side values that we require to be static here, for later
+	** return to the mesh.
+	*/
+
+	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
+		EulerDeform_System* sys = edCtx->systems + sys_i;
+
+		if( sys->staticSides ) {
+			IndexSet	*tmpIndSet;
+			unsigned	nInds, *inds;
+			unsigned	nDims;
+			unsigned	ind_i;
+
+			/* Collect indices of all the sides. */
+
+                        tmpIndSet = EulerDeform_CreateStaticSet(sys);
+                        IndexSet_GetMembers( tmpIndSet, &nInds, &inds );
+
+			/* Copy coords to temporary array. */
+			nDims = Mesh_GetDimSize( sys->mesh );
+			sys->sideCoords = AllocArray2D( double, nInds, nDims );
+			for( ind_i = 0; ind_i < nInds; ind_i++ )
+				memcpy( sys->sideCoords[ind_i], sys->mesh->verts[inds[ind_i]], nDims * sizeof(double) );
+                        FreeObject( tmpIndSet );
+                        FreeArray( inds );
+		}
+	}
+
+	/* Update advection arrays. */
+	for( sys_i = 0; sys_i < edCtx->nSystems; sys_i++ ) {
+		EulerDeform_System*	sys = edCtx->systems + sys_i;
+		unsigned					nDims;
+		unsigned					nLocalNodes;
+		unsigned					n_i;
+
+		nDims = Mesh_GetDimSize( sys->mesh );
+		nLocalNodes = Mesh_GetLocalSize( sys->mesh, MT_VERTEX );
+
+		for( n_i = 0; n_i < nLocalNodes; n_i++ )
+			memcpy( sys->verts + n_i * nDims, sys->mesh->verts[n_i], nDims * sizeof(double) );
+	}
+}
+
 

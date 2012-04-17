@@ -44,7 +44,41 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+Bool EulerDeform_TimeDeriv( void* crdAdvector, Index arrayInd, double* timeDeriv ) {
+	TimeIntegrand*		self = (TimeIntegrand*)crdAdvector;
+	FeVariable*				velocityField = (FeVariable*)self->data[0];
+	InterpolationResult	result = LOCAL;
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+	/* check if the node information is on the local proc */
+	if (arrayInd >= Mesh_GetDomainSize(velocityField->feMesh,MT_VERTEX) )
+		result = OTHER_PROC;
 
+	FeVariable_GetValueAtNode( velocityField, arrayInd, timeDeriv );
+
+	/* Check if periodic */
+	if ( Stg_Class_IsInstance( velocityField->feMesh->generator, CartesianGenerator_Type ) ) {
+		CartesianGenerator* cartesianGenerator = (CartesianGenerator*) velocityField->feMesh->generator;
+		if ( cartesianGenerator->periodic[ I_AXIS ] )
+			timeDeriv[I_AXIS] = 0.0;
+		if ( cartesianGenerator->periodic[ J_AXIS ] )
+			timeDeriv[J_AXIS] = 0.0;
+		if ( cartesianGenerator->periodic[ K_AXIS ] )
+			timeDeriv[K_AXIS] = 0.0;
+	}
+		
+	if ( result == OTHER_PROC || result == OUTSIDE_GLOBAL || isinf(timeDeriv[0]) || isinf(timeDeriv[1]) || 
+	     ( velocityField->dim == 3 && isinf(timeDeriv[2]) ) ) 
+	{
+#if 0
+		Journal_Printf( Journal_Register( Error_Type, (Name)self->type  ),
+				"Error in func '%s' for particle with index %u.\n\tPosition (%g, %g, %g)\n\tVelocity here is (%g, %g, %g)."
+				"\n\tInterpolation result is %s.\n",
+				__func__, array_I, coord[0], coord[1], coord[2], 
+
+				InterpolationResultToStringMap[result]  );
+#endif	
+		return False;	
+	}
+
+	return True;
+}

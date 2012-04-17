@@ -44,7 +44,45 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+Bool _EulerDeform_FindBarycenter1D(const double* crds, const double pnt,
+                                   double* bcs)
+{
+  assert( crds );
+  assert( bcs );
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+  bcs[1] = (pnt - crds[0])/(crds[1] - crds[0]);
+  bcs[0] = 1.0 - bcs[1];
+
+  std::cout << __func__ << " "
+            << bcs[0] << " "
+            << bcs[1] << " "
+            << pnt << " "
+            << crds[0] << " "
+            << crds[1] << " "
+            << "\n";
+
+  return (bcs[0] >= 0.0 && bcs[0] <= 1.0 && bcs[1] >= 0.0 && bcs[1] <= 1.0)
+    ? True : False;
+}
+
+
+Bool _EulerDeform_LineInterp(double** crds, const double &pnt,
+                             unsigned fromDim, unsigned toDim, double* val)
+{
+  double bcCrds[2];
+  double bcs[2];
+
+  assert(crds);
+  assert(val);
+
+  bcCrds[0] = crds[0][fromDim];
+  bcCrds[1] = crds[1][fromDim];
+  if(_EulerDeform_FindBarycenter1D(bcCrds, pnt, bcs))
+    {
+      *val = bcs[0]*crds[0][toDim] + bcs[1]*crds[1][toDim];
+      return True;
+    }
+
+  return False;
+}
 

@@ -44,7 +44,42 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+void EulerDeform_FloatLeftTop(EulerDeform_System* sys, Grid *grid,
+                              double** crds)
+{
+  int i, max_z;
+  IJK ijk, inside_ijk;
+  unsigned ind, nLocalNodes, inside;
 
-Name		EULERDEFORM_PLUGIN_TAG = "EulerDeform";
-ExtensionInfo_Index EulerDeform_ContextHandle;
+  nLocalNodes = Mesh_GetLocalSize( sys->mesh, MT_VERTEX );
+  ijk[0]=0;
+  ijk[1]=grid->sizes[1]-1;
+
+  if(Mesh_GetDimSize(sys->mesh)==2)
+    {
+      max_z=1;
+    }
+  else
+    {
+      max_z=grid->sizes[2];
+    }
+
+  for(i=0;i<max_z;++i)
+    {
+      ijk[2]=i;
+      ind=Grid_Project(grid,ijk);
+      if( !(!Mesh_GlobalToDomain( sys->mesh, MT_VERTEX, ind, &ind )
+            || ind >= nLocalNodes ))
+        {
+          inside_ijk[0]=ijk[0]+1;
+          inside_ijk[1]=ijk[1];
+          inside_ijk[2]=ijk[2];
+          inside=Grid_Project(grid,inside_ijk);
+          if(!(!Mesh_GlobalToDomain( sys->mesh, MT_VERTEX, inside, &inside )
+               || inside >= nLocalNodes ))
+            crds[ind][1]=crds[inside][1];
+        }
+    }
+}
+
 
