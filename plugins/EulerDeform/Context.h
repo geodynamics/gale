@@ -88,6 +88,10 @@
                 double          static_left_coord;
                 double          static_front_coord;
                 double          static_back_coord;
+                char*           static_right_equation;
+                char*           static_left_equation;
+                char*           static_front_equation;
+                char*           static_back_equation;
 	};
 
 #endif

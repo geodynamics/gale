@@ -46,7 +46,9 @@
 
 /* Remesh the top corners in 2D or 3D */
 
-void EulerDeform_Remesh_Corner(Mesh *mesh, const int &corner, const int &inside,
+void EulerDeform_Remesh_Corner(Mesh *mesh, EulerDeform_Context* edCtx,
+                               const int &corner, const int &inside,
+                               const char* side_eqn,
                                const double &side_coord, const int &boundary_dim,
                                const int &height_dim, const int &tangent_dim)
 {
@@ -73,15 +75,23 @@ void EulerDeform_Remesh_Corner(Mesh *mesh, const int &corner, const int &inside,
 
           crds[0]=mesh->verts[n];
           crds[1]=mesh->verts[n_in];
-          if(!_EulerDeform_LineInterp(crds,side_coord,boundary_dim,height_dim,
+          double coord=side_coord;
+          if(side_eqn!=NULL && strlen(side_eqn)!=0)
+            {
+              coord=Equation_eval(crds[0],
+                                  reinterpret_cast<DomainContext*>(edCtx->ctx),
+                                  side_eqn,true);
+            }
+
+          if(!_EulerDeform_LineInterp(crds,coord,boundary_dim,height_dim,
                                        &(mesh->verts[n][height_dim])))
             {
               printf("The side is moving in the wrong direction.\n");
-              printf("%g %g %g %g %g\n",side_coord,crds[0][0],crds[0][1],
+              printf("%g %g %g %g %g\n",coord,crds[0][0],crds[0][1],
                      crds[1][0],crds[1][1]);
               abort();
             }
-          mesh->verts[n][boundary_dim]=side_coord;
+          mesh->verts[n][boundary_dim]=coord;
         }
     }
   else /* 3D */
@@ -99,18 +109,25 @@ void EulerDeform_Remesh_Corner(Mesh *mesh, const int &corner, const int &inside,
               double *crds[2];
               crds[0]=mesh->verts[n];
               crds[1]=mesh->verts[n_in];
+              double coord=side_coord;
+              if(strlen(side_eqn)!=0)
+                {
+                  coord=Equation_eval(crds[0],
+                                      reinterpret_cast<DomainContext*>(edCtx->ctx),
+                                      side_eqn,true);
+                }
 
-              if(!_EulerDeform_LineInterp(crds,side_coord,boundary_dim,
+              if(!_EulerDeform_LineInterp(crds,coord,boundary_dim,
                                           height_dim,
                                           &(mesh->verts[n][height_dim])))
                 {
                   printf("The side is moving in the wrong direction.\n");
-                  printf("%g %g %g %g %g %g %g\n",side_coord,crds[0][0],
+                  printf("%g %g %g %g %g %g %g\n",coord,crds[0][0],
                          crds[0][1],crds[0][2],crds[1][0],crds[1][1],
                          crds[1][2]);
                   abort();
                 }
-              mesh->verts[n][boundary_dim]=side_coord;
+              mesh->verts[n][boundary_dim]=coord;
             }
         }
     }

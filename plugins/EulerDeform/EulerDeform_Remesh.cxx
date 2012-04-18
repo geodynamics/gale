@@ -44,6 +44,17 @@
 #include "Context.h"
 #include "EulerDeform.h"
 
+inline void set_vert(const int &d, const unsigned int &boundary, double *vert,
+                     IJK ijk, const char* eqn, EulerDeform_Context* edCtx)
+{
+  if(ijk[d]==boundary && strlen(eqn)!=0)
+    {
+      vert[d]=Equation_eval(vert,
+                            reinterpret_cast<DomainContext*>(edCtx->ctx),
+                            eqn);
+    }
+}
+
 void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
 {
   /* Do not remesh if this is the first step */
@@ -116,26 +127,61 @@ void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx)
         {
           if(sys->staticLeft && !sys->staticLeftTop && !sys->floatLeftTop)
             {
-              EulerDeform_Remesh_Corner(sys->mesh,0,1,sys->static_left_coord,
+              EulerDeform_Remesh_Corner(sys->mesh,edCtx,0,1,
+                                        sys->static_left_equation,
+                                        sys->static_left_coord,
                                         0,1,2);
             }
           if(sys->staticRight && !sys->staticRightTop && !sys->floatRightTop)
             {
-              EulerDeform_Remesh_Corner(sys->mesh,grid->sizes[0]-1,
+              EulerDeform_Remesh_Corner(sys->mesh,edCtx,grid->sizes[0]-1,
                                         grid->sizes[0]-2,
+                                        sys->static_right_equation,
                                         sys->static_right_coord,0,1,2);
-            }
-          if(sys->staticFront && !sys->staticTopFront)
-            {
-              EulerDeform_Remesh_Corner(sys->mesh,grid->sizes[2]-1,
-                                        grid->sizes[2]-2,sys->static_front_coord,2,1,0);
             }
           if(sys->staticBack && !sys->staticTopBack)
             {
-              EulerDeform_Remesh_Corner(sys->mesh,0,1,sys->static_back_coord,2,1,0);
+              EulerDeform_Remesh_Corner(sys->mesh,edCtx,0,1,
+                                        sys->static_back_equation,
+                                        sys->static_back_coord,2,1,0);
+            }
+          if(sys->staticFront && !sys->staticTopFront)
+            {
+              EulerDeform_Remesh_Corner(sys->mesh,edCtx,grid->sizes[2]-1,
+                                        grid->sizes[2]-2,
+                                        sys->static_front_equation,
+                                        sys->static_front_coord,2,1,0);
             }
         }
 
+
+      if((sys->static_left_equation!=NULL
+          && strlen(sys->static_left_equation)!=0)
+         || (sys->static_right_equation!=NULL
+             && strlen(sys->static_right_equation)!=0)
+         || (sys->static_front_equation!=NULL
+             && strlen(sys->static_front_equation)!=0)
+         || (sys->static_back_equation!=NULL
+             && strlen(sys->static_back_equation)!=0))
+        {
+          IJK ijk;
+          unsigned nNodes = Mesh_GetDomainSize( sys->mesh, MT_VERTEX );
+          for(unsigned n_i = 0; n_i < nNodes; n_i++ )
+            {
+              RegularMeshUtils_Node_1DTo3D
+                (sys->mesh,
+                 Mesh_DomainToGlobal(sys->mesh,MT_VERTEX,n_i),ijk);
+
+              set_vert(0,0,sys->mesh->verts[n_i],ijk,
+                       sys->static_left_equation,edCtx);
+              set_vert(0,grid->sizes[0]-1,sys->mesh->verts[n_i],ijk,
+                       sys->static_right_equation,edCtx);
+              set_vert(2,0,sys->mesh->verts[n_i],ijk,
+                       sys->static_back_equation,edCtx);
+              set_vert(2,grid->sizes[2]-1,sys->mesh->verts[n_i],ijk,
+                       sys->static_front_equation,edCtx);
+            }
+        }
     }
 
     /* If we have regular mesh algorithms specified, set the

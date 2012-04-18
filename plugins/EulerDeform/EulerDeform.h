@@ -63,7 +63,9 @@
         Bool _EulerDeform_LineInterp(double** crds, const double &pnt,
                                      unsigned fromDim, unsigned toDim, double* val);
         void EulerDeform_Remesh(TimeIntegrand* crdAdvector, EulerDeform_Context* edCtx);
-        void EulerDeform_Remesh_Corner(Mesh *mesh, const int &corner, const int &inside,
+        void EulerDeform_Remesh_Corner(Mesh *mesh, EulerDeform_Context* edCtx,
+                                       const int &corner, const int &inside,
+                                       const char* side_eqn,
                                        const double &side_coord, const int &boundary_dim,
                                        const int &height_dim, const int &tangent_dim);
         void EulerDeform_WrapSurface(EulerDeform_System* sys,double** oldCrds,

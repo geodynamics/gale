@@ -306,25 +306,37 @@ void EulerDeform_Build(void* component, void* data)
 
 
           /* TODO: fix to allow equations */
-          if(sys->staticRight && sys->wrapTop
-             && !sys->staticRightTop)
-            sys->static_right_coord =
-              Dictionary_GetDouble( uwCtx->dictionary, "maxX");
+          sys->static_right_equation=
+            Dictionary_GetString_WithDefault(sysDict,"right_equation","");
+          if(strlen(sys->static_right_equation)==0)
+            {
+              sys->static_right_coord =
+                Dictionary_GetDouble( uwCtx->dictionary, "maxX");
+            }
 
-          if(sys->staticLeft && sys->wrapTop
-             && !sys->staticLeftTop)
-            sys->static_left_coord =
-              Dictionary_GetDouble( uwCtx->dictionary, "minX");
+          sys->static_left_equation=
+            Dictionary_GetString_WithDefault(sysDict,"left_equation","");
+          if(strlen(sys->static_left_equation)==0)
+            {
+              sys->static_left_coord =
+                Dictionary_GetDouble( uwCtx->dictionary, "minX");
+            }
 
-          if(sys->staticBack && sys->wrapTop
-             && !sys->staticTopBack)
-            sys->static_back_coord =
-              Dictionary_GetDouble( uwCtx->dictionary, "minZ");
+          sys->static_back_equation=
+            Dictionary_GetString_WithDefault(sysDict,"back_equation","");
+          if(strlen(sys->static_back_equation)==0)
+            {
+              sys->static_back_coord =
+                Dictionary_GetDouble( uwCtx->dictionary, "minZ");
+            }
 
-          if(sys->staticFront && sys->wrapTop
-             && !sys->staticTopFront)
-            sys->static_front_coord =
-              Dictionary_GetDouble( uwCtx->dictionary, "maxZ");
+          sys->static_front_equation=
+            Dictionary_GetString_WithDefault(sysDict,"front_equation","");
+          if(strlen(sys->static_front_equation)==0)
+            {
+              sys->static_front_coord =
+                Dictionary_GetDouble( uwCtx->dictionary, "maxZ");
+            }
         }
     }
 
