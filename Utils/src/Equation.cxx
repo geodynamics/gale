@@ -6,7 +6,7 @@
 #include "StgDomain/StgDomain.h"
 
 double Equation_eval(const double *coord, DomainContext *context,
-                     const std::string &equation)
+                     const std::string &equation, const bool &add_dt)
 {
   mup::Value result;
   try
@@ -17,7 +17,7 @@ double Equation_eval(const double *coord, DomainContext *context,
       p.DefineConst("y", coord[1]); 
       if(context->dim==3)
         p.DefineConst("z", coord[2]); 
-      p.DefineConst("t", context->currentTime);
+      p.DefineConst("t", context->currentTime+(add_dt ? context->dt : 0));
       p.EnableAutoCreateVar(true);
       p.SetExpr(equation);
 
@@ -27,12 +27,14 @@ double Equation_eval(const double *coord, DomainContext *context,
         Journal_PrintfL(Journal_Register( Info_Type,"Equation"),
                         2, "Equation %s:  x=%g y=%g t=%g result=%g\n",
                         equation.c_str(),coord[0],coord[1],
-                        context->currentTime,result.GetFloat());
+                        context->currentTime+(add_dt ? context->dt : 0),
+                        result.GetFloat());
       else
         Journal_PrintfL(Journal_Register( Info_Type,"Equation"),
                         2, "Equation %s:  x=%g y=%g z=%g t=%g result=%g\n",
                         equation.c_str(),coord[0],coord[1],coord[2],
-                        context->currentTime,result.GetFloat());
+                        context->currentTime+(add_dt ? context->dt : 0),
+                        result.GetFloat());
     }
   catch (mup::ParserError &e)
     {
