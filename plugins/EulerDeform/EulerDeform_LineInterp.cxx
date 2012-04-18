@@ -53,14 +53,6 @@ Bool _EulerDeform_FindBarycenter1D(const double* crds, const double pnt,
   bcs[1] = (pnt - crds[0])/(crds[1] - crds[0]);
   bcs[0] = 1.0 - bcs[1];
 
-  std::cout << __func__ << " "
-            << bcs[0] << " "
-            << bcs[1] << " "
-            << pnt << " "
-            << crds[0] << " "
-            << crds[1] << " "
-            << "\n";
-
   return (bcs[0] >= 0.0 && bcs[0] <= 1.0 && bcs[1] >= 0.0 && bcs[1] <= 1.0)
     ? True : False;
 }
