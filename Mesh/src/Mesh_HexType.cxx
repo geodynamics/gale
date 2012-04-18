@@ -1081,7 +1081,7 @@ namespace {
 
     Journal_Firewall(x_equal || y_equal,
                      Journal_Register( Error_Type,"Mesh_HexType"),
-                     "The coordinates in either direction %d or %d must be lined up and evenly spaced.\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\nDid you forget to enable EulerDeform?",
+                     "The coordinates in either direction %d or %d must be lined up and evenly spaced.\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\n\t(%g %g %g)\nDid you forget to enable EulerDeform?\n",
                      x,y,verts[mm][0],verts[mm][1],verts[mm][2],
                      verts[mz][0],verts[mz][1],verts[mz][2],
                      verts[mp][0],verts[mp][1],verts[mp][2],
@@ -1181,7 +1181,7 @@ namespace {
     dx=verts[plus][x]-x_0;
     Journal_Firewall(about_equal(dx,x_0-verts[minus][x]),
                      Journal_Register( Error_Type,"Mesh_HexType"),
-                     "The coordinates in direction %d must be evenly spaced.\n\t(%g %g)\n\t(%g %g)\n\t(%g %g)\nDid you forget to enable EulerDeform?",
+                     "The coordinates in direction %d must be evenly spaced.\n\t(%g %g)\n\t(%g %g)\n\t(%g %g)\nDid you forget to enable EulerDeform?\n",
                      x,verts[minus][0],verts[minus][1],
                      verts[zero][0],verts[zero][1],
                      verts[plus][0],verts[plus][1]);
