@@ -268,6 +268,36 @@ void _StgFEM_StandardConditionFunctions_AssignFromXML( void* component, Stg_Comp
   condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File19,
                                    "File19");
   ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File20,
+                                   "File20");
+  ConditionFunction_Register_Add(condFunc_Register,condFunc);
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File21,
+                                   "File21");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File22,
+                                   "File22");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File23,
+                                   "File23");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File24,
+                                   "File24");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File25,
+                                   "File25");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File26,
+                                   "File26");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File27,
+                                   "File27");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File28,
+                                   "File28");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
+  condFunc = ConditionFunction_New(StgFEM_StandardConditionFunctions_File29,
+                                   "File29");
+  ConditionFunction_Register_Add( condFunc_Register, condFunc );
 }
 
 void _StgFEM_StandardConditionFunctions_Destroy( void* _self, void* data ) {
@@ -1786,12 +1816,82 @@ void StgFEM_StandardConditionFunctions_File19(const double *coord, void* _contex
   StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,19,&coords,&data);
 }
 
+void StgFEM_StandardConditionFunctions_File20(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,10,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File21(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,11,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File22(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,12,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File23(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,13,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File24(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,14,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File25(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,15,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File26(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,16,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File27(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,17,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File28(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,18,&coords,&data);
+}
+
+void StgFEM_StandardConditionFunctions_File29(const double *coord, void* _context, void* _result ) 
+{
+  static double *coords=NULL;
+  static double *data=NULL;
+  StgFEM_StandardConditionFunctions_FileN(coord,_context,_result,19,&coords,&data);
+}
+
 void StgFEM_StandardConditionFunctions_FileN(const double *coord, void* _context, void* _result, int file_num, double **coords, double **data)
 {
   FiniteElementContext *	context            = (FiniteElementContext*)_context;
   Dictionary*             dictionary         = context->dictionary;
   double*                 result             = (double*) _result;
-  int                     dim, dim2, dim3, i, j, k;
+  int                     dim, dim2, dim3(-1), i, j, k;
   char *filename;
   int N, N2, N3, ndims;
   double factor, factor2, factor3;

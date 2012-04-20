@@ -156,5 +156,25 @@ void StgFEM_StandardConditionFunctions_File18(const double *coord,
                                               void* _context, void* _result);
 void StgFEM_StandardConditionFunctions_File19(const double *coord,
                                               void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File20(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File21(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File22(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File23(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File24(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File25(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File26(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File27(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File28(const double *coord,
+                                              void* _context, void* _result);
+void StgFEM_StandardConditionFunctions_File29(const double *coord,
+                                              void* _context, void* _result);
 
 #endif	
