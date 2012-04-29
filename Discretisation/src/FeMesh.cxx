@@ -349,7 +349,8 @@ Bool FeMesh_NodeGlobalToDomain( void* feMesh, unsigned global, unsigned* domain 
 	return Mesh_GlobalToDomain( feMesh, MT_VERTEX, global, domain );
 }
 
-void FeMesh_CoordGlobalToLocal( void* feMesh, unsigned element, double* global, double* local ) {
+void FeMesh_CoordGlobalToLocal( void* feMesh, unsigned element,
+                                const double* global, double* local ) {
 	FeMesh*		self = (FeMesh*)feMesh;
 	ElementType*	elType;
 
@@ -362,7 +363,8 @@ void FeMesh_CoordGlobalToLocal( void* feMesh, unsigned element, double* global, 
 	ElementType_ConvertGlobalCoordToElLocal( elType, self, element, global, local );
 }
 
-void FeMesh_CoordLocalToGlobal( void* feMesh, unsigned element, double* local, double* global ) {
+void FeMesh_CoordLocalToGlobal( void* feMesh, unsigned element,
+                                const double* local, double* global ) {
 	FeMesh*		self = (FeMesh*)feMesh;
 	unsigned	nDims;
 	ElementType*	elType;
@@ -396,7 +398,8 @@ void FeMesh_CoordLocalToGlobal( void* feMesh, unsigned element, double* local, d
 	FreeArray( basis );
 }
 
-void FeMesh_EvalBasis( void* feMesh, unsigned element, double* localCoord, double* basis ) {
+void FeMesh_EvalBasis( void* feMesh, unsigned element,
+                       const double* localCoord, double* basis ) {
 	FeMesh*		self = (FeMesh*)feMesh;
 	ElementType*	elType;
 
@@ -407,7 +410,8 @@ void FeMesh_EvalBasis( void* feMesh, unsigned element, double* localCoord, doubl
 	ElementType_EvaluateShapeFunctionsAt( elType, localCoord, basis );
 }
 
-void FeMesh_EvalLocalDerivs( void* feMesh, unsigned element, double* localCoord, double** derivs ) {
+void FeMesh_EvalLocalDerivs( void* feMesh, unsigned element,
+                             const double* localCoord, double** derivs ) {
 	FeMesh*		self = (FeMesh*)feMesh;
 	ElementType*	elType;
 
@@ -419,7 +423,9 @@ void FeMesh_EvalLocalDerivs( void* feMesh, unsigned element, double* localCoord,
 	ElementType_EvaluateShapeFunctionLocalDerivsAt( elType, localCoord, derivs );
 }
 
-void FeMesh_EvalGlobalDerivs( void* feMesh, unsigned element, double* localCoord, double** derivs, double* jacDet ) {
+void FeMesh_EvalGlobalDerivs( void* feMesh, unsigned element,
+                              const double* localCoord, double** derivs,
+                              double* jacDet ) {
 	FeMesh*		self = (FeMesh*)feMesh;
 	unsigned	nDims;
 	ElementType*	elType;

@@ -124,11 +124,17 @@
 	unsigned FeMesh_NodeDomainToGlobal( void* feMesh, unsigned domain );
 	Bool FeMesh_NodeGlobalToDomain( void* feMesh, unsigned global, unsigned* domain );
 
-	void FeMesh_CoordGlobalToLocal( void* feMesh, unsigned element, double* global, double* local );
-	void FeMesh_CoordLocalToGlobal( void* feMesh, unsigned element, double* local, double* global );
-	void FeMesh_EvalBasis( void* feMesh, unsigned element, double* localCoord, double* basis );
-	void FeMesh_EvalLocalDerivs( void* feMesh, unsigned element, double* localCoord, double** derivs );
-	void FeMesh_EvalGlobalDerivs( void* feMesh, unsigned element, double* localCoord, double** derivs, double* jacDet );
+	void FeMesh_CoordGlobalToLocal( void* feMesh, unsigned element,
+                                        const double* global, double* local );
+	void FeMesh_CoordLocalToGlobal( void* feMesh, unsigned element,
+                                        const double* local, double* global );
+	void FeMesh_EvalBasis( void* feMesh, unsigned element,
+                               const double* localCoord, double* basis );
+	void FeMesh_EvalLocalDerivs( void* feMesh, unsigned element,
+                                     const double* localCoord, double** derivs );
+	void FeMesh_EvalGlobalDerivs( void* feMesh, unsigned element,
+                                      const double* localCoord, double** derivs,
+                                      double* jacDet );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Private Member functions
