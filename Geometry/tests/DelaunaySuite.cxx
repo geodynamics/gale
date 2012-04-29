@@ -195,15 +195,15 @@ void DelaunaySuite_TriangulatePolygonMesh( DelaunaySuiteData* data ) {
 		if( fabs( sites[j][0] ) < 0.00001 && fabs( sites[j][1] ) < 0.00001 ) {
 			side = delaunay->voronoiSides[j][0];
 			voronoiArea = delaunay->voronoiArea[j];
+                        a = ( (0.5*side)/sin(0.5*theta) );
+                        area = (0.5*a*a*sin(theta))*((float)(i-1));
+
+                        if( FABS( area - voronoiArea ) > epsilon )
+                          pass = False;
 			break;
 		}
 	}
 
-	a = ( (0.5*side)/sin(0.5*theta) );
-	area = (0.5*a*a*sin(theta))*((float)(i-1));
-
-	if( FABS( area - voronoiArea ) > epsilon )
-		pass = False;
 
 	fclose( fp );
 
