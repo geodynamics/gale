@@ -146,7 +146,7 @@
 	/** Function to calculate the new dt based on the solution just obtained, which
 	  * will be used next timestep. Calls as entry point of a corresponding name,
 	  * which each SLE can add a hook to based on its own criterion */
-	double FiniteElementContext_CalcNewDt( void* context ) ;
+	void FiniteElementContext_CalcNewDt( void* context ) ;
 
 	/* Public functions ------------------------------------------------------------------------------------------------------*/
 	

@@ -361,7 +361,7 @@ double _FiniteElementContext_GetDt( void* context ) {
 	return self->dt;
 }
 
-double FiniteElementContext_CalcNewDt( void* context ) {
+void FiniteElementContext_CalcNewDt( void* context ) {
   FiniteElementContext* self = (FiniteElementContext*)context;
 
   self->prevTimestepDt = self->dt;
@@ -405,7 +405,6 @@ double FiniteElementContext_CalcNewDt( void* context ) {
           self->dt = self->maxTimeStepSize;
       }
     }
-  return self->dt;
 }
 
 
