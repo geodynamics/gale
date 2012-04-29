@@ -450,13 +450,13 @@ void _StressBC_AssembleElement( void* forceTerm, ForceVector* forceVector, Eleme
                       if(dim==2)
                         {
                           geometric_factor=
-                            jac[surface][(d+1)%dim]*(d==face/2 ? -1 : 1);
+                            jac[surface][(d+1)%dim]*(d==local_norm ? 1 : -1);
                         }
                       else
-                        geometric_factor=jac[surface][(d+1)%dim]
-                          * jac[surface2][(d+2)%dim]
-                          - jac[surface][(d+2)%dim]
-                          * jac[surface2][(d+1)%dim];
+                        geometric_factor=
+                          (jac[surface][(d+1)%dim] * jac[surface2][(d+2)%dim]
+                           - jac[surface][(d+2)%dim] * jac[surface2][(d+1)%dim])
+                          *(d==local_norm ? 1 : -1);
                     }
                   else
                     {
