@@ -109,11 +109,11 @@ void pcu_test_gathersources( pcu_test_t* test ) {
    int buflen;
    pcu_source_t* cur;
    void* buf;
-   void* ptr;
+   void* ptr(0);
    int totalsize;
-   void* totalbuf;
-   int* alllens;
-   int* disps;
+   void* totalbuf(0);
+   int* alllens(0);
+   int* disps(0);
    int ii;
 
    MPI_Comm_rank( MPI_COMM_WORLD, &rank );
