@@ -73,7 +73,10 @@ double Stokes_SLE_UpdateDt( Stokes_SLE* self, FiniteElementContext* context ) {
             FeVariable_GetMinimumSeparation( velFeVar, &minSeparation, minSeparationEachDim );
             
             factor=Dictionary_GetDouble_WithDefault(dictionary,"dtFactor",1.0);
-            localDt = factor*0.5 * minSeparation / velMax;
+            if(velMax==0)
+              localDt=0;
+            else
+              localDt = factor*0.5 * minSeparation / velMax;
 
             MPI_Allreduce( &localDt, &globalDt, 1, MPI_DOUBLE, MPI_MIN, MPI_COMM_WORLD );
           }
