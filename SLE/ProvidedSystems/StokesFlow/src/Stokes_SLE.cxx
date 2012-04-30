@@ -44,6 +44,7 @@
 #include <StgDomain/StgDomain.h>
 #include "StgFEM/Discretisation/Discretisation.h"
 #include "StgFEM/SLE/SystemSetup/SystemSetup.h"
+#include <PICellerator/PICellerator.h>
 #include "types.h"
 #include "Stokes_SLE.h"
 #include "UpdateDt.h"
@@ -73,16 +74,18 @@ Stokes_SLE* Stokes_SLE_New(
 	SolutionVector*			uSolnVec,
 	SolutionVector*			pSolnVec,
 	ForceVector*				fForceVec,
-	ForceVector*				hForceVec )
+	ForceVector*				hForceVec,
+        bool damping)
 {
-	Stokes_SLE* self = (Stokes_SLE*) _Stokes_SLE_DefaultNew( name );
+  Stokes_SLE* self = (Stokes_SLE*) _Stokes_SLE_DefaultNew( name );
 
-	self->isConstructed = True;
-	_SystemLinearEquations_Init( self, solver, NULL, context, False, isNonLinear, 
-      nonLinearTolerance, nonLinearMaxIterations, killNonConvergent, 1,  "", "", entryPoint_Register, comm ); 
-	_Stokes_SLE_Init( self, kStiffMat, gStiffMat, dStiffMat, cStiffMat, uSolnVec, pSolnVec, fForceVec, hForceVec );
+  self->isConstructed = True;
+  _SystemLinearEquations_Init( self, solver, NULL, context, False, isNonLinear, 
+                               nonLinearTolerance, nonLinearMaxIterations, killNonConvergent, 1,  "", "", entryPoint_Register, comm ); 
+  _Stokes_SLE_Init(self,kStiffMat,gStiffMat,dStiffMat,cStiffMat,
+                   uSolnVec,pSolnVec,fForceVec,hForceVec,damping);
 
-	return self;
+  return self;
 }
 
 /* Creation implementation / Virtual constructor */
@@ -108,7 +111,8 @@ void _Stokes_SLE_Init(
 		SolutionVector*                                     uSolnVec,
 		SolutionVector*                                     pSolnVec,
 		ForceVector*                                        fForceVec,
-		ForceVector*                                        hForceVec ) 
+		ForceVector*                                        hForceVec,
+                bool                                                damping) 
 {
 	Stokes_SLE* self = (Stokes_SLE*)sle;
 
@@ -120,6 +124,7 @@ void _Stokes_SLE_Init(
 	self->pSolnVec  = pSolnVec;
 	self->fForceVec = fForceVec;   
 	self->hForceVec = hForceVec;   
+        self->damping = damping;
 
 	/* add the vecs and matrices to the Base SLE class's dynamic lists, so they can be 
 	initialised and built properly */
@@ -138,7 +143,27 @@ void _Stokes_SLE_Init(
 
 	/* Put timestep function onto entry point */
 	if ( self->context )
-		EP_AppendClassHook( self->context->calcDtEP, Stokes_SLE_UpdateDt, self );
+          {
+            EP_AppendClassHook(self->context->calcDtEP,Stokes_SLE_UpdateDt,
+                               self);
+
+            /* Add appropriate hooks and make it non-linear if we have
+               a damping term and a variable time step. */
+            if(self->damping)
+              {
+                self->context->dt=
+                  Dictionary_GetDouble_WithDefault(self->context->dictionary,
+                                                   "dt",0.0);
+                if(self->context->dt==0.0)
+                  {
+                    SystemLinearEquations_AddNonLinearEP(sle,Stokes_SLE_Type,
+                                                         Stokes_SLE_CalcNewDt);
+                    SystemLinearEquations_AddNonLinearSetupEP(sle,Stokes_SLE_Type,
+                                                              Stokes_SLE_CalcNewDt);
+                    self->isNonLinear=True;
+                  }
+              }
+          }
 }
 
 void _Stokes_SLE_Print( void* sle, Stream* stream ) {
@@ -195,31 +220,37 @@ void* _Stokes_SLE_DefaultNew( Name name ) {
 }
 
 void _Stokes_SLE_AssignFromXML( void* sle, Stg_ComponentFactory* cf, void* data ) {
-	Stokes_SLE*       self = (Stokes_SLE*)sle;
-	StiffnessMatrix*  kStiffMat;
-	StiffnessMatrix*  gStiffMat;
-	StiffnessMatrix*  dStiffMat;
-	StiffnessMatrix*  cStiffMat;
-	SolutionVector*   uSolnVec;
-	SolutionVector*   pSolnVec;
-	ForceVector*      fForceVec;
-	ForceVector*      hForceVec;
+  Stokes_SLE*       self = (Stokes_SLE*)sle;
+  StiffnessMatrix*  kStiffMat;
+  StiffnessMatrix*  gStiffMat;
+  StiffnessMatrix*  dStiffMat;
+  StiffnessMatrix*  cStiffMat;
+  SolutionVector*   uSolnVec;
+  SolutionVector*   pSolnVec;
+  ForceVector*      fForceVec;
+  ForceVector*      hForceVec;
 
-	/* Construct Parent */
-	_SystemLinearEquations_AssignFromXML( self, cf, data );
+  /* Construct Parent */
+  _SystemLinearEquations_AssignFromXML( self, cf, data );
 
-	kStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StressTensorMatrix", StiffnessMatrix, True, data  );
-	gStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"GradientMatrix", StiffnessMatrix, True, data  );
-	dStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"DivergenceMatrix", StiffnessMatrix, False, data  );
-	cStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"CompressibilityMatrix", StiffnessMatrix, False, data  );
+  kStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"StressTensorMatrix", StiffnessMatrix, True, data  );
+  gStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"GradientMatrix", StiffnessMatrix, True, data  );
+  dStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"DivergenceMatrix", StiffnessMatrix, False, data  );
+  cStiffMat =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"CompressibilityMatrix", StiffnessMatrix, False, data  );
 
-	uSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityVector", SolutionVector, True, data  );
-	pSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureVector", SolutionVector, True, data  );
+  uSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"VelocityVector", SolutionVector, True, data  );
+  pSolnVec  =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"PressureVector", SolutionVector, True, data  );
 
-	fForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ForceVector", ForceVector, True, data  );
-	hForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ContinuityForceVector", ForceVector, True, data  );
+  fForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ForceVector", ForceVector, True, data  );
+  hForceVec =  Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"ContinuityForceVector", ForceVector, True, data  );
 
-	_Stokes_SLE_Init( self, kStiffMat, gStiffMat, dStiffMat, cStiffMat, uSolnVec, pSolnVec, fForceVec, hForceVec );
+  BuoyancyDampingTerm* buoyancyDampingTerm=Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"BuoyancyDampingTerm", BuoyancyDampingTerm, False, data  );
+  bool damping=(buoyancyDampingTerm
+                && buoyancyDampingTerm->buoyancyForceTerm
+                && buoyancyDampingTerm->buoyancyForceTerm->damping);
+
+  _Stokes_SLE_Init(self,kStiffMat,gStiffMat,dStiffMat,cStiffMat,uSolnVec,
+                   pSolnVec,fForceVec,hForceVec,damping);
 }
 
 
@@ -235,5 +266,11 @@ void _Stokes_SLE_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix
 	(*sms)[0] = self->kStiffMat;
 }
 
+/* This version computes the complete dt, not just the dt from the
+   Stokes solve.  This is needed for the drunken seaman fix */
 
+void Stokes_SLE_CalcNewDt( void* self, void* context )
+{
+  FiniteElementContext_CalcNewDt((FiniteElementContext*)context);
+}
 

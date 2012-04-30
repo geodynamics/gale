@@ -76,6 +76,7 @@
 		SolutionVector*	pSolnVec;	/** pressure vector */\
 		ForceVector*		fForceVec;	/** forcing term vector */\
 		ForceVector*		hForceVec;	/** continuity force vector */\
+                bool damping;
 
 	struct Stokes_SLE { __Stokes_SLE };	
 
@@ -96,7 +97,8 @@
 		SolutionVector*			uSolnVec,
 		SolutionVector*			pSolnVec,
 		ForceVector*				fForceVec,
-		ForceVector*				hForceVec );
+		ForceVector*				hForceVec,
+                bool                    damping);
 
 	/* Creation implementation / Virtual constructor */
 	
@@ -121,7 +123,8 @@
 		SolutionVector*	uSolnVec,
 		SolutionVector*	pSolnVec,
 		ForceVector*		fForceVec,
-		ForceVector*		hForceVec ) ;
+		ForceVector*		hForceVec,
+                bool damping ) ;
 
 	void _Stokes_SLE_Delete( void* stokesSleSolver );
 
@@ -133,5 +136,8 @@
 	
 	void _Stokes_SLE_MG_SelectStiffMats( void* _sle, unsigned* nSMs, StiffnessMatrix*** sms );
 	
+        void Stokes_SLE_CalcNewDt( void* self, void* context );
+
+
 #endif
 
