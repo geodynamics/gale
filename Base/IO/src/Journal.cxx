@@ -627,12 +627,7 @@ int Journal_Firewall( int expression, void* _stream, Name fmt, ... )
 #ifndef NO_UNISTD
 		sleep( 1 );
 #endif
-		if ( nProc == 1 ) {
-			exit(EXIT_SUCCESS);
-		}
-		else {
-			MPI_Abort( MPI_COMM_WORLD, EXIT_SUCCESS );
-		}
+                MPI_Abort( MPI_COMM_WORLD, EXIT_FAILURE );
 	}
 	
 	return result;	
