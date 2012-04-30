@@ -46,6 +46,7 @@
 
 	#include "types.h"
 	#include "BuoyancyForceTerm.h"
+	#include "BuoyancyDampingTerm.h"
 	#include "BuoyancyForceTermThermoChem.h"
         #include "DiffusionSMT.h"
 	#include "MaterialSwarmVariable.h"

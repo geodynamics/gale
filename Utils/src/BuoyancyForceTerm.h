@@ -44,7 +44,7 @@
 #ifndef __PICellerator_Utils_BuoyancyForceTerm_h__
 #define __PICellerator_Utils_BuoyancyForceTerm_h__
 
-	typedef double (BuoyancyForceTerm_CalcGravityFunction) ( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle );
+	typedef void (BuoyancyForceTerm_CalcGravityFunction) (BuoyancyForceTerm *self, FeMesh *mesh, Element_DomainIndex dElement_I, double* xi, double *gravity);
 
 	/** Textual name of this class */
 	extern const Type BuoyancyForceTerm_Type;
@@ -70,6 +70,7 @@
 		double											gravity; \
 		double*											gHat; \
 		Bool												adjust; \
+		Bool												damping; \
 		Materials_Register*							materials_Register; \
 		ExtensionInfo_Index							materialExtHandle; \
 		MaterialSwarmVariable**						densitySwarmVariables; \
@@ -89,7 +90,9 @@
 		FeVariable*					temperatureField,
 		FeVariable*					pressureField,
 		double						gravity,
+		double*						gHat,
 		Bool							adjust,
+		Bool							damping,
 		Materials_Register*		materials_Register,
                 HydrostaticTerm*                                    hydrostaticTerm);
 
@@ -113,7 +116,9 @@
 		FeVariable*          temperatureField,
 		FeVariable*          pressureField,
 		double               gravity,
+		double*              gHat,
 		Bool                 adjust,
+		Bool                 damping,
 		Materials_Register*  materials_Register,
                 HydrostaticTerm*     hydrostaticTerm );
 	
@@ -135,10 +140,49 @@
 
 	void _BuoyancyForceTerm_AssembleElement( void* forceTerm, ForceVector* forceVector, Element_LocalIndex lElement_I, double* elForceVec ) ;
 
-	double _BuoyancyForceTerm_CalcGravity( void* forceTerm, Swarm* swarm, Element_LocalIndex lElement_I, void* particle ) ;
+	void _BuoyancyForceTerm_CalcGravity(BuoyancyForceTerm *self,
+                                            FeMesh *mesh,
+                                            Element_DomainIndex dElement_I,
+                                            double* xi, double *gravity);
 
-	#define BuoyancyForceTerm_CalcGravity( forceTerm, swarm, lElement_I, particle ) \
-		(( (BuoyancyForceTerm*) forceTerm )->_calcGravity( forceTerm, swarm, lElement_I, particle ) )
+        #define BuoyancyForceTerm_CalcGravity( forceTerm, mesh, dElement_I, xi, gravity ) \
+        (( (BuoyancyForceTerm*) forceTerm )->_calcGravity( forceTerm, mesh, dElement_I, xi, gravity ) )
+
+        void BuoyancyForceTerm_average_density_alpha(BuoyancyForceTerm *self,
+                                                     IntegrationPointsSwarm* input_swarm,
+                                                     FeMesh* mesh,
+                                                     const Element_LocalIndex &lElement_I,
+                                                     double *density, double *alpha);
+
+        double BuoyancyForceTerm_density_alpha(BuoyancyForceTerm *self,
+                                               FeMesh* mesh,
+                                               const Element_LocalIndex &lElement_I,
+                                               const Cell_Index &cell_I,
+                                               IntegrationPointMapper* mapper,
+                                               IntegrationPoint* particle,
+                                               const int &type);
+
+        inline double BuoyancyForceTerm_density(BuoyancyForceTerm *self,
+                                                FeMesh* mesh,
+                                                const Element_LocalIndex &lElement_I,
+                                                const Cell_Index &cell_I,
+                                                IntegrationPointMapper* mapper,
+                                                IntegrationPoint* particle)
+        {
+          return BuoyancyForceTerm_density_alpha(self,mesh,lElement_I,cell_I,
+                                                 mapper,particle,0);
+        }
+
+        inline double BuoyancyForceTerm_alpha(BuoyancyForceTerm *self,
+                                              FeMesh* mesh,
+                                              const Element_LocalIndex &lElement_I,
+                                              const Cell_Index &cell_I,
+                                              IntegrationPointMapper* mapper,
+                                              IntegrationPoint* particle)
+        {
+          return BuoyancyForceTerm_density_alpha(self,mesh,lElement_I,cell_I,
+                                                 mapper,particle,1);
+        }
 
 #endif
 

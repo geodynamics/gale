@@ -54,9 +54,10 @@
 #ifndef __PICellerator_Utils_types_h__
 #define __PICellerator_Utils_types_h__
 	
-	typedef struct MaterialSwarmVariable            MaterialSwarmVariable;
-	typedef struct BuoyancyForceTerm                BuoyancyForceTerm;
-	typedef struct BuoyancyForceTermThermoChem      BuoyancyForceTermThermoChem;
+	typedef struct MaterialSwarmVariable        MaterialSwarmVariable;
+	typedef struct BuoyancyForceTerm            BuoyancyForceTerm;
+        typedef struct BuoyancyDampingTerm          BuoyancyDampingTerm;
+	typedef struct BuoyancyForceTermThermoChem  BuoyancyForceTermThermoChem;
         typedef struct DiffusionSMT DiffusionSMT;
         typedef struct HydrostaticTerm      HydrostaticTerm;
         typedef struct PCDVC                        	PCDVC;
