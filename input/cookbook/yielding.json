@@ -155,5 +155,9 @@
     "particlesPerCell": "40",
     "seed": "13",
     "checkpointEvery": "1",
-    "gravity": "1.0"
+    "gravity": "1.0",
+   "journal.info": "True",
+    "journal.debug": "True",
+    "journal-level.info": "1",
+    "journal-level.debug": "1"
 }

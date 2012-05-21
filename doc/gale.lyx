@@ -15413,6 +15413,40 @@ picIntegrationPoints
 \end_layout
 
 \begin_layout Standard
+
+\family typewriter
+damping
+\family default
+ is whether to enable a damping term to fix a sloshing, 
+\begin_inset Quotes sld
+\end_inset
+
+drunken seaman
+\begin_inset Quotes srd
+\end_inset
+
+ instability often seen in models with a free surface.
+ Adding the damping term with an adaptive step size makes the problem non-linear.
+ If you have problems with convergence, try setting 
+\family typewriter
+dtFactor
+\family default
+ to something less than 1 (e.g.
+ 0.5), or use a fixed step size by setting 
+\family typewriter
+dt
+\family default
+ (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Variables"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
 \begin_inset VSpace defskip
 \end_inset
 
@@ -15423,10 +15457,10 @@ picIntegrationPoints
 \noindent
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="6" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
-<column alignment="center" valignment="top" width="0">
-<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0pt">
+<column alignment="center" valignment="top" width="0pt">
 <row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
@@ -15481,7 +15515,7 @@ gravityDirection
 \begin_inset Text
 
 \begin_layout Plain Layout
-(0,1,0)
+(0,-1,0)
 \end_layout
 
 \end_inset
@@ -15542,6 +15576,26 @@ Swarm
 
 \begin_layout Plain Layout
 none
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+damping
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+True
 \end_layout
 
 \end_inset
@@ -18500,7 +18554,7 @@ key "Folds"
 \begin_layout Standard
 \begin_inset Formula 
 \[
-t_{r}=\frac{4\pi\eta}{gL},
+t_{r}=\frac{4\pi\eta}{\rho gL},
 \]
 
 \end_inset
@@ -18510,6 +18564,10 @@ t_{r}=\frac{4\pi\eta}{gL},
 \end_inset
 
  is the viscosity, 
+\begin_inset Formula $\rho$
+\end_inset
+
+ is the density, 
 \begin_inset Formula $g$
 \end_inset
 

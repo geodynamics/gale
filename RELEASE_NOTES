@@ -1,3 +1,18 @@
+2.1.0
+----------------------------------
+
+* The temperature mesh has been changed to be the same as the velocity
+  mesh.  This fixes problems when running thermal problems with
+  distorting meshes.
+
+* Documentation has been added for modeling density and expansivity
+  changes as an arbitrary function of pressure and/or temperature.  This
+  is a simple way of modeling phase transitions.
+
+* You may now specify a moving static side.  This is useful when
+  modeling a moving wall boundary that only covers part of the
+  boundary.
+
 2.0.0
 ----------------------------------
 
