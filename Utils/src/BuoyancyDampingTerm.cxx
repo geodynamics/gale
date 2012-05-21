@@ -227,7 +227,7 @@ void _BuoyancyDampingTerm_AssembleElement(void* matrixTerm,
                   {
                     xi[tangent2]=legendre_points[j];
                   }
-                const int num_nodes(9);
+                const int num_nodes(dim==2 ? 9 : 27);
                 double Ni[num_nodes];
                 ElementType_EvaluateShapeFunctionsAt(elementType,xi,Ni);
                 ElementType_Jacobian(elementType,variable1->feMesh,
