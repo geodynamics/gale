@@ -537,7 +537,7 @@ void _BuoyancyForceTerm_CalcGravity(BuoyancyForceTerm *self, FeMesh *mesh,
                                     double* xi, double *gravity)
 {
   for(unsigned int d=0;d<mesh->generator->nDims;++d)
-    gravity[d]=self->gHat[d];
+    gravity[d]=self->gHat[d]*self->gravity;
 }
 
 void BuoyancyForceTerm_average_density_alpha(BuoyancyForceTerm *self,
