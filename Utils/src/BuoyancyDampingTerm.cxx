@@ -217,6 +217,18 @@ void _BuoyancyDampingTerm_AssembleElement(void* matrixTerm,
         {
           const unsigned int face((local_norm==0 ? 1 :
                                    (local_norm==1 ? 0 : 2))*2+(sgn+1)/2);
+          IJK ijk;
+          RegularMeshUtils_Node_1DTo3D
+            (variable1->feMesh,
+             Mesh_DomainToGlobal(variable1->feMesh,MT_VERTEX,
+                                 elementType->faceNodes[face][0]),ijk);
+
+          /* Do not apply a damping force to the bottom boundary.
+             Assume that it is counteracted by whatever is below
+             it. */
+          if(local_norm==1 && sgn==-1 && ijk[1]==0)
+            continue;
+          
           for(int i=0; i<3; ++i)
             for(int j=0;j<(dim==2 ? 1 : 3); ++j)
               {
