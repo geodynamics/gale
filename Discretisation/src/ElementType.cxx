@@ -497,7 +497,7 @@ void ElementType_Jacobian_AxisIndependent(
 	inc = (unsigned*)IArray_GetPtr((self->inc) );
 	
 	/* If GNi isn't passed in - then evaluate them for you */
-	if (_GNi == NULL) {
+	if (static_cast<void *>(_GNi) == NULL) {
 		/* Using 3 here instead of dim so that you can pass in dim = 2 and use axes 0 and 2 for your jacobian */
 		GNi = Memory_Alloc_2DArray( double, 3, nodesPerEl, (Name)"Temporary GNi"  );
 		self->_evaluateShapeFunctionLocalDerivsAt( self, xi, GNi );
