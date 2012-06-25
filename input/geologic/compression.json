@@ -1,0 +1,360 @@
+{
+    "EulerDeform":
+    {
+        "systems": [
+            {
+                "mesh": "v-mesh",
+                "p-mesh": "p-mesh",
+                "displacementField": "DisplacementField",
+                "remesher": "velocityRemesher",
+                "velocityField": "VelocityField",
+                "wrapTop": "True",
+                "staticBottom": "True",
+                "staticLeft": "True",
+                "staticRight": "True",
+                "left_equation": "0.01/(365*86400)*1e21 * t",
+                "right_equation": "1600000 - 0.01/(365*86400)*1e21 * t"
+            }
+        ]
+    },
+    "components":
+    {
+        "buoyancyForceTerm":
+        {
+            "Type": "BuoyancyForceTerm",
+            "ForceVector": "mom_force",
+            "Swarm": "gaussSwarm",
+            "gravity": "gravity",
+            "TemperatureField": "TemperatureField"
+        },
+        "backgroundShape":
+        {
+            "Type": "EquationShape",
+            "equation": "1"
+        },
+        "upperCrustShape":
+        {
+            "Type": "EquationShape",
+            "equation": "y-(800000-15000)"
+        },
+        "magmaShape":
+        {
+            "Type": "EquationShape",
+            "equation": "1^2 - (((x-800000)/25000)^2 + ((y-(800000-35000))/15000)^2)"
+        },
+        "lowerCrustLayerShape":
+        {
+            "Type": "EquationShape",
+            "equation": "((800000-15000)-y)*(y-(800000-45000))"
+        },
+        "lowerCrustShape":
+        {
+            "Type": "Intersection",
+            "shapes":
+            [
+                "lowerCrustLayerShape",
+                "!magmaShape"
+            ]
+        },
+        "lithosphericMantleShape":
+        {
+            "Type": "EquationShape",
+            "equation": "((800000-45000)-y)*(y-(800000-100000))"
+        },
+        "mantleShape":
+        {
+            "Type": "Intersection",
+            "shapes":
+            [
+                "backgroundShape",
+                "!upperCrustShape",
+                "!lowerCrustShape",
+                "!lithosphericMantleShape"
+            ]
+        },
+        "nonNewtonian":
+        {
+            "Type": "NonNewtonian",
+            "StrainRateInvariantField": "StrainRateInvariantField",
+            "TemperatureField": "TemperatureField",
+            "n": "3",
+            "T_0": "51717.1158914",
+            "A": "1.7578e1",
+            "refStrainRate": "396372.399798",
+            "maxViscosity": "1e4",
+            "minViscosity": "1e0"
+        },
+        "strainWeakening":
+        {
+            "Type": "StrainWeakening",
+            "TimeIntegrator": "timeIntegrator",
+            "MaterialPointsSwarm": "materialSwarm",
+            "initialSofteningStrain": "0.5",
+            "finalSofteningStrain": "1.5",
+            "initialDamageFraction": "0.0",
+            "initialDamageWavenumber": "0.5",
+            "initialDamageFactor": "0.5",
+            "healingRate": "0.0"
+        },
+        "yielding":
+        {
+            "Type": "DruckerPrager",
+            "PressureField": "PressureField",
+            "VelocityGradientsField": "VelocityGradientsField",
+            "MaterialPointsSwarm": "materialSwarm",
+            "Context": "context",
+            "StrainWeakening": "strainWeakening",
+            "StrainRateField": "StrainRateField",
+            "cohesion": "20e6",
+            "cohesionAfterSoftening": "1e6",
+            "frictionCoefficient": "0.258819045102",
+            "frictionCoefficientAfterSoftening": "0.0348994967025",
+            "minimumViscosity": "1.0e0"
+        },
+        "fixedViscosity":
+        {
+            "Type": "MaterialViscosity",
+            "eta0": "1.0e0"
+        },
+        "mantle":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "mantleShape",
+            "density": "3300.0",
+            "alpha": "1.0e-5",
+            "diffusivity": "1e15",
+            "heatingElements": [
+                {
+                    "Q": "0.0",
+                    "lambda": "1.0"
+                }
+            ],
+            "Rheology": [
+                "nonNewtonian",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "lithosphericMantle":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "lithosphericMantleShape",
+            "density": "3300.0",
+            "alpha": "1.0e-5",
+            "diffusivity": "1e15",
+            "heatingElements": [
+                {
+                    "Q": "0.0",
+                    "lambda": "1.0"
+                }
+            ],
+            "Rheology": [
+                "nonNewtonian",
+                "yielding",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "upperCrust":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "upperCrustShape",
+            "density": "2700.0",
+            "alpha": "1.0e-5",
+            "diffusivity": "1e15",
+            "heatingElements": [
+                {
+                    "Q": "0.0",
+                    "lambda": "1.0"
+                }
+            ],
+            "Rheology": [
+                "nonNewtonian",
+                "yielding",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "lowerCrust":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "lowerCrustShape",
+            "density": "2800.0",
+            "alpha": "1.0e-5",
+            "diffusivity": "1e15",
+            "heatingElements": [
+                {
+                    "Q": "0.0",
+                    "lambda": "1.0"
+                }
+            ],
+            "Rheology": [
+                "nonNewtonian",
+                "yielding",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "magma":
+        {
+            "Type": "RheologyMaterial",
+            "Shape": "magmaShape",
+            "density": "3000.0",
+            "alpha": "1.0e-5",
+            "diffusivity": "1e15",
+            "heatingElements": [
+                {
+                    "Q": "0.0",
+                    "lambda": "1.0"
+                }
+            ],
+            "Rheology": [
+                "fixedViscosity",
+                "storeViscosity",
+                "storeStress"
+            ]
+        },
+        "stressBC":
+        {
+            "Type": "StressBC",
+            "ForceVector": "mom_force",
+            "wall": "bottom",
+            "normal_value": "9.81*(2700*15000 + 2800*20000 + 3300*765000)*0.98"
+        }
+    },
+    "velocityBCs" :{
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "WallVC",
+                "wall": "left",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "value": "0.01/(365*86400)*1e21*(y<400000 ? 0 : (y<700000 ? (y-400000)/300000 : 1))"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "right",
+                "variables": [
+                    {
+                        "name": "vx",
+                        "value": "-0.01/(365*86400)*1e21*(y<400000 ? 0 : (y<700000 ? (y-400000)/300000 : 1))"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "right",
+                "variables": [
+                    {
+                        "name": "vy",
+                        "value": "0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "left",
+                "variables": [
+                    {
+                        "name": "vy",
+                        "value": "0"
+                    }
+                ]
+            }
+        ]
+    },
+    "temperatureBCs": {
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "WallVC",
+                "wall": "left",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "y>700000 ? (800000-y)/(100000)*(1660-273) + 273 : 1660"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "right",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "y>700000 ? (800000-y)/(100000)*(1660-273) + 273 : 1660"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "top",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "273.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
+                "wall": "bottom",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "1660.0"
+                    }
+                ]
+            }
+        ]
+    },
+    "temperatureICs":
+    {
+        "type": "CompositeVC",
+        "vcList": [
+            {
+                "type": "AllNodesVC",
+                "variables":[
+                    {
+                        "name": "temperature",
+                        "value": "y>700000 ? (800000-y)/(100000)*(1660-273) + 273 : 1660"
+                    }
+                ]
+            }
+        ]
+    },
+
+    "FieldVariablesToCheckpoint": [
+        "StrainRateInvariantField",
+        "VelocityField",
+        "TemperatureField",
+        "PressureField"
+    ],
+    "enable-thermal": true,
+    "maxTimeSteps": "100",
+    "outputPath": "./compression",
+    "dim": "2",
+    "minX": "0",
+    "minY": "0",
+    "minZ": "0",
+    "maxX": "1600000",
+    "maxY": "800000",
+    "maxZ": "0.3",
+    "nx": "32",
+    "ny": "32",
+    "nz": "4",
+    "particlesPerCell": "40",
+    "seed": "13",
+    "checkpointEvery": "1",
+    "gravity": "9.81",
+    "dtFactor": "0.25"
+// ,
+//    "journal.info": "True",
+//     "journal.debug": "True",
+//     "journal-level.info": "1",
+//     "journal-level.debug": "1"
+}
