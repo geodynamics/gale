@@ -241,6 +241,16 @@
         "vcList": [
             {
                 "type": "WallVC",
+                "wall": "top",
+                "variables": [
+                    {
+                        "name": "temperature",
+                        "value": "273.0"
+                    }
+                ]
+            },
+            {
+                "type": "WallVC",
                 "wall": "bottom",
                 "variables": [
                     {
