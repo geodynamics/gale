@@ -272,26 +272,6 @@
         "vcList": [
             {
                 "type": "WallVC",
-                "wall": "left",
-                "variables": [
-                    {
-                        "name": "temperature",
-                        "value": "y>700000 ? (800000-y)/(100000)*(1660-273) + 273 : 1660"
-                    }
-                ]
-            },
-            {
-                "type": "WallVC",
-                "wall": "right",
-                "variables": [
-                    {
-                        "name": "temperature",
-                        "value": "y>700000 ? (800000-y)/(100000)*(1660-273) + 273 : 1660"
-                    }
-                ]
-            },
-            {
-                "type": "WallVC",
                 "wall": "top",
                 "variables": [
                     {
