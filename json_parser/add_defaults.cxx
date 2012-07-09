@@ -532,6 +532,7 @@ void add_defaults(json_spirit::Value &root)
      "\"ExtraInfo\": \"EnergyEqn\","
      "\"VelocityField\": \"VelocityField\","
      "\"defaultDiffusivity\": \"defaultDiffusivity\","
+     "\"supgFactor\": \"supgFactor\","
      "\"UpwindXiFunction\": \"Exact\""
      "},"
      "\"internalHeatingTerm\":"
