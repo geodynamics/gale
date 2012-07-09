@@ -69,6 +69,7 @@ AdvDiffResidualForceTerm_New(Name name,
                              Stg_Component* sle, 
                              FeVariable* velocityField,
                              double defaultDiffusivity,
+                             double supgFactor,
                              Swarm* picSwarm,
                              void* materials_Register,
                              AdvDiffResidualForceTerm_UpwindParamFuncType
@@ -79,7 +80,8 @@ AdvDiffResidualForceTerm_New(Name name,
   self->isConstructed = True;
   _ForceTerm_Init( self, context, forceVector, swarm, sle );
   _AdvDiffResidualForceTerm_Init(self,velocityField,defaultDiffusivity,
-                                 picSwarm, materials_Register,upwindFuncType );
+                                 supgFactor,picSwarm, materials_Register,
+                                 upwindFuncType );
   self->picSwarm=picSwarm;
 
   return self;
@@ -174,6 +176,7 @@ void __AdvDiffResidualForceTerm_FreeLocalMemory( AdvectionDiffusionSLE* sle ){
 void _AdvDiffResidualForceTerm_Init(void* residual,
                                     FeVariable* velocityField,
                                     double defaultDiffusivity,
+                                    double supgFactor,
                                     Swarm* picSwarm,
                                     void* materials_Register,
                                     AdvDiffResidualForceTerm_UpwindParamFuncType
@@ -183,6 +186,7 @@ void _AdvDiffResidualForceTerm_Init(void* residual,
 
   self->velocityField = velocityField;
   self->defaultDiffusivity = defaultDiffusivity;
+  self->supgFactor = supgFactor;
   self->materials_Register  = materials_Register;
   self->upwindParamType = upwindFuncType;
   self->picSwarm = picSwarm;
@@ -210,13 +214,13 @@ void _AdvDiffResidualForceTerm_Print( void* residual, Stream* stream ) {
 	/* General info */
 	Journal_PrintPointer( stream, self->velocityField );
 	Journal_PrintDouble( stream, self->defaultDiffusivity );
+	Journal_PrintDouble( stream, self->supgFactor );
 }
 
 void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFactory* cf, void* data ) {
 	AdvDiffResidualForceTerm*							self = (AdvDiffResidualForceTerm*)residual;
 	FeVariable*												velocityField;
 	Name														upwindParamFuncName;
-	double													defaultDiffusivity;
 	Materials_Register*		materials_Register;
 	AdvDiffResidualForceTerm_UpwindParamFuncType	upwindFuncType = (AdvDiffResidualForceTerm_UpwindParamFuncType)0;
 
@@ -237,13 +241,18 @@ void _AdvDiffResidualForceTerm_AssignFromXML( void* residual, Stg_ComponentFacto
 	else 
 		Journal_Firewall( False, Journal_Register( Error_Type, (Name)self->type  ), "Cannot understand '%s'\n", upwindParamFuncName );
 
-	defaultDiffusivity = Stg_ComponentFactory_GetDouble( cf, self->name, (Dictionary_Entry_Key)"defaultDiffusivity", 1.0  );
+	double defaultDiffusivity=
+          Stg_ComponentFactory_GetDouble(cf,self->name,
+                                         (Dictionary_Entry_Key)"defaultDiffusivity",1.0);
+	double supgFactor=
+          Stg_ComponentFactory_GetDouble(cf,self->name,(Dictionary_Entry_Key)"supgFactor",1.0);
 	materials_Register = ((PICelleratorContext*)(self->context))->materials_Register;
 
-	_AdvDiffResidualForceTerm_Init( self, velocityField, defaultDiffusivity,
-                                        picSwarm,
-                                        materials_Register,
-                                        upwindFuncType );
+	_AdvDiffResidualForceTerm_Init(self,velocityField,defaultDiffusivity,
+                                       supgFactor,
+                                       picSwarm,
+                                       materials_Register,
+                                       upwindFuncType );
 }
 
 void _AdvDiffResidualForceTerm_Build(void* residual, void* data)
@@ -393,7 +402,6 @@ void _AdvDiffResidualForceTerm_AssembleElement(void* forceTerm,
   double*                    phiGrad;
   double*                    Ni;
   double*                    SUPGNi;
-  double                     supgfactor;
   double                     udotu, perturbation;
   double                     upwindDiffusivity;
 
@@ -464,7 +472,7 @@ void _AdvDiffResidualForceTerm_AssembleElement(void* forceTerm,
       if(dim==3)
         udotu+=velocity[K_AXIS]*velocity[K_AXIS];
 
-      supgfactor = upwindDiffusivity / udotu;
+      double supg = upwindDiffusivity*self->supgFactor / udotu;
       for(node_I=0; node_I<elementNodeCount; node_I++)
         {
           /* In the case of per diffusion - just build regular shape functions */
@@ -480,7 +488,7 @@ void _AdvDiffResidualForceTerm_AssembleElement(void* forceTerm,
             perturbation=perturbation+velocity[K_AXIS]*GNx[K_AXIS][node_I];
 			
           /* p = \frac{\bar \kappa \hat u_j w_j }{ ||u|| } -  Eq. 3.2.25 */
-          perturbation = supgfactor * perturbation;
+          perturbation = supg * perturbation;
 			
           SUPGNi[node_I] = Ni[node_I] + perturbation;
         }  

@@ -76,6 +76,7 @@ typedef struct {
   /* AdvDiffResidualForceTerm info */ \
   FeVariable* velocityField; \
   double defaultDiffusivity; \
+  double supgFactor; \
   AdvDiffResidualForceTerm_UpwindParamFuncType upwindParamType;
 
 struct AdvDiffResidualForceTerm { __AdvDiffResidualForceTerm };	
@@ -92,6 +93,7 @@ AdvDiffResidualForceTerm_New(Name name,
                              Stg_Component* sle, 
                              FeVariable* velocityField,
                              double defaultDiffusivity,
+                             double supgFactor,
                              Swarm* picSwarm,
                              void* materials_Register,
                              AdvDiffResidualForceTerm_UpwindParamFuncType
@@ -115,6 +117,7 @@ AdvDiffResidualForceTerm* _AdvDiffResidualForceTerm_New(  ADVDIFFRESIDUALFORCETE
 void _AdvDiffResidualForceTerm_Init(void* residual,
                                     FeVariable* velocityField,
                                     double defaultDiffusivity,
+                                    double supgFactor,
                                     Swarm* picSwarm,
                                     void* materials_Register,
                                     AdvDiffResidualForceTerm_UpwindParamFuncType
