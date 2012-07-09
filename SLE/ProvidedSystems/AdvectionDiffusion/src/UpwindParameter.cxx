@@ -153,9 +153,12 @@ double AdvDiffResidualForceTerm_UpwindDiffusivity(AdvDiffResidualForceTerm* self
     }
   upwindDiffusivity*=ISQRT15;         /* See Eq. 3.3.11 */
 
-  upwindDiffusivity/=2; /* This factor is because we are using Q2
+  upwindDiffusivity/=16; /* This factor is because we are using Q2
                            instead of Q1 elements, so the spacing
-                           needs to be adjusted. */
+                           needs to be adjusted.  That gives a factor
+                           of 2, but we make it a factor of 16 to
+                           ensure stability even when the mesh is
+                           distorted. */
 	
   return upwindDiffusivity;
 }
