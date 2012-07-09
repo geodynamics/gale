@@ -147,5 +147,6 @@
     "particlesPerCell": "40",
     "seed": "13",
     "checkpointEvery": "1",
-    "gravity": "1.0"
+    "gravity": "1.0",
+    "supgFactor": "0.125"
 }

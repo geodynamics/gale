@@ -369,10 +369,6 @@
     "seed": "13",
     "checkpointEvery": "1",
     "gravity": "9.81",
-    "dtFactor": "0.25"
-// ,
-//    "journal.info": "True",
-//     "journal.debug": "True",
-//     "journal-level.info": "1",
-//     "journal-level.debug": "1"
+    "dtFactor": "0.25",
+    "supgFactor": "0.5"
 }
