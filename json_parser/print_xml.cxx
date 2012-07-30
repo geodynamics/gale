@@ -14,11 +14,17 @@ std::string fix_comparisons(const std::string &s)
       result.replace(i,1,"&lt;");
       i=result.find('<',i+1);
     }
-  i=result.find('<');
+  i=result.find('>');
   while(i!=std::string::npos)
     {
       result.replace(i,1,"&gt;");
       i=result.find('>',i+1);
+    }
+  i=result.find('&');
+  while(i!=std::string::npos)
+    {
+      result.replace(i,1,"&amp;");
+      i=result.find('&',i+1);
     }
   return result;
 }
