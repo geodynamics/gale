@@ -21,9 +21,9 @@ Configure with
 
   ./configure --enable-parallel --enable-production --enable-shared=no --prefix=$HOME CC=mpicc
 
-Then get Petsc 3.0.0 and configure with
+Then get Petsc 3.2-p7 and configure with
 
-  ./configure --with-fortran=0 --with-x=0 --download-c-blas-lapack=1 --with-shared=0 --with-debugging=0
+  ./configure --with-fortran=0 --with-x=0 --download-c-blas-lapack=1 --with-shared-libraries=0 --with-debugging=0
 
 Next is Gale.  Gale uses dgesv_ from lapack.  The downloaded
 c-blas-lapack library may define it as "dgesv" or "dgesv_".  You can
@@ -68,6 +68,13 @@ which are all libaries provided by the kernel.
 MAC
 ---
 
+export MACOSX_DEPLOYMENT_TARGET=10.5
+export PATH=/Users/walter/src/mpich-bin/bin:$PATH
+export PETSC_DIR=/Users/walter/src/petsc-3.2-p7
+export PETSC_ARCH=arch-darwin-c-opt
+export CC=mpicc
+export CXX=mpicxx
+
 To build a version on 10.6 that works for both 10.5 and 10.6,
 configure HDF5 with
 
@@ -75,14 +82,15 @@ configure HDF5 with
 
 When configuring Petsc,
 
-  ./configure --with-fortran=0 --with-x=0 --with-shared=0 --with-debugging=0 --CFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk" --LDFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+  ./configure --with-fortran=0 --with-x=0 --with-shared-libraries=0 --with-debugging=0 --CFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk" --LDFLAGS="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
 
 and when configuring Gale
 
-  ./configure.sh --with-debugging=0 --hdf5-dir=/Users/walter/src/hdf5-bin --cxxflags="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk" --linkflags="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
+  ./configure.sh --cxx=/Users/walter/src/mpich-bin/bin/mpicxx --with-debugging=0 --hdf5-dir=/Users/walter/src/hdf5-bin --cxxflags="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk" --linkflags="-mmacosx-version-min=10.5 -isysroot /Developer/SDKs/MacOSX10.5.sdk"
 
-When linking Gale, it will not find libz needed by hdf5.  So add 'z'
-to the list of libaries in config.cfg.  Running
+When linking Gale, it will not find lapack, blas, and libz functions.
+So add 'lapack, 'blas' and 'z' to the list of libaries in config.cfg.
+Running
 
   otool -L build/bin/Gale
 
@@ -92,9 +100,12 @@ Windows
 -------
 
 Install the libxml2-dev, lapack-dev, libhdf5-dev packages.  Configure
-mpich, petsc and Gale the same as in Linux.  In the end, you will have
-to copy a number of dll's.  Run ldd on Gale.exe and copy all of the
-dll's not in the Windows directory.
+mpich and Gale the same as in Linux.  Configure Petsc with
+
+  ./configure --with-fortran=0 --with-x=0 --with-shared-libraries=0 --with-debugging=0 --with-windows-graphics=0
+
+In the end, you will have to copy a number of dll's.  Run ldd on
+Gale.exe and copy all of the dll's not in the Windows directory.
 
 
 
