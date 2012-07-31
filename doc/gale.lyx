@@ -124,7 +124,7 @@ Walter Landry and Luke Hodkinson
 \begin_inset Newline newline
 \end_inset
 
-Version 2.0.0
+Version 2.0.1
 \end_layout
 
 \begin_layout Date
@@ -882,22 +882,22 @@ Gale can use a few different types of finite elements to represent the solution.
 \begin_inset Formula $Q_{2}$
 \end_inset
 
-) elements for the velocity, discontinuous linear (
+) elements for the velocity and temperature, and discontinuous linear (
 \begin_inset Formula $P_{-1}$
 \end_inset
 
-) elements for the pressure, and continuous linear (
-\begin_inset Formula $Q_{1}$
-\end_inset
-
-) elements for the temperature.
+) elements for the pressure.
  These elements are mathematically well behaved and have been used in other
  computational codes with success.
 \end_layout
 
 \begin_layout Standard
 If, for some reason, you wish use a different element type, Gale also supports
- piecewise constant (
+ linear (
+\begin_inset Formula $Q_{1}$
+\end_inset
+
+) and piecewise constant (
 \begin_inset Formula $P_{0}$
 \end_inset
 
@@ -936,6 +936,45 @@ Previous versions of Gale did not support
  as resolution increases.
  In practice, for realistic geologic problems, the artificial compressibility
  was far too large and dramatically altered the dynamics.
+\end_layout
+
+\begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Thermal-Advection"
+
+\end_inset
+
+Thermal Advection and Diffusion
+\end_layout
+
+\begin_layout Standard
+Gale uses the Stream Upwind Petrov-Galerkin (SUPG) method to solve the energy
+ equation (eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:energy"
+
+\end_inset
+
+).
+ This should normally work without any modification.
+ However, if the elements in your model gets significantly distorted, you
+ may see anomalously high temperature variations.
+ To fix this, you can modify 
+\family typewriter
+supgFactor
+\family default
+, as detailed in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Temperature-components"
+
+\end_inset
+
+.
+ 
 \end_layout
 
 \begin_layout Subsubsection
@@ -1045,17 +1084,16 @@ minViscosity
 maxViscosity
 \family default
 .
- Note that the scaling for 
+ For example, 
 \family typewriter
 A
 \family default
- is non-trivial.
- It has units of 
-\begin_inset Formula $s^{-1/n}Pa^{-1}$
+ has units of 
+\begin_inset Formula $s^{-1}Pa^{-n}$
 \end_inset
 
 , so in this case 
-\begin_inset Formula $A_{new}=A_{old}\left(10^{25}\right)^{1/n}$
+\begin_inset Formula $A_{new}=A_{old}10^{25}$
 \end_inset
 
 .
@@ -1949,7 +1987,7 @@ If you downloaded binaries for your platform, you can run the Gale executable
 \end_layout
 
 \begin_layout LyX-Code
-./Gale-2_0_0 input/cookbook/yielding.json
+./Gale-2_0_1 input/cookbook/yielding.json
 \end_layout
 
 \begin_layout Standard
@@ -1961,43 +1999,43 @@ TimeStep = 0, Time = 0
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 1, Time = 0.0215028
+TimeStep = 1, Time = 0.021503
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 2, Time = 0.0427742
+TimeStep = 2, Time = 0.0427746
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 3, Time = 0.063824
+TimeStep = 3, Time = 0.0638247
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 4, Time = 0.084661
+TimeStep = 4, Time = 0.0846619
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 5, Time = 0.105287
+TimeStep = 5, Time = 0.105288
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 6, Time = 0.125703
+TimeStep = 6, Time = 0.125705
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 7, Time = 0.145912
+TimeStep = 7, Time = 0.145914
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 8, Time = 0.165915
+TimeStep = 8, Time = 0.165918
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 9, Time = 0.18572
+TimeStep = 9, Time = 0.185726
 \end_layout
 
 \begin_layout LyX-Code
-TimeStep = 10, Time = 0.205274
+TimeStep = 10, Time = 0.205284
 \end_layout
 
 \begin_layout Standard
@@ -2016,14 +2054,27 @@ If you do not specify an input file, you will get no output.
 \begin_layout LyX-Code
 
 \size small
-Error: File input/cookbook/foo.json doesn't exist, not readable, or not valid.
+Error on line 1 at column 1
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+	not a value
+\end_layout
+
+\begin_layout LyX-Code
+
+\size small
+Error: Could not read input file input/cookbook/foo.json.
+ Exiting.
 \end_layout
 
 \begin_layout Standard
 Due to quirks in some implementations of MPI, you may have to specify the
  complete path to the input file (e.g., 
 \family typewriter
-./Gale-2_0_0 /home/juser/gale/input/cookbook/yielding.
+./Gale-2_0_1 /home/juser/gale/input/cookbook/yielding.
 \family default
 json).
 \end_layout
@@ -5333,10 +5384,17 @@ A worked example is in
 input/cookbook/sinusoid.json
 \family default
 .
- Figure 
+ Figures 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "fig:Strain-initial-deformed"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "fig:Strain-final-deformed"
 
 \end_inset
 
@@ -5347,7 +5405,54 @@ reference "sub:Visualization-with-Visit"
 
 \end_inset
 
-).
+) at the beginning and after the tenth timestep.
+ Note that the material has flattened out and the magnitude of the velocity
+ and strainrate has reduced considerably.
+\end_layout
+
+\begin_layout Standard
+\noindent
+\align center
+\begin_inset Float figure
+placement H
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\noindent
+\align center
+\begin_inset Graphics
+	filename images/cookbook_viscous_sinusoid_initial.png
+	lyxscale 75
+	width 100col%
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "fig:Strain-initial-deformed"
+
+\end_inset
+
+Strain rate invariant and velocity with initially deformed upper boundary
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -5378,7 +5483,7 @@ status open
 \begin_layout Plain Layout
 \begin_inset CommandInset label
 LatexCommand label
-name "fig:Strain-initial-deformed"
+name "fig:Strain-final-deformed"
 
 \end_inset
 
@@ -8706,6 +8811,53 @@ Similarly, you can independently set the left, top, bottom, front, and back
 \end_layout
 
 \begin_layout Standard
+Setting staticRight will make the right boundary immobile.
+ You can make the whole boundary move with a fixed velocity, by setting
+ 
+\family typewriter
+right_equation
+\family default
+.
+ So setting
+\end_layout
+
+\begin_layout LyX-Code
+\begin_inset Quotes sld
+\end_inset
+
+right_equation
+\begin_inset Quotes srd
+\end_inset
+
+: 
+\begin_inset Quotes sld
+\end_inset
+
+10 - 0.01 * t
+\begin_inset Quotes srd
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+will make the right side move from 10 inwards with a velocity 0.1.
+ Similarly, you can make the left side move by setting 
+\family typewriter
+left_equation
+\family default
+.
+ If you are scaling units as in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Scaling"
+
+\end_inset
+
+, be sure to scale the velocity here.
+\end_layout
+
+\begin_layout Standard
 Note that this will only fix the interior of that boundary.
  So setting 
 \family typewriter
@@ -9916,6 +10068,30 @@ reference "sec:Materials"
 \end_inset
 
 ).
+\end_layout
+
+\begin_layout Standard
+This should normally work without any tweaking.
+ However, if your model has strongly distorted elements, then you may see
+ anomalously high temperature variations.
+ Fo fix that, modify the prefactor for SUPG (see Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Thermal-Convection"
+
+\end_inset
+
+) by setting the variable 
+\family typewriter
+supgFactor
+\family default
+ to something smaller.
+ A good first guess is to try 0.5.
+ Note that if you set 
+\family typewriter
+supgFactor
+\family default
+ too small, then you may see other numerical artifacts.
 \end_layout
 
 \begin_layout Section
@@ -11168,6 +11344,43 @@ ty (
 \end_inset
 
 ), and a thermal diffusivity.
+ To make a pressure or temperature dependent density, set 
+\family typewriter
+densityEquation
+\family default
+ instead of 
+\family typewriter
+density
+\family default
+.
+ For example, specifying
+\end_layout
+
+\begin_layout LyX-Code
+”densityEquation”: ”p<1 ? 2 : 1”
+\end_layout
+
+\begin_layout Standard
+will set the density to 2 when the pressure (
+\family typewriter
+p
+\family default
+) is less than 1, and 1 otherwise.
+ For temperature dependence, use the variable 
+\family typewriter
+T
+\family default
+.
+ Similarly, to set a pressure or temperature dependent thermal expansity,
+ specify 
+\family typewriter
+alphaEquation
+\family default
+ instead of 
+\family typewriter
+alpha
+\family default
+.
 \end_layout
 
 \begin_layout Standard
@@ -14340,6 +14553,12 @@ Gale has two different models for modeling erosion.
 \end_layout
 
 \begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Diffusion"
+
+\end_inset
+
 Diffusion
 \end_layout
 
@@ -14361,6 +14580,59 @@ This plugin applies a diffusive operator to the top.
 SurfaceProcess
 \family default
 .
+ For example to apply diffusion with a coefficient of 1, add
+\end_layout
+
+\begin_layout LyX-Code
+"plugins": [
+\end_layout
+
+\begin_layout LyX-Code
+  {
+\end_layout
+
+\begin_layout LyX-Code
+    "Type": "Underworld_SurfaceProcess"
+\end_layout
+
+\begin_layout LyX-Code
+  }
+\end_layout
+
+\begin_layout LyX-Code
+],
+\end_layout
+
+\begin_layout LyX-Code
+"SurfaceProcess":
+\end_layout
+
+\begin_layout LyX-Code
+  {
+\end_layout
+
+\begin_layout LyX-Code
+    "mesh": "v-mesh",
+\end_layout
+
+\begin_layout LyX-Code
+    "VelocityField": "VelocityField",
+\end_layout
+
+\begin_layout LyX-Code
+    "diffusionCoefficient": "0.1"
+\end_layout
+
+\begin_layout LyX-Code
+  },
+\end_layout
+
+\begin_layout Standard
+just before the 
+\family typewriter
+EulerDeform
+\family default
+ struct.
 \end_layout
 
 \begin_layout Subsubsection
@@ -16786,11 +17058,11 @@ Maximum of all values
 \end_layout
 
 \begin_layout Standard
-In addition, you can use the function 
+In addition, you can use the syntax 
 \family typewriter
-if(a,b,c)
+a ? b : c
 \family default
-.
+ as a conditonal.
  If the first element 
 \family typewriter
 a
@@ -16815,7 +17087,7 @@ a
 
 \begin_layout Standard
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="2">
+<lyxtabular version="3" rows="9" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -16944,7 +17216,7 @@ is not equal
 \begin_inset Text
 
 \begin_layout Plain Layout
-||
+or
 \end_layout
 
 \end_inset
@@ -16960,11 +17232,31 @@ logical or
 </cell>
 </row>
 <row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+and
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+logical and
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
 <cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-&&
+xor
 \end_layout
 
 \end_inset
@@ -16973,7 +17265,7 @@ logical or
 \begin_inset Text
 
 \begin_layout Plain Layout
-logical and
+exclusive or
 \end_layout
 
 \end_inset
@@ -16987,32 +17279,7 @@ logical and
 \end_layout
 
 \begin_layout Standard
-You can use the syntax 
-\family typewriter
-?:
-\family default
- as an exact replacement for 
-\family typewriter
-if()
-\family default
-.
- So instead of
-\end_layout
-
-\begin_layout LyX-Code
-if(x<1,a,b)
-\end_layout
-
-\begin_layout Standard
-you can use
-\end_layout
-
-\begin_layout LyX-Code
-(x < 1) ? a : b
-\end_layout
-
-\begin_layout Standard
-Note that both forms will only evaluate the element as needed.
+Note that this will only evaluate the element as needed.
  So if x<1, 
 \family typewriter
 a
@@ -18124,6 +18391,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/Sphere_v.png
+	lyxscale 50
 	height 60pheight%
 
 \end_inset
@@ -18241,6 +18509,7 @@ status open
 \align center
 \begin_inset Graphics
 	filename images/inclusion_setup.png
+	lyxscale 50
 	width 50col%
 
 \end_inset
