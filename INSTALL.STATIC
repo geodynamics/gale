@@ -23,7 +23,7 @@ Configure with
 
 Then get Petsc 3.2-p7 and configure with
 
-  ./configure --with-fortran=0 --with-x=0 --download-c-blas-lapack=1 --with-shared-libraries=0 --with-debugging=0
+  ./configure --with-fortran=0 --with-x=0 --download-f2cblaslapack=1 --with-shared-libraries=0 --with-debugging=0
 
 Next is Gale.  Gale uses dgesv_ from lapack.  The downloaded
 c-blas-lapack library may define it as "dgesv" or "dgesv_".  You can
@@ -39,10 +39,13 @@ Otherwise, use
 
   ./configure.sh --with-debugging=0 --hdf5-dir=$HOME --cxxflags='-Ddgesv_=dgesv'
 
-The final link for Gale will still pull in shared versions of libxml2.
+The final link will fail because it can not find lapack and blas.  Add
+"f2clapack" and "f2cblas" to the list of libraries.
+
+The Gale executable will still pull in shared versions of libxml2.
 Copy the final link line, remove the -lxml2 flag, and add
 
-  /usr/lib/libxml2.a /usr/lib/libz.a
+  /usr/lib/libxml2.a /usr/lib/libz.a -ldl
 
 at the end.  You also need to staticly link libstdc++.  Symlink the
 static libstdc++ into the build directory with the command
