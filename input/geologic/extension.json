@@ -1,4 +1,15 @@
 {
+    "plugins": [
+        {
+            "Type": "Underworld_SurfaceProcess"
+        }
+    ],
+    "SurfaceProcess":
+    {
+            "mesh": "v-mesh",
+            "VelocityField": "VelocityField",
+            "diffusionCoefficient": "1e16"
+    },
     "EulerDeform":
     {
         "systems": [

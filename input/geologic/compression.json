@@ -1,4 +1,15 @@
 {
+    "plugins": [
+        {
+            "Type": "Underworld_SurfaceProcess"
+        }
+    ],
+    "SurfaceProcess":
+    {
+            "mesh": "v-mesh",
+            "VelocityField": "VelocityField",
+            "diffusionCoefficient": "1e16"
+    },
     "EulerDeform":
     {
         "systems": [
@@ -13,7 +24,7 @@
                 "staticLeft": "True",
                 "staticRight": "True",
                 "left_equation": "0.01/(365*86400)*1e21 * t",
-                "right_equation": "1600000 - 0.01/(365*86400)*1e21 * t"
+                "right_equation": "3200000 - 0.01/(365*86400)*1e21 * t"
             }
         ]
     },
@@ -40,7 +51,7 @@
         "magmaShape":
         {
             "Type": "EquationShape",
-            "equation": "1^2 - (((x-800000)/25000)^2 + ((y-(800000-35000))/15000)^2)"
+            "equation": "1^2 - (((x-1600000)/25000)^2 + ((y-(800000-35000))/15000)^2)"
         },
         "lowerCrustLayerShape":
         {
@@ -231,7 +242,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "0.01/(365*86400)*1e21*(y<400000 ? 0 : (y<700000 ? (y-400000)/300000 : 1))"
+                        "value": "0.01/(365*86400)*1e21*(y < 400000 ? 0 : (y<700000 ? (y-400000)/300000 : 1))"
                     }
                 ]
             },
@@ -241,7 +252,7 @@
                 "variables": [
                     {
                         "name": "vx",
-                        "value": "-0.01/(365*86400)*1e21*(y<400000 ? 0 : (y<700000 ? (y-400000)/300000 : 1))"
+                        "value": "-0.01/(365*86400)*1e21*(y < 400000 ? 0 : (y<700000 ? (y-400000)/300000 : 1))"
                     }
                 ]
             },
@@ -301,7 +312,7 @@
                 "variables":[
                     {
                         "name": "temperature",
-                        "value": "y>700000 ? (800000-y)/(100000)*(1660-273) + 273 : 1660"
+                        "value": "y > 700000 ? (800000-y)/(100000)*(1660-273) + 273 : 1660"
                     }
                 ]
             }
@@ -316,15 +327,15 @@
     ],
     "enable-thermal": true,
     "maxTimeSteps": "100",
-    "outputPath": "./compression",
+    "outputPath": "./compression_wide",
     "dim": "2",
     "minX": "0",
     "minY": "0",
     "minZ": "0",
-    "maxX": "1600000",
+    "maxX": "3200000",
     "maxY": "800000",
     "maxZ": "0.3",
-    "nx": "32",
+    "nx": "64",
     "ny": "32",
     "nz": "4",
     "particlesPerCell": "40",
@@ -332,9 +343,4 @@
     "checkpointEvery": "1",
     "gravity": "9.81",
     "dtFactor": "0.25"
-// ,
-//    "journal.info": "True",
-//     "journal.debug": "True",
-//     "journal-level.info": "1",
-//     "journal-level.debug": "1"
 }
