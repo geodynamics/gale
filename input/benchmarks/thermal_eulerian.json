@@ -121,7 +121,7 @@
     "enable-stokes": false,
     "enable-thermal": true,
     "timeIntegratorOrder": "1",
-    "maxTimeSteps": "10",
+    "maxTimeSteps": "16",
     "outputPath": "./output",
     "dim": "2",
     "minX": "0",
