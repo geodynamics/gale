@@ -1,0 +1,7 @@
+touch $1
+rm $1
+for i in `seq 1 10`; do
+  h=`h5dump -d /max Mesh.v-mesh.0000$i.h5 | tail -n 4 | head -n 1 | cut -d ' ' -f 6`
+  t=`h5dump -d /currentTime timeInfo.0000$i.h5 | tail -n 4 | head -n 1 | cut -d ' ' -f 5`
+  echo $t $h >> $1
+done

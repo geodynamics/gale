@@ -1,0 +1,10 @@
+set term postscript eps color
+set output "sinusoid_error.eps"
+set xlabel "Time"
+set ylabel "Error"
+set key top left
+plot [:100] "64/height_64" using ($1):(abs(($2-1)-0.01*exp(-$1/(4*pi)))) w l lw 4 title "64x128", "128/height_128" using ($1):(abs(($2-1)-0.01*exp(-$1/(4*pi)))) w l lw 4 title "128x256", "256/height_256" using ($1):(abs(($2-1)-0.01*exp(-$1/(4*pi)))) w l lw 4 title "256x512"
+
+set output "sinusoid_scaled_error.eps"
+set ylabel "Scaled Error"
+plot [:100] "64/height_64" using ($1):(1*abs(($2-1)-0.01*exp(-$1/(4*pi)))) w l lw 4 title "64x128", "128/height_128" using ($1):(2*abs(($2-1)-0.01*exp(-$1/(4*pi)))) w l lw 4 title "128x256", "256/height_256" using ($1):(4*abs(($2-1)-0.01*exp(-$1/(4*pi)))) w l lw 4 title "256x512"

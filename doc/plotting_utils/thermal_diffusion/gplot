@@ -1,0 +1,6 @@
+set term postscript eps color
+set output "thermal_diffusion_error.eps"
+set ylabel "Error"
+set xlabel "h"
+set key off
+plot "data" using (1/$1):($1*abs($2-0.908116048146)) w lp lw 4
