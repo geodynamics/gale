@@ -1,7 +1,7 @@
 %!PS-Adobe-2.0 EPSF-2.0
 %%Title: thermal_diffusion_error.eps
-%%Creator: gnuplot 4.4 patchlevel 0
-%%CreationDate: Fri Nov 25 11:22:24 2011
+%%Creator: gnuplot 4.6 patchlevel 0
+%%CreationDate: Wed Aug 22 13:27:21 2012
 %%DocumentFonts: (atend)
 %%BoundingBox: 50 50 410 302
 %%EndComments
@@ -20,10 +20,12 @@ gnudict begin
 /Level1 false def
 /Rounded false def
 /ClipToBoundingBox false def
+/SuppressPDFMark false def
 /TransparentPatterns false def
 /gnulinewidth 5.000 def
 /userlinewidth gnulinewidth def
 /Gamma 1.0 def
+/BackgroundColor {-1.000 -1.000 -1.000} def
 %
 /vshift -46 def
 /dl1 {
@@ -38,22 +40,6 @@ gnudict begin
 /vpt_ 31.5 def
 /hpt hpt_ def
 /vpt vpt_ def
-Level1 {} {
-/SDict 10 dict def
-systemdict /pdfmark known not {
-  userdict /pdfmark systemdict /cleartomark get put
-} if
-SDict begin [
-  /Title (thermal_diffusion_error.eps)
-  /Subject (gnuplot plot)
-  /Creator (gnuplot 4.4 patchlevel 0)
-  /Author (boo)
-%  /Producer (gnuplot)
-%  /Keywords ()
-  /CreationDate (Fri Nov 25 11:22:24 2011)
-  /DOCINFO pdfmark
-end
-} ifelse
 /doclip {
   ClipToBoundingBox {
     newpath 50 50 moveto 410 50 lineto 410 302 lineto 50 302 lineto closepath
@@ -61,7 +47,7 @@ end
   } if
 } def
 %
-% Gnuplot Prolog Version 4.4 (January 2010)
+% Gnuplot Prolog Version 4.4 (August 2010)
 %
 %/SuppressPDFMark true def
 %
@@ -73,6 +59,7 @@ end
 /Z {closepath} bind def
 /C {setrgbcolor} bind def
 /f {rlineto fill} bind def
+/g {setgray} bind def
 /Gshow {show} def   % May be redefined later in the file to support UTF-8
 /vpt2 vpt 2 mul def
 /hpt2 hpt 2 mul def
@@ -94,6 +81,7 @@ end
 	dup 1 lt {pop 1} if 10 mul /udl exch def} def
 /PL {stroke userlinewidth setlinewidth
 	Rounded {1 setlinejoin 1 setlinecap} if} def
+3.8 setmiterlimit
 % Default Line colors
 /LCw {1 1 1} def
 /LCb {0 0 0} def
@@ -431,8 +419,26 @@ Level1 {Level1PatternFill} {Level2PatternFill} ifelse
 /Symbol-Oblique /Symbol findfont [1 0 .167 1 0 0] makefont
 dup length dict begin {1 index /FID eq {pop pop} {def} ifelse} forall
 currentdict end definefont pop
+Level1 SuppressPDFMark or 
+{} {
+/SDict 10 dict def
+systemdict /pdfmark known not {
+  userdict /pdfmark systemdict /cleartomark get put
+} if
+SDict begin [
+  /Title (thermal_diffusion_error.eps)
+  /Subject (gnuplot plot)
+  /Creator (gnuplot 4.6 patchlevel 0)
+  /Author (boo)
+%  /Producer (gnuplot)
+%  /Keywords ()
+  /CreationDate (Wed Aug 22 13:27:21 2012)
+  /DOCINFO pdfmark
+end
+} ifelse
 end
 %%EndProlog
+%%Page: 1 1
 gnudict begin
 gsave
 doclip
@@ -441,65 +447,114 @@ doclip
 0 setgray
 newpath
 (Helvetica) findfont 140 scalefont setfont
+BackgroundColor 0 lt 3 1 roll 0 lt exch 0 lt or or not {BackgroundColor C 1.000 0 0 7200.00 5040.00 BoxColFill} if
 1.000 UL
 LTb
-938 448 M
-63 0 V
-5988 0 R
--63 0 V
 854 448 M
-( 0.005) Rshow
+63 0 V
+6030 0 R
+-63 0 V
+770 448 M
+( 0.002) Rshow
 1.000 UL
 LTb
-938 1333 M
+854 1080 M
 63 0 V
-5988 0 R
+6030 0 R
 -63 0 V
--6072 0 R
+-6114 0 R
+( 0.004) Rshow
+1.000 UL
+LTb
+854 1712 M
+63 0 V
+6030 0 R
+-63 0 V
+-6114 0 R
+( 0.006) Rshow
+1.000 UL
+LTb
+854 2344 M
+63 0 V
+6030 0 R
+-63 0 V
+-6114 0 R
+( 0.008) Rshow
+1.000 UL
+LTb
+854 2975 M
+63 0 V
+6030 0 R
+-63 0 V
+-6114 0 R
 ( 0.01) Rshow
 1.000 UL
 LTb
-938 2217 M
+854 3607 M
 63 0 V
-5988 0 R
+6030 0 R
 -63 0 V
--6072 0 R
-( 0.015) Rshow
+-6114 0 R
+( 0.012) Rshow
 1.000 UL
 LTb
-938 3102 M
+854 4239 M
 63 0 V
-5988 0 R
+6030 0 R
 -63 0 V
--6072 0 R
-( 0.02) Rshow
+-6114 0 R
+( 0.014) Rshow
 1.000 UL
 LTb
-938 3986 M
+854 4871 M
 63 0 V
-5988 0 R
+6030 0 R
 -63 0 V
--6072 0 R
-( 0.025) Rshow
+-6114 0 R
+( 0.016) Rshow
 1.000 UL
 LTb
-938 4871 M
-63 0 V
-5988 0 R
--63 0 V
--6072 0 R
-( 0.03) Rshow
-1.000 UL
-LTb
-938 448 M
+854 448 M
 0 63 V
 0 4360 R
 0 -63 V
-938 308 M
+854 308 M
+( 0.03) Cshow
+1.000 UL
+LTb
+1463 448 M
+0 63 V
+0 4360 R
+0 -63 V
+0 -4500 R
+( 0.04) Cshow
+1.000 UL
+LTb
+2073 448 M
+0 63 V
+0 4360 R
+0 -63 V
+0 -4500 R
+( 0.05) Cshow
+1.000 UL
+LTb
+2682 448 M
+0 63 V
+0 4360 R
+0 -63 V
+0 -4500 R
 ( 0.06) Cshow
 1.000 UL
 LTb
-1543 448 M
+3291 448 M
+0 63 V
+0 4360 R
+0 -63 V
+0 -4500 R
+( 0.07) Cshow
+1.000 UL
+LTb
+3901 448 M
 0 63 V
 0 4360 R
 0 -63 V
@@ -507,7 +562,15 @@ LTb
 ( 0.08) Cshow
 1.000 UL
 LTb
-2148 448 M
+4510 448 M
+0 63 V
+0 4360 R
+0 -63 V
+0 -4500 R
+( 0.09) Cshow
+1.000 UL
+LTb
+5119 448 M
 0 63 V
 0 4360 R
 0 -63 V
@@ -515,7 +578,15 @@ LTb
 ( 0.1) Cshow
 1.000 UL
 LTb
-2753 448 M
+5728 448 M
+0 63 V
+0 4360 R
+0 -63 V
+0 -4500 R
+( 0.11) Cshow
+1.000 UL
+LTb
+6338 448 M
 0 63 V
 0 4360 R
 0 -63 V
@@ -523,78 +594,30 @@ LTb
 ( 0.12) Cshow
 1.000 UL
 LTb
-3358 448 M
+6947 448 M
 0 63 V
 0 4360 R
 0 -63 V
 0 -4500 R
-( 0.14) Cshow
-1.000 UL
-LTb
-3963 448 M
-0 63 V
-0 4360 R
-0 -63 V
-0 -4500 R
-( 0.16) Cshow
-1.000 UL
-LTb
-4569 448 M
-0 63 V
-0 4360 R
-0 -63 V
-0 -4500 R
-( 0.18) Cshow
-1.000 UL
-LTb
-5174 448 M
-0 63 V
-0 4360 R
-0 -63 V
-0 -4500 R
-( 0.2) Cshow
-1.000 UL
-LTb
-5779 448 M
-0 63 V
-0 4360 R
-0 -63 V
-0 -4500 R
-( 0.22) Cshow
-1.000 UL
-LTb
-6384 448 M
-0 63 V
-0 4360 R
-0 -63 V
-0 -4500 R
-( 0.24) Cshow
-1.000 UL
-LTb
-6989 448 M
-0 63 V
-0 4360 R
-0 -63 V
-0 -4500 R
-( 0.26) Cshow
+( 0.13) Cshow
 1.000 UL
 LTb
 1.000 UL
 LTb
-938 4871 N
-938 448 L
-6051 0 V
+854 4871 N
+854 448 L
+6093 0 V
 0 4423 V
--6051 0 V
+-6093 0 V
 Z stroke
 LCb setrgbcolor
-196 2659 M
+112 2659 M
 currentpoint gsave translate -270 rotate 0 0 M
 (Error) Cshow
 grestore
 LTb
 LCb setrgbcolor
-3963 98 M
+3900 98 M
 (h) Cshow
 LTb
 1.000 UP
@@ -605,20 +628,20 @@ LTb
 4.000 UL
 LT0
 /Helvetica findfont 140 scalefont setfont
-6686 4372 M
-2905 1622 L
-1014 680 L
-6686 4372 Pls
-2905 1622 Pls
-1014 680 Pls
+6642 4659 M
+2834 2425 L
+930 989 L
+6642 4659 Pls
+2834 2425 Pls
+930 989 Pls
 % End plot #1
 1.000 UL
 LTb
-938 4871 N
-938 448 L
-6051 0 V
+854 4871 N
+854 448 L
+6093 0 V
 0 4423 V
--6051 0 V
+-6093 0 V
 Z stroke
 1.000 UP
 1.000 UL

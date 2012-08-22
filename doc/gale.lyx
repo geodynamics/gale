@@ -2290,14 +2290,6 @@ In practice, both of these quantities may need to be set.
  on the surface, such as landslides.
  A maximum strain rate, in the mean time, will assist in ensuring that the
  code is convergent.
- Both of these parameters are used for the Geomod benchmark (Sections 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
-
-\end_inset
-
-).
 \end_layout
 
 \begin_layout Subsection
@@ -2311,25 +2303,11 @@ If you have a problem with strong viscosity gradients, the default solver
  viscosities (e.g., Appendix 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Circular-Inclusion"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
 reference "sec:Falling-Sphere"
 
 \end_inset
 
-), or when materials yield (e.g., Appendix 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
-
-\end_inset
-
-).
+), or when materials yield.
 \end_layout
 
 \begin_layout Standard
@@ -3604,13 +3582,6 @@ For some problems where you are comparing against a solution over an infinite
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Falling-Sphere"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Circular-Inclusion"
 
 \end_inset
 
@@ -17698,7 +17669,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Tabular
-<lyxtabular version="3" rows="8" columns="2">
+<lyxtabular version="3" rows="7" columns="2">
 <features tabularvalignment="middle">
 <column alignment="center" valignment="top" width="0">
 <column alignment="center" valignment="top" width="0">
@@ -17738,13 +17709,6 @@ Stokes solver and interpolate between particles and mesh in 2D
 \begin_layout Plain Layout
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Circular-Inclusion"
-
-\end_inset
-
-,
-\begin_inset CommandInset ref
-LatexCommand ref
 reference "sec:Relaxation-of-Topography"
 
 \end_inset
@@ -17753,13 +17717,6 @@ reference "sec:Relaxation-of-Topography"
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Divergence"
-
-\end_inset
-
- , 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
 
 \end_inset
 
@@ -17822,14 +17779,7 @@ reference "sec:Relaxation-of-Topography"
 
 \end_inset
 
-,  
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
 
-\end_inset
-
- 
 \end_layout
 
 \end_inset
@@ -17862,13 +17812,6 @@ reference "sec:Relaxation-of-Topography"
 
 \end_inset
 
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
-
-\end_inset
-
 
 \end_layout
 
@@ -17892,39 +17835,6 @@ Free surface
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Relaxation-of-Topography"
-
-\end_inset
-
-, 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-</cell>
-</row>
-<row>
-<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-Drucker Prager rheology in 2D
-\end_layout
-
-\end_inset
-</cell>
-<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
-\begin_inset Text
-
-\begin_layout Plain Layout
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Geomod-2004"
 
 \end_inset
 
@@ -18037,6 +17947,13 @@ n error than the low-resolution error.
 \begin_layout Standard
 Altogether, these benchmarks give us a high degree of confidence in the
  code.
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage pagebreak
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -18173,7 +18090,7 @@ Setting
 \end_inset
 
 , 
-\begin_inset Formula $\delta\rho=0.01$
+\begin_inset Formula $\delta\rho=1$
 \end_inset
 
 , and 
@@ -18186,7 +18103,7 @@ Setting
 \begin_layout Standard
 \begin_inset Formula 
 \[
-u=0.00222.
+u=0.222.
 \]
 
 \end_inset
@@ -18282,7 +18199,7 @@ For our case with
 \begin_layout Standard
 \begin_inset Formula 
 \[
-u=1.122747319\cdot10^{-3}.
+u=0.1122747319.
 \]
 
 \end_inset
@@ -18327,7 +18244,7 @@ For our case, this gives a speed of
 \begin_layout Standard
 \begin_inset Formula 
 \[
-u=1.12293603939\cdot10^{-3},
+u=0.112293603939,
 \]
 
 \end_inset
@@ -18460,343 +18377,6 @@ Error in computed velocity vs.
 
 \end_layout
 
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Circular-Inclusion"
-
-\end_inset
-
-Circular Inclusion
-\end_layout
-
-\begin_layout Standard
-Schmid and Podladchikov 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Clast"
-
-\end_inset
-
- derived a simple analytic solution for the pressure and velocity fields
- for a circular inclusion under simple shear as in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:inclusion-setup"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/inclusion_setup.png
-	lyxscale 50
-	width 50col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:inclusion-setup"
-
-\end_inset
-
-Schematic for the circular inclusion benchmark
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Because of the symmetry of the problem, we only have to solve over the top
- right quarter of the domain.
- For the velocity boundary conditions, the analytic solution is a bit complicate
-d.
- So we used the simple relation
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\begin{eqnarray*}
-v_{x} & = & -\dot{\epsilon}y,\\
-v_{y} & = & \dot{\epsilon}x,
-\end{eqnarray*}
-
-\end_inset
-
- for the boundaries, where 
-\begin_inset Formula $\dot{\epsilon}=1$
-\end_inset
-
- is the magnitude of the shear and 
-\begin_inset Formula $x$
-\end_inset
-
- and 
-\begin_inset Formula $y$
-\end_inset
-
- are the coordinates.
- This induces an error of order 
-\begin_inset Formula $r_{i}^{2}/r^{2}$
-\end_inset
-
-, where 
-\begin_inset Formula $r_{i}=1$
-\end_inset
-
- is the radius of the inclusion, and 
-\begin_inset Formula $r$
-\end_inset
-
- is the radius.
- We have the boundaries at 80 times the radius of the inclusion, giving
- an error of about 0.01%.
- This error dominates near the boundary, but near the inclusion other errors
- dominate.
- 
-\end_layout
-
-\begin_layout Standard
-A characteristic of the analytic solution is that the pressure is zero inside
- the inclusion, while outside it follows the relation
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-p_{m}=4\dot{\epsilon}\frac{\mu_{m}\left(\mu_{i}-\mu_{m}\right)}{\mu_{i}+\mu_{m}}\frac{r_{i}^{2}}{r^{2}}\cos\left(2\theta\right),
-\]
-
-\end_inset
-
-where 
-\begin_inset Formula $\mu_{i}=2$
-\end_inset
-
- is the viscosity of the inclusion and 
-\begin_inset Formula $\mu_{m}=1$
-\end_inset
-
- is the viscosity of the background media.
- Many numerical codes that solve Stokes flow (Eq.
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:simple momentum conservation"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "eq:continuity"
-
-\end_inset
-
-), including Gale, assume that pressure, velocity, and viscosity are continuous
- within an element.
- The pressure discontinuity at the surface of the inclusion violates that
- assumption, so the error tends to concentrate near the surface of the inclusion.
-\end_layout
-
-\begin_layout Standard
-Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Pressure-inclusion"
-
-\end_inset
-
- plots the error in the pressure along the line 
-\begin_inset Formula $y=x/2$
-\end_inset
-
- for different resolutions.
- The convergence is not uniform.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/inclusion_pressure.png
-	width 100col%
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Pressure-inclusion"
-
-\end_inset
-
-Pressure along the line 
-\begin_inset Formula $y=x/2$
-\end_inset
-
- for resolutions of 128
-\begin_inset Formula $\times$
-\end_inset
-
-128 (red), 256
-\begin_inset Formula $\times$
-\end_inset
-
-256 (green), and 512
-\begin_inset Formula $\times$
-\end_inset
-
-512 (blue).
- The inclusion has a radius 
-\begin_inset Formula $r_{i}=1.$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Outside the inclusion, the error is better behaved.
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Pressure-Error"
-
-\end_inset
-
- plots the error in the pressure along the line 
-\begin_inset Formula $y=x/2$
-\end_inset
-
- outside the inclusion for different resolutions.
- This kind of result, where the solution is bad close to the surface, but
- good otherwise, is typical for numerical solutions of this problem 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "FD Stokes"
-
-\end_inset
-
-.
- 
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/inclusion_error.png
-	lyxscale 75
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Pressure-Error"
-
-\end_inset
-
-Error in the pressure outside the inclusion along the line 
-\begin_inset Formula $y=x/2$
-\end_inset
-
- for resolutions of 128
-\begin_inset Formula $\times$
-\end_inset
-
-128 (blue), 256
-\begin_inset Formula $\times$
-\end_inset
-
-256 (red), and 512
-\begin_inset Formula $\times$
-\end_inset
-
-512 (black).
- The inclusion has a radius 
-\begin_inset Formula $r_{i}=1.$
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -18876,11 +18456,11 @@ reference "fig:Strain-topo"
 
 \end_inset
 
- shows the results of a high-resolution (128
+ shows the results of a high-resolution (256
 \begin_inset Formula $\times$
 \end_inset
 
-256) run.
+512) run.
  Note that we use symmetry to only simulate half of the wavelength.
  
 \end_layout
@@ -18936,16 +18516,17 @@ reference "fig:topo-error"
 \end_inset
 
 .
- Scaling the error with resolution gives Figure 
+ The error behaves a bit erratically because of the damping term applied
+ to the free surface (Section 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "fig:scaled-topo-error"
+reference "sub:BouyancyForceTerm"
 
 \end_inset
 
-.
- The error decreases linearly with increasing resolution, giving us confidence
- in our ability to accurately track topography.
+).
+ Even so, the error decreases linearly with increasing resolution, giving
+ us confidence in our ability to accurately track topography.
 \end_layout
 
 \begin_layout Standard
@@ -18987,58 +18568,6 @@ Error in the height at the peak
 
 \end_layout
 
-\begin_layout Standard
-\noindent
-\align center
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/sinusoid_scaled_error.eps
-
-\end_inset
-
-
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:scaled-topo-error"
-
-\end_inset
-
-As in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:topo-error"
-
-\end_inset
-
-, but with the error scaled with 
-\begin_inset Formula $h$
-\end_inset
-
-.
- So the medium-resolution error is multiplied by 2 and the high-resolution
- error is multiplied by 4.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
 \begin_layout Section
 \begin_inset CommandInset label
 LatexCommand label
@@ -19061,22 +18590,6 @@ reference "eq:divergence"
 .
  In 2D, a constant divergence is applied to a square domain, and the velocity
  on the corners is set to enforce a spreading from the center of the square.
- Figures 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Divergence_v_sri"
-
-\end_inset
-
- and 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Divergence_v_sri3D"
-
-\end_inset
-
- show the velocity and the error in the strain rate invariant for a numerical
- solution.
  For a constant divergence 
 \begin_inset Formula $d$
 \end_inset
@@ -19129,87 +18642,6 @@ linearTolerance
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/divergence_v.png
-	width 50col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Divergence_v_sri"
-
-\end_inset
-
-Velocity and error in the strain rate invariant solution for the 2D Divergence
- benchmark.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/divergence_v_3D.png
-	width 50col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Divergence_v_sri3D"
-
-\end_inset
-
-Velocity and error in the strain rate invariant solution for the 3D Divergence
- benchmark.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
 \begin_inset Newpage newpage
 \end_inset
 
@@ -19281,7 +18713,7 @@ reference "fig:Diffusion_end"
 \end_inset
 
  and 
-\begin_inset Formula $t=0.0367647$
+\begin_inset Formula $t=0.0011489$
 \end_inset
 
  for a run with 16
@@ -19297,7 +18729,7 @@ reference "fig:Diffusion_error"
 \end_inset
 
  plots the error in the maximum temperature at 
-\begin_inset Formula $t=0.0367647$
+\begin_inset Formula $t=0.0011489$
 \end_inset
 
  as a function of the grid spacing 
@@ -19305,7 +18737,7 @@ reference "fig:Diffusion_error"
 \end_inset
 
 .
- The error decreases quadratically as the spacing decreases.
+ The error decreases linearly as the spacing decreases.
 \end_layout
 
 \begin_layout Standard
@@ -19426,7 +18858,7 @@ name "fig:Diffusion_error"
 \end_inset
 
 Error in the maximum temperature at 
-\begin_inset Formula $t=0.0367647$
+\begin_inset Formula $t=0.0011489$
 \end_inset
 
  as a function of resolution.
@@ -19674,7 +19106,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/thermal_eulear_start.png
+	filename images/thermal_euler_start.png
 	width 50col%
 
 \end_inset
@@ -19715,7 +19147,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/thermal_eulear_low.png
+	filename images/thermal_euler_low.png
 	width 50col%
 
 \end_inset
@@ -19761,7 +19193,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/thermal_eulear_medium.png
+	filename images/thermal_euler_medium.png
 	width 50col%
 
 \end_inset
@@ -19807,7 +19239,7 @@ status open
 \begin_layout Plain Layout
 \align center
 \begin_inset Graphics
-	filename images/thermal_eulear_high.png
+	filename images/thermal_euler_high.png
 	width 50col%
 
 \end_inset
@@ -19834,196 +19266,6 @@ Temperature at
 \end_inset
 
 64 elements.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Newpage pagebreak
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Geomod-2004"
-
-\end_inset
-
-Geomod 2004 Extension
-\end_layout
-
-\begin_layout Standard
-This benchmark simulates a sandbox being extended as in Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Extension-model-setup"
-
-\end_inset
-
-.
- The right side and half of the bottom are translated to the right.
- This creates a velocity discontinuity at the center which is the initial
- seed for localization.
-\end_layout
-
-\begin_layout Standard
-Like half of the codes in the benchmark, boundary friction was not included.
- Rather, the material is held fixed to the bottom boundary, and the velocity
- discontinuity is smoothed over 0.2 cm.
- In addition, the exact background viscosity is not prescribed by the benchmark.
- We have used 
-\begin_inset Formula $10^{12}Pa\cdot s$
-\end_inset
-
-, the same as used in the I2ELVIS calculations.
- This value is somewhere in the middle of the range of values used in the
- calculations for other codes.
- We used a maximum strain rate of 
-\begin_inset Formula $5\cdot10^{4}$
-\end_inset
-
- and a minimum viscosity of 
-\begin_inset Formula $10^{-4}$
-\end_inset
-
-.
- Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:Comparison-extension"
-
-\end_inset
-
- shows the Gale results along with the other codes.
- While it is difficult to perform exact comparisons, Gale produces similar
- fault patterns.
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Extension_setup.png
-	lyxscale 50
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Extension-model-setup"
-
-\end_inset
-
-Extension model setup.
- Reproduced, with permission, from Buiter et al.
- 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Buiter et al Numerical Sandbox"
-
-\end_inset
-
-.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-placement H
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\align center
-\begin_inset Graphics
-	filename images/Extension_comparision.png
-	lyxscale 50
-	width 100col%
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:Comparison-extension"
-
-\end_inset
-
-Strain rate invariant for the numerical extension models after 5 cm of extension.
- The resolutions of the various models are: I2ELVIS: 400
-\begin_inset Formula $\times$
-\end_inset
-
-75, LAPEX-2D: 301
-\begin_inset Formula $\times$
-\end_inset
-
-71, Microfem: 201
-\begin_inset Formula $\times$
-\end_inset
-
-61, SloMo: 401
-\begin_inset Formula $\times$
-\end_inset
-
-71, Sopale: 401
-\begin_inset Formula $\times$
-\end_inset
-
-71, Gale: 1024
-\begin_inset Formula $\times$
-\end_inset
-
-128.
- Upper images reproduced, with permission, from Buiter et al.
- 
-\begin_inset CommandInset citation
-LatexCommand cite
-key "Buiter et al Numerical Sandbox"
-
-\end_inset
-
-.
 \end_layout
 
 \end_inset
