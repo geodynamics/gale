@@ -10045,7 +10045,7 @@ reference "sec:Materials"
 This should normally work without any tweaking.
  However, if your model has strongly distorted elements, then you may see
  anomalously high temperature variations.
- Fo fix that, modify the prefactor for SUPG (see Section 
+ To fix that, modify the prefactor for SUPG (see Section 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Thermal-Convection"
