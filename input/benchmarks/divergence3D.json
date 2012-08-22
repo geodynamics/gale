@@ -1,6 +1,13 @@
 {
     "components":
     {
+        "buoyancyForceTerm":
+        {
+            "Type": "BuoyancyForceTerm",
+            "ForceVector": "mom_force",
+            "Swarm": "gaussSwarm",
+            "gravity": "0"
+        },
         "boxShape":
         {
             "Type": "Box",
@@ -286,5 +293,6 @@
     "nz": "4",
     "particlesPerCell": "40",
     "seed": "13",
-    "checkpointEvery": "1"
+    "checkpointEvery": "1",
+    "linearTolerance": "1e-9"
 }
