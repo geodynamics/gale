@@ -1,9 +1,12 @@
-2.1.0
+2.0.1
 ----------------------------------
 
-* The temperature mesh has been changed to be the same as the velocity
-  mesh.  This fixes problems when running thermal problems with
-  distorting meshes.
+* The temperature mesh has been changed to be Q2, the same as the
+  velocity mesh.  This fixes problems when running thermal problems
+  with distorting meshes.
+
+* A free surface stabilization term has been implemented.  This
+  applies a non-linear damping term to all models by default.
 
 * Documentation has been added for modeling density and expansivity
   changes as an arbitrary function of pressure and/or temperature.  This
@@ -12,6 +15,22 @@
 * You may now specify a moving static side.  This is useful when
   modeling a moving wall boundary that only covers part of the
   boundary.
+
+* You may now use up to 30 different files for input as boundary
+  conditions etc.
+
+* A bug in parsing equations with "<" has been fixed.
+
+* There is now a single binary for Mac 10.5 and later.  10.4 and
+  earlier are no longer supported.
+
+* The configure script now accepts --linkflags.
+
+* Fix a bug when compiling Gale without HDF5.
+
+* Checkpointing now occurs on the first solve, before taking a time step.
+
+* Gale now works with Petsc 3.2.
 
 2.0.0
 ----------------------------------
