@@ -110,7 +110,8 @@
             "cohesionAfterSoftening": "1e6",
             "frictionCoefficient": "0.258819045102",
             "frictionCoefficientAfterSoftening": "0.0348994967025",
-            "minimumViscosity": "1.0e0"
+            "minimumViscosity": "1.0e0",
+            "maxStrainRate": "1e6"
         },
         "fixedViscosity":
         {
