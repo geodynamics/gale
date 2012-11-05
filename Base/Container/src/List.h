@@ -60,7 +60,7 @@
 		unsigned	maxItems;	\
 		unsigned	delta;
 
-	struct List { __List };
+	struct LList { __List };
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Constructors
@@ -79,9 +79,9 @@
 	#define LIST_PASSARGS \
                 STG_CLASS_PASSARGS
 
-	List* List_New();
-	List* _List_New(  LIST_DEFARGS  );
-	void _List_Init( List* self );
+	LList* List_New();
+	LList* _List_New(  LIST_DEFARGS  );
+	void _List_Init( LList* self );
 
 	/*--------------------------------------------------------------------------------------------------------------------------
 	** Virtual functions
@@ -114,9 +114,9 @@
 	** Private Member functions
 	*/
 
-	void List_Expand( List* self );
-	void List_Contract( List* self );
-	void List_Destruct( List* self );
+	void List_Expand( LList* self );
+	void List_Contract( LList* self );
+	void List_Destruct( LList* self );
 
 #endif /* __StGermain_Base_Container_List_h__ */
 

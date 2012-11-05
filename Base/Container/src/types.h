@@ -82,7 +82,7 @@ struct IMapItem {
 	typedef struct IndexSet				IndexSet;
 	typedef struct PtrMap				PtrMap;
 	typedef struct IndexMap				IndexMap;
-	typedef struct List				List;
+	typedef struct LList				LList;
 	typedef struct Hasher				Hasher;
 	typedef struct NumberHasher			NumberHasher;
 	typedef struct Mapping				Mapping;

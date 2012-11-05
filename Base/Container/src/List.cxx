@@ -49,9 +49,9 @@ const Type List_Type = "List";
 ** Constructors
 */
 
-List* List_New() {
+LList* List_New() {
 	/* Variables set in this function */
-	SizeT                      _sizeOfSelf = sizeof(List);
+	SizeT                      _sizeOfSelf = sizeof(LList);
 	Type                              type = List_Type;
 	Stg_Class_DeleteFunction*      _delete = _List_Delete;
 	Stg_Class_PrintFunction*        _print = _List_Print;
@@ -60,12 +60,12 @@ List* List_New() {
 	return _List_New(  LIST_PASSARGS  );
 }
 
-List* _List_New(  LIST_DEFARGS  ) {
-	List*	self;
+LList* _List_New(  LIST_DEFARGS  ) {
+	LList*	self;
 	
 	/* Allocate memory */
-	assert( _sizeOfSelf >= sizeof(List) );
-	self = (List*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
+	assert( _sizeOfSelf >= sizeof(LList) );
+	self = (LList*)_Stg_Class_New(  STG_CLASS_PASSARGS  );
 
 	/* Virtual info */
 
@@ -75,7 +75,7 @@ List* _List_New(  LIST_DEFARGS  ) {
 	return self;
 }
 
-void _List_Init( List* self ) {
+void _List_Init( LList* self ) {
 	self->nItems = 0;
 	self->items = NULL;
 	self->itemSize = 0;
@@ -89,7 +89,7 @@ void _List_Init( List* self ) {
 */
 
 void _List_Delete( void* list ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 
 	List_Destruct( self );
 
@@ -98,7 +98,7 @@ void _List_Delete( void* list ) {
 }
 
 void _List_Print( void* list, Stream* stream ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 	
 	/* Print parent */
 	Journal_Printf( stream, "List (ptr): (%p)\n", self );
@@ -111,7 +111,7 @@ void _List_Print( void* list, Stream* stream ) {
 */
 
 void List_SetDelta( void* list, unsigned delta ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 
 	assert( self );
 	assert( delta );
@@ -120,7 +120,7 @@ void List_SetDelta( void* list, unsigned delta ) {
 }
 
 void List_SetItemSize( void* list, unsigned itemSize ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 
 	assert( self );
 	assert( itemSize );
@@ -131,7 +131,7 @@ void List_SetItemSize( void* list, unsigned itemSize ) {
 }
 
 void List_Clear( void* list ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 
 	assert( self );
 
@@ -141,7 +141,7 @@ void List_Clear( void* list ) {
 }
 
 void List_Insert( void* list, unsigned index, void* data ) {
-	List*		self = (List*)list;
+	LList*		self = (LList*)list;
 	unsigned	item_i;
 
 	assert( self );
@@ -163,7 +163,7 @@ void List_Insert( void* list, unsigned index, void* data ) {
 }
 
 void List_Append( void* list, void* data ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 
 	assert( self );
 
@@ -175,7 +175,7 @@ void List_Prepend( void* list, void* data ) {
 }
 
 void List_Remove( void* list, void* data ) {
-	List*		self = (List*)list;
+	LList*		self = (LList*)list;
 	unsigned	item_i;
 
 	assert( self );
@@ -198,7 +198,7 @@ void List_Remove( void* list, void* data ) {
 }
 
 void* List_GetItem( void* list, unsigned index ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 
 	assert( self );
 	assert( index < self->nItems );
@@ -207,7 +207,7 @@ void* List_GetItem( void* list, unsigned index ) {
 }
 
 unsigned List_GetSize( void* list ) {
-	List*	self = (List*)list;
+	LList*	self = (LList*)list;
 
 	assert( self );
 
@@ -215,7 +215,7 @@ unsigned List_GetSize( void* list ) {
 }
 
 Bool List_Exists( void* list, void* data ) {
-	List*		self = (List*)list;
+	LList*		self = (LList*)list;
 	unsigned	item_i;
 
 	assert( self );
@@ -233,7 +233,7 @@ Bool List_Exists( void* list, void* data ) {
 ** Private Functions
 */
 
-void List_Expand( List* self ) {
+void List_Expand( LList* self ) {
 	self->maxItems += self->delta;
 	if( !self->items )
           self->items = (Stg_Byte*)Memory_Alloc_Array_Bytes( self->itemSize, self->maxItems, "", "List::items" );
@@ -241,7 +241,7 @@ void List_Expand( List* self ) {
           self->items = (Stg_Byte*)Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
 }
 
-void List_Contract( List* self ) {
+void List_Contract( LList* self ) {
 	if( self->delta > self->maxItems )
 		self->maxItems = 0;
 	else
@@ -253,7 +253,7 @@ void List_Contract( List* self ) {
           self->items = (Stg_Byte*)Memory_Realloc_Array_Bytes( self->items, self->itemSize, self->maxItems );
 }
 
-void List_Destruct( List* self ) {
+void List_Destruct( LList* self ) {
 	self->nItems = 0;
 	KillArray( self->items );
 	self->itemSize = 0;

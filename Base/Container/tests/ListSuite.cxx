@@ -41,7 +41,7 @@
 #define NUM_ITEMS  100
 
 typedef struct {
-   List*    list;
+   LList*    list;
    int      arrayData[NUM_ITEMS];
 } ListSuiteData;
 
