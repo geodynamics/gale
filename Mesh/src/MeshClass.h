@@ -61,7 +61,7 @@
 		MeshTopology*			topo;		\
 		double**			verts;		\
 								\
-		List*				vars;		\
+		LList*				vars;		\
 								\
 		double				minSep;		\
 		double*				minAxialSep;	\
