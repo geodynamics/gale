@@ -1,0 +1,2 @@
+Timestep 0: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.0001.
+Timestep 1: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is within a tolerance 0.0001.

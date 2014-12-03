@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 
+	<!-- Load plugins that provide features you need for this model or your analysis -->
+	<list name="import">
+		<param>StgFEM</param>
+	</list>
+	<list name="plugins">
+		<param>StgFEM_StandardConditionFunctions</param>
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>StgFEM_CPUTime</param>	
+	</list>
+
+	<!-- Include Components that define the basic model -->
+	<include>StgFEM/ConstantMesh.xml</include>
+	<include>StgFEM/LinearMesh.xml</include>
+	<include>StgFEM/VelocityField.xml</include>
+	<include>StgFEM/TemperatureField.xml</include>
+	<include>StgFEM/PressureField.xml</include>
+	<include>StgFEM/GaussSwarm.xml</include>
+	<include>StgFEM/StokesFlowUzawa.xml</include>
+	<include>StgFEM/TempAdvDiff.xml</include>
+
+	<!-- Specialised components for this particular model -->
+	<struct name="components" mergeType="merge">
+		<struct name="thermalForcingTerm">
+			<param name="Type">ThermalBuoyancyForceTerm</param>
+			<param name="Swarm">gaussSwarm</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="Ra">Ra</param>
+		</struct>
+	</struct>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 10 </param>
+	<param name="outputPath"> ./output </param>
+	<param name="dumpEvery"> 100 </param>	
+	<param name="checkpointEvery"> 100 </param>	
+
+	<!-- Control Journal output -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory"> 2 </param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>
+
+	<!-- Global physics paramters -->
+	<param name="Ra"> 1e6 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>
+	<param name="velocityMesh">linearMesh</param>
+	<param name="pressureMesh">constantMesh</param>
+	<param name="temperatureMesh">linearMesh</param>
+	<param name="elementMesh">linearMesh</param>
+	<param name="elementResI"> 10 </param>
+	<param name="elementResJ"> 10 </param>
+	<param name="elementResK"> 1 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0f </param>
+	<param name="minY"> 0.0f </param>
+	<param name="minZ"> 0.0f </param>
+	<param name="maxX"> 1.0f </param>
+	<param name="maxY"> 1.0f </param>
+	<param name="maxZ"> 1.0f </param>
+
+	<!-- Integration Scheme configuration -->
+	<param name="gaussParticlesX"> 2 </param>
+	<param name="gaussParticlesY"> 2 </param>
+	<param name="gaussParticlesZ"> 2 </param>
+
+	<!-- Set up BCs -->
+	<include> temperatureBCs.xml </include>
+	<include> temperatureICs.xml </include>
+	<include> velocityFreeslipBCs.xml </include>
+
+</StGermainData>

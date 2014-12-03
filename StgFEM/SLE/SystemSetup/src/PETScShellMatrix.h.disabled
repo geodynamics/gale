@@ -1,0 +1,139 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+**
+** Authors:
+**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+*/
+/** \file
+**  Role:
+**
+** Assumptions:
+**
+** Invariants:
+**
+** Comments:
+**
+** $Id: PETScShellMatrix.h 3584 2006-05-16 11:11:07Z PatrickSunter $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#ifndef __StgFEM_SLE_SystemSetup_SystemSetup_PETScShellMatrix_h__
+#define __StgFEM_SLE_SystemSetup_SystemSetup_PETScShellMatrix_h__
+
+	/** Textual name of this class */
+	extern const Type PETScShellMatrix_Type;
+
+	/** Virtual function types */
+	typedef void (PETScShellMatrix_SetCommFunc)( void* matrix, MPI_Comm comm );
+	typedef void (PETScShellMatrix_SetGlobalSizeFunc)( void* matrix, unsigned nRows, unsigned nColumns );
+	typedef void (PETScShellMatrix_SetLocalSizeFunc)( void* matrix, unsigned nRows, unsigned nColumns );
+	typedef void (PETScShellMatrix_SetNonZeroStructureFunc)( void* matrix, unsigned nNonZeros, 
+							unsigned* diagonalNonZeroIndices, unsigned* offDiagonalNonZeroIndices);
+
+	/** PETScShellMatrix class contents */
+	#define __PETScShellMatrix				\
+		/* General info */				\
+		/*__PETScMatrix*/				\
+		__Stg_Component					\
+								\
+		/* Virtual info */				\
+		PETScShellMatrix_SetCommFunc*			setCommFunc;		\
+		PETScShellMatrix_SetGlobalSizeFunc*		setGlobalSizeFunc;	\
+		PETScShellMatrix_SetLocalSizeFunc*		setLocalSizeFunc;	\
+		PETScShellMatrix_SetNonZeroStructureFunc*	setNonZeroStructure;	\
+								\
+		/* PETScShellMatrix info */			\
+		Mat			matrix;			\
+		Bool			hasChanged;		\
+		MPI_Comm		comm;			\
+								\
+		StiffnessMatrix*	stiffMat;		\
+		SystemLinearEquations*	sle;			\
+								\
+		unsigned		nRowDofs;		\
+		unsigned		nColDofs;		\
+		double**		elStiffMat;		\
+		double**		elStiffMatTrans;
+
+	struct PETScShellMatrix { __PETScShellMatrix };
+
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Constructors
+	*/
+
+	#define PETSCSHELLMATRIX_DEFARGS 						\
+		STG_COMPONENT_DEFARGS,							\
+		PETScShellMatrix_SetCommFunc*			setCommFunc,		\
+		PETScShellMatrix_SetGlobalSizeFunc*		setGlobalSizeFunc,	\
+		PETScShellMatrix_SetLocalSizeFunc*		setLocalSizeFunc,	\
+		PETScShellMatrix_SetNonZeroStructureFunc*	setNonZeroStructure
+		//PETSCMATRIX_DEFARGS
+
+	#define PETSCSHELLMATRIX_PASSARGS 	\
+		STG_COMPONENT_PASSARGS		\
+		setCommFunc, 			\
+		setGlobalSizeFunc,		\
+		setLocalSizeFunc,		\
+		setNonZeroStructure
+		//PETSCMATRIX_PASSARGS
+
+	PETScShellMatrix* PETScShellMatrix_New( Name name );
+	PETScShellMatrix* _PETScShellMatrix_New( PETSCSHELLMATRIX_DEFARGS );
+	void _PETScShellMatrix_Init( PETScShellMatrix* self );
+
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Virtual functions
+	*/
+
+	void _PETScShellMatrix_Delete( void* matrix );
+	void _PETScShellMatrix_Print( void* matrix, Stream* stream );
+	void _PETScShellMatrix_Construct( void* matrix, Stg_ComponentFactory* cf, void* data );
+	void _PETScShellMatrix_Build( void* matrix, void* data );
+	void _PETScShellMatrix_Initialise( void* matrix, void* data );
+	void _PETScShellMatrix_Execute( void* matrix, void* data );
+	void _PETScShellMatrix_Destroy( void* matrix, void* data );
+
+	void PETScShellMatrix_SetComm( void* matrix, MPI_Comm comm );
+	void PETScShellMatrix_SetGlobalSize( void* matrix, unsigned nRows, unsigned nColumns );
+	void PETScShellMatrix_SetLocalSize( void* matrix, unsigned nRows, unsigned nColumns );
+
+	void PETScShellMatrix_SetNonZeroStructure( void* matrix, unsigned nNonZeros, 
+						   unsigned* diagonalNonZeroIndices, unsigned* offDiagonalNonZeroIndices);
+
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Public functions
+	*/
+
+	void PETScShellMatrix_UpdateAssembly( void* matrix );
+
+	/*--------------------------------------------------------------------------------------------------------------------------
+	** Private Member functions
+	*/
+
+	PetscErrorCode PETScShellMatrix_MatMult( Mat A, Vec x, Vec y );
+	PetscErrorCode PETScShellMatrix_MatMultAdd( Mat A, Vec x, Vec y );
+	PetscErrorCode PETScShellMatrix_MatMultTranspose( Mat A, Vec x, Vec y );
+	PetscErrorCode PETScShellMatrix_MatGetDiagonal( Mat A, Vec x );
+
+#endif /* __StgFEM_SLE_SystemSetup_SystemSetup_PETScShellMatrix_h__ */

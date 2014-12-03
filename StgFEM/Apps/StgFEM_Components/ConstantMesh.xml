@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+  <struct name="components" mergeType="merge">
+    <struct name="constantMesh">
+      <param name="Type">FeMesh</param>
+      <param name="elementType">constant</param>
+    </struct>
+
+    <struct name="constantMeshGenerator">
+      <param name="Type">C0Generator</param>
+      <param name="mesh">constantMesh</param>
+      <param name="elementMesh">elementMesh</param>
+    </struct>
+  </struct>
+
+</StGermainData>

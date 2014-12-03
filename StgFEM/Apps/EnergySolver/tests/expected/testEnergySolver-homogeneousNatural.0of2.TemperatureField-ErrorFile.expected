@@ -1,0 +1,11 @@
+Timestep 0: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.025.
+Timestep 5: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.025.
+Timestep 10: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.025.
+Timestep 15: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.025.
+Timestep 20: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.025.
+Timestep 25: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.025.
+Timestep 30: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is outside a tolerance 0.025.
+Timestep 35: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is within a tolerance 0.025.
+Timestep 40: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is within a tolerance 0.025.
+Timestep 45: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is within a tolerance 0.025.
+Timestep 50: Total integrated value of 'TemperatureField-ErrorMagnitudeField' is within a tolerance 0.025.

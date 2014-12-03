@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">FieldTest</param>
+<param name="Author">dave lee</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">./StgFEM/Discretisation/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">Tests numerical accuracy for a given field.</param>
+<param name="Description">Takes either a FeVariable or a Swarm and either a analytic solution plugin or a reference solution file as input and compares the numerical solution against the analytic or reference solution and determines both an element wise error field and a global error value.</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">normaliseByReferenceSolution</param>
+		<param name="Type">Bool</param>
+		<param name="Default">True</param>
+		<param name="Description">Normalise the error field against the analytic or reference solution.</param>
+	</struct>
+		
+	<struct>
+		<param name="Name">testTimestep</param>
+		<param name="Type">int</param>
+		<param name="Default">0</param>
+		<param name="Description">The timestep at which the testing will occur. If this is 0 (or undefined) the testing will occur after the first solve.</param>
+	</struct>
+	<struct>
+		<param name="Name">numericVariableName</param>
+		<param name="Type">String</param>
+		<param name="Default">""</param>
+		<param name="Description">Textual name of the variable to be used in the case of a swarm based variable.</param>
+	</struct>
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">ConstantMesh</param>
+		<param name="Type">Mesh</param>
+		<param name="Description">Constant element mesh for storing the element-wise error field.</param>
+	</struct>
+
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">ReferenceMesh</param>
+		<param name="Type">Mesh</param>
+		<param name="Description">Mesh for which the reference solution FeVariable is to be built.</param>
+	</struct>
+
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">IntegrationSwarm</param>
+		<param name="Type">Swarm</param>
+		<param name="Description">Swarm for integration the value of the fields across an element.</param>
+	</struct>
+
+	<struct>
+		<param name="Essential">False</param>
+		<param name="Name">NumericVariable</param>
+		<param name="Type">FeVariable</param>
+		<param name="Description">FeVariable for the numeric solution.</param>
+	</struct>
+
+	<struct>
+		<param name="Essential">False</param>
+		<param name="Name">NumericSwarm</param>
+		<param name="Type">FeVariable</param>
+		<param name="Description">Swarm for the numeric solution.</param>
+	</struct>
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">...</param>
+
+</StGermainData>

@@ -1,0 +1,7 @@
+# this line is a comment
+# np x, where x is the number of procs to run test
+# everything after will be passed as a command line arg
+np 4 --elementResI=10 --elementResJ=10 --sinusoidalLidWavenumber=1
+np 4 --elementResI=20 --elementResJ=20 --sinusoidalLidWavenumber=1
+np 4 --elementResI=30 --elementResJ=30 --sinusoidalLidWavenumber=1
+np 4 --elementResI=40 --elementResJ=40 --sinusoidalLidWavenumber=1

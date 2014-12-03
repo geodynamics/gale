@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="FieldVariablesToCheckpoint" mergeType="merge">
+		<param> VelocityField </param>
+		<param> CompositionField </param>
+		<!-- the CompositionField-phiDotField is never explicitly made in xml, 
+		but in the AdvectionDiffusionSLE.c, it's a necessary field for restarting. -->
+		<param> CompositionEqn-phiDotField </param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+		<struct name="cResidual">
+			<param name="Type">ForceVector</param>
+			<param name="FeVariable">CompositionField</param>
+		</struct>
+		<struct name="cMassMatrix">
+			<param name="Type">ForceVector</param>
+			<param name="FeVariable">CompositionField</param>
+		</struct>
+		<struct name="cPredictorMulticorrector">
+			<param name="Type">AdvDiffMulticorrector</param>
+		</struct>
+		<struct name="CompositionEqn">
+			<param name="Type">AdvectionDiffusionSLE</param>
+			<param name="SLE_Solver">cPredictorMulticorrector</param> 
+			<param name="Context">context</param>
+			<param name="PhiField">CompositionField</param>
+			<param name="Residual">cResidual</param>
+			<param name="MassMatrix">cMassMatrix</param>
+			<param name="courantFactor">courantFactor</param>
+		</struct>
+		<struct name="cLumpedMassMatrixForceTerm" mergeType="merge">
+    <!-- Make this the same as the temperature massMatrix -->
+			<param name="Type">LumpedMassMatrixForceTerm</param>
+			<param name="Swarm">gaussSwarm</param>
+			<param name="ForceVector">cMassMatrix</param>
+		</struct>
+		<struct name="cDefaultResidualForceTerm">
+			<param name="Type">AdvDiffResidualForceTerm</param>
+			<param name="Swarm">gaussSwarm</param>
+			<param name="ForceVector">cResidual</param>
+			<param name="ExtraInfo">CompositionEqn</param>
+			<param name="VelocityField">VelocityField</param>
+			<param name="defaultDiffusivity">compositionDiffusivity</param>
+			<!-- UpwindXiFunction can be 'Exact', 'DoublyAsymptoticAssumption' or 'CriticalAssumption' -->
+			<param name="UpwindXiFunction">DoublyAsymptoticAssumption</param> 
+		</struct>
+	</struct>
+
+</StGermainData>

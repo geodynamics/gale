@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 	
+	<!--include>tests/testAnalyticHyperbolic.xml</include-->
+	<include>ThermalConvection.xml</include>
+
+	<include>TemperatureAndVelocityArrowsVP.xml</include>
+	<include>VelocityMagnitudeVP.xml</include>
+	<!--include>AnalyticVelocityMagnitudeVP.xml</include-->
+	<include>PressureAndVelocityArrowsVP.xml</include>
+	<!--include>AnalyticPressureVP.xml</include-->
+	<include>window.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="velocityMagnitudeColourMap" mergeType="merge">
+			<param name="dynamicRange" mergeType="replace">False</param>
+		</struct>
+		<struct name="velocityArrows" mergeType="merge">
+			<param name="dynamicRange" mergeType="replace">False</param>
+		</struct>
+		<struct name="window" mergeType="merge">
+			<list name="Viewport">
+				<param>TemperatureAndVelocityArrowsVP VelocityMagnitudeVP</param>
+				<param>PressureAndVelocityArrowsVP</param>
+			</list>
+		</struct>
+	</struct>
+	<param name="outputPath">./output</param>
+
+</StGermainData>

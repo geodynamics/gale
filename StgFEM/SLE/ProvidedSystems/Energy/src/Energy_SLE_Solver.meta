@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Energy_SLE_Solver</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">./StgFEM/SLE/ProvidedSystems/Energy/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">SLE_Solver</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">...</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+
+</list>
+
+<list name="Dependencies">
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example"><![CDATA[
+	<struct name="energy_SLE_Solver">
+		<param name="Type">Energy_SLE_Solver</param>
+		<param name="matrixSolver">matrixSolver</param>
+	</struct]]>
+</param>
+
+</StGermainData>

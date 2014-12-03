@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<param name="Name">AdvDiffMulticorrector</param>
+	<param name="Author">...</param>
+	<param name="Organisation">VPAC</param>
+	<param name="Project">StgFEM</param>
+	<param name="Location">./StgFEM/SLE/ProvidedSystems/AdvectionDiffusion/src/</param>
+	<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+	<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+	<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+	<param name="Parent">SLE_Solver</param>
+	<param name="Reference">Brooks, A. and T. Hughes, Streamline upwind Petrov-Galerkin formulations for convection dominated flows with paricular emphasis on the incompressible Navier-Stokes equation, Comput. Methods Apll. Mech. Eng., Vol 32, 1982, pp. 199-259</param>
+	<param name="Summary">...</param>
+	<param name="Description">An explicit method to solve the equations set up in the SU/PG formulation. See Brooks and Hughes, Section 4.2, pp. 225f</param>
+
+	<!--Now the interesting stuff-->
+
+	<list name="Params">
+		<struct>
+			<param name="Name">gamma</param>
+			<param name="Type">Double</param>
+			<param name="Default">0.5</param>
+			<param name="Description">Factor used to calculate generalised mass matrix. If $\gamma$ is 1/2, this is the trapezoidal rule.</param>
+		</struct>
+		<struct>
+			<param name="Name">multiCorrectorIterations</param>
+			<param name="Type">UnsignedInt</param>
+			<param name="Default">2</param>
+			<param name="Description">The number of iterations of the algorithm. See Remark 2 in Brooks and Hughes, Section 4.2, p. 228</param>
+		</struct>
+	</list>
+
+	<list name="Dependencies">
+	</list>
+
+	<!-- Add an exmaple XML if possible -->
+	<param name="Example"><![CDATA[
+		<struct name="predictorMulticorrector">
+			<param name="Type">AdvDiffMulticorrector</param>
+		</struct>]]>
+	</param>
+
+</StGermainData>

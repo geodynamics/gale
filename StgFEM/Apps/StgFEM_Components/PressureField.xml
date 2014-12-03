@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- PressureField Stuff -->
+	<struct name="components" mergeType="merge">
+		<struct name="pressure">
+			<param name="Type">MeshVariable</param>
+			<param name="mesh">pressureMesh</param>
+			<param name="Rank">Scalar</param>
+			<param name="DataType">Double</param>
+		</struct>
+		<struct name="pressureBCs">
+			<param name="Type">CompositeVC</param>
+			<param name="Data">pressureMesh</param>
+		</struct>
+		<struct name="pressureICs">
+			<param name="Type">CompositeVC</param>
+			<param name="Data">pressureMesh</param>
+		</struct>
+		<struct name="pressureDofLayout">
+			<param name="Type">DofLayout</param>
+			<param name="mesh">pressureMesh</param>
+			<list name="BaseVariables">
+				<param>pressure</param>
+			</list>
+		</struct>		
+		<struct name="PressureField">
+			<param name="Type">FeVariable</param>
+			<param name="FEMesh">pressureMesh</param>
+			<param name="DofLayout">pressureDofLayout</param>
+			<param name="BC">pressureBCs</param>
+			<param name="IC">pressureICs</param>
+			<param name="LinkedDofInfo">pressureLinkedDofs</param>
+		</struct>
+	</struct>
+
+	<param name="elementMesh"> linearMesh </param>
+	<param name="pressureMesh"> constantMesh </param>
+
+</StGermainData>

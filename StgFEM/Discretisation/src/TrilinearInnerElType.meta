@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">TrilinearInnerElType</param>
+<param name="Author">dave lee</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">./StgFEM/Discretisation/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">ElementType</param>
+<param name="Reference">...</param>
+<param name="Summary">Defines a set of linear shape functions for a 3D element with the nodes situated at internal points within the element.</param>
+<param name="Description">Four internal nodes, constituting a tetrahedron with resulting shape functions being discontinuous between elements.</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+
+</list>
+
+<list name="Dependencies">
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">n/a</param>
+
+</StGermainData>

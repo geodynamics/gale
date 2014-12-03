@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">LinkedDofInfo</param>
+<param name="Author">Patrick Sunter</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">./StgFEM/Discretisation/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
+<param name="Description">Links Degrees of Freedom on a DofLayout so that all the degrees of freedom act as one. This component is no longer needed to make meshes periodic, simply set the values 'periodic_x', 'periodic_y' or 'periodic_z' to true for the Mesh Generator.</param>
+
+<!--Now the interesting stuff-->
+<list name="Params">
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">Mesh</param>
+		<param name="Type">Mesh</param>
+		<param name="Description">The mesh that this linking applies to.</param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">DofLayout</param>
+		<param name="Type">DofLayout</param>
+		<param name="Description">The Dof Layout that this linking applies to.</param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">linkSpecifications</param>
+		<param name="Type">List</param>
+		<param name="Description">A list of structs which spells out which DOFs are linked. Each script must contain a parameter labelled 'dof' which gives the number of the degree of freedom being linked and it also must have a parameter called either 'shape' or 'wall'. If the parameter given is 'shape' then the value for this parameter must be the name of an Stg_Shape object, within which you want all the DOFs to be linked. If the parameter given is 'wall', then the value given must be any of 'left', 'right', 'front', 'back', 'top' or 'bottom' depending on which DOFs you wish to be linked.</param>
+	</struct>
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">
+<![CDATA[
+		<struct name="velocityLinkedDofs">
+			<param name="Type">LinkedDofInfo</param>
+			<param name="Mesh">linearMesh</param>
+			<param name="DofLayout">velocityDofLayout</param>
+
+			<list name="linkSpecifications">
+				<struct>
+					<param name="shape">myShape</param>
+					<param name="dof">0</param>
+				</struct>
+				<struct>
+					<param name="shape">myShape</param>
+					<param name="dof">1</param>
+				</struct>
+				<struct>
+					<param name="shape">myShape</param>
+					<param name="dof">2</param>
+				</struct>
+				<struct>
+					<param name="wall">bottom</param>
+					<param name="dof">1</param>
+				</struct>
+			</list>	
+		</struct>
+]]>
+</param>
+
+</StGermainData>

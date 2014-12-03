@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<list name="ColourMaps" mergeType="merge">
+	<struct>
+			<param name="Name">CIItcomTemperatureColourMap</param>
+			<param name="ColourMap">Blue white Red</param>
+			<param name="Minimum">0.0</param>
+			<param name="Maximum">1.0</param>
+			<param name="DynamicRange">true</param>
+	</struct>
+</list>
+<list name="Cameras" mergeType="merge">
+	<struct>
+			<param name="Name">camera</param>
+			<param name="CameraRadius">2.000000</param>
+			<param name="UpDirectionX">0.0</param>
+			<param name="UpDirectionY">0.0</param>
+			<param name="UpDirectionZ">1.0</param>
+			<param name="CameraTheta">-27.000000</param>
+			<param name="CameraPhi">55.000000</param>
+			<param name="FocalPointX">0.500000</param>
+			<param name="FocalPointY">0.500000</param>
+			<param name="FocalPointZ">0.500000</param>
+	</struct>
+</list>
+
+<list name="Viewports" mergeType="merge">
+	<struct>
+		<param name="Name">Temperature</param>
+		<param name="CameraName">camera</param>
+		<list name="Objects">
+			<struct>
+				<param name="FeVariable">TemperatureField</param>
+				<param name="PlotAs">FeVariableSurface</param>
+				<param name="ColourMap">CIItcomTemperatureColourMap</param>
+				<param name="Wireframe">False</param>
+			</struct>	
+			<struct>
+				<param name="FeVariable">TemperatureField</param>
+				<param name="PlotAs">FeVariableSurface</param>
+				<param name="ColourMap">Black</param>
+				<param name="Wireframe">True</param>
+			</struct>				
+			<struct>
+				<param name="FieldVariable">TemperatureField</param>
+				<param name="PlotAs">DomainBoundary</param>
+				<!--
+				<param name="LineWidth"> 1.0 </param>
+				<param name="Colour"> Black </param>
+				-->
+			</struct>			
+			<struct>
+				<param name="FieldVariable">VelocityField</param>
+				<param name="PlotAs">VectorArrows</param>
+				<param name="LengthScale">0.15</param>
+				<param name="ArrowHeadSize">0.3</param>
+				<param name="ColourMap">Black</param>
+			</struct>			
+			<struct>
+				<param name="PlotAs">ColourBar</param>
+				<param name="ColourMap">CIItcomTemperatureColourMap</param>
+				<!--
+				<param name="Width"> 10 </param>
+				<param name="Length"> viewport->width - 160 </param>
+				<param name="Border"> 16 </param>
+				<param name="TextColour"> Black </param>
+				-->
+			</struct>
+		</list>
+	</struct>
+</list>
+
+</StGermainData>

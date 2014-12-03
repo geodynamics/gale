@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<!-- Note: suffixing the name by "_Toolbox" is important here! -->
+<param name="Name">StgFEM_Toolbox</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">StgFEM/libStgFEM/Toolbox</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">SystemLinearEquations</param>
+<param name="Summary">...</param>
+<param name="Description">StgFEM Toolbox</param>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Type">StgDomain</param>
+		<param name="Name">StgDomain</param>
+		<param name="Essential">True</param>
+		<param name="Description">StgDomain is required</param>
+	</struct>
+</list>
+
+</StGermainData>

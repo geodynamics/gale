@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>LidDrivenConvection.xml</include>
+	<include>velocityBCs.shear.xml</include>
+
+	<list name="plugins" mergeType="merge">
+		<param>StgFEM_LinearVelocityAnalytic</param>
+	</list>
+
+	<param name="VelocityField-Tolerance">5e-6</param>
+	<param name="PressureField-Tolerance">5e-5</param>
+	<param name="StrainRateField-Tolerance">1e-6</param>
+	<param name="StrainRateInvariantField-Tolerance">1e-6</param>
+	
+</StGermainData>

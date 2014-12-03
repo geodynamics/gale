@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- PressureField Stuff -->
+	<struct name="components" mergeType="merge">
+		<struct name="pressureGrad">
+			<param name="Type">MeshVariable</param>
+			<param name="mesh">pressureMesh</param>
+			<param name="Rank">Vector</param>
+			<param name="DataType">Double</param>
+			<param name="VectorComponentCount">dim</param>
+			<list name="names">
+				<param>PGx</param>
+				<param>PGy</param>
+				<param>PGz</param>
+			</list>
+		</struct>
+		<struct name="pressureGradDofLayout">
+			<param name="Type">DofLayout</param>
+			<param name="mesh">pressureMesh</param>
+			<param name="BaseVariableCount">dim</param>
+			<list name="BaseVariables">
+				<param>PGx</param>
+				<param>PGy</param>
+				<param>PGz</param>
+			</list>
+		</struct>
+		<struct name="PressureGradField">
+			<param name="Type">FeVariable</param>
+			<param name="FEMesh">pressureMesh</param>
+			<param name="DofLayout">pressureGradDofLayout</param>
+		</struct>
+
+		<struct name="PressureGradXField">
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeFirstComponent</param>
+			<param name="FeVariable">PressureGradField</param>
+		</struct>
+		<struct name="PressureGradYField">
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeSecondComponent</param>
+			<param name="FeVariable">PressureGradField</param>
+		</struct>
+		<struct name="PressureGradZField">
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">TakeThirdComponent</param>
+			<param name="FeVariable">PressureGradField</param>
+		</struct>
+	</struct>
+
+	<param name="elementMesh"> linearMesh </param>
+	<param name="pressureMesh"> constantMesh </param>
+
+</StGermainData>

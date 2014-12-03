@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<!-- Load the plugin that sets up the app, plus any others you require -->
+	<list name="import">
+		<param>StgFEM</param>
+	</list>
+	<list name="plugins">
+		<param>StgFEM_PrintFeVariableDiscreteValues</param>
+		<param>StgFEM_StandardConditionFunctions</param>
+	</list>
+	
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 1 </param>
+	<param name="outputEvery"> 1 </param>
+	<param name="dumpEvery"> 1 </param>
+	<param name="outputPath"> ./output </param>
+
+	<!-- Journal control -->
+	<param name="journal-level.info.Stg_ComponentFactory"> 1 </param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">f</param>
+	<param name="journal-level-branch.debug.StgFEM"> 1 </param>
+
+	<!-- Geometry & Mesh setup -->
+	<param name="temperatureMesh">linearMesh</param>
+	<param name="dim"> 2 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0f </param>
+	<param name="minY"> 0.0f </param>
+	<param name="minZ"> 0.0f </param>
+	<param name="maxX"> 1.0f </param>
+	<param name="maxY"> 1.0f </param>
+	<param name="maxZ"> 1.0f </param>
+	<param name="elementResI"> 128 </param>
+	<param name="elementResJ"> 128 </param>
+	<param name="elementResK"> 5 </param>
+
+	<!-- Set up BCs -->
+	<include>standardTempBCs.xml</include>
+
+	<!-- Integration Scheme configuration -->
+	<param name="gaussParticlesX"> 2 </param>
+	<param name="gaussParticlesY"> 2 </param>
+	<param name="gaussParticlesZ"> 2 </param>
+
+	<list name="PrintFeVariableDiscreteValues">
+		<param>TemperatureField</param>
+	</list>
+
+	<include>StgFEM/LinearMesh.xml</include>
+	<include>StgFEM/TemperatureField.xml</include>
+	<include>StgFEM/GaussSwarm.xml</include>
+	<include>StgFEM/TempDiffusionSolver.xml</include>
+
+</StGermainData>

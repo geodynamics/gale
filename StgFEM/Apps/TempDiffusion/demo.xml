@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 	
+	<include>TempDiffusion.xml</include>
+	<include>analyticTemperature.xml</include>
+	
+	<include>TemperatureVP.xml</include>
+	<include>AnalyticTemperatureVP.xml</include>
+	<include>window.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="window"  mergeType="merge">
+			<param name="Viewport">TemperatureVP AnalyticTemperatureVP</param>
+		</struct>
+	</struct>
+
+	<param name="outputPath">./output</param>
+
+</StGermainData>

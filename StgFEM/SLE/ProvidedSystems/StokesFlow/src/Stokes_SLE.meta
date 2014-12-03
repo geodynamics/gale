@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Stokes_SLE</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgFEM</param>
+<param name="Location">./StgFEM/SLE/ProvidedSystems/StokesFlow/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgFEM.html</param>
+<param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">SystemLinearEquations</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
+<param name="Description"><![CDATA[
+	This SLE define the Stokes system of equations given by the 2x2 block matrix
+		[  K  G  ]{u} = {f}
+		[  D  C  ]{p} = {h} ........................................ (1)
+
+	The param names used to identify each matrix in (1) within the Stokes_SLE are
+	provided below.
+		K: StressTensorMatrix
+		G: GradientMatrix
+		D: DivergenceMatrix
+		C: CompressibilityMatrix
+		u: VelocityVector
+		p: PressureVector
+		f: ForceVector
+		h: ContinuityForceVector:]]>
+</param>
+
+<list name="Params">
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Name">      StressTensorMatrix </param>
+		<param name="Type">      StiffnessMatrix    </param>
+		<param name="Essential"> True               </param>
+		<param name="Description"> Matrix which is discrete counter part of a tensor gradient. </param>
+	</struct>
+	<struct>
+		<param name="Name">      GradientMatrix  </param>
+		<param name="Type">      StiffnessMatrix </param>
+		<param name="Essential"> True            </param>
+		<param name="Description"> Matrix which is the discrete counter part of the gradient operator. </param>
+	</struct>
+	<struct>
+		<param name="Name">      DivergenceMatrix </param>
+		<param name="Type">      StiffnessMatrix  </param>
+		<param name="Essential"> No               </param>
+		<param name="Description"> Matrix which is the discrete counter part of the divergence operator. </param>
+	</struct>
+	<struct>
+		<param name="Name">      CompressibilityMatrix </param>
+		<param name="Type">      StiffnessMatrix       </param>
+		<param name="Essential"> No                    </param>
+		<param name="Description"> Matrix which is the discrete counter part of "some" operator applied to p. The form of the operator is application dependent.  </param>
+	</struct>
+	<struct>
+		<param name="Name">      VelocityVector </param>
+		<param name="Type">      SolutionVector </param>
+		<param name="Essential"> True           </param>
+		<param name="Description"> The discrete velocity vector. </param>
+	</struct>
+	<struct>
+		<param name="Name">      PressureVector </param>
+		<param name="Type">      SolutionVector </param>
+		<param name="Essential"> True           </param>
+		<param name="Description"> The discrete pressure vector. </param>
+	</struct>
+	<struct>
+		<param name="Name">      ForceVector </param>
+		<param name="Type">      ForceVector </param>
+		<param name="Essential"> True        </param>
+		<param name="Description"> The discrete forcing term for the momentum equation. </param>
+	</struct>
+	<struct>
+		<param name="Name">      ContinuityForceVector </param>
+		<param name="Type">      ForceVector           </param>
+		<param name="Essential"> True                  </param>
+		<param name="Description"> The discrete forcing term for the continuity equation. </param>
+	</struct>
+</list>
+
+<param name="Example">
+<![CDATA[
+	<struct name="stokesEqn">
+			<param name="Type">Stokes_SLE</param>
+			<param name="SLE_Solver">uzawa</param>
+			<param name="Context">context</param>
+			<param name="StressTensorMatrix">k_matrix</param>
+			<param name="GradientMatrix">g_matrix</param>
+			<param name="DivergenceMatrix"></param>
+			<param name="CompressibilityMatrix"></param>
+			<param name="VelocityVector">solutionVelocity</param>
+			<param name="PressureVector">solutionPressure</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="ContinuityForceVector">cont_force</param>
+			<param name="killNonConvergent">false</param>
+			<param name="nonLinearMaxIterations">nonLinearMaxIterations</param>
+			<param name="nonLinearTolerance">nonLinearTolerance</param>
+			<param name="makeConvergenceFile">false</param>
+	</struct>
+]]>
+</param>
+
+</StGermainData>

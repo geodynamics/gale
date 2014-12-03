@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="wallVC">
+		<param name="type"> WallVC </param>
+		<param name="wall"> left </param>
+		<list name="variables">
+			<struct>
+				<param name="name"> vx </param>
+				<param name="type"> double </param>
+				<param name="value"> 0.0 </param>
+			</struct>
+		</list>
+	</struct>
+
+</StGermainData>
