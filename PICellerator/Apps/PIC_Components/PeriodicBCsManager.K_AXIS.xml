@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- Periodic boundary conditions manager for particles -->
+	<struct name="components" mergeType="merge">
+		<struct name="periodicBCsManager" mergeType="merge">
+			<param name="Type">PeriodicBoundariesManager</param>
+			<param name="Geometry">geometry</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="mesh">linearMesh</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<list name="PeriodicBoundaries" mergeType="merge">
+				<param>K_AXIS</param>
+			</list>	
+		</struct>
+	</struct>
+	<param name="isPeriodicK"> t </param>
+</StGermainData>

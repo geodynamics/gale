@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 	
+	<include>./LidDrivenPIC.xml</include>
+	<include>./velocityBCs.shearX.xml</include>
+	<list name="plugins">
+		<param>StgFEM_LinearVelocityAnalytic</param>
+	</list>
+	
+	<param name="VelocityField-Tolerance">1e-6</param>
+	<param name="PressureField-Tolerance">1e-5</param>
+	<param name="StrainRateField-Tolerance">1e-6</param>
+	<param name="StrainRateInvariantField-Tolerance">1e-6</param>
+
+</StGermainData>

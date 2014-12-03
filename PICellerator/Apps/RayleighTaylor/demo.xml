@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 	
+	<include>./RayTay_Example.xml</include>
+	<include>./ParticleDensityVP.xml</include>
+	<include>./ParticleDisplacementVP.xml</include>
+	<include>./window.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="window" mergeType="merge">
+			<param name="Viewport">ParticleDensityVP ParticleDisplacementVP</param>
+		</struct>
+	</struct>
+	<param name="outputPath">./output</param>
+	<param name="interactive">True</param>
+
+</StGermainData>

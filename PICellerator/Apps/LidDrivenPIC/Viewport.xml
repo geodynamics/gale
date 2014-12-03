@@ -1,0 +1,80 @@
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- Viewport stuff -->
+	<struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+		</struct>
+		<struct name="pressureColourMap" mergeType="replace">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Black Grey White Orange Red</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<struct name="velocityMagnitudeColourMap" mergeType="replace">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="pressureColourBar" mergeType="replace">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pressureColourMap</param>
+		</struct>			
+		<struct name="pressureMap" mergeType="replace">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">PressureField</param>
+			<param name="ColourMap">pressureColourMap</param>
+		</struct>
+		<struct name="velocityArrows" mergeType="replace">
+			<param name="Type">lucVectorArrows</param>
+			<param name="VectorVariable">VelocityField</param>
+			<param name="Colour">black</param>
+			<param name="arrowHeadSize">0.15</param>	
+			<param name="lengthScale">0.15</param>	
+		</struct>
+		<struct name="velocitySwarmVariable">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="Swarm">materialSwarm</param> <!-- THIS IS THE WRONG SWARM - DOESN'T GET XI's CORRECTLY -->
+			<param name="FeVariable">VelocityMagnitudeField</param>
+		</struct>
+		<struct name="particleDots" mergeType="replace">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">velocitySwarmVariable</param>
+			<param name="ColourMap">velocityMagnitudeColourMap</param>
+			<param name="pointSize">2.0</param>
+		</struct>		
+		<struct name="border" mergeType="replace">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+		</struct>
+		<struct name="velocityMagnitudeColourBar" mergeType="replace">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">velocityMagnitudeColourMap</param>
+		</struct>
+		<struct name="particlesAndVelocityMagTitle" mergeType="replace">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particles and Velocity Mag</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="ParticlesAndVelocityMagVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+<!--
+				<param>pressureMap</param>
+-->
+				<param>particlesAndVelocityMagTitle</param>
+				<param>particleDots</param>
+				<param>velocityArrows</param>
+				<param>border</param>
+				<param>velocityMagnitudeColourBar</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

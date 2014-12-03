@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>StgFEM/StokesFlowUzawa.xml</include>
+
+	<!-- Stokes Flow Stuff -->
+	<struct name="components" mergeType="merge">
+		<!--
+		<struct name="isoviscousStressTensorTerm2" mergeType="replace">
+			<param name="Type">IsoviscousStressTensorTerm</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="viscosity">1.0</param>
+			<param name="StiffnessMatrix">k_matrix</param>
+		</struct>
+		-->
+		<!--
+		<struct name="isoviscousStressTensorTerm2">
+			<param name="Type">IsoviscousStressTensorTerm</param>
+			<param name="Swarm">backgroundIntegration</param>
+			<param name="viscosity">1.0</param>
+			<param name="StiffnessMatrix">k_matrix</param>
+		</struct>
+		-->
+		<!--
+		<struct name="preconditionerTerm2">
+			<param name="Type">UzawaPreconditionerTerm</param>
+			<param name="Swarm">backgroundIntegration</param>
+			<param name="StiffnessMatrix">preconditioner</param>
+		</struct>
+		-->
+		<struct name="buoyancyForceTerm2">
+			<param name="Type">BuoyancyForceTerm</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="Swarm">backgroundIntegration</param>
+			<param name="gravity">gravity</param>
+		</struct>
+	</struct>	
+
+</StGermainData>

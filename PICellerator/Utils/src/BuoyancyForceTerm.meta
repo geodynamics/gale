@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<param name="Name">BuoyancyForceTerm</param>
+	<param name="Author">...</param>
+	<param name="Organisation">VPAC and MCC</param>
+	<param name="Project">PICellerator</param>
+	<param name="Location">./PICellerator/Utils/src/</param>
+	<param name="Project Web">http://www.stgermainproject.org/PICellerator.html</param>
+	<param name="Copyright">Copyright (C) 2005 VPAC and Monash Cluster Computing.</param>
+	<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+	<param name="Parent">ForceTerm</param>
+	<param name="Reference">...</param>
+	<param name="Summary">...</param>
+	<param name="Description">This adds a force term for themo-chemical convection, where the fluid is driven my both the thermal expansivity ($\alpha$) as well as the density ($\rho$). Both 'alpha' and 'density' are required as parameters for each material.</param>
+	<param name="Equation">$\rho g \left( 1 - \alpha T \right)$</param>
+
+	<!--Now the interesting stuff-->
+
+	<list name="Params">
+		<struct>
+			<param name="Name">gravity</param>
+			<param name="Type">Double</param>
+			<param name="Default">0.0</param>
+			<param name="Description">This corresponds to the $g$ in the equation above.</param>
+		</struct>
+	</list>
+
+	<list name="Dependencies">
+		<struct>
+			<param name="Essential">No</param>
+			<param name="Name">TemperatureField</param>
+			<param name="Type">FeVariable</param>
+			<param name="Description">This is the FeVariable from which the temperature, $T$, is calculated in the above calculation.</param>
+		</struct>
+	</list>
+
+	<!-- Add an exmaple XML if possible -->
+	<param name="Example"><![CDATA[
+		<struct name="buoyancyForceTerm">
+			<param name="Type">BuoyancyForceTerm</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="Swarm">materialPoints</param>
+			<param name="gravity">1.0</param>
+		</struct>]]>
+	</param>
+
+</StGermainData>

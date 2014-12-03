@@ -1,0 +1,71 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="plugins" mergeType="merge">
+		<param>PICellerator_CalculateParticleDisplacement</param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+		<!--
+		<struct name="materialSwarm-DisplacementMagnitude">
+			<param name="Type">OperatorSwarmVariable</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="Operator">Magnitude</param>
+			<param name="SwarmVariable">materialSwarm-Displacement</param>
+		</struct>
+		-->
+		<!-- Camera And Colour Maps -->
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+		</struct>
+		<struct name="displacementColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">White LightBlue Green Yellow DarkRed</param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">0.6</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="displacementColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">displacementColourMap</param>
+		</struct>
+		<struct name="title" mergeType="replace">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle displacement</param>
+		</struct>
+		<struct name="displacementArrows">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="DirectionVariable">materialSwarm-Displacement</param>
+			<param name="Colour">black</param>
+			<param name="arrowHeadSize">0.05</param>	
+			<param name="LengthVariable">materialSwarm-DisplacementMagnitude</param>	
+			<param name="thickness">2.0</param>	
+		</struct>
+		<struct name="displacementParticleDots">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-DisplacementMagnitude</param>
+			<param name="ColourMap">displacementColourMap</param>
+			<param name="pointSize">5.0</param>
+		</struct>		
+		<!-- Viewport -->
+		<struct name="ParticleDisplacementVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>title</param>
+				<!--
+				<param>displacementArrows</param>
+				-->
+				<param>displacementParticleDots</param>
+				<param>displacementColourBar</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 	
+	<include>./AnalyticShear.xml</include>
+	<include>./velocityBCs.shearXZ.xml</include>
+	
+	<param name="dim">3</param>
+	<param name="elementResI">10</param>
+	<param name="elementResJ">10</param>
+	<param name="elementResK">10</param>
+	
+	<!-- I don't know why this should be less accurate than the 2D solution -->
+	<param name="VelocityField-Tolerance">1e-4</param>
+	<param name="PressureField-Tolerance">1e-2</param>
+	<param name="StrainRateField-Tolerance">1e-2</param>
+	<param name="StrainRateInvariantField-Tolerance">1e-2</param>
+
+</StGermainData>

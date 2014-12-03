@@ -1,0 +1,3 @@
+Timestep 0: Total integrated value of 'PressureField-ErrorMagnitudeField' is outside a tolerance 0.15.
+Timestep 1: Total integrated value of 'PressureField-ErrorMagnitudeField' is within a tolerance 0.15.
+Timestep 2: Total integrated value of 'PressureField-ErrorMagnitudeField' is within a tolerance 0.15.

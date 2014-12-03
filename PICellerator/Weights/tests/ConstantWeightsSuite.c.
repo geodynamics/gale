@@ -1,0 +1,258 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+**
+** Authors:
+**   Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**   Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**   Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**   Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**   Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**   Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** $Id: testList.c 2136 2004-09-30 02:47:13Z PatrickSunter $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "pcu/pcu.h"
+#include <StGermain/StGermain.h>
+#include <StgDomain/StgDomain.h>
+#include <StgFEM/StgFEM.h>
+#include "PICellerator/PopulationControl/PopulationControl.h"
+#include "PICellerator/Weights/Weights.h"
+
+#include "ConstantWeightsSuite.h"
+
+typedef struct {
+   DomainContext*       context;
+} ConstantWeightsSuiteData;
+
+void ConstantFunction( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   *value = -3.0;
+}
+void LinearFunction( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   double x = xi[0];
+   double y = xi[1];
+
+   *value = 2.0 + 2.2 * x - y;
+}
+void ShapeFunction( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   double x = xi[0];
+   double y = xi[1];
+
+   *value = 1 + x + y + x * y;
+}
+void PolynomialFunction( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   double x = xi[0];
+   double y = xi[1];
+
+   *value = 11 + 2*x*x + 3*x*x*x*y + y + x*x*x + 2*y*y;
+}
+void QuadraticFunction( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   double x = xi[0];
+
+   *value = 1 + x + x * x;
+}
+void ExponentialFunction( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   double x = xi[0];
+   double y = xi[1];
+
+   *value = 5*exp(2*x*x*x + 2*y*y*y) * (1-x) * (1+y);
+}
+void ExponentialInterface( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   double x = xi[0];
+   double y = xi[1];
+
+   *value = (double) (y <= 0.1 * exp( 2*x ));
+}
+void CircleInterface( void* feVariable, Element_DomainIndex dElement_I, Coord xi, double* value ) {
+   double x = xi[0];
+   double y = xi[1];
+
+   *value = (double) (x*x + y*y <= 1.0);
+}
+
+
+void WeightsSuite_TestElementIntegral(
+      DomainContext* context,
+      Name           funcName,
+      Index          count,   // was SampleSize - defaults to 5000
+      double         meanTolerance,
+      double         stdDevTolerance,
+      double         expectedMean,
+      double         expectedStdDev ) 
+{
+   Swarm*              integrationSwarm = (Swarm*)LiveComponentRegister_Get(
+                           context->CF->LCRegister, "integrationSwarm" );
+   Swarm*              materialSwarm    = (Swarm*)LiveComponentRegister_Get(
+                           context->CF->LCRegister, "materialPoints" );
+   FeMesh*             mesh             = (FeMesh*) LiveComponentRegister_Get(
+                           context->CF->LCRegister, "linearMesh" );
+   WeightsCalculator*  weights          = (WeightsCalculator*) LiveComponentRegister_Get(
+                           context->CF->LCRegister, "weights" );
+   FeVariable*         feVariable;
+   Element_LocalIndex  lElement_I       = 0;
+   double              analyticValue    = 0.0;
+   double              integral         = 0.0;
+   double              error;
+   double              errorSquaredSum  = 0.0;
+   double              errorSum         = 0.0;
+   /*Particle_Index      lParticle_I;*/
+   /*IntegrationPoint*   particle;*/
+   double              mean;
+   double              standardDeviation;
+   Index               loop_I;
+   /*ElementLayout*      elementLayout    = mesh->layout->elementLayout;*/
+   void*               data;
+   double              differenceMean, differenceStdDev;   
+
+   assert( integrationSwarm );
+   assert( materialSwarm );
+   assert( mesh );
+   assert( weights );
+
+   /* Create FeVariable */
+   feVariable = FeVariable_New_Full( "feVariable", mesh, NULL, NULL, NULL, NULL, NULL, NULL, 
+         1, context->dim, False, False, False, MPI_COMM_WORLD, context->fieldVariable_Register );
+
+   Journal_Firewall( (funcName!=NULL),
+      Journal_Register( Error_Type, "WeightsSuite" ),
+      "Error, function name input to %s is NULL", __func__ );
+
+   if ( strcasecmp( funcName, "ShapeFunction" ) == 0 ) {
+      feVariable->_interpolateWithinElement = ShapeFunction;
+      analyticValue = 4.0;
+   }
+   else if ( strcasecmp( funcName, "ConstantFunction" ) == 0 ) {
+      feVariable->_interpolateWithinElement = ConstantFunction;
+      analyticValue = -12.0;
+   }
+   else if ( strcasecmp( funcName, "LinearFunction" ) == 0 ) {
+      feVariable->_interpolateWithinElement = LinearFunction;
+      analyticValue = 8.0;
+   }
+   else if ( strcasecmp( funcName, "QuadraticFunction" ) == 0 ) {
+      feVariable->_interpolateWithinElement = QuadraticFunction;
+      analyticValue = 16.0/3.0;
+   }
+   else if ( strcasecmp( funcName, "PolynomialFunction" ) == 0 ) {
+      feVariable->_interpolateWithinElement = PolynomialFunction;
+      analyticValue = 148.0/3.0;
+   }
+   else if ( strcasecmp( funcName, "ExponentialFunction" ) == 0 ) {
+      feVariable->_interpolateWithinElement = ExponentialFunction;
+      analyticValue = 0.0 /*TODO*/;
+      abort();
+   }
+   else if ( strcasecmp( funcName, "ExponentialInterface" ) == 0 ) {
+      feVariable->_interpolateWithinElement = ExponentialInterface;
+      analyticValue = 0.05 * (exp(2) - exp(-2)) + 2.0;
+   }
+   else if ( strcasecmp( funcName, "CircleInterface" ) == 0 ) {
+      feVariable->_interpolateWithinElement = CircleInterface;
+      analyticValue = M_PI;
+   }
+   else 
+      Journal_Firewall( False,
+            Journal_Register( Error_Type, "WeightsSuite" ),
+            "Cannot understand function name '%s'\n", funcName );
+
+   for ( loop_I = 0 ; loop_I < count ; loop_I++ ) {
+      /* Layout Particles */
+      Swarm_Random_Seed( (long) loop_I );
+      _Swarm_InitialiseParticles( materialSwarm, data );
+
+      _IntegrationPointsSwarm_UpdateHook( NULL, integrationSwarm );
+      
+      WeightsCalculator_CalculateCell( weights, integrationSwarm, lElement_I );
+
+      /* Evaluate Integral */
+      integral = FeVariable_IntegrateElement( feVariable, integrationSwarm, lElement_I );
+
+      /* Calculate Error */
+      error = fabs( integral - analyticValue )/fabs( analyticValue );
+      errorSum += error;
+      errorSquaredSum += error*error;
+   }
+
+   /* Calculate Mean and Standard Deviation */
+   mean = errorSum / (double) count;
+   standardDeviation = sqrt( errorSquaredSum / (double) count - mean * mean );
+
+   /* compare the mean and standard deviation */
+   differenceMean = fabs(mean - expectedMean);
+   differenceStdDev = fabs(standardDeviation - expectedStdDev);
+   pcu_check_le( differenceMean, meanTolerance );
+   pcu_check_le( differenceStdDev, stdDevTolerance );
+}
+
+
+void ConstantWeightsSuite_Setup( ConstantWeightsSuiteData* data ) {
+   char              xmlInputFilename[PCU_PATH_MAX];
+
+   pcu_filename_input( "testConstantWeights.xml", xmlInputFilename );
+   data->context = (DomainContext*)stgMainInitFromXML( xmlInputFilename, MPI_COMM_WORLD );
+} 
+
+
+void ConstantWeightsSuite_Teardown( ConstantWeightsSuiteData* data ) {
+   stgMainDestroy( (AbstractContext*)data->context );
+}
+
+
+void ConstantWeightsSuite_TestElementIntegral_Circle( ConstantWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "CircleInterface", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.091215, /* --mean-expectedValue */
+      0.066458 /* --standardDeviation-expectedValue */ );
+}
+
+
+void ConstantWeightsSuite_TestElementIntegral_Exponential( ConstantWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "ExponentialInterface", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.155483, /* --mean-expectedValue */
+      0.116796 /* --standardDeviation-expectedValue */ );
+}
+
+
+void ConstantWeightsSuite_TestElementIntegral_Polynomial( ConstantWeightsSuiteData* data ) {
+   WeightsSuite_TestElementIntegral( data->context, "PolynomialFunction", 1000,
+      0.000001, /* --mean-tolerance */
+      0.000001, /* --standardDeviation-tolerance */
+      0.017475, /* --mean-expectedValue */
+      0.013738 /* --standardDeviation-expectedValue */ );
+}
+
+
+void ConstantWeightsSuite( pcu_suite_t* suite ) {
+   pcu_suite_setData( suite, ConstantWeightsSuiteData );
+   pcu_suite_setFixtures( suite, ConstantWeightsSuite_Setup, ConstantWeightsSuite_Teardown );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_Circle );
+/* TEMPORARILY disable multiple tests until Toolbox/Context issue sorted out (See tickets #70,#71
+ in StGermain trac) -- PatrickSunter, 19 Aug 2009 */
+#if 0
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_Exponential );
+   pcu_suite_addTest( suite, ConstantWeightsSuite_TestElementIntegral_Polynomial );
+#endif
+}
