@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">SwarmDump</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Swarm/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">Dumps all the information from the Swarm into a binary file. Occurs on the 'Dump' Entry Point specified by the 'dumpEvery' parameter in your imput file. This component will used HDF5 if it is installed.</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">newFileEachTime</param>
+		<param name="Type">Bool</param>
+		<param name="Default">True</param>
+		<param name="Description">The flag set whether you want the file to re-written over each output step or if you want a new file time.</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">context</param>
+		<param name="Type">AbstractContext</param>
+		<param name="Description">The current context we are working in.</param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">Swarm</param>
+		<param name="Type">Swarm</param>
+		<param name="Description">A list of swarms that out want to output.</param>
+	</struct>	
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example"><![CDATA[
+	<struct name="swarmDump">
+		<param name="Type">SwarmDump</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="newFileEachTime">false</param>
+	</struct>]]>
+</param>
+
+</StGermainData>

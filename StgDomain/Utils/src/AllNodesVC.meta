@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">AllNodesVC</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Utils/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">VariableCondition</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">Provides a definition of a variable on all nodes. AllNodesVC is not a standard component, so its definition in xml is not standard.</param>
+
+<list name="Params">
+
+</list>
+
+<list name="Dependencies">
+		<struct>
+		<param name="Name">variables</param>
+		<param name="Type">VC list</param>
+		<param name="Default">N/A</param>
+		<param name="Description">See example. Type can be a: int, double, short, char and func (function defined by a plugin)</param>
+	</struct>
+</list>
+<param name="Example"></param>
+
+</StGermainData>

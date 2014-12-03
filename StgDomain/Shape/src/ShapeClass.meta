@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Stg_Shape</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Shape/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">The parent class for how Shapes (geometries) are defined in Underworld. This parent class provides data structures and polymoric functions for its children classes - as such should never be an instance of this class, only its children.</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">CentreX</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">x coord the shape is centred on</param>
+	</struct>
+	<struct>
+		<param name="Name">CentreY</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">y coord the shape is centred on</param>
+	</struct>
+	<struct>
+		<param name="Name">CentreZ</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">z coord the shape is centred on</param>
+	</struct>
+	<struct>
+		<param name="Name">alpha</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Sets the rotatio</param>
+	</struct>
+	<struct>
+		<param name="Name">beta</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">...</param>
+	</struct>
+	<struct>
+		<param name="Name">gamma</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">...</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">N/A</param>
+
+</StGermainData>

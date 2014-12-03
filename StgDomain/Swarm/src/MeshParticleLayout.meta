@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">MeshParticleLayout</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+  <param name="Location">./StgDomain/Swarm/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">PerCellParticleLayout</param>
+  <param name="Reference">...</param>
+  <param name="Summary">...</param>
+
+  <param name="Description">
+    A utlility for filling a Swarm with particles based on the elements of a mesh.  Restricted
+    to meshes using quadrilateral and hexahedral topology, but useful for any geometry.
+  </param>
+
+  <list name="Params">
+    <struct>
+      <param name="Name">cellParticleCount</param>
+      <param name="Type">Integer</param>
+      <param name="Default">0</param>
+      <param name="Description">
+        The number of particles you want in each cell.
+      </param>
+    </struct>
+    <struct>
+      <param name="Name">seed</param>
+      <param name="Type">Integer</param>
+      <param name="Default">13</param>
+      <param name="Description">
+        The seed that you want to give the random number generator. The same seed
+        will always give the same particle positions.
+      </param>
+    </struct>
+  </list>
+
+  <list name="Dependencies">
+    <struct>
+      <param name="Essential">Yes</param>
+      <param name="Name">mesh</param>
+      <param name="Type">Mesh</param>
+      <param name="Description">
+        The mesh whose elements will be used as a particle template.
+      </param>
+    </struct>
+  </list>
+
+  <param name="Example">
+  </param>
+
+</StGermainData>

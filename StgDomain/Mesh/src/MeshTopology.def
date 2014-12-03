@@ -1,0 +1,58 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StgDomain/Mesh
+#define CLASSNAME MeshTopology
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+
+MEMBER( int, nDims )
+MEMBER( int, nTDims )
+MEMBER( int, shadDepth )
+MEMBER( Comm*, comm )
+
+
+VOIDOVERRIDE( Init, void, 
+	      (void* self), 
+	      (self) )
+
+VOIDOVERRIDE( Destruct, void, 
+	      (void* self), (self) )
+
+VOIDOVERRIDE( Copy, void, 
+	      (void* self, const void* op), 
+              (self, op) )
+
+OVERRIDE( CalcMem, SizeT, 
+	  (const void* self, PtrMap* ptrs), 
+	  (self, ptrs) )
+
+VOIDVIRTUALMETHOD( SetComm, void, 
+		   (void* self, const Comm* comm), 
+        	   (self, comm) )
+
+VOIDVIRTUALMETHOD( SetNumDims, void, 
+	       	   (void* self, int nDims), 
+	       	   (self, nDims) )
+
+VOIDVIRTUALMETHOD( SetShadowDepth, void, 
+		   (void* self, int depth), 
+		   (self, depth) )
+
+METHOD( GetNumDims, int, 
+	(const void* self), 
+	(self) )
+
+METHOD( GetComm, const Comm*, 
+	(const void* self), 
+	(self) )
+
+ABSTRACTMETHOD( GetNumCells, int,
+		(const void* self, int dim),
+		(self, dim) )
+
+VOIDABSTRACTMETHOD( GetIncidence, void, 
+		    (void* self, int fromDim, int fromEl, int toDim, IArray* inc), 
+		    (self, fromDim, fromEl, toDim, inc) )

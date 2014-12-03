@@ -1,0 +1,557 @@
+/*~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+**
+** Copyright (C), 2003, Victorian Partnership for Advanced Computing (VPAC) Ltd, 110 Victoria Street, Melbourne, 3053, Australia.
+**
+** Authors:
+**	Stevan M. Quenette, Senior Software Engineer, VPAC. (steve@vpac.org)
+**	Patrick D. Sunter, Software Engineer, VPAC. (pds@vpac.org)
+**	Luke J. Hodkinson, Computational Engineer, VPAC. (lhodkins@vpac.org)
+**	Siew-Ching Tan, Software Engineer, VPAC. (siew@vpac.org)
+**	Alan H. Lo, Computational Engineer, VPAC. (alan@vpac.org)
+**	Raquibul Hassan, Computational Engineer, VPAC. (raq@vpac.org)
+**
+**  This library is free software; you can redistribute it and/or
+**  modify it under the terms of the GNU Lesser General Public
+**  License as published by the Free Software Foundation; either
+**  version 2.1 of the License, or (at your option) any later version.
+**
+**  This library is distributed in the hope that it will be useful,
+**  but WITHOUT ANY WARRANTY; without even the implied warranty of
+**  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+**  Lesser General Public License for more details.
+**
+**  You should have received a copy of the GNU Lesser General Public
+**  License along with this library; if not, write to the Free Software
+**  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+**
+** $Id: SwarmShapeVC.c 4153 2007-07-26 02:25:22Z LukeHodkinson $
+**
+**~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*/
+
+#include <mpi.h>
+#include <StGermain/StGermain.h>
+#include <StgDomain/Geometry/Geometry.h>
+#include <StgDomain/Shape/Shape.h>
+#include <StgDomain/Mesh/Mesh.h>
+#include <StgDomain/Utils/Utils.h>
+
+#include "types.h"
+#include "SwarmShapeVC.h"
+
+#include "Swarm.h"
+#include <assert.h>
+#include <string.h>
+
+const Type SwarmShapeVC_Type = "SwarmShapeVC";
+const Name defaultSwarmShapeVCName = "defaultSwarmShapeVCName";
+
+/*-----------------------------------------------------------------------------------------------------------------
+** Constructor
+*/
+VariableCondition* SwarmShapeVC_Factory(
+	AbstractContext*					context,
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									data )
+{
+	return (VariableCondition*) SwarmShapeVC_New( defaultSwarmShapeVCName, context, NULL, variable_Register, conFunc_Register, dictionary, (Swarm*)data );
+}
+
+SwarmShapeVC* SwarmShapeVC_New(
+	Name									name,
+	AbstractContext*					context,
+	Name									_dictionaryEntryName, 
+	Variable_Register*				variable_Register, 
+	ConditionFunction_Register*	conFunc_Register, 
+	Dictionary*							dictionary,
+	void*									_swarm )
+{
+	SwarmShapeVC* self = (SwarmShapeVC*) _SwarmShapeVC_DefaultNew( name );
+
+	self->isConstructed = True;
+	_VariableCondition_Init( self, context, variable_Register, conFunc_Register, dictionary );
+	_SwarmShapeVC_Init( self, _dictionaryEntryName, _swarm );
+
+	return self;
+}
+
+void* _SwarmShapeVC_DefaultNew( Name name ) {
+	/* Variables set in this function */
+	SizeT                                               _sizeOfSelf = sizeof(SwarmShapeVC);
+	Type                                                       type = SwarmShapeVC_Type;
+	Stg_Class_DeleteFunction*                               _delete = _SwarmShapeVC_Delete;
+	Stg_Class_PrintFunction*                                 _print = _SwarmShapeVC_Print;
+	Stg_Class_CopyFunction*                                   _copy = _SwarmShapeVC_Copy;
+	Stg_Component_DefaultConstructorFunction*   _defaultConstructor = _SwarmShapeVC_DefaultNew;
+	Stg_Component_ConstructFunction*                     _construct = _SwarmShapeVC_AssignFromXML;
+	Stg_Component_BuildFunction*                             _build = _SwarmShapeVC_Build;
+	Stg_Component_InitialiseFunction*                   _initialise = _SwarmShapeVC_Initialise;
+	Stg_Component_ExecuteFunction*                         _execute = _VariableCondition_Execute;
+	Stg_Component_DestroyFunction*                         _destroy = _VariableCondition_Destroy;
+	AllocationType                               nameAllocationType = NON_GLOBAL;
+	VariableCondition_BuildSelfFunc*                     _buildSelf = _SwarmShapeVC_BuildSelf;
+	VariableCondition_PrintConciseFunc*               _printConcise = _SwarmShapeVC_PrintConcise;
+	VariableCondition_ReadDictionaryFunc*           _readDictionary = _SwarmShapeVC_ReadDictionary;
+	VariableCondition_GetSetFunc*                           _getSet = _SwarmShapeVC_GetSet;
+	VariableCondition_GetVariableCountFunc*       _getVariableCount = _SwarmShapeVC_GetVariableCount;
+	VariableCondition_GetVariableIndexFunc*       _getVariableIndex = _SwarmShapeVC_GetVariableIndex;
+	VariableCondition_GetValueIndexFunc*             _getValueIndex = _SwarmShapeVC_GetValueIndex;
+	VariableCondition_GetValueCountFunc*             _getValueCount = _SwarmShapeVC_GetValueCount;
+	VariableCondition_GetValueFunc*                       _getValue = _SwarmShapeVC_GetValue;
+	VariableCondition_ApplyFunc*                             _apply = _VariableCondition_Apply;
+
+	return (void*) _SwarmShapeVC_New(  SWARMSHAPEVC_PASSARGS  );
+}
+
+SwarmShapeVC* _SwarmShapeVC_New(  SWARMSHAPEVC_DEFARGS  ) {
+	SwarmShapeVC* self;
+	
+	/* Allocate memory/General info */
+	assert( _sizeOfSelf >= sizeof(SwarmShapeVC) );
+	self = (SwarmShapeVC*)_VariableCondition_New(  VARIABLECONDITION_PASSARGS  );
+	
+	/* Virtual info */
+	
+	return self;
+}
+
+
+void _SwarmShapeVC_Init( void* variableCondition, Name _dictionaryEntryName, void* _swarm ) {
+	SwarmShapeVC* self = (SwarmShapeVC*) variableCondition;
+
+	self->conFunc_Register = condFunc_Register; 
+	
+	self->_dictionaryEntryName = _dictionaryEntryName;
+	self->_swarm                = (Swarm*)_swarm;
+	self->_entryTbl            = 0;
+	self->_entryCount          = 0;
+
+	assert( _swarm && Stg_Class_IsInstance( _swarm, Swarm_Type ) );
+}
+
+
+/*--------------------------------------------------------------------------------------------------------------------------
+** General virtual functions
+*/
+
+
+void _SwarmShapeVC_Delete( void* variableCondition ) {
+	SwarmShapeVC* self = (SwarmShapeVC*)variableCondition;
+	
+	/* Stg_Class_Delete parent */
+	_VariableCondition_Delete(self);
+}
+
+void _SwarmShapeVC_Destroy( void* variableCondition, void* data ) {
+	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
+	
+	if ( self->_entryTbl ) 
+		Memory_Free(self->_entryTbl);
+
+	if ( self->shapeName )
+          Memory_Free( self->shapeName );
+	
+	/* Stg_Class_Delete parent */
+	_VariableCondition_Destroy( self, data );
+}
+
+void _SwarmShapeVC_Print(void* variableCondition, Stream* stream) {
+	SwarmShapeVC*                self = (SwarmShapeVC*)variableCondition;
+	SwarmShapeVC_Entry_Index     entry_I;
+	Index                   array_I;
+	
+	/* General info */
+	Journal_Printf( stream, "SwarmShapeVC (ptr): %p\n", self);
+	
+	/* Virtual info */
+	
+	/* Stg_Class info */
+	Journal_Printf( stream, "\tdictionary (ptr): %p\n", self->dictionary);
+	Journal_Printf( stream, "\t_dictionaryEntryName (ptr): %p\n", self->_dictionaryEntryName);
+	if (self->_dictionaryEntryName)
+		Journal_Printf( stream, "\t\t_dictionaryEntryName: %s\n", self->_dictionaryEntryName);
+	if ( self->_shape )
+		Journal_Printf( stream, "\t_shape: %s '%s'\n", self->_shape->type, self->_shape->name );
+	
+	Journal_Printf( stream, "\t_entryCount: %u\n", self->_entryCount);
+	Journal_Printf( stream, "\t_entryTbl (ptr): %p\n", self->_entryTbl);
+	if (self->_entryTbl) {
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++) {
+			Journal_Printf( stream, "\t\t_entryTbl[%u]:\n", entry_I);
+			Journal_Printf( stream, "\t\t\tvarName (ptr): %p\n", self->_entryTbl[entry_I].varName);
+			if (self->_entryTbl[entry_I].varName)
+				Journal_Printf( stream, "\t\t\t\tvarName: %s\n", self->_entryTbl[entry_I].varName);
+			Journal_Printf( stream, "\t\t\tvalue:\n");
+			switch (self->_entryTbl[entry_I].value.type) {
+				case VC_ValueType_Double:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_Double\n" );
+					Journal_Printf( stream, "\t\t\t\tasDouble: %g\n", self->_entryTbl[entry_I].value.as.typeDouble );
+					break;
+					
+				case VC_ValueType_Int:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_Int\n" );
+					Journal_Printf( stream, "\t\t\t\tasInt: %i\n", self->_entryTbl[entry_I].value.as.typeInt );
+					break;
+					
+				case VC_ValueType_Short:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_Short\n" );
+					Journal_Printf( stream, "\t\t\t\tasShort: %i\n", self->_entryTbl[entry_I].value.as.typeShort );
+					break;
+					
+				case VC_ValueType_Char:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_Char\n");
+					Journal_Printf( stream, "\t\t\t\tasChar: %c\n", self->_entryTbl[entry_I].value.as.typeChar );
+					break;
+					
+				case VC_ValueType_Ptr:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_Ptr\n");
+					Journal_Printf( stream, "\t\t\t\tasPtr: %g\n", self->_entryTbl[entry_I].value.as.typePtr );
+					break;
+					
+				case VC_ValueType_DoubleArray:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_DoubleArray\n");
+					Journal_Printf( stream, "\t\t\t\tarraySize: %u\n", self->_entryTbl[entry_I].value.as.typeArray.size);
+					Journal_Printf( stream, "\t\t\t\tasDoubleArray (ptr): %p\n", 
+						self->_entryTbl[entry_I].value.as.typeArray.array);
+					if (self->_entryTbl[entry_I].value.as.typeArray.array)
+						for ( array_I = 0;  array_I < self->_entryTbl[entry_I].value.as.typeArray.size;  array_I++)
+							Journal_Printf( stream, "\t\t\t\tasDoubleArray[%u]: %g\n",  array_I,
+								self->_entryTbl[entry_I].value.as.typeArray.array[ array_I]);
+					break;
+					
+				case VC_ValueType_CFIndex:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_CFIndex\n");
+					Journal_Printf( stream, "\t\t\t\tasCFIndex: %u\n", self->_entryTbl[entry_I].value.as.typeCFIndex);
+					break;
+				case VC_ValueType_Equation:
+					Journal_Printf( stream, "\t\t\t\ttype: VC_ValueType_Equation\n");
+					Journal_Printf( stream, "\t\t\t\tasEquation: %s\n", self->_entryTbl[entry_I].value.as.equation);
+					break;
+			}
+		}
+	}
+	Journal_Printf( stream, "\t_swarm (ptr): %p\n", self->_swarm);
+	
+	/* Print parent */
+	_VariableCondition_Print( self );
+}
+
+
+void* _SwarmShapeVC_Copy( const void* variableCondition, void* dest, Bool deep, Name nameExt, struct PtrMap* ptrMap ) {
+	SwarmShapeVC*   self           = (SwarmShapeVC*)variableCondition;
+	SwarmShapeVC*   newSwarmShapeVC;
+	PtrMap*         map            = ptrMap;
+	Bool            ownMap         = False;
+	
+	if( !map ) {
+		map = PtrMap_New( 10 );
+		ownMap = True;
+	}
+	
+	newSwarmShapeVC = (SwarmShapeVC*)_VariableCondition_Copy( self, dest, deep, nameExt, map );
+	
+	newSwarmShapeVC->_dictionaryEntryName = self->_dictionaryEntryName;
+	newSwarmShapeVC->_shape = self->_shape;
+	newSwarmShapeVC->_entryCount = self->_entryCount;
+	
+	if( deep ) {
+		newSwarmShapeVC->_swarm = (Swarm*)Stg_Class_Copy( self->_swarm, NULL, deep, nameExt, map );
+		
+		if( (newSwarmShapeVC->_entryTbl = (SwarmShapeVC_Entry*)PtrMap_Find( map, self->_entryTbl )) == NULL && self->_entryTbl ) {
+			newSwarmShapeVC->_entryTbl = Memory_Alloc_Array( SwarmShapeVC_Entry, newSwarmShapeVC->_entryCount, "SwarmShapeVC->_entryTbl");
+			memcpy( newSwarmShapeVC->_entryTbl, self->_entryTbl, sizeof(SwarmShapeVC_Entry) * newSwarmShapeVC->_entryCount );
+			PtrMap_Append( map, newSwarmShapeVC->_entryTbl, self->_entryTbl );
+		}
+	}
+	else {
+		newSwarmShapeVC->_swarm = self->_swarm;
+		newSwarmShapeVC->_entryTbl = self->_entryTbl;
+	}
+	
+	if( ownMap ) {
+		Stg_Class_Delete( map );
+	}
+	
+	return (void*)newSwarmShapeVC;
+}
+	
+/****************** Stg_Component Virtual Functions ******************/
+void _SwarmShapeVC_AssignFromXML( void* variableCondition, Stg_ComponentFactory* cf, void* data ) {
+	SwarmShapeVC*		self = (SwarmShapeVC*)variableCondition;
+	void*					conFunc_Register = NULL;
+	void*					variable_Register = NULL;
+	AbstractContext*	context;
+
+	self = Stg_ComponentFactory_ConstructByName( cf, (Name)self->name, SwarmShapeVC, False, data  );
+
+	context = Stg_ComponentFactory_ConstructByKey( cf, self->name, (Dictionary_Entry_Key)"Context", AbstractContext, False, data );
+	if( !context  )
+		context = Stg_ComponentFactory_ConstructByName( cf, (Name)"context", AbstractContext, True, data );
+
+	variable_Register = context->variable_Register; 
+	assert( variable_Register  );
+	self->variable_Register = (Variable_Register*)variable_Register;
+
+	_VariableCondition_Init( self, context, (Variable_Register*)variable_Register, (ConditionFunction_Register*)conFunc_Register, NULL );
+	
+	self->dictionary = Dictionary_GetDictionary( cf->componentDict, self->name );
+}
+
+void _SwarmShapeVC_Build(  void* variableCondition, void* data ) {
+	SwarmShapeVC*		self 	= (SwarmShapeVC*)variableCondition;
+	AbstractContext* 	context = (AbstractContext*) data;
+	
+	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
+
+	self->_swarm = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, (Dictionary_Entry_Key)"Swarm", Swarm, True, 0  ) ; 
+	assert( self->_swarm  );
+	
+	self->_shape = Stg_ComponentFactory_ConstructByKey( context->CF, self->name, (Dictionary_Entry_Key)"Shape", Stg_Shape, True, 0 /* dummy */  ) ;
+	assert( self->_shape  );
+
+	_VariableCondition_Build( self, data );
+
+	Stg_Component_Build( self->_shape, data, False );
+}
+	
+/****************** VariableCondition Virtual Functions ******************/
+void _SwarmShapeVC_BuildSelf(  void* variableCondition, void* data /* for build phase */ ) {
+	SwarmShapeVC*         	self    = (SwarmShapeVC*)variableCondition;
+#ifndef NDEBUG
+	AbstractContext* 	context = (AbstractContext*) data;
+#endif
+	assert( context && Stg_Class_IsInstance( context, AbstractContext_Type ) );
+
+	/* dave - 06.08.07 */
+	/*self->shapeName = Stg_ComponentFactory_GetString( context->CF, self->name, (Dictionary_Entry_Key)"Shape", "" );
+*/
+	/*Journal_Firewall( strlen( self->shapeName  ) > 0, Journal_MyStream( Error_Type, self ),
+			"You need to fill out the 'Shape' dictionary entry for this SwarmShapeVC.\n" );*/
+	/*assert( self->shapeName );*/
+	
+	/*Stg_Component_Build( self->_swarm, data, False );*/ /* remove this call? */
+	Stg_Component_Build( self->_shape, data, False );
+}
+
+/* added to call the porisity field standard condition plugin */
+void _SwarmShapeVC_Initialise(  void* variableCondition, void* data ) {
+	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
+
+	_VariableCondition_Initialise( self, data );
+
+	/* need to call the standard condition function here */
+}
+	
+void _SwarmShapeVC_PrintConcise( void* variableCondition, Stream* stream ) {
+	SwarmShapeVC* self = (SwarmShapeVC*) variableCondition;
+	
+	Journal_Printf( stream, "\ttype: %s, Shape: %s '%s'", self->type, self->_shape->type, self->_shape->name );
+}
+
+void _SwarmShapeVC_ReadDictionary( void* variableCondition, void* dict /**/ ) {
+	SwarmShapeVC*                  	self = (SwarmShapeVC*)variableCondition;
+	Dictionary_Entry_Value*   	vcDictVal;
+	Dictionary_Entry_Value    	_vcDictVal;
+	Dictionary_Entry_Value*   	varsVal;
+	SwarmShapeVC_Entry_Index	entry_I;
+	Dictionary*			dictionary = (Dictionary*)dict; /**/
+	
+	/* Find dictionary entry */
+	if (self->_dictionaryEntryName)
+		vcDictVal = Dictionary_Get( dictionary, (Dictionary_Entry_Key)self->_dictionaryEntryName );
+	else {
+		vcDictVal = &_vcDictVal;
+		Dictionary_Entry_Value_InitFromStruct(vcDictVal, dictionary);
+	}
+
+	if (vcDictVal) {
+		/* Get Name of Shape from dictionary - Grab pointer to shape later on */
+		self->shapeName = StG_Strdup( 
+				Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"Shape" ))  );
+
+		/* Obtain the variable entries */
+		self->_entryCount = Dictionary_Entry_Value_GetCount(Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables") );
+		self->_entryTbl = Memory_Alloc_Array( SwarmShapeVC_Entry, self->_entryCount, "SwarmShapeVC->_entryTbl" );
+		varsVal = Dictionary_Entry_Value_GetMember( vcDictVal, (Dictionary_Entry_Key)"variables");
+		
+		for (entry_I = 0; entry_I < self->_entryCount; entry_I++ ) {
+			char*			valType;
+			Dictionary_Entry_Value*	valueEntry;
+			Dictionary_Entry_Value*	varDictListVal;
+			
+			varDictListVal = Dictionary_Entry_Value_GetElement(varsVal, entry_I);
+			valueEntry = Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"value" );
+			
+			self->_entryTbl[entry_I].varName = Dictionary_Entry_Value_AsString(
+				Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"name") );
+				
+			valType = Dictionary_Entry_Value_AsString(Dictionary_Entry_Value_GetMember( varDictListVal, (Dictionary_Entry_Key)"type") );
+			if (strlen(valType)==0 || 0==strcasecmp(valType, "equation"))
+                          {
+                            self->_entryTbl[entry_I].value.type = VC_ValueType_Equation;
+                            /* This leaks memory */
+                            self->_entryTbl[entry_I].value.as.equation=
+                              StG_Strdup(Dictionary_Entry_Value_AsString(valueEntry));
+                          }
+			else if (0 == strcasecmp(valType, "func"))
+                          {
+				char*	funcName = Dictionary_Entry_Value_AsString(valueEntry);
+				Index	cfIndex;
+				
+				self->_entryTbl[entry_I].value.type = VC_ValueType_CFIndex;
+				cfIndex = ConditionFunction_Register_GetIndex( self->conFunc_Register, funcName);
+				if ( cfIndex == (Index) -1 ) {	
+					Stream*	errorStr = Journal_Register( Error_Type, (Name)self->type  );
+
+					Journal_Printf( errorStr, "Error- in %s: While parsing "
+						"definition of swarmShapeVC \"%s\" (applies to shape \"%s\"), the cond. func. applied to "
+						"variable \"%s\" - \"%s\" - wasn't found in the c.f. register.\n",
+						__func__, self->_dictionaryEntryName, self->shapeName,
+						self->_entryTbl[entry_I].varName, funcName );
+					Journal_Printf( errorStr, "(Available functions in the C.F. register are: ");	
+					ConditionFunction_Register_PrintNameOfEachFunc( self->conFunc_Register, errorStr );
+					Journal_Printf( errorStr, ")\n");	
+					assert(0);
+				}	
+				self->_entryTbl[entry_I].value.as.typeCFIndex = cfIndex;
+                          }
+			else if (0 == strcasecmp(valType, "array"))
+			{
+				Dictionary_Entry_Value*	valueElement;
+				Index			i;
+
+				self->_entryTbl[entry_I].value.type = VC_ValueType_DoubleArray;
+				self->_entryTbl[entry_I].value.as.typeArray.size = Dictionary_Entry_Value_GetCount(valueEntry);
+				self->_entryTbl[entry_I].value.as.typeArray.array = Memory_Alloc_Array( double,
+					self->_entryTbl[entry_I].value.as.typeArray.size, "SwarmShapeVC->_entryTbl[].value.as.typeArray.array" );
+					
+				for (i = 0; i < self->_entryTbl[entry_I].value.as.typeArray.size; i++)
+				{
+					valueElement = Dictionary_Entry_Value_GetElement(valueEntry, i);
+					self->_entryTbl[entry_I].value.as.typeArray.array[i] = 
+						Dictionary_Entry_Value_AsDouble(valueElement);
+				}
+			}
+			else if( 0 == strcasecmp( valType, "double" ) || 0 == strcasecmp( valType, "d" ) ||
+				0 == strcasecmp( valType, "float" ) || 0 == strcasecmp( valType, "f" ) )
+			{
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Double;
+				self->_entryTbl[entry_I].value.as.typeDouble = Dictionary_Entry_Value_AsDouble( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "integer" ) || 0 == strcasecmp( valType, "int" ) || 0 == strcasecmp( valType, "i" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Int;
+				self->_entryTbl[entry_I].value.as.typeInt = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "short" ) || 0 == strcasecmp( valType, "s" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Short;
+				self->_entryTbl[entry_I].value.as.typeShort = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "char" ) || 0 == strcasecmp( valType, "c" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Char;
+				self->_entryTbl[entry_I].value.as.typeChar = Dictionary_Entry_Value_AsUnsignedInt( valueEntry );
+			}
+			else if( 0 == strcasecmp( valType, "pointer" ) || 0 == strcasecmp( valType, "ptr" ) || 0 == strcasecmp( valType, "p" ) ) {
+				self->_entryTbl[entry_I].value.type = VC_ValueType_Ptr;
+				self->_entryTbl[entry_I].value.as.typePtr = (void*) ( (ArithPointer)Dictionary_Entry_Value_AsUnsignedInt( valueEntry ));
+			}
+			else {
+                          Journal_Firewall(False,Journal_Register(Error_Type,SwarmShapeVC_Type),
+                                           "Unknown type for SwarmShapeVC: %s\n",valType);
+			}
+		}
+	}
+	else
+	{
+		self->_entryCount = 0;
+		self->_entryTbl = NULL;
+	}
+}
+
+IndexSet* _SwarmShapeVC_GetSet(void* variableCondition) {
+	SwarmShapeVC*		self = (SwarmShapeVC*)variableCondition;
+	Swarm*			swarm = self->_swarm;
+	IndexSet*		set;
+	Index           	particleDomainCount;
+	unsigned		particleIndex;
+	GlobalParticle*		particle; /* check that this is ok for the given swarm type */
+
+	/*Stg_Component_Initialise( swarm, NULL, False );*/
+	/*Stg_Component_Build( swarm, NULL, False );*/
+
+	particleDomainCount = swarm->particleLocalCount; /* sizeof(swarm particle array) - think this is right?? */
+	set = IndexSet_New( particleDomainCount );
+
+	for( particleIndex = 0; particleIndex < particleDomainCount; particleIndex++ ) {
+		particle = (GlobalParticle*)Swarm_ParticleAt( swarm, particleIndex );
+		if( Stg_Shape_IsCoordInside( self->_shape, particle->coord ) ) {
+			IndexSet_Add( set, particleIndex );
+		}	
+	}
+
+	return set;
+}
+
+VariableCondition_VariableIndex _SwarmShapeVC_GetVariableCount(void* variableCondition, Index globalIndex) {
+	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
+
+	return self->_entryCount;
+}
+
+Variable_Index _SwarmShapeVC_GetVariableIndex(void* variableCondition, Index globalIndex, VariableCondition_VariableIndex varIndex) {
+	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
+	Variable_Index	searchedIndex = 0;
+	Stream*			errorStr = Journal_Register( Error_Type, (Name)self->type );
+	Name				varName;
+	Swarm*			swarm = self->_swarm;
+	char*				swarmVarName;
+
+	varName = self->_entryTbl[varIndex].varName;
+
+	swarmVarName = (char*)calloc( strlen(swarm->name) + 1 + strlen(varName ) + 1, sizeof(char) );
+	strcat( swarmVarName, swarm->name );
+	strcat( swarmVarName, "-" );
+	strcat( swarmVarName, varName );
+	/*searchedIndex = (Variable_Index)-1;
+	for( swarmVar_I = 0; swarmVar_I < self->_swarm->nSwarmVars; swarmVar_I++ ) {
+		if( swarm->swarmVars[swarmVar_I]->name && !strcmp(swarmVarName, swarm->swarmVars[swarmVar_I]->name) ) {
+			searchedIndex = swarmVar_I;
+		}
+	}*/
+	searchedIndex = Variable_Register_GetIndex(self->variable_Register, swarmVarName );
+	
+	Journal_Firewall( 
+			( searchedIndex < self->variable_Register->count ),
+			errorStr,
+			"Error- in %s: searching for index of varIndex %u (\"%s\") at global node number %u failed"
+			" - register returned index %u, greater than count %u.\n",
+			__func__, varIndex, varName, globalIndex, searchedIndex, self->variable_Register->count );
+
+	return searchedIndex; 
+}
+
+
+VariableCondition_ValueIndex _SwarmShapeVC_GetValueIndex(
+		void*                                       variableCondition, 
+		Index                                       globalIndex, 
+		VariableCondition_VariableIndex             varIndex )
+{
+	return varIndex;
+}
+
+
+VariableCondition_ValueIndex _SwarmShapeVC_GetValueCount(void* variableCondition) {
+	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
+	
+	return self->_entryCount;
+}
+
+
+VariableCondition_Value _SwarmShapeVC_GetValue(void* variableCondition, VariableCondition_ValueIndex valIndex) {
+	SwarmShapeVC*	self = (SwarmShapeVC*)variableCondition;
+
+	return self->_entryTbl[valIndex].value;
+}
+
+
+

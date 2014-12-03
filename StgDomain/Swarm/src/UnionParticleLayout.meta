@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">UnionParticleLayout</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Swarm/src</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">GlobalParticleLayout</param>
+<param name="Reference">...</param>
+<param name="Description">This is a particle layout that simply combines many particle layouts together into one. When one particle layout finishes initialises all its particles, then the next one begins.</param>
+
+<list name="Params">
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">ParticleLayoutList</param>
+		<param name="Type">GlobalParticleLayout</param>
+		<param name="Description">This is a list of all the particle layouts that you want to combine into one.</param>
+		<param name="Fallback Key"></param>
+	</struct>
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example"><![CDATA[
+	<struct name="particleLayout">
+		<param name="Type">UnionParticleLayout</param>
+		<list name="ParticleLayoutList">
+			<param>ParticleLayout1</param>
+			<param>ParticleLayout2</param>
+			<param>ParticleLayout3</param>
+		</list>
+	</struct>]]>
+</param>
+
+</StGermainData>
+

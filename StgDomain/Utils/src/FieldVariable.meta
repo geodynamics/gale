@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">FieldVariable</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Utils/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">Creates the background data structures for a variable across the whole domain. This class doesn't do much but just provides an api for accessing variable information. (The real work of a variable is done Variable class and the FeVariable class). As this is an abstract class it is not used explicitly in xml. </param>
+
+<list name="Params">
+	<struct>
+		<param name="Name">dim</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">0</param>
+		<param name="Description">Number of dimensions the field exists in</param>
+	</struct>
+	<struct>
+		<param name="Name">fieldComponentCount</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">0</param>
+		<param name="Description">Number of components which make up the field.</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+
+</list>
+<param name="Example">N/A</param>
+
+</StGermainData>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">SemiRegDeform</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Discretisation/Utils/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">A remeshing tool that performs a  semi-regular deformation.  It used linear interpolation and can operate in one, two or three dimensions.</param>
+<param name="Description"><p>SemiRegDeform is a method for remeshing. It performs a semi-regular deformation.</p>
+
+<p>To use it, pass SemiRegDeform a set of two points on the  mesh you wish to deform.  SemiRegDeform will construct a straight line between these points and evenly redistribute any nodes that lie along that line.   When moving nodes, SemiRegDeform does a linear interpolation on the contents of those features to preserve the accuracy of their data.</p>
+
+<p>Running SemiRegDeform on a large mesh is moderately time-consuming for a single-processor system, though the process is faster when parallelised.  SemiRegDeform has been designed to automatically run in parallel, and although this process is non-trivial internally, the mechanism is accessible from the same simple interface.</p>
+
+<p>Furthermore, you can remesh at a higher resolution by using more than one linear set of points.  To do this, define a number of lines via the two-point interface.  You can build-up a remeshing procedure with SemiRegDeform that works in two or three dimensions, and the order of operations is unimportant.</p>
+</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+
+</list>
+
+<list name="Dependencies">
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">...</param>
+
+</StGermainData>

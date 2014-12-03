@@ -1,0 +1,18 @@
+import os
+Import('env')
+
+# Setup current module.
+env.curModule = env['helpers']['buildModName'](env)
+
+# Execute subdirectory SConscripts.
+objs = SConscript('src/SConscript', exports='env')
+
+# Build libraries.
+libs = env.Library(env['helpers']['buildLibDir'](env), objs)
+libs += env.LoadableModule(env['helpers']['buildLibDir'](env), objs)
+env.Install(os.path.join(env['prefix'], 'lib'), libs)
+
+# Build tests.
+SConscript('tests/SConscript', exports='env')
+
+Return('objs')

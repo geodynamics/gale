@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">MeshAdaptor</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">MeshGenerator</param>
+<param name="Reference">...</param>
+<param name="Summary">A plug-in that lets you modify the output of a MeshGenerator without changing its code.</param>
+<param name="Description"><p>A MeshAdaptor is a customisable component that can be inserted into the mesh generation pipeline.  An Adaptor permits you modify the output from different types of mesh generators without modifying the code of a mesh generator.  Conceptually, an adaptor can be viewed as a filter or an addition to the output stage.</p>
+
+<p><br/>MeshGenerator --> MeshAdaptor --> Mesh</p>
+
+<p>Note that one or more MeshAdaptors may be inserted into the process, and there is no theoretical limit to the number of MeshAdaptors.  In practise, using more than three or four MeshAdaptors may add a prohibitive overhead and could be grounds for optimisation by removing or combining adaptors.
+This modular approach allows a small set of MeshAdaptors to be plugged-in in many combinations for a wide range of effects.</p>
+
+<p>Each MeshAdaptor is active on its local processor as part of that processor's pipeline.  Generally, an even mesh decomposition will lead to processor-load being balanced and processors keeping in synch with their neighbours, but there is no restriction on how a MeshAdaptor can operate.  Inserting additional steps where there are dependencies on other processors and pipelines can result in a pipeline stall.  This may be the case if there is extensive interaction between processors, as in the following example:</p>
+
+<p>Generating a Mesh with four processors and modifying it with two MeshAdaptors.
+MeshGenerator1 --> MeshAdaptor1a --> MeshAdaptor1b --> Mesh1
+MeshGenerator2 --> MeshAdaptor2a --> MeshAdaptor2b --> Mesh2
+MeshGenerator3 --> MeshAdaptor3a --> MeshAdaptor3b --> Mesh3
+MeshGenerator4 --> MeshAdaptor4a --> MeshAdaptor4b --> Mesh4</p>
+</param>
+
+<list name="Params">
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">False</param>
+		<param name="Name">sourceMesh</param>
+		<param name="Type">Mesh</param>
+		<param name="Description">Used as a template </param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">sourceGenerator</param>
+		<param name="Type">MeshGenerator</param>
+		<param name="Description">Used as a template if sourceMesh is not available. </param>
+	</struct>
+</list>
+
+<!-- Add an exmaple XML if possible -->
+<param name="Example">n/a</param>
+
+</StGermainData>

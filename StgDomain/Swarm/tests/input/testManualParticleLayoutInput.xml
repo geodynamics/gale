@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003"> 
+<!--Purpose: Defines a Manual Particle Layout-->
+	<struct name="particleLayout">
+		<param name="Type">ManualParticleLayout</param>
+		<list name="manualParticlePositions">
+			<asciidata>
+				<columnDefinition name = "x" type="double"/>
+				<columnDefinition name = "y" type="double"/>
+				<columnDefinition name = "z" type="double"/>
+				0.5 0.1 0.0
+				0.1 1.0 0.0
+				0.3 1.0 2.0
+			</asciidata>
+		</list>
+	 </struct> 
+</StGermainData> 

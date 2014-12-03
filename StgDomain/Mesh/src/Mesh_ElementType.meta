@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Mesh_ElementType</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+
+<param name="Description">
+    Base class for defining operations on a per-element level for a mesh.
+    Operations include determining if an element contains a point in space,
+    calculating the centroid of an element and calculating the shortest
+    distance between any two vertices of an element.
+</param>
+
+<list name="Params">
+    n/a
+</list>
+
+<list name="Dependencies">
+    n/a
+</list>
+
+<param name="Example">
+    n/a
+</param>
+
+</StGermainData>

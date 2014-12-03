@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Mesh</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+  <param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">Stg_Component</param>
+  <param name="Reference">...</param>
+  <param name="Summary">A high-level interface that provides access to geometry and topology of a discretised domain.</param>
+
+  <param name="Description">
+    <p>Mesh is an abstraction that gives access to geometry and topology of a discretised domain.  It describes how the space is split into discrete regions and not, for example, how data is stored in nodes.  It can assist with functions acting on data such as searching, or locating a particle in the domain.</p>
+
+    <p>Mesh presents a consistent, high-level interface with many ways of entering information and one standardised means of output.  It interfaces with other Codes and acts independently of  the underlying structure of the mesh (a grid, triangles, etc).  This lets it represent any shape of mesh or topology.</p>
+
+    <p>Mesh exhibits the common trade-off between memory utilisation and performance: more memory affords better performance.  It also offers better performance on a regular grid.</p>
+
+    <p>Mesh is implicitly parallel.  Some aspects may be local or global, but this is generally handled automatically.</p>
+  </param>
+
+  <list name="Params">
+    n/a
+  </list>
+
+  <list name="Dependencies">
+    n/a
+  </list>
+
+  <param name="Example">
+    StgFEM/Apps/StgFEM_Components/LinearMesh.xml
+  </param>
+
+</StGermainData>

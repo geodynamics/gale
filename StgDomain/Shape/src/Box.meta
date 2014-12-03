@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Box</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Shape/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Shape</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">Defines a Box shape</param>
+
+<list name="Params">
+	<struct>
+		<param name="Name">startX</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">minimum x coord of box shape. (Will override widthX)</param>
+	</struct>
+	<struct>
+		<param name="Name">endX</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">maximum x coord of box shape. (Will override widthX)</param>
+	</struct>
+	<struct>
+		<param name="Name">widthX</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Can use this to define the width in x, centred around the centre coords of the shape</param>
+	</struct>
+	<struct>
+		<param name="Name">startY</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">minimum y coord of box shape. (Will override widthY)</param>
+	</struct>
+	<struct>
+		<param name="Name">endY</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">maximum y coord of box shape. (Will override widthY)</param>
+	</struct>
+	<struct>
+		<param name="Name">widthY</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Can use this to define the width in y, centred around the centre coords of the shape</param>
+	</struct>
+	
+	<struct>
+		<param name="Name">startZ</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">minimum z coord of box shape. (Will override widthZ)</param>
+	</struct>
+	<struct>
+		<param name="Name">endZ</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">maximum z coord of box shape. (Will override widthZ)</param>
+	</struct>
+	<struct>
+		<param name="Name">widthZ</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Can use this to define the width in z, centred around the centre coords of the shape</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">...</param>
+
+</StGermainData>

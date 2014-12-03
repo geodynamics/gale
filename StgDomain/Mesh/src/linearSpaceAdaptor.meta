@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">LinearSpaceAdaptor</param>
+<param name="Author">Sergio Zlotnik</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">MeshAdaptor</param>
+<param name="Reference">...</param>
+<param name="Summary">Changes the mesh nodes location.</param>
+<param name="Description"> This adaptos takes a regular mesh and allows to change the position of the nodes without changing the connectivity of the elements. The node location is changed using a mapping function. There are two or three independent mapping functions $F_i$ one for each axis. The mapping function is defined as $F: [0,1]\rightarrow[0,1]$ and is described in the input xml by a series of linear segments. The function must be strictly increasing. \Note 1: the mesh must be flagged as not regular (see example below).\Note 2: optionally you can change the initial particle layout to have the same number of particles per element (see example below).\Note 3: the mapping functions are defined by a series of points. The first point (0,0) is always implicit. The last point (1,1) must be present.</param>
+
+<list name="Params">
+</list>
+
+<list name="Dependencies">
+</list>
+
+
+<!-- Add an exmaple XML if possible -->
+<param name="Example">
+<![CDATA[
+<!-- Make the mesh regular. -->
+<struct name="linearMeshGenerator" mergeType="merge">
+  <param name="regular"> False </param>
+</struct>
+
+<!-- Mesh particle layout. -->
+<struct name="materialSwarmParticleLayout" mergeType="replace">
+  <param name="Type">MeshParticleLayout</param>
+  <param name="mesh">linearMesh</param>
+  <param name="cellParticleCount">particlesPerCell</param>
+</struct>
+
+<!-- Create the adaptor -->
+<struct name="meshDefo">
+  <param name="Type">LinearSpaceAdaptor</param>
+  <param name="sourceGenerator">linearMeshGenerator</param>
+  <param name="mesh">linearMesh</param>
+
+  <!-- This is the identity mapping function (do not moves the nodes) --> 
+  <list name="mappingFunctionX">
+    <asciidata>
+      <columnDefinition name = "point" type="double"/>
+      <columnDefinition name = "mappedTo" type="double"/>
+      1      1
+    </asciidata>
+  </list>
+
+  <list name="mappingFunctionY">
+    <asciidata>
+      <columnDefinition name = "point" type="double"/>
+      <columnDefinition name = "mappedTo" type="double"/>
+      0.053   0.15
+      0.13    0.34
+      0.24    0.51
+      0.37    0.66
+      0.5     0.77
+      0.71    0.88
+      1       1
+    </asciidata>
+  </list> 
+</struct>
+]]>
+
+</param>
+
+
+
+</StGermainData>

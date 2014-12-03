@@ -1,0 +1,77 @@
+#include INHERIT( StgDomain/Mesh/MeshTopology )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StgDomain/Mesh
+#define PARENT MeshTopology
+#define CLASSDIR StgDomain/Mesh
+#define CLASSNAME IGraph
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+
+MEMBER( Decomp**, locals )
+MEMBER( Sync**, remotes )
+MEMBER( int*, nBndEls )
+MEMBER( int**, bndEls )
+MEMBER( int***, nIncEls )
+MEMBER( int****, incEls )
+
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+
+OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
+
+VOIDOVERRIDE( SetNumDims, void, (void* self, int nDims), (self, nDims) )
+
+METHOD( SetDomain, void, (void* self, int dim, Sync* sync), (self, dim, comm) )
+
+METHOD( SetElements, void, (void* self, int dim, int nEls, const int* globals), (self, dim, nEls, globals) )
+
+METHOD( SetLocalElements, void, (void* self, int dim, int nEls, const int* globals), (self, dim, nEls, globals) )
+
+METHOD( AddLocalElements, void, (void* self, int dim, int nEls, const int* globals), (self, dim, nEls, globals) )
+
+METHOD( RemoveLocalElements, void, (void* self, int dim, int nEls, const int* globals, IMap* map), (self, dim, nEls, globals, map) )
+
+METHOD( SetRemoteElements, void, (void* self, int dim, int nEls, const int* globals), (self, dim, nEls, globals) )
+
+METHOD( AddRemoteElements, void, (void* self, int dim, int nEls, const int* globals), (self, dim, nEls, globals) )
+
+METHOD( RemoveRemoteElements, void, (void* self, int dim, int nEls, const int* globals, IMap* map), (self, dim, nEls, globals, map) )
+
+METHOD( SetBoundaryElements, void, (void* self, int dim, int nEls, const int* els ), (self, dim, nEls, els) )
+
+METHOD( SetIncidence, void, (void* self, int fromDim, int fromEl, int toDim, int nIncEls, const int* incEls ), (self, fromDim, fromEl, toDim, nIncEls, incEls) )
+
+METHOD( RemoveIncidence, void, (void* self, int fromDim, int toDim), (self, fromDim, toDim) )
+
+METHOD( InvertIncidence, void, (void* self, int fromDim, int toDim), (self, fromDim, toDim) )
+
+METHOD( ExpandIncidence, void, (void* self, int dim), (self, dim) )
+
+VOIDOVERRIDE( SetShadowDepth, void, (void* self, int depth), (self, depth) )
+
+METHOD( Clear, void, (void* self), (self) )
+
+METHOD( ClearDims, void, (void* self), (self) )
+
+METHOD( ClearElements, void, (void* self), (self) )
+
+METHOD( ClearIncidence, void, (void* self), (self) )
+
+METHOD( HasDomain, Bool, (const void* self, int dim), (self, dim) )
+
+METHOD( GetDomain, const Sync*, (const void* self, int dim), (self) )
+
+METHOD( GetBoundaryElements, void, (const void* self, int dim, int* nEls, const int** els), (self, dim, nEls, els) )
+
+METHOD( HasIncidence, Bool, (const void* self, int fromDim, int toDim), (self, fromDim, toDim) )
+
+METHOD( GetIncidenceSize, int, (const void* self, int fromDim, int fromEl, int toDim), (self, fromDim, fromEl, toDim) )
+
+VOIDOVERRIDE( GetIncidence, void, (void* self, int fromDim, int fromEl, int toDim, IArray* inc), (self, fromDim, fromEl, toDim, inc) )
+
+METHOD( PrintIncidence, void, (const void* self, int fromDim, int toDim), (self, fromDim, toDim) )

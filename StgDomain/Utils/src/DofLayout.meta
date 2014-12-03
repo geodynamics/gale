@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">DofLayout</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Utils/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">Maps between the spatial domain of a mesh and variables.</param>
+<param name="Description"><p>DofLayout (Degrees of Freedom Layout) prescribes how particular chunks of data are attached to specified parts a mesh.  A mesh describes a divided domain, and you need to know where values lie in the domain when solving for a variable over the domain.</p>
+
+<p>DofLayout maps between the spacial domain and one or more Variables.  Briefly, a Variable is a block of memory which is indexed so it can be associated with part of a mesh.  This can be a vertex, face or some other topological feature.   See the StGermain component, Variable, for more information.</p>
+
+<p>DofLayout refers to scalar variables only, not vectors, though a wrapper can be applied later to convert vectors.</p>
+</param>
+
+<list name="Params">
+	<struct>
+		<param name="Name">BaseVariableCount</param>
+		<param name="Type">int</param>
+		<param name="Default">sizeof(BaseVariables) list</param>
+		<param name="Description">Number of BaseVariables (each components) to be stored by this dof</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">mesh</param>
+		<param name="Type">Mesh</param>
+		<param name="Description">The discrete mesh the variable will be associated with</param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">BaseVariables</param>
+		<param name="Type">list</param>
+		<param name="Description">The  BaseVariables (each components) to be stored  by this dof</param>
+	</struct>
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">
+<![CDATA[
+		<!-- velocityDofLayout -->
+		<struct name="velocityDofLayout">
+			<param name="Type">DofLayout</param>
+			<param name="mesh">velocityMesh</param>
+			<param name="BaseVariableCount">dim</param>
+			<list name="BaseVariables">
+				<param>vx</param>
+				<param>vy</param>
+				<param>vz</param>
+			</list>
+		</struct>
+		<!-- How the BaseVariables are defined -->
+		<struct name="velocity">
+			<param name="Type">MeshVariable</param>
+			<param name="mesh">velocityMesh</param>
+			<param name="Rank">Vector</param>
+			<param name="DataType">Double</param>
+			<param name="VectorComponentCount">dim</param>
+			<list name="names">
+				<param>vx</param>
+				<param>vy</param>
+				<param>vz</param>
+			</list>
+		</struct>
+]]>
+</param>
+
+</StGermainData>

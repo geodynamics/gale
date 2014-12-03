@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Intersection</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+  <param name="Location">./StgDomain/Shape/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">Stg_Shape</param>
+  <param name="Reference">...</param>
+  <param name="Summary">...</param>
+
+  <param name="Description">
+    Takes the intersection of a set of other shapes.
+  </param>
+
+  <list name="Params">
+    <struct>
+      <param name="Name">shapes</param>
+      <param name="Type">List</param>
+      <param name="Default"></param>
+      <param name="Description">
+        A list of names referring to other shape components to be involved
+        in the intersection.
+      </param>
+    </struct>
+  </list>
+
+  <list name="Dependencies">
+    n/a
+  </list>
+
+  <param name="Example">
+  Underworld/InputFiles/ExtensionFMM.xml
+  </param>
+
+</StGermainData>

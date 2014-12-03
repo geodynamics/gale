@@ -1,0 +1,80 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StgDomain/Mesh
+#define CLASSNAME Sync
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
+
+METHOD( SetDecomp, void, (void* self, const Decomp* decomp), (self, decomp) )
+METHOD( FindRemotes, void, (void* self, int nRemotes, const int* remotes), 
+	(self, nRemotes, remotes) )
+METHOD( SetComm, void, (void* self, const Comm* comm), (self, comm) )
+METHOD( SetRemotes, void, (void* self, int nRemotes, const int* remotes), 
+	(self, nRemotes, remotes) )
+METHOD( AddRemotes, void, (void* self, int nRemotes, const int* remotes), 
+	(self, nRemotes, remotes) )
+METHOD( RemoveRemotes, void, (void* self, int nRemotes, const int* remotes, IMap* map), 
+	(self, nRemotes, remotes, map) )
+METHOD( Clear, void, (void* self), (self) )
+METHOD( ClearDecomp, void, (void* self), (self) )
+METHOD( ClearComm, void, (void* self), (self) )
+METHOD( ClearRemotes, void, (void* self), (self) )
+
+METHOD( GetDecomp, const Decomp*, (const void* self), (self) )
+METHOD( GetComm, const Comm*, (const void* self), (self) )
+METHOD( GetNumRemotes, int, (const void* self), (self) )
+METHOD( GetNumDomains, int, (const void* self), (self) )
+METHOD( GetNumShared, int, (const void* self), (self) )
+METHOD( GetNumSharers, int, (const void* self, int shared), (self, shared) )
+METHOD( GetRemotes, void, (const void* self, int* nRemotes, const int** remotes), 
+	(self, nRemotes, remotes) )
+METHOD( GetOwner, int, (const void* self, int remote), (self, remote) )
+METHOD( GetShared, void, (const void* self, int* nShared, const int** shared), 
+	(self, nShared, shared) )
+METHOD( GetSharers, void, (const void* self, int shared, 
+			   int* nSharers, const int** sharers), 
+	(self, shared, nSharers, sharers) )
+
+METHOD( RemoteToGlobal, int, (const void* self, int remote), (self, remote) )
+METHOD( GlobalToRemote, int, (const void* self, int global), (self, global) )
+METHOD( TryGlobalToRemote, Bool, (const void* self, int global, int* remote), 
+	(self, global, remote) )
+METHOD( DomainToGlobal, int, (const void* self, int domain), (self, domain) )
+METHOD( GlobalToDomain, int, (const void* self, int global), (self, global) )
+METHOD( TryGlobalToDomain, Bool, (const void* self, int global, int* domain), 
+	(self, global, domain) )
+METHOD( SharedToLocal, int, (const void* self, int shared), (self, shared) )
+METHOD( LocalToShared, int, (const void* self, int local), (self, global) )
+METHOD( TryLocalToShared, Bool, (const void* self, int local, int* shared), 
+	(self, global, shared) )
+METHOD( SyncArray, void, (const void* self, 
+			  const void* local, size_t localStride, 
+			  const void* remote, size_t remoteStride, 
+			  size_t itmSize), 
+	(self, local, localStride, remote, remoteStride, itmSize) )
+
+MEMBER( Decomp*, decomp )
+MEMBER( Comm*, comm )
+MEMBER( int, nDomains )
+MEMBER( IArray*, remotes )
+MEMBER( IArray, remotesObj )
+MEMBER( int*, owners )
+MEMBER( int, nShared )
+MEMBER( int*, shared )
+MEMBER( int*, nSharers )
+MEMBER( int**, sharers )
+MEMBER( IMap*, gr )
+MEMBER( IMap, grObj )
+MEMBER( IMap*, ls )
+MEMBER( IMap, lsObj )
+MEMBER( int*, nSrcs )
+MEMBER( int**, srcs )
+MEMBER( int*, nSnks )
+MEMBER( int**, snks )

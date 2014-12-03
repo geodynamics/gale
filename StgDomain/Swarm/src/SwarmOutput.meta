@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">SwarmOutput</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StDomain</param>
+<param name="Location">./StgDomain/Swarm/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">This component creates output files for a swarm. It creates one file per particle in the swarm and with each timestep the file grows with a line been printed in the file. The information it prints is: particle ID number, timeStep, currentTime, particle x-coord, particle y-coord, particle z-coord</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">baseFilename</param>
+		<param name="Type">String</param>
+		<param name="Default">The instance name of this component</param>
+		<param name="Description">The filename of the output file within the output directory</param>
+	</struct>
+	<struct>
+		<param name="Name">columnWidth</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">12</param>
+		<param name="Description">Defines the column width of entries in the file</param>
+	</struct>
+	<struct>
+		<param name="Name">decimalLength</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">6</param>
+		<param name="Description">Defines the decimal place length of entries in the file</param>
+	</struct>
+	<struct>
+		<param name="Name">borderString</param>
+		<param name="Type">String</param>
+		<param name="Default">   </param>
+		<param name="Description">Defines column borders, by default it's a tab</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">Swarm</param>
+		<param name="Type">Swarm</param>
+		<param name="Description">The swarm who's information will be output in the file</param>
+	</struct>
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">N/A</param>
+
+</StGermainData>

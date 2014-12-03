@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">CommTopology</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">Finds and identifies neighbours of a processor.<br/>Can lead to  more elegant and efficient design.</param>
+<param name="Description"><p>CommTopology is a tool that helps to find and identify the neighbours of a processor.  It is useful for hugely parallel operations, such as those distributed over thousands of processors.</p><p>Typically, a processor only needs to communicate with adjacent processors.  A global (one-to-all) operation is an example of a poorly designed operation because it calls for unnecessary communication beyond the scope of the processor's neighbourhood.  In this situation, redesigning the operation and using CommTopology would be a more elegant design and lead to improved efficiency.</p></param>
+
+</StGermainData>

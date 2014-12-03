@@ -1,0 +1,115 @@
+/* Inherit from a parent class and clear any pre-existing 
+   class definitions. */
+#include INHERIT( StgDomain/Utils/NewRemesher )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+
+/*
+** Class parameter declarations. Here we need to define:
+**   CLASSDIR and
+**   CLASSNAME.
+**
+** We can optionally define:
+**   PREFIX, 
+**   PARENTDIR and
+**   PARENT.
+*/
+
+#define PARENTDIR StgDomain/Utils
+#define PARENT Remesher
+#define CLASSDIR StgDomain/Utils
+#define CLASSNAME RegularRemesher
+
+/* Do standard class initialisation. */
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+
+/*
+** Declare all class members using the MEMBER command.  Accepted
+** parameters are:
+**   ( <type>, <name> )
+*/
+
+MEMBER( int, nDims )
+MEMBER( int, contactDepth )
+MEMBER( double, contactSize )
+MEMBER( ISet*, remeshDims )
+MEMBER( ISet**, staticWalls )
+MEMBER( Sync**, syncs )
+MEMBER( double**, crds )
+MEMBER( int**, nWallVerts )
+MEMBER( int***, wallVerts )
+MEMBER( double***, wallCrds )
+MEMBER( double*, contactVerts )
+MEMBER( Bool, diffuseCorners )
+MEMBER( Bool, diffuseSurface )
+MEMBER( double, diffusionCoef )
+MEMBER( AbstractContext*, ctx )
+
+
+/*
+** Declare all virtual, abstract and overridden methods.
+**
+** Available method types are:
+**   VIRTUALMETHOD, 
+**   VOIDVIRTUALMETHOD, 
+**   ABSTRACTMETHOD, 
+**   VOIDABSTRACTMETHOD, 
+**   OVERRIDE and
+**   VOIDOVERRIDE.
+**
+** All method types accept the following parameters:
+**   ( <name>, 
+**     <return type>, 
+**     <arg definitions>, 
+**     <arg names> )
+**
+** where:
+**   <name> is the method name, 
+**   <return type> is the type to be returned by the method, 
+**   <arg definitions> is a parenthesised list of method arguments and 
+**   <arg names> is a parenthesised list of method argument names.
+**
+** Note that any virtual, abstract or overridden method that returns
+** void must be declared as VOIDVIRTUALMETHOD, VOIDABSTRACTMETHOD or
+** VOIDOVERRIDE.
+*/
+
+VOIDOVERRIDE( Init, void, 
+	      (void* self), 
+	      (self) )
+
+VOIDOVERRIDE( Copy, void, 
+	      (void* self, const void* op), 
+	      (self, op) )
+
+VOIDOVERRIDE( Destruct, void, 
+	      (void* self), 
+	      (self) )
+
+VOIDOVERRIDE( Print, void, 
+	      (const void* self, Stream* stream), 
+	      (self, stream) )
+
+VOIDOVERRIDE( Remesh, void, 
+	      (void* self), 
+	      (self) )
+
+
+/*
+** Declare all local methods using the METHOD command.  Local method 
+** declarations accept the same parameters as virtual methods, however 
+** there are no separate declarations required for void return types.
+*/
+
+METHOD( Build, void, 
+	(void* self), 
+	(self) )
+
+METHOD( SetRemeshState, void, 
+	(void* self, int dim, Bool state), 
+	(self, dim, state) )
+
+METHOD( SetStaticWall, void, 
+	(void* self, int dim, int wall, Bool state), 
+	(self, dim, int wall, state) )

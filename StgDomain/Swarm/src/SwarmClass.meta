@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Swarm</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+  <param name="Location">./StgDomain/Swarm/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">Stg_Component</param>
+  <param name="Reference">...</param>
+  <param name="Summary">...</param>
+
+  <param name="Description">
+    The main class representing a swarm of particles.  This class is intended
+    as a means of consolidating all the other components used to manage swarms,
+    as well as providing convienient interfaces to manipulate them.
+  </param>
+
+  <list name="Params">
+    <struct>
+      <param name="Name">dim</param>
+      <param name="Type">Integer</param>
+      <param name="Default">0</param>
+      <param name="Description">
+        The number of spatial dimensions the swarm will exist in.
+      </param>
+    </struct>
+    <struct>
+      <param name="Name">cellParticleTblDelta</param>
+      <param name="Type">Integer</param>
+      <param name="Default">DEFAULT_CELL_PARTICLE_TBL_DELTA</param>
+      <param name="Description">
+        As particles are added to a cell in a swarm there will usually be a need
+        to increase the size, this parameter determines by how much the table will
+        be extended each time.
+      </param>
+    </struct>
+    <struct>
+      <param name="Name">extraParticlesFactor</param>
+      <param name="Type">Double</param>
+      <param name="Default">DEFAULT_EXTRA_PARTICLES_FACTOR</param>
+      <param name="Description">
+        Similar to cellParticleTblDelta but for the particles array.
+      </param>
+    </struct>
+  </list>
+
+  <list name="Dependencies">
+    <struct>
+      <param name="Essential">True</param>
+      <param name="Name">CellLayout</param>
+      <param name="Type">CellLayout</param>
+      <param name="Description">
+        The CellLayout class to use to determine how the cells that contain
+        particles are defined.
+      </param>
+    </struct>
+    <struct>
+      <param name="Essential">True</param>
+      <param name="Name">ParticleLayout</param>
+      <param name="Type">ParticleLayout</param>
+      <param name="Description">
+        An instance of the ParticleLayout class that will be used to determine
+        how to initially place particles in each cell.
+      </param>
+    </struct>
+  </list>
+
+  <param name="Example">
+  </param>
+
+</StGermainData>

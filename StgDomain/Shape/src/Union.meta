@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Union</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Shape/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Shape</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">This is used to create a union geometry of two other geometries. Not can be used in the union if the geometry is preceded by a !</param>
+
+<list name="Params">
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">shapes</param>
+		<param name="Type">list</param>
+		<param name="Description">A list of shapes (each defined in a param tag). A ! preceding the shape name will caused the not of that shape to be used in the union</param>
+	</struct>
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">
+<![CDATA[
+	<struct name="myUnion">
+		<param name="Type">Union</param>
+		<list name="shapes">
+			<param>box</param>
+			<param>sphere</param>
+		</list>
+	</struct>
+
+	<!-- With the NOT of a sphere -->
+	<struct name="myUnionWithNot">
+		<param name="Type">Union</param>
+		<list name="shapes">
+			<param>box</param>
+			<param>!sphere</param>
+		</list>
+	</struct>
+
+
+	]]>
+</param>
+
+</StGermainData>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">MeshGenerator</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+  <param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent"></param>
+  <param name="Reference">...</param>
+  <param name="Summary">...</param>
+
+  <param name="Description">
+    The base class for supplying mesh data to the Mesh component.  Provides
+    a very simple interface.
+  </param>
+
+  <list name="Params">
+    <struct>
+      <param name="Name">dims</param>
+      <param name="Type">Integer</param>
+      <param name="Default">2</param>
+      <param name="Description">
+        The number of dimensions of the mesh to generate.
+      </param>
+    </struct>
+  </list>
+
+  <list name="Dependencies">
+    <struct>
+      <param name="Essential">Only if 'meshes' not specified</param>
+      <param name="Name">mesh</param>
+      <param name="Type">Mesh</param>
+      <param name="Description">
+        The Mesh component to be filled with data.
+      </param>
+    </struct>
+    <struct>
+      <param name="Essential">Only if 'mesh' not specified</param>
+      <param name="Name">meshes</param>
+      <param name="Type">List</param>
+      <param name="Description">
+        A list of Mesh components, each to be filled with data the same
+        data.
+      </param>
+    </struct>
+  </list>
+
+  <param name="Example">
+  StgFEM/Apps/StgFEM_Components/LinearMesh.xml
+  </param>
+
+</StGermainData>

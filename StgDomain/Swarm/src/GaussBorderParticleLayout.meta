@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">GaussBorderParticleLayout</param>
+  <param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+  <param name="Location">./StgDomain/Swarm/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">GaussParticleLayout</param>
+
+  <param name="Description">
+    Gauss particle layout, but with all particles on borders of cell
+    (intended for use in evaluating boundary integral terms)
+  </param>
+
+  <list name="Params">
+    <struct>
+      <param name="Name">gaussParticles</param>
+      <param name="Type">UnsignedInt</param>
+      <param name="Default">2</param>
+      <param name="Description">
+        This is the default value that will be used for 'gaussParticlesX',
+        'gaussParticlesY' and 'gaussParticlesZ'.</param>
+    </struct>
+    <struct>
+      <param name="Name">gaussParticlesX</param>
+      <param name="Type">UnsignedInt</param>
+      <param name="Default">gaussParticles</param>
+      <param name="Description">The number of gauss points laid out in the X direction</param>
+    </struct>
+    <struct>
+      <param name="Name">gaussParticlesY</param>
+      <param name="Type">UnsignedInt</param>
+      <param name="Default">gaussParticles</param>
+      <param name="Description">The number of gauss points laid out in the Y direction.</param>
+    </struct>
+    <struct>
+      <param name="Name">gaussParticlesZ</param>
+      <param name="Type">UnsignedInt</param>
+      <param name="Default">gaussParticles</param>
+      <param name="Description">The number of gauss points laid out in the Z direction.</param>
+    </struct>
+  </list>
+
+  <list name="Dependencies">
+  </list>
+
+  <param name="Example">
+  </param>
+
+</StGermainData>

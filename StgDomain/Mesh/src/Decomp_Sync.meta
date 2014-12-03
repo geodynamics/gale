@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Decomp_Sync</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Mesh/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">Combines local and remote indices into a domain set.</param>
+<param name="Description"><p>Decomp_sync is a subclass of Decomp and is a conduit for shifting data between processors.</p>
+
+<p>Decomp_sync relies on the concept of Remote Indices, indices which are not owned by the local  processor but which contain information that may be useful for Shadowing.  Local and remote indices are combined into a domain set with no distinction made of their origins.</p>
+
+<p>Decomp_Sync stores other useful information, such as which processor owns an index, and which processors are interested in an index or set of indices.</p>
+
+<p>In an abstract sense, Decomp_sync deals in locations but it does not do any copying or transferring of data.  This is functionality is left to other Codes.  Similarly, Decomp_sync deals with indices and it doesn't matter that these indices can refer to nodes or other parts of a grid.</p>
+</param>
+
+</StGermainData>

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">RegularRemesherCmpt</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+  <param name="Project">StgFEM</param>
+  <param name="Location">./StgDomain/Utils/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">Copyright (C) 2004-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">Remesher</param>
+  <param name="Reference">...</param>
+  <param name="Summary">...</param>
+
+  <param name="Description">
+    This is a wrapper component to allow the RegularRemesher class to be used
+    as a component.  This will be changed in the near future to combine the two.
+  </param>
+
+  <list name="Params">
+  </list>
+
+  <list name="Dependencies">
+  </list>
+
+  <param name="Example">
+  </param>
+
+</StGermainData>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">CornerVC</param>
+<param name="Author">VPAC</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Utils/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">VariableCondition</param>
+<param name="Reference">...</param>
+<param name="Summary">This function is designed so that a user can specify Boundary Condition's at the corners of a region.</param>
+<param name="Description"> <p>This function is designed so that a user can specify BC's at the corners of a region. It works in 2D and 3D. If values are specified for a location in 2D that does not exist, it will display a warning about it, and the value will be ignored.
+</p> 
+<p>In each Direction: 
+y direction - Bottom or Top;
+x direction - Left or Right;
+z direction - Back or Front;
+</p>
+ </param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+    <struct>
+      <param name="Name">corner</param>
+      <param name="Type">string</param>
+      <param name="Default"></param>
+      <param name="Description">specifies corner location and must be choosen based on name: (yDirection)(XDirection)(ZDirection), eg bottomRightFront  </param>
+    </struct>
+    <struct>
+      <param name="Name">type</param>
+      <param name="Type">string</param>
+      <param name="Default">CornerVC</param>
+      <param name="Description">tells the code that this is a CornerVC type</param>
+    </struct>
+    <struct>
+      <param name="Name">variables</param>
+      <param name="Type">list</param>
+      <param name="Default"></param>
+      <param name="Description">list of values for specified corner, ie vx, vy ...</param>
+    </struct>
+
+</list>
+
+<list name="Dependencies">
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">../tests/data/CornerVC.xml</param>
+
+</StGermainData>
+

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Delaunay</param>
+<param name="Author">...</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+<param name="Location">./StgDomain/Geometry/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference">...</param>
+<param name="Summary">The Constrained Delaunay Algorithm performs Delaunay triangulation on a set of 2D points.  It also generates a dual graph (Voronoi diagram) and a Convex Hull.<br/>Single-processor version - good for small data sets or where speed is not critical.</param>
+<param name="Description"><p>Delaunay works on a set of 2D points.  It uses the Constrained Delaunay Algorithm to generate a  network between these points.</p><p>Once that step is complete it generates a dual graph, a Voronoi Diagram, based on the Delaunay Triangulation.</p><p>Delaunay can also generate a Convex Hull based on the set of points.</p><p>This is a single-processor implementation of Delaunay.  Use ParallelDelaunay on a multi-processor system for large data sets, speed-critical applications or where memory resources are limited.</p>
+</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">numSites</param>
+		<param name="Type">int</param>
+		<param name="Default">0</param>
+		<param name="Description">...</param>
+	</struct>
+</list>
+
+<list name="Dependencies">
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">...</param>
+
+</StGermainData>
+

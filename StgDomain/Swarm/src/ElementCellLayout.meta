@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">ElementCellLayout</param>
+  <param name="Organisation">VPAC</param>
+<param name="Project">StgDomain</param>
+  <param name="Location">./StgDomain/Swarm/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/StgDomain.html</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">CellLayout</param>
+
+  <param name="Description">
+    Implements a CellLayout component that uses a mesh to define where
+    particle cells will be.
+  </param>
+
+  <list name="Params">
+    n/a
+  </list>
+
+  <list name="Dependencies">
+    <struct>
+      <param name="Essential">True</param>
+      <param name="Name">Mesh</param>
+      <param name="Type">Mesh</param>
+      <param name="Description">
+        The mesh to use as a template for cell locations.
+      </param>
+    </struct>
+  </list>
+
+  <param name="Example">
+    ./StgDomain/Swarm/tests/testParticleCoords.xml
+  </param>
+
+</StGermainData>
