@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>testOutput.xml</include>
+
+	<struct name="components" mergeType="merge">
+		<struct name="imageOutput">
+				<param name="Type">lucOutputJPEG</param>
+		</struct>		
+	</struct>	
+
+</StGermainData>

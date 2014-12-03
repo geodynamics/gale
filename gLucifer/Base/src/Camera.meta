@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">lucCamera</param>
+<param name="Author">Robert Turnbull</param>
+<param name="Organisation">MCC</param>
+<param name="Project">gLucifer</param>
+<param name="Location">./gLucifer/Base/src/</param>
+<param name="Project Web">http://mcc.monash.edu.au/gLucifer</param>
+<param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference"></param>
+<param name="Summary">...</param>
+<param name="Description">Contols how the user views the visualisation scene in a lucViewport.</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">focalPointX</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The X component of the coordinate of the point that the camera is centred on.</param>
+	</struct>
+	<struct>
+		<param name="Name">focalPointY</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The Y component of the coordinate of the point that the camera is centred on.</param>
+	</struct>
+	<struct>
+		<param name="Name">focalPointZ</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The Z component of the coordinate of the point that the camera is centred on.</param>
+	</struct>
+	<struct>
+		<param name="Name">upDirectionX</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The X component of the vector which describes which direction is up for the camera.</param>
+	</struct>
+	<struct>
+		<param name="Name">upDirectionY</param>
+		<param name="Type">Double</param>
+		<param name="Default">1.0</param>
+		<param name="Description">The Y component of the vector which describes which direction is up for the camera.</param>
+	</struct>
+	<struct>
+		<param name="Name">upDirectionZ</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The Z component of the vector which describes which direction is up for the camera.</param>
+	</struct>
+	<struct>
+		<param name="Name">focalLength</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Parameter only used for stereo cameras.</param>
+	</struct>
+	<struct>
+		<param name="Name">coordX</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The X component of the coordinate of where the camera initially is in space.</param>
+	</struct>
+	<struct>
+		<param name="Name">coordY</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The Y component of the coordinate of where the camera initially is in space.</param>
+	</struct>
+	<struct>
+		<param name="Name">coordZ</param>
+		<param name="Type">Double</param>
+		<param name="Default">1.0</param>
+		<param name="Description">The Z component of the coordinate of where the camera initially is in space.</param>
+	</struct>
+	<struct>
+		<param name="Name">aperture</param>
+		<param name="Type">Double</param>
+		<param name="Default">45.0</param>
+		<param name="Description">The field-of-view angle, in degrees.</param>
+	</struct>
+	<struct>
+		<param name="Name">stereoType</param>
+		<param name="Type">String</param>
+		<param name="Default">"lucMono"</param>
+		<param name="Description">There are three options for how the camera behaves in stereo: lucMono (No stereo behaviour), lucStereoToeIn (simplified stereo behaviour), lucStereoAsymmetric (true stereo behaviour).</param>
+	</struct>
+	<struct>
+		<param name="Name">eyeSeparation</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.2</param>
+		<param name="Description">If your camera is working in stereo, then this is distance between the "left eye" and the "right eye", otherwise this parameter is not used.</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">No</param>
+		<param name="Name">CentreFieldVariable</param>
+		<param name="Type">FieldVariable</param>
+		<param name="Description">If a CentreFieldVariable is specified, then it overrides the values given by the focalPoint[X,Y,Z] parameters and just sets the focal point to be the middle of the field given by this FieldVariable.</param>
+	</struct>
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example"><![CDATA[
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">TemperatureField</param>
+			<param name="coordZ">1.5</param>
+		</struct>]]>
+</param>
+
+</StGermainData>

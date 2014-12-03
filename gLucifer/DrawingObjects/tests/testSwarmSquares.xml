@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<include>testDrawingObject.xml</include>
+	<include>testSwarm.xml</include>
+	
+	<list name="plugins">
+		<param>DummySwarmVariable</param>
+	</list>
+
+	
+	<struct name="components" mergeType="merge">
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="coordZ">5.0</param>
+		</struct>
+		
+		<!-- Drawing Objects -->
+		<struct name="colourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Red Blue Green Yellow Orange</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		
+		<struct name="vectorVariable">
+			<param name="Type">DummySwarmVariable</param>
+			<param name="dofCount">dim</param>
+		</struct>
+
+    		<struct name="normalVariable">
+			<param name="Type">DummySwarmVariable</param>
+			<param name="dofCount">dim</param>
+		</struct>
+
+    		<struct name="lengthVariable">
+			<param name="Type">DummySwarmVariable</param>
+			<param name="name">lengthVariableName</param>
+			<param name="dofCount">1</param>
+		</struct>
+   
+		<struct name="swarmSquares">
+			<param name="Type">lucSwarmSquares</param>
+			<param name="Swarm">swarm</param>
+<!--			<param name="OpacityVariable">0.5</param>-->
+			<param name="ColourVariable">DummySwarmVariable</param>
+		  	<param name="ColourMap">colourMap</param>
+			<param name="NormalVariable">normalVariable</param>
+			<param name="PlaneVectorVariable">vectorVariable</param> 
+			<param name="LengthVariable">lengthVariable</param>
+		</struct>
+		
+		<!-- Put these althogether in a viewport -->
+		<struct name="viewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>swarmSquares</param>
+			</list>
+		</struct>
+	</struct>
+
+	<param name="dofCount">1</param> <!-- This is to make the DummySwarmVariable a scalar value -->
+
+</StGermainData>

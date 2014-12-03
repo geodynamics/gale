@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>testDrawingObject.xml</include>
+
+	<list name="plugins">
+		<param>DummyFieldVariable</param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">DummyFieldVariable</param>
+			<param name="coordZ">5.0</param>
+		</struct>
+		<struct name="colourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">#0B0133 White #B7210B</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<!-- Drawing Objects -->
+		
+		<struct name="border" mergeType="replace">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">DummyFieldVariable</param>
+		</struct>
+		
+		<!-- Put these althogether in a viewport -->
+		<struct name="viewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>border</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

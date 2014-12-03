@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">lucHistoricalSwarmTrajectory</param>
+<param name="Author">Robert Turnbull</param>
+<param name="Organisation">MCC</param>
+<param name="Project">gLucifer</param>
+<param name="Location">./gLucifer/DrawingObjects/src/</param>
+<param name="Project Web">http://mcc.monash.edu.au/gLucifer</param>
+<param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="Parent">lucOpenGLDrawingObject</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
+<param name="Description">Draws a trail for each particle, showing where each one has been.</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">colour</param>
+		<param name="Type">String</param>
+		<param name="Default">"black"</param>
+		<param name="Description">The colour of the line (is overridden by the Colour Map if one is present)</param>
+	</struct>
+	<struct>
+		<param name="Name">lineWidth</param>
+		<param name="Type">Double</param>
+		<param name="Default">1.0</param>
+		<param name="Description">The thickness of the line.</param>
+	</struct>
+	<struct>
+		<param name="Name">historySteps</param>
+		<param name="Type">Unsigned Int</param>
+		<param name="Default">50</param>
+		<param name="Description">How many timesteps the particle's position is recorded.</param>
+	</struct>
+	<struct>
+		<param name="Name">historyTime</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">The maximum time period in the past for which a particle will visualise its trajectory. If this value is left at 0.0 then all the particle's positions up to 'historySteps' will be displayed.</param>
+	</struct>
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">Swarm</param>
+		<param name="Type">Swarm</param>
+		<param name="Description">The swarm containing the particles to be visualised.</param>
+	</struct>
+
+	<struct>
+		<param name="Essential">No</param>
+		<param name="Name">ColourMap</param>
+		<param name="Type">lucColourMap</param>
+		<param name="Description">The colour map determining how the line changes colour according to how long ago the particle was in that position.</param>
+	</struct>
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">
+<![CDATA[
+	<struct name="swarmTrajectory">
+		<param name="Type">lucHistoricalSwarmTrajectory</param>
+		<param name="Swarm">materialPointSwarm</param>
+		<param name="ColourMap">fadeAwayColourMap</param>
+		<param name="lineWidth">1.2</param>
+		<param name="historySteps">80</param>
+		<param name="historyTime">0.001</param>
+	</struct>
+]]>
+</param>
+
+</StGermainData>

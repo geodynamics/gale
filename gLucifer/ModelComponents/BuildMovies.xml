@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 	
+<!-- Add the ability to build movies to the default gLucifer window 
+	 as defined in gLucifer.xml  -->
+
+	<struct name="components" mergeType="merge">
+		<struct name="movie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">window</param>
+		</struct>	
+		
+	</struct>
+	
+
+</StGermainData>

@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	<!-- Purpose: Allows to view a Svarm as a collection of dots-->
+	
+	<include>testDrawingObject.xml</include>
+	<include>testSwarm.xml</include>
+	
+	<list name="plugins">
+		<param>DummySwarmVariable</param>
+	</list>
+	<param name="dofCount">1</param> <!-- This is to make the DummySwarmVariable a scalar value -->
+
+	
+	<struct name="components" mergeType="merge">
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="coordZ">3.0</param>
+		</struct>
+		
+
+		<!-- Drawing Objects -->
+		<struct name="colourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Purple Blue Green Yellow Orange Red</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		<struct name="swarmViewer">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">swarm</param>	
+			<param name="ColourVariable">DummySwarmVariable</param>
+			<param name="ColourMap">colourMap</param>
+			<param name="pointSize">2.0</param>
+		</struct>
+		
+		<!-- Put these althogether in a viewport -->
+		<struct name="viewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>swarmViewer</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

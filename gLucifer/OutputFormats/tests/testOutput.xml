@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 
+	<list name="import">
+		<param>StgDomain</param>
+	</list>
+	<list name="plugins">
+		<param>RenderingEngineTest</param>
+	</list>
+
+	<param name="dim">2</param>
+	<param name="outputPath">./output</param>
+	<param name="journal.debug.Plugin">true</param>
+
+	<struct name="components">
+		<struct name="renderingEngine">
+				<param name="Type">lucRenderingEngineTest</param>
+		</struct>
+		<struct name="camera">
+				<param name="Type">lucCamera</param>
+		</struct>
+		<struct name="viewport">
+				<param name="Type">lucViewport</param>
+				<param name="Camera">camera</param>
+				<list name="DrawingObject">
+				</list>
+		</struct>		
+		<struct name="window">
+			<param name="Type">lucWindow</param>
+			<param name="RenderingEngine">renderingEngine</param>
+			<list name="OutputFormat">
+				<param>imageOutput</param>
+			</list>
+			<param name="height">32</param>
+			<param name="width">64</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">white</param>
+			<param name="Viewport">viewport</param>
+		</struct>		
+	</struct>	
+
+</StGermainData>
