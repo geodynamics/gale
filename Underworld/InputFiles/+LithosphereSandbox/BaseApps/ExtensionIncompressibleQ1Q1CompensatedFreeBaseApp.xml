@@ -1,0 +1,293 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<list name="import" mergeType="merge">
+		<param>Underworld</param>
+		<param>Experimental</param>
+	</list>
+
+	<list name="plugins" mergeType="Replace">
+		<param>Underworld_EulerDeform</param>
+		<param>StgFEM_StandardConditionFunctions</param>
+		<param>Underworld_VTKOutput</param>
+		<param>Underworld_MovingMeshEnergyCorrection</param>
+	</list>
+	
+	<include>StgFEM/LinearMesh.xml                      </include>
+	<include>StgFEM/VelocityField.xml                   </include>
+	<include>StgFEM/PressureField.xml                   </include>
+	<include>StgFEM/TemperatureField.xml                </include>
+	<include>StgFEM/GaussSwarm.xml                      </include> 
+	<include>StgFEM/TimeIntegrator.xml                  </include>
+	<include>PICellerator/MaterialPointSwarm.xml        </include>
+	<include>Experimental/StokesFlowStable.xml          </include>
+	<include>Experimental/StoreViscosity.xml            </include>
+	<include>PICellerator/AllowOutflow.xml              </include>
+	<include>StgFEM/TempAdvDiff.xml                     </include>
+
+
+	<param name="timeIntegratorOrder"> 1 </param>
+	
+	<param name="pressureMesh" mergeType="replace"> linearMesh </param> 
+	
+	<struct name="components" mergeType="merge">
+		<struct name="buoyancyForceTerm">
+			<param name="Type">BuoyancyForceTerm</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="gravity">gravity</param>
+		</struct>
+	</struct>
+	
+	<param name="gravity"> 1.0 </param> 
+
+	<!-- Replacement for MovingMesh -->
+	
+	<struct name="components" mergeType="merge">
+		<struct name="velocityRemesher">
+			<param name="Type">RegularRemesherCmpt</param>
+			<param name="mesh">velocityMesh</param>
+			<param name="wrapTop">true</param> <!-- FOR FREE SURFACE --> 
+			<list name="remeshDims">
+				<param>0</param>
+				<param>1</param>
+				<param>2</param>
+			</list>
+		</struct>
+	</struct>
+	
+	<!-- ?? Pressure mesh needs deforming too ?? -->
+	
+	<struct name="EulerDeform">
+		<list name="systems">
+			<struct>
+				<param name="mesh"> velocityMesh </param>
+				<param name="remesher">velocityRemesher</param>
+				<param name="staticBottom">true</param>
+				<param name="velocityField"> VelocityField </param>
+				<list name="fields">
+					<struct>
+						<param name="field">VelocityField</param>
+						<param name="variable">velocity</param>
+					</struct>
+					<struct>
+				    	<param name="field">PressureField</param>
+				    	<param name="variable">pressure</param>
+				 </struct>			  
+				</list>
+			</struct>
+		</list>
+	</struct>
+
+	<struct name="components" mergeType="merge">
+		<!-- Make the mesh non-regular / regular as needed -->
+		<struct name="linearMeshGenerator" mergeType="merge">
+			<param name="regular"> False </param>
+		</struct>
+		
+		<!-- Mesh particle layout needs to be element-by-element for free surface -->
+    	<struct name="materialSwarmParticleLayout" mergeType="replace">
+      		<param name="Type">MeshParticleLayout</param>
+      		<param name="mesh">linearMesh</param>
+      		<param name="cellParticleCount">particlesPerCell</param>
+    	</struct>
+	</struct>
+
+	<!-- The velocity boundary conditions for this problem are entirely specific ...
+	 	 therefore we build them in here --> 
+
+
+		 <struct name="components" mergeType="merge">
+		    <struct name="weights" mergeType="replace">
+		      <param name="Type">PCDVC</param>
+		      <param name="resolutionX">10</param>
+		      <param name="resolutionY">10</param>
+		      <param name="resolutionZ">10</param>
+		      <param name="lowerT">0.25</param>
+		      <param name="upperT">15</param>
+		      <param name="maxDeletions">5</param>
+		      <param name="maxSplits">10</param>
+		      <param name="Inflow">true</param>
+		      <param name="MaterialPointsSwarm">materialSwarm</param>
+		    </struct>
+		  </struct>	
+	
+	
+	<!-- For the continuous pressure mess, pressure BCs may be necessary -->
+
+	 <!-- <struct name="pressureBCs">
+	    <param name="type">CompositeVC</param>
+	    <list name="vcList">
+	      <struct>
+		<param name="type">WallVC</param>
+		<param name="wall">top</param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">pressure</param>
+		    <param name="type">double</param>
+		    <param name="value">0</param>
+		  </struct>
+		</list>
+	      </struct>
+	    </list>
+	  </struct>	 -->
+	
+	<!-- velocity boundary conditions - free at the top surface, traction (normal stress) at the base
+	     and a couple of the corners are specified to keep the mesh stable.   -->
+	
+	  <struct name="velocityBCs">
+	    <param name="type">CompositeVC</param>
+	    <list name="vcList">
+	      <struct>
+		<param name="type"> CornerVC </param>
+		<param name="corner"> bottomLeftBack </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vy</param>
+		    <param name="type">double</param>
+		    <param name="value">0</param>
+		  </struct>
+		</list>
+	      </struct>
+	      <struct>
+		<param name="type"> CornerVC </param>
+		<param name="corner"> bottomRightBack </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vy</param>
+		    <param name="type">double</param>
+		    <param name="value">0</param>
+		  </struct>
+		</list>
+	      </struct>
+	      <struct>
+		<param name="type"> CornerVC </param>
+		<param name="corner"> bottomLeftFront </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vy</param>
+		    <param name="type">double</param>
+		    <param name="value">0</param>
+		  </struct>
+		</list>
+	      </struct>
+	      <struct>
+		<param name="type"> CornerVC </param>
+		<param name="corner"> bottomRightFront </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vy</param>
+		    <param name="type">double</param>
+		    <param name="value">0</param>
+		  </struct>
+		</list>
+	      </struct>
+	      <struct>
+		<param name="type"> WallVC </param>
+		<param name="wall"> left </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vx</param>
+		    <param name="type">double</param>
+		    <param name="value">-1</param>
+		  </struct>
+		</list>
+	      </struct>
+	      <struct>
+		<param name="type"> WallVC </param>
+		<param name="wall"> right </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vx</param>
+		    <param name="type">double</param>
+		    <param name="value">1</param>
+		  </struct>
+		</list>
+	      </struct>
+	      <struct>
+		<param name="type"> WallVC </param>
+		<param name="wall"> front </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vz</param>
+		    <param name="type">double</param>
+		    <param name="value"> 0 </param>
+		  </struct>
+	<!-- 	  <struct> -->
+	<!-- 	    <param name="name">vy</param> -->
+	<!-- 	    <param name="type">double</param> -->
+	<!-- 	    <param name="value">0</param> -->
+	<!-- 	  </struct> -->
+		</list>
+	      </struct>
+	      <struct>
+		<param name="type"> WallVC </param>
+		<param name="wall"> back </param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">vz</param>
+		    <param name="type">double</param>
+		    <param name="value"> 0 </param>
+		  </struct>
+	<!-- 	  <struct> -->
+	<!-- 	    <param name="name">vy</param> -->
+	<!-- 	    <param name="type">double</param> -->
+	<!-- 	    <param name="value">0</param> -->
+	<!-- 	  </struct> -->
+		</list>
+	      </struct>
+	    </list>
+	  </struct>
+
+	  <!-- Traction boundary conditions. -->
+	  <struct name="components" mergeType="merge">
+	    <struct name="stressBC">
+	      <param name="Type">TractionForceTerm</param>
+	      <param name="ForceVector">mom_force</param>
+	      <param name="Swarm">borderGaussSwarm</param>
+	      <param name="velocityField">VelocityField</param>
+	      <param name="wall">bottom</param>
+	      <param name="y_type">double</param>
+	      <param name="y_value">1.05</param>
+	    </struct>
+
+	    <struct name="borderCellLayout">
+	      <param name="Type">SingleCellLayout</param>
+	    </struct>
+	    <struct name="borderParticleLayout">
+	      <param name="Type">GaussBorderParticleLayout</param>
+	    </struct>
+	    <struct name="borderGaussSwarm">
+	      <param name="Type">IntegrationPointsSwarm</param>
+	      <param name="CellLayout">borderCellLayout</param>
+	      <param name="ParticleLayout">borderParticleLayout</param>
+	      <param name="FeMesh">elementMesh</param>
+	      <param name="TimeIntegrator">timeIntegrator</param>
+	      <param name="IntegrationPointMapper">borderGaussMapper</param>
+	    </struct>
+	    <struct name="borderGaussMapper">
+	      <param name="Type">GaussMapper</param>
+	      <param name="IntegrationPointsSwarm">borderGaussSwarm</param>
+	      <param name="MaterialPointsSwarm">borderGaussMaterialSwarm</param>
+	    </struct>
+	    <struct name="borderBackgroundLayout">
+	      <param name="Type">BackgroundParticleLayout</param>
+	    </struct>
+	    <struct name="borderGaussMSwarmMovementHandler"> 
+	      <param name="Type">ParticleMovementHandler</param>
+	    </struct>
+	    <struct name="borderGaussMaterialSwarm">
+	      <param name="Type">MaterialPointsSwarm</param>
+	      <param name="CellLayout">borderCellLayout</param>
+	      <param name="ParticleLayout">borderBackgroundLayout</param>
+	      <param name="FeMesh">elementMesh</param>
+	      <list name="ParticleCommHandlers">
+		<param>borderGaussMSwarmMovementHandler</param>
+	      </list>
+	    </struct>
+	  </struct>
+
+</StGermainData>

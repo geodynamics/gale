@@ -1,0 +1,50 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camerapsd">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.5</param>
+		</struct>
+			<!-- Drawing Objects -->
+		<struct name="eigenVectorMax">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="DirectionVariable">materialSwarm-EigenVectorMax</param>
+			<!--param name="LengthVariable">materialSwarm-LengthMaxVector</param-->
+			<param name="colour">red</param>
+			<param name="length">0.1</param>
+			<param name="arrowHeadSize">0.2</param>
+			<param name="MaskVariable">materialSwarm-PlotParticle</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+		</struct>
+
+		
+		<struct name="psdborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">4</param>			
+		</struct>
+		
+		<struct name="psdtitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">PrincipleStressDirection</param>
+		</struct>
+
+		<!-- Viewport -->
+		<struct name="PrincipleStressDirectionVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerapsd</param>
+			<list name="DrawingObject">
+				<param>eigenVectorMax</param>
+				<param>psdborder</param>
+				<param>psdtitle</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

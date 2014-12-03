@@ -1,0 +1,53 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camerahashasbeenwz">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.8</param>
+			<param name="coordY">1.0</param>
+		</struct>
+		<struct name="hasbeenwzColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">White Green</param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0.0</param>
+			<param name="maximum">1.0</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="hbparticleDots">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-HasBeenInWeakZone</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<!--param name="ColourVariable">green</param>
+			<param name="ColourMap">hasbeenwzColourMap</param-->
+			<param name="colour">green</param>
+			<param name="pointSize">2.0</param>
+		</struct>		
+		<struct name="hbborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">4</param>
+		</struct>
+		<struct name="hbmtitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">ParticleHasBeenInWeakZoneViewport</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="ParticleHasBeenInWeakZoneVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerahashasbeenwz</param>
+			<list name="DrawingObject">
+				<param>hbmtitle</param>
+				<param>hbparticleDots</param>
+				<param>hbborder</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

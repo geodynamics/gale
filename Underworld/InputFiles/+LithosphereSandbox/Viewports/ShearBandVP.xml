@@ -1,0 +1,509 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+	<!--
+	<include> ./VPwindow.xml </include>
+	-->
+	<struct name="components" mergeType="merge">
+		
+		<!-- Be careful defining new materials to ensure that the
+			material index masks and the viewers are kept in sync -->
+		
+		<!-- Expects to have cameras defined from Cameras.xml -->
+		
+		
+		<!-- Map strain rate to particles -->
+		
+		<!--
+		<struct name="shearBandViewer-ParticleStrainRate">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">StrainRateInvariantField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+	-->
+	
+		<!-- VelocityXXField is defined as the first component of V in StgFEM -->
+	
+	
+	    <struct name="shearBandViewer-VelocityZZField">
+          <param name="Type">OperatorFeVariable</param>
+          <param name="Operator">TakeThirdComponent</param>
+          <param name="FeVariable">VelocityField</param>
+        </struct>
+    	
+		<struct name="shearBandViewer-ParticleVz">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">shearBandViewer-VelocityZZField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+	
+		<struct name="shearBandViewer-ParticleVy">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">VelocityYYField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+	
+		<struct name="shearBandViewer-ParticleVmag">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">VelocityMagnitudeField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+		
+			<!-- this is the colour scheme for the strain-rate VPs -->
+			
+			<struct name="shearBandViewer-ColourMap">
+				<param name="Type">lucColourMap</param>
+				<param name="colours"> #FFFFFF #CCCCCC #000000 </param>
+				<param name="dynamicRange">True</param>
+				<param name="centreOnFixedValue">False</param>
+				<param name="centringValue">0.0</param>
+				<param name="minimum">0</param>
+				<param name="maximum">1.0</param>
+			</struct>
+
+			<struct name="shearBandViewer-StrainIncrementColourMap">
+				<param name="Type">lucColourMap</param>
+				<param name="colours"> #1807a9 #ace0ff #ffe0ac #a90718 </param>
+				<param name="dynamicRange">True</param>
+				<param name="centreOnFixedValue">True</param>
+				<param name="centringValue">0.0</param>
+				<param name="minimum">0</param>
+				<param name="maximum">1</param>
+			</struct>
+					
+			<struct name="shearBandViewer-ColourBar">
+				<param name="Type">lucColourBar</param>
+				<param name="ColourMap">shearBandViewer-ColourMap</param>
+			</struct>
+			
+			<struct name="shearBandViewer-ColourBar2">
+				<param name="Type">lucColourBar</param>
+				<param name="ColourMap">shearBandViewer-StrainIncrementColourMap</param>
+				<param name="printTickValue"> False </param>
+				<param name="ticks"> 0 </param>
+			</struct>
+
+	
+			<struct name="shearBandViewer-Boxborder">
+				<param name="Type">lucFieldVariableBorder</param>
+				<param name="FieldVariable">VelocityField</param>
+			</struct>
+	
+	
+			<struct name="shearBandViewer-velocityColourMap">
+				<param name="Type">lucColourMap</param>
+				<param name="colours">Purple Blue Green Yellow Orange Red Black</param>
+				<param name="dynamicRange">true</param>
+			</struct>
+			
+			<struct name="shearBandViewer-velocityColourBar">
+				<param name="Type">lucColourBar</param>
+				<param name="ColourMap">shearBandViewer-velocityColourMap</param>
+				<param name="ColourMap">shearBandViewer-StrainIncrementColourMap</param>
+				<param name="printTickValue"> True </param>
+				<param name="ticks"> 5 </param>
+			</struct>
+
+			
+			
+			<!-- Drawing Objects -->
+		
+		
+			<struct name="shearBandViewer-BandsByStrainRate">
+				<param name="Type">lucSwarmViewer</param>
+				<param name="Swarm">materialSwarm</param>
+				<param name="ColourVariable">layersParticleStrainRate</param>
+				<param name="ColourMap">shearBandViewer-ColourMap</param>
+				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
+				<param name="maskType">GreaterThan</param>
+				<param name="maskValue">0.5</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
+				<param name="positionRange">False</param>
+				<param name="minPositionX">-10</param>
+				<param name="maxPositionX">10</param>
+				<param name="minPositionY">-10</param>
+				<param name="maxPositionY">10</param>
+				<param name="minPositionZ">-10</param>
+				<param name="maxPositionZ">10</param>
+			</struct>
+			
+	
+			<struct name="shearBandViewer-BackgroundByVz">
+				<param name="Type">lucSwarmViewer</param>
+				<param name="Swarm">materialSwarm</param>
+				<param name="ColourVariable">shearBandViewer-ParticleVz</param>
+				<param name="ColourMap">shearBandViewer-velocityColourMap</param>
+				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
+				<param name="maskType">LesserThan</param>
+				<param name="maskTolerance">0.0</param>
+				<param name="maskValue">0.5</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
+				<param name="positionRange">True</param>
+				<param name="minPositionX">-10</param>
+				<param name="maxPositionX">10</param>
+				<param name="minPositionY">0.6</param>
+				<param name="maxPositionY">1.2</param>
+				<param name="minPositionZ">-10</param>
+				<param name="maxPositionZ">10</param>
+			</struct>
+	
+		
+			<struct name="shearBandViewer-BackgroundByVy">
+				<param name="Type">lucSwarmViewer</param>
+				<param name="Swarm">materialSwarm</param>
+				<param name="ColourVariable">shearBandViewer-ParticleVy</param>
+				<param name="ColourMap">shearBandViewer-velocityColourMap</param>
+				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
+				<param name="maskType">LesserThan</param>
+				<param name="maskTolerance">0.0</param>
+				<param name="maskValue">0.5</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">False</param>
+				<param name="positionRange">True</param>
+				<param name="minPositionX">-10</param>
+				<param name="maxPositionX">10</param>
+				<param name="minPositionY">0.6</param>
+				<param name="maxPositionY">1.2</param>
+				<param name="minPositionZ">-10</param>
+				<param name="maxPositionZ">10</param>
+			</struct>
+	
+			
+
+			<struct name="shearBandViewer-BandsByStrain">
+				<param name="Type">lucSwarmViewer</param>
+				<param name="Swarm">materialSwarm</param>
+				<param name="ColourVariable">materialSwarm-PostFailureWeakeningIncrement</param>
+				<param name="ColourMap">shearBandViewer-StrainIncrementColourMap</param>
+				<param name="MaskVariable">materialSwarm-PostFailureWeakening</param>
+				<param name="maskType">GreaterThan</param>
+				<param name="maskValue">0.1</param>
+				<param name="pointSize">1.0</param>
+				<param name="pointSmoothing">True</param>
+				<param name="positionRange">True</param>
+				<param name="minPositionX">-10</param>
+				<param name="maxPositionX">10</param>
+				<param name="minPositionY">0.5</param>
+				<param name="maxPositionY">1.2</param>
+				<param name="minPositionZ">-10</param>
+				<param name="maxPositionZ">10</param>
+			</struct>
+
+
+		<!-- Tries to pick up all 3 crust materials with the loose tolerance
+		
+		  -->
+	
+		<struct name="shearBandViewer-CrustBlock1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">shearBandViewer-UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ"> 0.0</param>
+			<param name="maxPositionZ"> 0.2</param>
+		</struct>
+
+		<struct name="shearBandViewer-CrustBlock2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">shearBandViewer-UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ"> -0.8</param>
+			<param name="maxPositionZ"> -0.6</param>
+		</struct>
+
+		<struct name="shearBandViewer-CrustBlock3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">shearBandViewer-UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ"> 0.8 </param>
+			<param name="maxPositionZ"> 1.0 </param>
+		</struct>
+
+
+		<struct name="shearBandViewer-MantleBaseLayer">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">shearBandViewer-LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">1.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="pointSmoothing">False</param>
+			<param name="positionRange">False</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="shearBandViewer-MantleUpperLayer">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleStrainRate</param>
+			<param name="ColourMap">shearBandViewer-UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSmoothing">False</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">False</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">0.5</param>
+			<param name="minPositionY">0.1</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">0.5</param>
+		</struct>
+		
+	
+	
+
+
+
+<!-- Strain rate block/s -->
+
+		<struct name="shearBandViewer-PerspectiveVP-BandsByStrainRateAndVz">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera3</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-BandsByStrainRate</param>
+				<param> shearBandViewer-BackgroundByVz </param>
+				<param> Boxborder </param>
+		 	<!--	<param> shearBandViewer-ColourBar</param>-->
+		 		<param> shearBandViewer-velocityColourBar</param>
+			</list>
+		</struct>
+
+		<struct name="shearBandViewer-PerspectiveVP-BandsByStrainRateAndVy">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera3</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-BandsByStrainRate</param>
+				<param> shearBandViewer-BackgroundByVy </param>
+				<param> Boxborder </param>
+		 	<!--	<param> shearBandViewer-ColourBar</param>-->
+		 		<param> shearBandViewer-velocityColourBar</param>
+			</list>
+		</struct>
+
+		<struct name="shearBandViewer-PerspectiveVP-BandsByStrain">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera3</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-BandsByStrain</param>
+				<param> Boxborder </param>
+		 		<param> shearBandViewer-ColourBar2</param>
+			</list>
+		</struct>
+
+		<struct name="shearBandViewer-TopDownVP-BandsByStrainRateAndVz">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxTopDownCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-BandsByStrainRate</param>
+				<param> shearBandViewer-BackgroundByVz </param>
+				<param> Boxborder </param>
+		 	<!--	<param> shearBandViewer-ColourBar</param>-->
+		 		<param> shearBandViewer-velocityColourBar</param>
+			</list>
+		</struct>
+
+		<struct name="shearBandViewer-TopDownVP-BandsByStrainRateAndVy">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxTopDownCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-BandsByStrainRate</param>
+				<param> shearBandViewer-BackgroundByVy </param>
+				<param> Boxborder </param>
+		 	<!--	<param> shearBandViewer-ColourBar</param>-->
+		 		<param> shearBandViewer-velocityColourBar</param>
+			</list>
+		</struct>
+
+		<struct name="shearBandViewer-TopDownVP-BandsByStrain">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxTopDownCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-BandsByStrain</param>
+				<param> Boxborder </param>
+		 		<param> shearBandViewer-ColourBar2</param>
+			</list>
+		</struct>
+
+		
+					
+		<struct name="shearBandViewerBlocksPerspectiveVP1">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera3</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-CrustBlock1</param>
+				<param> shearBandViewer-CrustBlock2</param>
+				<param> shearBandViewer-CrustBlock3</param>
+				<param> shearBandViewer-MantleBaseLayer </param>
+				<param> shearBandViewer-MantleUpperLayer </param>
+				<!-- <param> passiveTracerDots </param> -->
+				<param> Boxborder </param>
+		 		<param> shearBandViewer-ColourBar</param>
+			</list>
+		</struct>
+			
+
+		<struct name="shearBandViewerWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">640</param>
+			<param name="width">1600</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> shearBandViewer-PerspectiveVP-BandsByStrainRateAndVz shearBandViewer-PerspectiveVP-BandsByStrainRateAndVy shearBandViewer-PerspectiveVP-BandsByStrain </param>
+			</list>
+		</struct>
+		
+		<struct name="shearBandViewerTopDownWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">640</param>
+			<param name="width">1600</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> shearBandViewer-TopDownVP-BandsByStrainRateAndVz shearBandViewer-TopDownVP-BandsByStrainRateAndVy shearBandViewer-TopDownVP-BandsByStrain </param>
+			</list>
+		</struct>
+		
+		
+
+
+<!-- Strain rate slices 
+
+		<struct name="ShearBandSlicesViewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxHighViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-UC2Slice1 </param>
+				<param> shearBandViewer-UC1Slice1</param>
+			</list>
+		</struct>
+		
+		<struct name="ShearBandSlicesViewport2">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxHighViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-UC2Slice2 </param>
+				<param> shearBandViewer-UC1Slice2</param>
+			</list>
+		</struct>
+		<struct name="ShearBandSlicesViewport3">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxHighViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-UC2Slice3 </param>
+				<param> shearBandViewer-UC1Slice3</param>
+			</list>
+		</struct>
+		
+		<struct name="ShearBandSlicesViewport4">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxHighViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> shearBandViewer-LC-Slice4</param>
+			</list>			
+		</struct>
+
+
+
+		<struct name="shearBandSlicesWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">1184</param>
+			<param name="width">800</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> strainRateSlicesViewport </param>
+				<param> strainRateSlicesViewport2 </param>
+				<param> strainRateSlicesViewport3 </param>
+				<param> strainRateSlicesViewport4 </param>
+			</list>
+		</struct>
+		
+-->		
+
+		<!-- making movies -->
+		<!--
+		<struct name="shearBandViewerMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">shearBandViewerWindow</param>
+		</struct> -->
+ 
+	
+	
+	
+	
+	
+ 
+	</struct>
+</StGermainData>
+
+
+

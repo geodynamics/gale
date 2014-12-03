@@ -1,0 +1,155 @@
+<!-- Rayleigh-Taylor app input file -->
+
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>Underworld/BaseApps/ThermalConvectionPIC.xml</include>
+
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>	
+			<param name="VelocityField">VelocityField</param>	
+			<param name="GaussSwarm">gaussSwarm</param>	
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Velic_solCx</param>	
+			<param name="Context">context</param>	
+		</struct>
+	</list>
+
+	<struct name="pluginData">
+		<list name="NumericFields">
+			<param>VelocityField</param> <param> 0 </param>
+			<param>PressureField</param> <param> 1 </param>
+			<param>StrainRateField</param> <param> 2 </param>
+		</list>
+		<param name="IntegrationSwarm">gaussSwarm</param>
+		<param name="ConstantMesh">constantMesh</param>
+		<param name="ElementMesh">linearMesh</param>
+		<param name="normaliseByAnalyticSolution">false</param>
+		<param name="useReferenceSolutionFromFile">false</param>
+		<param name="appendToAnalysisFile">false</param>
+		<param name="epsilon">1e-3</param>
+		<param name="Context">context</param>
+	</struct>
+
+	<struct name="temperatureICs" mergeType="replace">
+		<param name="type">CompositeVC</param>
+		<list name="vcList">
+			<struct>
+				<param name="type"> AllNodesVC </param>
+				<list name="variables">
+					<struct>
+						<param name="name">temperature</param>
+						<param name="type">func</param>
+						<param name="value">VelicTemperatureIC</param>
+					</struct>
+				</list>
+			</struct>
+		</list>
+	</struct>
+
+	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>	
+		<struct name="rheologyA">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">solCx_etaA</param>
+		</struct>
+		<struct name="shapeA">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> solCx_xc </param>
+			<param name="startY"> minY </param> <param name="endY"> maxY </param>
+		</struct>	
+		<struct name="materialA">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">shapeA</param>
+			<param name="Rheology">rheologyA</param>
+		</struct>
+		<struct name="rheologyB">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">solCx_etaB</param>
+		</struct>
+		<struct name="shapeB">
+			<param name="Type">Box</param>
+			<param name="startX"> solCx_xc </param> <param name="endX"> maxX </param>
+			<param name="startY"> minY </param> <param name="endY"> maxY </param>
+		</struct>	
+		<struct name="materialB">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">shapeB</param>
+			<param name="Rheology">rheologyB</param>
+		</struct>
+	</struct>
+
+	<!-- to disable scaling check --> 
+	<param name="Ra_ScalingCheck">false</param>
+	<param name="Ra"> 1 </param>	
+	<param name="courantFactor"> 0.25 </param>
+
+	<!-- I don't know if the courantFactor is vital or unimportant -->
+	<param name="solCx_etaA">100</param>
+	<param name="solCx_etaB">1</param>
+	<param name="solCx_xc">0.5</param>
+	<param name="solCx_n">2.0</param>
+	<param name="wavenumberY">2.0</param>
+
+	<param name="journal.info.Context-verbose">true</param>
+	<param name="journal.debug.Plugins">true</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal-enable-branch.debug.StG_FEM">f</param>
+	<param name="journal-level-branch.debug.StG_FEM"> 2 </param>
+	<param name="journal-enable-branch.debug.Swarm">f</param>
+	<param name="journal-level-branch.debug.Swarm"> 2 </param>
+	<param name="journal.debug">true</param>
+
+	<!-- general simulation parameters -->
+	<param name="maxTimeSteps"> 1 </param>
+	<param name="dumpEvery"> 1 </param>
+	<param name="outputPath"> ./output/ </param>
+	<!--
+	<param name="gravity"> 1.0 </param>
+	-->
+
+	<!-- general decomposition parameters -->
+	<param name="dim"> 2 </param>
+	<!-- mesh parameters -->
+	<param name="elementResI"> 64 </param>
+	<param name="elementResJ"> 64 </param>
+	<param name="elementResK"> 1 </param>
+
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 1.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="allowUnbalancing"> True </param>
+	<param name="buildElementNodeTbl"> True </param>
+
+	<param name="particleLayoutType"> random </param>
+	<param name="particlesPerCell"> 20 </param>
+	<param name="seed"> 13 </param>
+	
+	<!-- Boundary conditions -->
+	<include>Underworld/VariableConditions/velocityBCs.freeslip.xml</include>
+
+	<!-- Visualisation stuff -->
+	<!--
+	<include> ./analyticVis.xml </include>
+	<include> ./analyticVis2.xml </include>
+	-->
+
+</StGermainData>	

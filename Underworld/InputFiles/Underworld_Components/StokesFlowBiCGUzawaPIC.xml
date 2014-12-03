@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>StokesFlowBiCGUzawa.xml</include>
+
+	<!-- Stokes Flow Stuff -->
+	<struct name="components" mergeType="merge">
+		<struct name="constitutiveMatrix" mergeType="replace">
+			<param name="Type">ConstitutiveMatrixCartesian</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="StiffnessMatrix">k_matrix</param>
+		</struct>
+		<struct name="preconditionerTerm" mergeType="replace">
+			<param name="Type">UzawaPreconditionerTerm</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="StiffnessMatrix">preconditioner</param>
+		</struct>		
+	</struct>	
+</StGermainData>

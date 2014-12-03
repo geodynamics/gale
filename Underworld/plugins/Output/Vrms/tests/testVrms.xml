@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 
+	<param name="journal-level.info.ComponentFactory"> 2 </param>
+	<param name="journal.info.Context-verbose">True</param>
+	<!--
+	<param name="journal.debug">True</param>
+	<param name="journal-enable-branch.debug.StgFEM">True</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>
+	-->
+
+	<include>StgFEM/LinearMesh.xml</include>
+	<include>StgFEM/VelocityField.xml</include>
+	<include>StgFEM/GaussSwarm.xml</include>
+	
+	<list name="plugins">
+		<param>StgFEM_FrequentOutput</param>	
+		<param>StgFEM_StandardConditionFunctions</param>	
+		<param>Underworld_Vrms</param>	
+	</list>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 5 </param>
+	<param name="outputEvery"> 1 </param>
+	<param name="outputPath"> ./output </param>
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>
+	<param name="elementResI"> 32 </param>
+	<param name="elementResJ"> 32 </param>
+	<param name="elementResK"> 1 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> -0.5f </param>
+	<param name="minY"> -0.5f </param>
+	<param name="minZ"> -0.5f </param>
+	<param name="maxX"> 0.5f </param>
+	<param name="maxY"> 0.5f </param>
+	<param name="maxZ"> 0.5f </param>
+	<param name="allowUnbalancing"> True </param>
+
+	<!-- Set up BCs -->
+	<include> solidBodyRotation.xml </include>
+
+	<!-- Integration Scheme configuration -->
+	<param name="gaussParticlesX"> 2 </param>
+	<param name="gaussParticlesY"> 2 </param>
+	<param name="gaussParticlesZ"> 2 </param>
+
+</StGermainData>

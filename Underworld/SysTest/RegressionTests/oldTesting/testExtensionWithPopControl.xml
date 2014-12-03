@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	<include> InputFiles/Extension.xml</include>
+
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->	
+		<param>StgFEM_CompareFeVariableAgainstReferenceSolution</param>
+	</list>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps" mergeType="replace"> 2 </param>
+	<param name="outputPath" mergeType="replace"> ./output </param>
+	<param name="dumpEvery"> 1 </param>	
+	<param name="checkpointEvery"> 1 </param>
+
+	<!-- Non-linear stuff -->
+	<param name="nonLinearMaxIterations" mergeType="replace"> 50 </param>	
+	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="elementResI" mergeType="replace"> 24 </param>
+	<param name="elementResJ" mergeType="replace"> 12 </param>
+	<param name="elementResK" mergeType="replace"> 1 </param>
+	
+	<!--override weights defaults-->
+	<struct name="weights">
+		<param name="Type">PCDVC</param>
+		<param name="resolutionX">10</param>
+		<param name="resolutionY">10</param>
+		<param name="resolutionZ">10</param>
+		<param name="lowerT">0.6</param>
+		<param name="upperT">25</param>
+		<param name="maxDeletions">3</param>
+		<param name="maxSplits">3</param>
+		<param name="MaterialPointsSwarm">materialSwarm</param>
+	</struct>
+
+	<!-- Visualisation stuff -->
+
+ 	<param name="interactive" mergeType="replace">False</param>
+	
+	
+	<struct name="StgFEM_CompareFeVariableAgainstReferenceSolution">
+		<list name="variables">
+			<param>PressureField</param>
+			<param>VelocityField</param>
+		</list>
+		<param name="referencePath">./expected/testExtensionWithPop.0of1</param>
+		<param name="VelocityField-tolerance">0.000005</param>
+
+		<param name="timeStepToCompare">2</param>
+	</struct>
+</StGermainData>

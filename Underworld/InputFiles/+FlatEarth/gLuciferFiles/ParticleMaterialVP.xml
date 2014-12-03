@@ -1,0 +1,120 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+			<!-- Camera And Colour Maps -->
+	
+		<struct name="particleMaterialColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> Black #005522 Orange Blue Red </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">3</param>
+		</struct>
+		
+		<!--
+			<struct name="materialSwarm-Temperature">
+				<param name="Type">FeSwarmVariable</param>
+				<param name="Swarm">materialSwarm</param>
+				<param name="FeVariable">TemperatureField</param>
+			</struct>
+
+			<struct name="materialSwarm-StrainRateInvariant">
+					<param name="Type">FeSwarmVariable</param>
+					<param name="Swarm">materialSwarm</param>
+					<param name="FeVariable">StrainRateInvariantField</param>
+			</struct>
+		-->	
+
+		<struct name="particleMaterial0VariableColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> DarkRed Orange Yellow  </param>
+			<param name="dynamicRange">True</param>
+			<param name="minimum">0.0</param>
+			<param name="maximum">1.0</param>
+		</struct>
+		
+		<struct name="particleMaterial1VariableColourMap">
+				<param name="Type">lucColourMap</param>
+				<param name="colours"> DarkBlue LightBlue Cyan  </param>
+				<param name="dynamicRange">False</param>
+				<param name="minimum">0.0</param>
+				<param name="maximum">0.2</param>
+		</struct>
+		
+		<!--
+			Constructing particleMaterialDots2..
+                       Looking for essential component 'materialSwarm': Found.
+                       Getting parameter 'ColourVariable': Found - Value = "materialSwarm-Temperature"
+                       Looking for non-essential component 'particleMaterialVariableColourMap': Found.
+                       Getting parameter 'OpacityVariable': Using default value = ""
+                       Getting parameter 'MaskVariable': Found - Value = "materialSwarm-MaterialIndex"
+                       Getting parameter 'drawParticleNumber': Using default value = false
+                       Getting parameter 'sameParticleColour': Using default value = false
+                       Getting parameter 'subSetEvery': Using default value = 1
+                       Getting parameter 'positionRange': Using default value = false
+                       Getting parameter 'minPositionX': Using default value = -100000
+                       Getting parameter 'minPositionY': Using default value = -100000
+                       Getting parameter 'minPositionZ': Using default value = -100000
+                       Getting parameter 'maxPositionX': Using default value = 100000
+                       Getting parameter 'maxPositionY': Using default value = 100000
+                       Getting parameter 'maxPositionZ': Using default value = 100000
+                       Getting parameter 'maskValue': Found - Value = "2"
+                       Getting parameter 'maskTolerance': Using default value = 0.001
+                       Getting parameter 'maskType': Found - Value = "EqualTo"
+                       Getting parameter 'colour': Using default value = "black"
+                       Getting parameter 'pointSize': Found - Value = "2.0"
+            -->
+		
+		
+	<!-- Drawing Objects -->
+	
+	<struct name="particleMaterialDots0">
+		<param name="Type">lucSwarmViewer</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+		<param name="maskValue">0.0</param>
+		<param name="maskTolerance">0.1</param>
+		<param name="maskType">EqualTo</param> 
+		<param name="ColourVariable">materialSwarm-Temperature</param>
+		<param name="ColourMap">particleMaterial0VariableColourMap</param>
+		<param name="pointSize">2.0</param>
+	</struct>		
+
+
+	 <struct name="particleMaterialDots1">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+	 	<param name="maskValue">1.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">EqualTo</param> 
+		<param name="positionRange">True</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-Temperature</param>
+	 	<param name="ColourMap">particleMaterial1VariableColourMap</param>
+	 	<param name="pointSize">2.0</param>
+	 </struct>		
+       
+		
+		<!-- Drawing Objects -->
+		<struct name="particleMaterialTitle" mergeType="replace">
+			<param name="Type">lucTitle</param>
+			<param name="string">Particle material dots</param>
+		</struct>
+
+		<!-- Viewport -->
+		<struct name="ParticleMaterialVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
+			<list name="DrawingObject">
+				<param>particleMaterialTitle</param>
+				<param>particleMaterialDots0</param>
+				<param>particleMaterialDots1</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

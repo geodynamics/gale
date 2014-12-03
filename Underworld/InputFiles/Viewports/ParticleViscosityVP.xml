@@ -1,0 +1,51 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camerapviscosity">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+		</struct>
+		<struct name="pviscosityColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Grey LightBlue Purple Blue DarkBlue</param>
+			<param name="dynamicRange">true</param>
+		</struct>
+		<struct name="pvColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pviscosityColourMap</param>
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="pvparticleDots">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-CorrectedViscosity</param>
+			<param name="ColourMap">pviscosityColourMap</param>
+			<param name="pointSize">2.0</param>
+		</struct>		
+		<struct name="pvborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">2</param>
+		</struct>
+		<struct name="pvmtitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">ParticleViscosityViewport</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="ParticleViscosityVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerapviscosity</param>
+			<list name="DrawingObject">
+				<param>pvmtitle</param>
+				<param>pvborder</param>
+				<param>pvparticleDots</param>
+				<param>pvColourBar</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

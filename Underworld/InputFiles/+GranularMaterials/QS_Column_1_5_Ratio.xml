@@ -1,0 +1,66 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include>./Column_Base.xml </include>
+	<include>./Column_3LayersShape.xml </include>
+	<include>./BoundaryConditions/QS_Column_VelocityBCs.xml </include>
+
+	<list name="plugins" mergeType="merge">
+		<param>Underworld_EulerDeform</param>
+	</list>
+
+	<param name="timeIntegratorOrder">1</param>
+	
+	<struct name="components" mergeType="merge">
+		<struct name="velocityRemesher">
+			<param name="Type">RegularRemesherCmpt</param>
+			<param name="mesh">velocityMesh</param>
+			<list name="remeshDims">
+				<param>0</param>
+				<param>1</param>
+				<param>2</param>
+			</list>
+		</struct>
+	</struct>
+	<struct name="EulerDeform">
+ 		<list name="systems">
+			<struct>
+				<param name="mesh">velocityMesh</param>
+				<param name="remesher">velocityRemesher</param>
+				<param name="velocityField">VelocityField</param>
+					<list name="fields">
+						<struct>
+	    						<param name="field">VelocityField</param>
+	   						<param name="variable">velocity</param>
+						</struct>
+					</list>
+			</struct>
+		</list>
+	</struct>
+	<struct name="components" mergeType="merge">
+		<struct name="linearMeshGenerator" mergeType="merge">
+			<param name="regular">True</param>
+		</struct>
+	</struct>
+
+	<param name="eta_init">  1.0e5 </param>
+	<param name="eta_final"> 1.0 </param>
+	<param name="eta_background"> 1.0e-2 </param>
+
+	<param name="maxTimeSteps"> 5000 </param>
+	<param name="elementResI">  96 </param>
+	<param name="elementResJ">  64  </param>
+	<param name="elementResK"> 1    </param>
+   	<param name="minColumnX">  0.0 </param>
+   	<param name="maxColumnX">  4.0  </param>
+   	<param name="minColumnY">  0.0  </param>
+   	<param name="maxColumnY">  6.0  </param>
+   	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 4.0 </param>
+	<param name="maxY"> 7.0 </param>
+	<param name="maxZ"> 1 </param>
+
+</StGermainData>

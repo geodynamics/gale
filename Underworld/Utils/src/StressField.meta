@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">StressField</param>
+<param name="Author"></param>
+<param name="Organisation">MCC</param>
+<param name="Project">Underworld</param>
+<param name="Location">./Underworld/Utils/src/</param>
+<param name="Project Web">http://www.mcc.monash.edu.au/Software/Underworld</param>
+<param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="Parent">ParticleFeVariable</param>
+<param name="Reference"></param>
+<param name="Summary"></param>
+<param name="Description">This creates a meshed based deviatoric stress field thoughout the total domain. A shape function averaging process is used to calculated the stress (constitutive information on particles, strain-rate information from nodes) to mesh nodal point. By default this field is stored at velocity mesh node location.</param>
+
+<!--Now the interesting stuff-->
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">StressVariable</param>
+		<param name="Type">String</param>
+		<param name="Default">Stress</param>
+		<param name="Description">This is the name of a particle based storage field, and if this field is found then it values will be used to first calculate the stress tensors at particle location - but the averaging process will still occur.</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">StrainRateField</param>
+		<param name="Type">FeVariable</param>
+		<param name="Description">Required to multiple with the constitutive matrix to produce a stress tensor.</param>
+	</struct>
+
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">ConstitutiveMatrix</param>
+		<param name="Type">ConstitutiveMatrix</param>
+		<param name="Description">Used to calculate Constitutive information from the particles.</param>
+	</struct>
+	<struct>
+		<param name="Essential">False</param>
+		<param name="Name">SLE</param>
+		<param name="Type">SystemLinearEquations</param>
+		<param name="Description">Optional. If appropriately defined the stress field will then be calculated each nonLinear step.</param>
+	</struct>
+
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example">  
+<![CDATA[
+    <struct name="deviatoricStressField">
+      <param name="Type">StressField</param>
+      <param name="StrainRateField">StrainRateField</param>
+      <param name="Context">context</param>
+      <param name="ConstitutiveMatrix">constitutiveMatrix</param>
+      <param name="Swarm">picIntegrationPoints</param>
+      <param name="Mesh">elementMesh</param>
+    </struct>
+]]>
+</param>
+
+</StGermainData>

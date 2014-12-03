@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="import" mergeType="merge">
+		<param>Underworld</param>
+	</list>
+	
+	<list name="plugins" mergeType="Replace">
+		<param>Underworld_EulerDeform</param>
+		<param>StgFEM_StandardConditionFunctions</param>
+		<param>Underworld_IncompressibleExtensionBC</param>
+	</list>
+
+	<!-- Component Stuff -->
+	<!--><include>StgFEM/ConstantMesh.xml                    </include> -->
+	<include>StgFEM/LinearMesh.xml                      </include>
+	<include>StgFEM/VelocityField.xml                   </include>
+	<include>StgFEM/PressureField.xml                   </include>
+	<include>Underworld/GaussSwarm.xml                  </include> 
+	<include>StgFEM/TimeIntegrator.xml                  </include>
+	<include>PICellerator/MaterialPointSwarm.xml        </include>
+	<!--><include>Underworld/StokesFlowUzawaPIC.xml 			</include> -->
+	<include>Experimental/StokesFlowUzawaStable.xml </include>
+	<include>Experimental/NodalViscosityField.xml</include>
+	<include>Experimental/StoreViscosity.xml</include>
+	<include>StgFEM/PeriodicZ.xml 					</include> 
+
+
+	<param name="timeIntegratorOrder"> 1 </param>
+
+	<param name="pressureMesh" mergeType="replace"> linearMesh </param> 
+
+	<struct name="components" mergeType="merge">
+		<struct name="buoyancyForceTerm">
+			<param name="Type">BuoyancyForceTerm</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="gravity">gravity</param>
+		</struct>
+	</struct>
+	
+	<param name="gravity"> 1.0 </param>
+
+	<!-- Replacement for MovingMesh -->
+	
+	<struct name="components" mergeType="merge">
+		<struct name="velocityRemesher">
+			<param name="Type">RegularRemesherCmpt</param>
+			<param name="mesh">velocityMesh</param>
+			<!-- ><param name="wrapTop">true</param> FOR FREE SURFACE --> 
+			<list name="remeshDims">
+				<param>0</param>
+				<param>1</param>
+				<param>2</param>
+			</list>
+		</struct>
+	</struct>
+	
+	<struct name="EulerDeform">
+		<list name="systems">
+			<struct>
+				<param name="mesh"> velocityMesh </param>
+				<param name="remesher">velocityRemesher</param>
+				<param name="velocityField"> VelocityField </param>
+				<list name="fields">
+					<struct>
+						<param name="field">VelocityField</param>
+						<param name="variable">velocity</param>
+					</struct>
+				  <struct>
+				    <param name="field">PressureField</param>
+				    <param name="variable">pressure</param>
+				 </struct>	
+				</list>
+			</struct>
+		</list>
+	</struct>
+
+	<struct name="components" mergeType="merge">
+		<!-- Make the mesh non-regular / regular as needed -->
+		<struct name="linearMeshGenerator" mergeType="merge">
+			<param name="regular"> True </param> <!-- False if free surface -->
+		</struct>
+	
+		<!-- Mesh particle layout needs to be element-by-element for free surface -->
+    	<struct name="materialSwarmParticleLayout" mergeType="replace">
+      		<param name="Type">MeshParticleLayout</param>
+      		<param name="mesh">linearMesh</param>
+      		<param name="cellParticleCount">particlesPerCell</param>
+    	</struct>
+  	</struct>
+	
+	<!-- The velocity boundary conditions for this problem are entirely specific ...
+	 	 therefore we build them in here --> 
+	 
+	 <param name="leftWallVelocity"> -0.5 </param>
+	 <param name="rightWallVelocity"> 0.5 </param>
+	 <param name="backWallVelocity"> 0.0 </param>
+	 <param name="frontWallVelocity"> 0.0 </param>
+	 <param name="constantHeight"> 0.5 </param>
+	
+	<!-- For the continuous pressure mess, pressure BCs are necessary -->
+	
+	  <struct name="pressureBCs">
+	    <param name="type">CompositeVC</param>
+	    <list name="vcList">
+	      <struct>
+		<param name="type">WallVC</param>
+		<param name="wall">top</param>
+		<list name="variables">
+		  <struct>
+		    <param name="name">pressure</param>
+		    <param name="type">double</param>
+		    <param name="value">0</param>
+		  </struct>
+		</list>
+	      </struct>
+	    </list>
+	  </struct>	
+		
+	<!-- WARNING !!! FRONT / BACK VELOCITIES BREAK THIS SETUP SO WE NEED TO REMOVE THEM -->
+	
+		<struct name="velocityBCs">
+			<param name="type">CompositeVC</param>
+			<list name="vcList">
+
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> left </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vx</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_LeftCondition </param>
+						</struct>
+							<struct>
+								<param name="name">vz</param>
+								<param name="type">func</param>
+								<param name="value"> IncompressibleExtensionBC_LeftShearCondition</param>
+							</struct>
+						</list>
+				</struct>
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> right </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vx</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_RightCondition </param>
+						</struct>
+							<struct>
+								<param name="name">vz</param>
+								<param name="type">func</param>
+								<param name="value"> IncompressibleExtensionBC_RightShearCondition</param>
+							</struct>
+					</list>
+				</struct>
+
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> top </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vy</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_TopCondition </param>
+						</struct>
+					</list>
+				</struct>
+				<struct>
+					<param name="type"> WallVC </param>
+					<param name="wall"> bottom </param>
+					<list name="variables">
+						<struct>
+							<param name="name">vy</param>
+							<param name="type">func</param>
+							<param name="value"> IncompressibleExtensionBC_BottomCondition </param>
+						</struct>
+					</list>
+				</struct>
+			</list>
+		</struct>
+
+	
+
+
+
+
+</StGermainData>

@@ -1,0 +1,51 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camerayieldtypergb">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">2.0</param>
+			<param name="coordY">1.0</param>
+		</struct>
+			<!-- Drawing Objects -->
+		<struct name="yteparticleDotsrgb">
+			<param name="Type">lucSwarmRGBColourViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-HasYielded</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="OpacityVariable">materialSwarm-YieldTypeOpacity</param>
+			<param name="ColourRedVariable">materialSwarm-YieldTypeExtension</param>
+			<param name="ColourBlueVariable">materialSwarm-YieldTypeCompression</param>
+			<param name="ColourGreenVariable">materialSwarm-YieldTypeShear</param>
+			
+			<param name="pointSize">2.0</param>
+		</struct>
+		
+		<struct name="ytborderrgb">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">2</param>			
+		</struct>
+		
+		<struct name="yttitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">ParticleYieldTypeViewport</param>
+		</struct>
+
+		<!-- Viewport -->
+		<struct name="ParticleYieldTypeVPRGB">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerayieldtypergb</param>
+			<list name="DrawingObject">
+				<param>yteparticleDotsrgb</param>
+				<param>ytborderrgb</param>
+				<param>yttitle</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

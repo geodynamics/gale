@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- Visualisation stuff -->
+	<include>Underworld/Viewports/TemperatureVP.xml</include>
+	<include>Underworld/Viewports/VelocityMagnitudeVP.xml</include>
+	<include>Underworld/Viewports/AnalyticVelocityMagnitudeVP.xml</include>
+	<include>Underworld/Viewports/VelocityErrorMagnitudeVP.xml</include>
+	<include>../../InputFiles/window.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="window" mergeType="merge">
+			<list name="Viewport">
+				<param>TemperatureVP VelocityErrorMagnitudeVP</param>
+				<param>VelocityMagnitudeVP AnalyticVelocityMagnitudeVP</param>
+			</list>
+		</struct>
+	</struct>
+ 
+</StGermainData>

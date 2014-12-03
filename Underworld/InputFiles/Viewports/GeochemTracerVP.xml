@@ -1,0 +1,50 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">1.4762</param>
+		</struct>
+		<struct name="meltColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">Red Blue</param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">2</param>
+		</struct>		
+		<!-- Drawing Objects -->
+		<struct name="geochemParticleDots">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">geochemSwarm</param>
+			<param name="colour">green</param>
+			<param name="ColourVariable">geochemSwarm-MeltFlag</param>
+			<param name="ColourMap">meltColourMap</param>
+			<!--
+			-->
+			<param name="pointSize">2.0</param>
+		</struct>		
+		<struct name="border" mergeType="replace">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+		</struct>
+		<struct name="meltColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">meltColourMap</param>
+		</struct>
+		<!-- Viewport -->
+		<struct name="GeochemTracerVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>geochemParticleDots</param>
+				<param>border</param>
+				<param>meltColourBar</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

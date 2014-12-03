@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		<struct name="camerastrainrateXX">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">StrainRateXXField</param>
+			<param name="coordZ">2.0</param>
+		</struct>
+		<struct name="strainrateXXColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">#111111 #220044 DarkSlateBlue Blue green yellow orange red DarkRed</param>
+			<param name="dynamicRange">True</param>
+			<!--param name="minimum">-10.0</param>
+			<param name="maximum">10.0</param-->
+		</struct>
+		<!-- Drawing Objects -->
+		<struct name="strainrateXXMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">StrainRateXXField</param>
+			<param name="ColourMap">strainrateXXColourMap</param>
+		</struct>
+		<struct name="border1">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">StrainRateXXField</param>
+		</struct>
+		<struct name="strainrateXXColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">strainrateXXColourMap</param>
+		</struct>
+		<struct name="titlexx">
+			<param name="Type">lucTitle</param>
+			<param name="string">StrainRateXX</param>
+			<param name="colour">Green</param>
+		</struct>
+		<!--<struct name="timeStep">
+			<param name="Type">lucTimeStep</param>
+			<param name="colour">Green</param>
+		</struct>-->
+		
+		<!-- Put these althogether in a viewport -->
+		<struct name="StrainRateXXVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerastrainrateXX</param>
+			<list name="DrawingObject">
+				<param>titlexx</param>
+				<param>strainrateXXMap</param>
+				<param>border1</param>
+				<param>strainrateXXColourBar</param>
+			</list>
+		</struct>
+	</struct>
+</StGermainData>

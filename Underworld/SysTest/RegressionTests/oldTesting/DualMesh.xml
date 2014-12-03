@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include> StgFEM/TemperatureLinearMesh.xml </include>
+	<param name="Temp_elementResI"> 20 </param>
+	<param name="Temp_elementResJ"> 20 </param>
+	<param name="Temp_elementResK"> 20 </param>
+
+</StGermainData>

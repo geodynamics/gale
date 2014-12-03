@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	
+	<list name="import" mergeType="merge">
+		<param>Underworld</param>
+	</list>
+
+	<list name="plugins" mergeType="merge">
+		<param>StgFEM_StandardConditionFunctions</param>	
+		<param>Underworld_Ra_Scaling</param>	
+	</list>
+
+	<!-- Component Stuff -->
+	<include>StgFEM/ConstantMesh.xml           </include>
+	<include>StgFEM/LinearMesh.xml             </include>
+	<include>StgFEM/VelocityField.xml          </include>
+	<include>StgFEM/TemperatureField.xml       </include>
+	<include>StgFEM/PressureField.xml          </include>
+	<include>Underworld/GaussSwarm.xml         </include>
+	<include>Underworld/StokesFlowUzawa.xml    </include>
+	<include>StgFEM/TempAdvDiff.xml            </include>
+
+	<struct name="components" mergeType="merge">
+		<struct name="buoyancyForceTerm">
+			<param name="Type">ThermalBuoyancyForceTerm</param>
+			<param name="ForceVector">mom_force</param>
+			<param name="TemperatureField">TemperatureField</param>
+			<param name="Swarm">gaussSwarm</param>
+			<param name="Ra">Ra</param>
+		</struct>
+	</struct>
+</StGermainData>
+

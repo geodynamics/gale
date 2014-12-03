@@ -1,0 +1,553 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
+	
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>
+	</list>
+
+	<!-- Rheology Components -->
+	<struct name="components" mergeType="merge">
+		<!-- Shape Stuff -->
+		<struct name="backgroundShape">
+			<param name="Type">Everywhere</param>
+		</struct>	
+		<struct name="incompressibleShape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 1.00 </param>  <param name="endY"> 1.10 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+
+			
+		<struct name="mantleShape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.0 </param>   <param name="endY"> 0.0 </param>
+			<param name="startZ"> minZ </param>  <param name="endZ"> maxZ </param>
+		</struct>
+		
+	<!-- Layering in the crust -->
+	<!--
+		<struct name="CrustLayer1Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4  </param> <param name="endY"> 0.45  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+	
+		<struct name="CrustLayer2Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45  </param> <param name="endY"> 0.50  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+	
+		<struct name="CrustLayer3Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.50  </param> <param name="endY"> 0.55  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+
+		<struct name="CrustLayer4Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.55  </param> <param name="endY"> 0.60  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+
+		<struct name="CrustLayer5Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.60  </param> <param name="endY"> 0.65  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+
+		<struct name="CrustLayer6Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.65  </param> <param name="endY"> 0.70  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+	
+		<struct name="CrustLayer7Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.70  </param> <param name="endY"> 0.75  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+	
+		<struct name="CrustLayer8Shape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.75  </param> <param name="endY"> 0.80  </param>
+			<param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+		</struct>
+	-->	
+
+              <struct name="CrustLayer1Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.0  </param> <param name="endY"> 0.12  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+
+                <struct name="CrustLayer2Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.12  </param> <param name="endY"> 0.24  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+
+                <struct name="CrustLayer3Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.24  </param> <param name="endY"> 0.36  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+
+                <struct name="CrustLayer4Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.36  </param> <param name="endY"> 0.48  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+
+                <struct name="CrustLayer5Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.48  </param> <param name="endY"> 0.60  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+
+                <struct name="CrustLayer6Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.60  </param> <param name="endY"> 0.72  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+
+                <struct name="CrustLayer7Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.72  </param> <param name="endY"> 0.84  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+
+                <struct name="CrustLayer8Shape">
+                        <param name="Type">Box</param>
+                        <param name="startX"> minX </param> <param name="endX"> maxX </param>
+                        <param name="startY"> 0.84  </param> <param name="endY"> 1.00  </param>
+                        <param name="startZ"> minZ  </param> <param name="endZ"> maxZ </param>
+                </struct>
+	
+
+
+
+		<!-- "Weak" zones in the crust (seeds for initial faults) -->
+		
+		<struct name="weakZoneShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> 1.475 </param> <param name="endX"> 1.525 </param>
+			<param name="startY"> 0.0 </param>   <param name="endY"> 0.05 </param>
+			<param name="startZ"> minZ </param>  <param name="endZ"> 0.5 </param>
+		</struct>		
+		<struct name="weakZoneShape2">
+			<param name="Type">Box</param>
+			<param name="startX"> 1.475 </param> <param name="endX"> 1.525 </param>
+			<param name="startY"> 0.00 </param>   <param name="endY"> 0.05 </param>
+			<param name="startZ"> 1.50 </param>  <param name="endZ"> maxZ </param>
+		</struct>			
+		
+		<struct name="weakZoneShape">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param>weakZoneShape1</param>
+				<param>weakZoneShape2</param>
+			</list>
+		</struct>
+			
+		<struct name="mantleShape2">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param>mantleShape</param>
+				<param>weakZoneShape</param>
+			</list>
+		</struct>
+		
+		<struct name="CrustLayer1Shape2">
+			<param name="Type">Intersection</param>
+			<list name="shapes">
+				<param>CrustLayer1Shape</param>
+				<param>!weakZoneShape</param>
+			</list>
+		</struct>	
+		
+		<!-- Material Stuff -->
+		<struct name="backgroundViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.0e-1</param>
+		</struct>	
+		<struct name="compressibility">
+			<param name="Type">Compressible</param>
+			<param name="GeometryMesh">elementMesh</param>
+			<param name="StiffnessMatrix">c_matrix</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="oneOnLambda">10.0</param>
+		</struct>
+				
+		<!--Materials themselves -->
+		
+		<struct name="background">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">backgroundShape</param>
+			<param name="density">0.0</param>
+			<param name="Compressible">compressibility</param>
+			<param name="Rheology">backgroundViscosity</param>
+		</struct>
+		
+		<struct name="incompressible">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">incompressibleShape</param>
+			<param name="density">0.0</param>
+			<param name="Rheology">backgroundViscosity</param>
+		</struct>	
+
+		<struct name="mantle"> 
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">mantleShape2</param>
+			<param name="density">1.1</param>
+			<!-- Rheology Stuff -->
+			<param name="Rheology">mantleViscosity</param>
+		</struct>
+		<!--	
+		<struct name="crust">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">crustShape2</param>
+	       		<param name="density">CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+		-->							
+		<struct name="CrustLayer1">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer1Shape2</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+
+		<struct name="CrustLayer2">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer2Shape</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+
+		<struct name="CrustLayer3">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer3Shape</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+
+		<struct name="CrustLayer4">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer4Shape</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+
+		<struct name="CrustLayer5">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer5Shape</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+
+		<struct name="CrustLayer6">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer6Shape</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+
+		<struct name="CrustLayer7">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer7Shape</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+
+		<struct name="CrustLayer8">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">CrustLayer8Shape</param>
+	       		<param name="density"> CrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+		</struct>
+		
+	
+	
+		
+		<!-- Crust Rheology -->
+		<struct name="crustViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">CrustDefaultViscosity</param>
+		</struct>	
+		<struct name="strainWeakening">
+			<param name="Type">StrainWeakening</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="softeningStrain">0.1</param>
+			<param name="initialDamageFraction">0.0</param>
+			<param name="initialDamageWavenumber">0.5</param>
+			<param name="initialDamageFactor">0.5</param>
+			<param name="healingRate">0.0</param>
+		</struct>
+		<struct name="director">
+			<param name="Type">Director</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="initialDirectionX">0.0</param>
+			<param name="initialDirectionY">1.0</param>
+			<param name="initialDirectionZ">0.0</param>
+			<param name="dontUpdate">True</param>
+		</struct>	
+		
+		<!-- Choose which failure model 
+				FaultingMoresiMuhlhaus2006
+			 	DruckerPrager  					-->
+
+		
+		
+		<struct name="yielding">
+			<param name="Type"> FaultingMoresiMuhlhaus2006 </param>
+			<param name="PressureField">PressureField</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="Director">director</param>
+			<param name="Context">context</param>
+			<param name="StrainWeakening">strainWeakening</param>
+			<param name="cohesion">10.0</param>
+			<param name="cohesionAfterSoftening">0.0001</param><!--0.0001-->
+			<param name="frictionCoefficient">0.0</param><!--0.5-->
+			<param name="frictionCoefficientAfterSoftening">0.0</param><!--0.0-->
+			<param name="minimumYieldStress">0.00001</param>
+			<param name="ignoreOldOrientation">false</param>
+		</struct>
+		
+		<!-- Mantle rheology -->
+		
+		<struct name="mantleViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.000</param>
+		</struct>	
+		
+
+		<!-- Mantle Field Stuff -->
+		<struct name="MantleField">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">mantle</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+
+		<!-- Crust Field Stuff -->
+								
+		<struct name="CrustLayer1Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer1</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+
+		<struct name="CrustLayer2Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer2</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	
+
+		<struct name="CrustLayer3Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer3</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	
+
+		<struct name="CrustLayer4Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer4</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	
+
+		<struct name="CrustLayer5Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer5</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	
+
+		<struct name="CrustLayer6Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer6</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	
+
+		<struct name="CrustLayer7Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer7</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	
+
+		<struct name="CrustLayer8Field">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">CrustLayer8</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	
+
+		<!-- Compressible Field Stuff -->
+		<struct name="CompressibleField">
+			<param name="Type">MaterialFeVariable</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Material">background</param>
+			<param name="Context">context</param>
+			<param name="Mesh">linearMesh</param>
+		</struct>	
+	</struct>
+
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 10 </param>
+	<param name="outputPath"> ./output-test </param>
+	<param name="dumpEvery"> 1 </param>	
+	<param name="checkpointEvery"> 0 </param>
+
+    <!--   choose what to checkpoint
+	<list name="FieldVariablesToCheckpoint">
+		<param>VelocityField</param>
+		<param>VelocityGradientsField</param>
+	</list>
+	-->
+
+        <!--  restart from a previous checkpoint 
+        <param name="restartTimestep"> 10 </param>
+         -->
+
+	<!-- Non-linear stuff -->
+	<param name="nonLinearMaxIterations"> 20 </param>	
+	
+	<!-- Journal Control -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">t</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
+	<param name="journal-enable-branch.debug.lucDebug">t</param>
+	<param name="journal-level-branch.debug.lucDebug">2</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="elementMesh"> linearMesh </param>
+	<param name="velocityMesh"> linearMesh </param>
+	<param name="pressureMesh"> constantMesh </param>
+	<param name="dim"> 3 </param>
+	<!-- Note : for proper resolution of the problem, it is strongly recommended you run
+	     this problem in parallel, with at least 100 * 50 * 100 elements. The values below are for
+	     small testing / demonstration only. -->
+	     <param name="elementResI"> 20</param>
+	     <param name="elementResJ"> 10 </param>
+	     <param name="elementResK"> 20 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 2.0 </param>
+	<param name="maxY"> 1.2 </param>
+	<param name="maxZ"> 2.0 </param>
+	<param name="allowUnbalancing"> True </param>
+
+	<param name="particlesPerCell"> 16 </param>
+	<param name="cellParticleCount"> 16 </param>
+	<param name="seed"> 13 </param>
+	
+		
+	<!-- Global material parameters picked up by various materials -->
+	
+	<param name="CrustDefaultViscosity"> 10.0 </param>
+	<param name="CrustDefaultDensity">    1.0 </param>
+	
+
+
+		
+	<!-- Set up BCs and ICs -->
+	<include> BoundaryConditions/velocityBCs.extensionV01.xml </include>
+
+
+	<param name="Gravity">10.0</param>
+
+	<!-- Visualisation -->
+		
+	<!-- Test Jay's viewports for this problem -->
+	<include>./Viewports/BlockCutAwayVP.xml</include>
+	<include>./Viewports/MapViewSlicesVP.xml</include>
+	<include>./Viewports/ProfileSlicesSedLayersXYVP.xml</include>
+	<!--include>./Viewports/ProfileSlicesSedLayersZYVP.xml</include-->
+	<include>./Viewports/ProfileSlicesXYVP.xml</include>
+	<include>./Viewports/ProfileSlicesZYVP.xml</include>
+	
+	
+	
+</StGermainData>

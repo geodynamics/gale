@@ -1,0 +1,329 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+
+	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
+	
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>
+	</list>
+
+	<!-- Rheology Components -->
+	<struct name="components" mergeType="merge">
+
+
+       <!--
+            Geometry of the problem
+	 ____________________________________________
+	I                                            I    
+	I         Compressible background            I   
+	I ___________________________________________I
+	I           Incompressible Layer             I
+	I ___________________________________________I
+	I                                            I
+	I                                            I
+	I                  Crust                     I
+	I                    _                       I
+	I___________________[ ]______________________I
+	I                    l> small notch          I
+	I                                            I
+	I                 Mantle                     I
+	I                                            I
+	I____________________________________________I
+
+       -->
+
+
+		<!-- Definition of the geometry -->
+		<struct name="backgroundShape">
+		        <!--Compressible background-->
+			<param name="Type">Everywhere</param>
+		</struct>	
+		<struct name="incompressibleShape">
+		        <!--Incompressible layer-->
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.8 </param>  <param name="endY"> 0.85 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="crustShape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4 </param>   <param name="endY"> 0.8 </param>
+			<param name="startZ"> minZ </param>  <param name="endZ"> maxZ </param>
+		</struct>		
+		<struct name="weakZoneShape">
+			<param name="Type">Box</param>
+			<param name="startX"> 0.975 </param> <param name="endX"> 1.025 </param>
+			<param name="startY"> 0.4 </param>   <param name="endY"> 0.45 </param>
+			<param name="startZ"> minZ </param>  <param name="endZ"> maxZ </param>
+		</struct>		
+		<struct name="crustShape2">
+			<!--Crust = Box - small notch -->
+			<param name="Type">Intersection</param>
+			<list name="shapes">
+				<param>crustShape</param>
+				<param>!weakZoneShape</param>
+			</list>
+		</struct>		
+		<struct name="mantleShape">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.0 </param>   <param name="endY"> 0.4 </param>
+			<param name="startZ"> minZ </param>  <param name="endZ"> maxZ </param>
+		</struct>		
+		<struct name="mantleShape2">
+			<!--Mantle = Box + small notch -->
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param>mantleShape</param>
+				<param>weakZoneShape</param>
+			</list>
+		</struct>
+		
+		<!-- Definition of the materials -->
+		<struct name="backgroundViscosity">
+		        <!--Compressible background-->
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.0e-1</param>
+		</struct>	
+		<struct name="compresibility">
+		        <!--This component is necessary when you use a compressible layer-->
+		        <!--Fortunately, you don't have to change anything here-->
+			<param name="Type">Compressible</param>
+			<param name="GeometryMesh">linearMesh</param>
+			<param name="StiffnessMatrix">c_matrix</param>
+			<param name="Swarm">picIntegrationPoints</param>			
+			<param name="oneOnLambda">10.0</param>
+		</struct>
+
+		<struct name="crustViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">10.000</param>
+		</struct>	
+
+		<struct name="director">
+			<param name="Type">Director</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="initialDirectionX">0.0</param>
+			<param name="initialDirectionY">1.0</param>
+			<param name="initialDirectionZ">0.0</param>
+			<param name="dontUpdate">True</param>
+		</struct>	
+
+		<struct name="strainWeakening">
+			<param name="Type">StrainWeakening</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="softeningStrain">0.1</param>
+			<param name="initialDamageFraction">0.0</param>
+			<param name="initialDamageWavenumber">0.5</param>
+			<param name="initialDamageFactor">0.5</param>
+			<param name="healingRate">0.0</param>
+		</struct>
+
+		<struct name="yielding">
+			<param name="Type">FaultingMoresiMuhlhaus2006</param>
+			<param name="PressureField">PressureField</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="Director">director</param>
+			<param name="Context">context</param>
+			<param name="StrainWeakening">strainWeakening</param>
+			<param name="cohesion">10.0</param>
+			<param name="cohesionAfterSoftening">0.0001</param>
+			<param name="frictionCoefficient">0.0</param>
+			<param name="frictionCoefficientAfterSoftening">0.0</param>
+			<param name="minimumYieldStress">0.00001</param>
+			<param name="ignoreOldOrientation">false</param>
+		</struct>
+
+		<struct name="mantleViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.000</param>
+		</struct>	
+
+
+		<!-- Assembly of the geometry and the material -->
+		<struct name="background">
+		        <!--Compressible background-->
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">backgroundShape</param>
+			<param name="Compressible">compresibility</param>
+			<param name="Rheology">backgroundViscosity</param>
+		</struct>
+		<struct name="incompressible">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">incompressibleShape</param>
+			<param name="Rheology">backgroundViscosity</param>
+		</struct>	
+		
+		<struct name="crust">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">crustShape2</param>
+			<list name="Rheology">
+				<param>crustViscosity</param>
+				<param>yielding</param>
+			</list>
+			<!--param name="density">1.0</param-->
+		</struct>
+		
+		<struct name="mantle"> 
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">mantleShape2</param>
+			<param name="Rheology">mantleViscosity</param>
+		</struct>
+	</struct>
+
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 50 </param>    <!--The simulation ends after solving for the number of timesteps indicated here-->
+	<param name="outputPath"> ./output </param><!--The name of the directory where the results are stored-->
+	<param name="dumpEvery"> 1 </param>        <!--Frequency of the ouput-->	
+
+	<!--param name="gravity"> 1.00    </param-->
+
+	<!-- Non-linear stuff -->
+	<param name="nonLinearMaxIterations"> 20 </param><!--number of iterations before considering that the algorithme fails to converge within a timestep-->	
+	
+	<!-- Journal Control -->
+	<!-- These parameters are needed to control the amount of informations printed on screen-->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">t</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>             <!--this is a 2D problem-->
+	<param name="elementResI"> 120 </param>   <!--number of elements in x-direction-->
+	<param name="elementResJ"> 60 </param>    <!--number of elements in y-direction-->
+	<param name="elementResK"> 10 </param>    <!--number of elements in z-direction (not necessary here)-->
+	<param name="shadowDepth"> 1 </param>     <!--used for parallel purpose-->
+
+         <!--The following 6 parameters define the size of the box (or the cube in 3D)-->
+	<param name="minX"> 0.0 </param>       
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 2.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 2.0 </param>
+
+	<param name="allowUnbalancing"> True </param>
+	<param name="particlesPerCell"> 30 </param>
+	<param name="cellParticleCount"> 30 </param>
+	<param name="seed"> 13 </param>
+		
+	<!-- Set up BCs and ICs -->
+	<!--This file defines the boundary conditions for this problem-->
+	<include> Underworld/VariableConditions/velocityBCs.extension.xml </include>
+
+	<!-- Integration Scheme configuration -->
+
+	<!--
+	<param name="Gravity">10.0</param>
+	-->
+	<!-- Visualisation stuff -->
+	<!--The end of the file is for vizualisation purpose-->
+<!--	<include>glucifer/window.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="camera" mergeType="replace">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">StrainRateInvariantField</param>
+			<param name="coordZ">1.5</param>
+		</struct>	
+		<struct name="strainRateInvColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">#111111 #220044 DarkSlateBlue Blue green yellow orange DarkRed red</param>
+			<param name="dynamicRange">f</param>
+			<param name="minimum">0.0</param>
+			<param name="maximum">2.0</param>
+		</struct>		
+		<struct name="strainRateInvMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">StrainRateInvariantField</param>
+			<param name="ColourMap">strainRateInvColourMap</param>
+		</struct>
+		<struct name="strainRateInvTitle" mergeType="replace">
+			<param name="Type">lucTitle</param>
+			<param name="string">Strain Rate Invariant</param>
+		</struct>
+		<struct name="border" mergeType="replace">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">StrainRateInvariantField</param>
+		</struct>
+		<struct name="strainRateInvColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">strainRateInvColourMap</param>
+		</struct>		
+		<struct name="faultSquares">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="colour">white</param>
+			<param name="ColourVariable">materialSwarm-FaultingMoresiMuhlhaus2006Brightness</param>
+			<param name="ColourMap">brightnessColourMap</param>
+			<param name="OpacityVariable">materialSwarm-FaultingMoresiMuhlhaus2006Opacity</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskValue">2</param>
+			<param name="maskType">EqualTo</param>
+			<param name="DirectionVariable">materialSwarm-SlipVector</param>
+			<param name="arrowHeadSize">0.0</param>
+			<param name="NormalVariable">materialSwarm-Director</param>
+			<param name="PlaneVectorVariable">materialSwarm-SlipVector</param>
+			<param name="LengthVariable">materialSwarm-FaultingMoresiMuhlhaus2006Length</param>
+			<param name="ThicknessVariable">materialSwarm-FaultingMoresiMuhlhaus2006Thickness</param>
+		</struct>
+		<struct name="StrainRateInvariantVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>strainRateInvTitle</param>
+				<param>strainRateInvMap</param>
+				<param>border</param>
+				<param>faultSquares</param>
+				<param>strainRateInvColourBar</param>
+			</list>
+		</struct>		
+		<include>./Viewports/ParticleMaterialAndNodalVelocityVP.xml</include>
+		<struct name="window" mergeType="merge">
+			<list name="Viewport">
+				<param>StrainRateInvariantVP</param>
+				<param>ParticleMaterialAndNodalVelocityVP</param>
+			</list>	
+		</struct>
+	</struct>
+-->
+	
+
+	<list name="plugins" mergeType="merge">
+		<param>StgFEM_CompareFeVariableAgainstReferenceSolution</param>
+	</list>
+
+
+	<param name="maxTimeSteps">5</param>
+	<param name="interactive">f</param>
+
+	<param name="journal-level-branch.debug.StgFEM" mergeType="replace"> 1 </param>
+
+	<struct name="StgFEM_CompareFeVariableAgainstReferenceSolution">
+		<list name="variables">
+			<param>PressureField</param>
+			<param>VelocityField</param>
+		</list>
+		<param name="referencePath">./expected/testExtensionFMM.0of1</param>
+		<param name="VelocityField-tolerance">0.000005</param>
+	</struct>
+
+	<param name="elementResI">20</param>
+	<param name="elementResJ">10</param>
+	<param name="interactive">false</param>
+
+
+</StGermainData>

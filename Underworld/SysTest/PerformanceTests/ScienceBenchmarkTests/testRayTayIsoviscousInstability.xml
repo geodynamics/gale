@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<!-- Taken From:
+	A comparison of methods for the modeling of thermochemical convection, P.E. van Keken et al.,
+       	Journal of Geophysical Research. vol. 102, No. B10, 22477-22495, 1997 
+
+	This is the Isoviscous Rayleigh-Taylor Instability
+-->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 
+ 	<include>InputFiles/RayleighTaylorBenchmark.xml</include>
+
+	<list name="plugins" mergeType="merge">
+			
+	</list>
+	
+	<include>testTracers.xml</include>
+	<struct name="components" mergeType="merge">
+		<struct name="passiveTracerViewport" mergeType="replace">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>densityTitle</param>
+				<param>passiveTracerPoints</param>
+				<param>particleDots</param>
+			</list>	
+		</struct>
+		<struct name="window" mergeType="merge">
+			<param name="Viewport" mergeType="replace">passiveTracerViewport StrainRateInvariantVP</param>
+		</struct>
+	</struct>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 600 </param>
+	<param name="outputPath"> ./output </param>
+	<param name="dumpEvery"> 1 </param>	
+	
+	<param name="courantFactor"> 0.25 </param>	
+
+	<!-- Journal Parameters -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">f</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>
+	<param name="elementResI"> 124 </param>
+	<param name="elementResJ"> 124 </param>
+	<param name="elementResK"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 0.9142 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="allowUnbalancing"> True </param>
+
+	<!-- Swarm parameters -->
+	<param name="particlesPerCell"> 20 </param>
+
+</StGermainData>

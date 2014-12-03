@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- quick change of parameters -->
+
+	<param name="crustCohesion">10.0</param>
+	<param name="crustCohesionAfterSoftening">5.0</param>
+	<param name="crustFrictionCoefficient">0.5</param>
+	<param name="crustFrictionCoefficientAfterSoftening">0.5</param>
+	<param name="crustMinimumYieldStress">0.1</param>
+
+	<param name="UpperCrustDefaultViscosity"> 10.0 </param>
+	<param name="LowerMantleDefaultViscosity"> 1.000 </param>
+
+	<param name="UpperCrustDefaultDensity">    1.0 </param>
+	<param name="LowerMantleDefaultDensity">    2.0 </param>
+
+	
+
+	<struct name="components" mergeType="merge">
+				
+	<include> ../Viewports/VPwindow.xml </include>
+
+	<!-- Material Stuff -->
+		<struct name="backgroundViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.0e-1</param>
+		</struct>
+			
+		<!-- Crust Rheology -->
+		<struct name="UpperCrustViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">UpperCrustDefaultViscosity</param>
+		</struct>	
+		<struct name="LowerCrustViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">UpperCrustDefaultViscosity</param>
+		</struct>	
+		<struct name="strainWeakening">
+			<param name="Type">StrainWeakening</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="softeningStrain">0.1</param>
+			<param name="initialDamageFraction">0.1</param>
+			<param name="initialDamageWavenumber">0.5</param>
+			<param name="initialDamageWavenumberZ">10.0</param>
+			<param name="initialDamageFactor">0.1</param>
+			<param name="healingRate">0.1</param>
+		</struct>
+		<struct name="director">
+			<param name="Type">Director</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param>
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="initialDirectionX">0.0</param>
+			<param name="initialDirectionY">1.0</param>
+			<param name="initialDirectionZ">0.0</param>
+			<param name="dontUpdate">True</param>
+		</struct>
+		<struct name="UpperCrustYielding">
+		<!--	<param name="Type">FaultingMoresiMuhlhaus2006</param>-->
+			<param name="Type">DruckerPrager</param>
+			<param name="PressureField">PressureField</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param>
+		    <param name="StrainRateField">StrainRateField</param> 
+		    <!-- ><param name="StrainRateField">recoveredStrainRateField</param> -->
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="Director">director</param>
+			<param name="Context">context</param>
+			<param name="StrainWeakening">strainWeakening</param>
+			<param name="cohesion">crustCohesion</param>
+			<param name="cohesionAfterSoftening">crustCohesionAfterSoftening</param>
+			<param name="frictionCoefficient">crustFrictionCoefficient</param>    
+			<param name="frictionCoefficientAfterSoftening">crustFrictionCoefficientAfterSoftening</param>
+			<param name="minimumYieldStress">crustMinimumYieldStress</param>
+			<param name="ignoreOldOrientation">false</param>
+		</struct>
+		
+		<struct name="LowerCrustYielding">
+		<!--	<param name="Type">FaultingMoresiMuhlhaus2006</param>-->
+			<param name="Type">DruckerPrager</param>
+			<param name="PressureField">PressureField</param>
+			<param name="VelocityGradientsField">VelocityGradientsField</param> <!-- ?? is this used ?? -->
+			<param name="StrainRateField">StrainRateField</param> 
+			<!-- ><param name="StrainRateField">recoveredStrainRateField</param> -->
+			<param name="MaterialPointsSwarm">materialSwarm</param>
+			<param name="Director">director</param>
+			<param name="Context">context</param>
+			<param name="StrainWeakening">strainWeakening</param>
+			<param name="cohesion">crustCohesion</param>
+			<param name="cohesionAfterSoftening">crustCohesionAfterSoftening</param>
+			<param name="frictionCoefficient">crustFrictionCoefficient</param>    
+			<param name="frictionCoefficientAfterSoftening">crustFrictionCoefficientAfterSoftening</param>
+			<param name="minimumYieldStress">crustMinimumYieldStress</param>
+			<param name="ignoreOldOrientation">false</param>
+		</struct>
+		
+	<!-- Mantle rheology -->
+		<struct name="UpperMantleViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">LowerMantleDefaultViscosity</param>
+		</struct>	
+		<struct name="LowerMantleViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">LowerMantleDefaultViscosity</param>
+		</struct>	
+	</struct>
+</StGermainData>
+

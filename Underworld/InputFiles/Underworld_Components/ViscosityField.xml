@@ -1,0 +1,11 @@
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+	<struct name="components" mergeType="merge">
+		<struct name="ViscosityField">
+			<param name="Type">ViscosityField</param>
+			<param name="Context">context</param>
+			<param name="Swarm">picIntegrationPoints</param>
+			<param name="Mesh">elementMesh</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+		</struct>
+	</struct>
+</StGermainData>	

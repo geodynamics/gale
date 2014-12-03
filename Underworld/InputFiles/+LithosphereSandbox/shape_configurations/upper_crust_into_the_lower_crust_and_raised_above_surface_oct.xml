@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+
+	<!-- Rheology Components -->
+	<struct name="components" mergeType="merge">
+		<!-- Shape Stuff -->
+
+		<struct name="CrustBlock">
+		 	<param name="Type">PolygonShape</param>
+       			<param name="perpendicularAxis">y</param>
+			<list name="vertices">
+				<asciidata>
+	       				<columnDefinition name = "x" type="double"/>
+					<columnDefinition name = "y" type="double"/>
+				    	<columnDefinition name = "z" type="double"/>
+				      	<!-- \ bottom -->
+					0.759	0.800	0.900
+					0.900	0.800	0.759
+					1.100	0.800	0.759
+					1.241	0.800	0.900
+					1.241	0.800	1.100
+					1.100	0.800	1.241
+					0.900	0.800	1.241
+					0.759	0.800	1.100
+				</asciidata>
+			</list>
+			<param name="startY"> 0.400 </param>  <param name="endY"> 0.850 </param>
+        	</struct>
+
+		<!--Materials themselves -->
+		<struct name="LowerCrustUnionShape" mergeType="replace">
+			<param name="Type">Intersection</param>
+			<list name="shapes">
+				<param> LowerCrustShape1 </param>
+				<param> !CrustBlock </param>
+			</list>
+		</struct>
+		<struct name="UpperCrustUnionShape" mergeType="replace">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param> UpperCrustShape1 </param>
+				<param> CrustBlock </param>
+			</list>
+		</struct>
+	</struct>
+</StGermainData>

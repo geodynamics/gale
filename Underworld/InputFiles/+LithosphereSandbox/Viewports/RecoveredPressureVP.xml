@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+	<!--
+	<include> ./VPwindow.xml </include>
+	-->
+	<struct name="components" mergeType="merge">
+		<!--
+		this viewport is designed for extensional 2 layered problems. the mantle has to have material id 2 and the crustal material id greater than 2. if the crust is made up of multiple materials make sure their id is 3 or higher and this VP will work :)
+		-->
+		
+		
+		<!-- Expects to have cameras defined from Cameras.xml -->
+		
+		<!-- Recovered pressure mapped to the particles	-->
+	
+		<struct name="layersParticlePressure">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">PressureField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+		
+		<struct name="layersParticleRecoveredPressure">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">recoveredPressureField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+		
+		
+		<struct name="pressureLayers-MantleColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #440000 #FF6600 #FFFF00 </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">10</param>
+		</struct>
+		
+		<struct name="pressureLayers-CrustColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #1807a9 #390afe #50a1ff #ace0ff </param>
+			<param name="dynamicRange">True</param>
+			<param name="minimum">0</param>
+			<param name="maximum">10</param>
+		</struct>
+		
+		<struct name="pressureLayers-CrustColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
+		</struct>
+
+
+		<struct name="pressureLayers-MantleColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">pressureLayers-MantleColourMap</param>
+		</struct>
+		
+		
+		
+		
+		<struct name="pressureLayers-Crust">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticlePressure</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="pressureLayers-Mantle">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticlePressure</param>
+			<param name="ColourMap">pressureLayers-MantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">1.5</param>
+			<param name="maskTolerance">0.6</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">False</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="pressureLayers-Air">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticlePressure</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">0.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+		
+		
+
+		<struct name="recoveredPressureLayers-Crust">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleRecoveredPressure</param>
+			<param name="ColourMap">pressureLayers-CrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="maskTolerance">1.1</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="recoveredPressureLayers-Mantle">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleRecoveredPressure</param>
+			<param name="ColourMap">pressureLayers-MantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">1.5</param>
+			<param name="maskTolerance">0.6</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">False</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="recoveredPressureLayers-Air">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">layersParticleRecoveredPressure</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskTolerance">0.5</param>
+			<param name="maskValue">0.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+
+
+		<struct name="pressureLayersPerspectiveVP1">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera2</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> pressureLayers-Crust </param>
+				<param> pressureLayers-Mantle </param>
+				<param>Boxborder</param>
+				<param>pressureLayers-CrustColourBar</param>
+			</list>
+		</struct>
+
+		<struct name="recoveredPressureLayersPerspectiveVP1">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">lithosphereSandboxPerspectiveViewCamera2</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param> recoveredPressureLayers-Crust </param>
+				<param> recoveredPressureLayers-Mantle </param>
+				<param>Boxborder</param>
+				<param>pressureLayers-MantleColourBar</param>
+			</list>
+		</struct>
+
+		
+		<struct name="pressureLayersWindow">
+	        <param name="Type">lucDefaultWindow</param>
+	        <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">1184</param>
+			<param name="width">800</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param> pressureLayersPerspectiveVP1 </param>
+				<param> recoveredPressureLayersPerspectiveVP1 </param>
+			</list>
+		</struct>
+
+		<!-- making movies -->
+		<!--><struct name="pressureLayersMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">pressureLayersWindow</param>
+		</struct>-->
+ 
+	
+ 
+	</struct>
+</StGermainData>
+
+
+

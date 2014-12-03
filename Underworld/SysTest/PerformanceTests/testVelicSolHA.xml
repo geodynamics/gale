@@ -1,0 +1,141 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include> Underworld/BaseApps/RayleighTaylor.xml </include>
+
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<struct>
+			<param name="Type">StgFEM_FrequentOutput</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Vrms</param>	
+			<param name="Context">context</param>	
+			<param name="VelocityField">VelocityField</param>	
+			<param name="GaussSwarm">gaussSwarm</param>	
+		</struct>
+		<struct>
+			<param name="Type">StgFEM_CPUTime</param>	
+			<param name="Context">context</param>	
+		</struct>
+		<struct>
+			<param name="Type">Underworld_Velic_solA</param>	
+			<param name="Context">context</param>	
+		</struct>
+	</list>
+	
+	<struct name="pluginData">
+		<list name="NumericFields">
+			<param>VelocityField</param> <param> 0 </param>
+			<param>PressureField</param> <param> 1 </param>
+			<param>StrainRateField</param> <param> 2 </param>
+		</list>
+		<param name="IntegrationSwarm">gaussSwarm</param>
+		<param name="ConstantMesh">constantMesh</param>
+		<param name="ElementMesh">linearMesh</param>
+		<param name="normaliseByAnalyticSolution">true</param>
+		<param name="useReferenceSolutionFromFile">false</param>
+		<param name="appendToAnalysisFile">false</param>
+		<param name="Context">context</param>
+	</struct>
+
+	<!-- Test tolerances. THIS IS A LOW RESOLUTION TEST -->
+
+	<param name="solHA_sigma">1.0</param>
+	<param name="solHA_eta">1.0</param>
+	<!-- Define the width and column of the box -->
+	<param name="solHA_startX">0.25</param>
+	<param name="solHA_endX">0.75</param>
+	<param name="solHA_startY">0.25</param>
+	<param name="solHA_endY">0.75</param>
+
+	<struct name="components" mergeType="merge">
+		<struct name="context">
+			<param name="Type">UnderworldContext</param>
+		</struct>
+		<struct name="Viscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">solHA_eta</param>
+		</struct>
+		<struct name="backgroundShape">
+			<param name="Type">Everywhere</param>
+		</struct>	
+		<struct name="background">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">backgroundShape</param>
+			<param name="density">0.0</param>
+			<param name="Rheology">Viscosity</param>
+		</struct>
+		<struct name="Shape">
+			<param name="Type">PolygonShape</param>
+			<param name="perpendicularAxis">y</param>
+			<param name="startY">-99.0</param>
+			<param name="endY">99.0</param>
+			<!--
+			Define the 3D column
+			-->
+			<list name="vertices">
+				<asciidata>
+					<columnDefinition name = "x" type="double"/>
+					<columnDefinition name = "y" type="double"/>
+					<columnDefinition name = "z" type="double"/>
+					0.25  0.0 0.25
+					0.25  0.0 0.75
+					0.75  0.0 0.75 
+					0.75  0.0 0.25 
+				</asciidata>
+			</list>
+		</struct>	
+		<struct name="column">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">Shape</param>
+			<param name="density">1</param>
+			<param name="Rheology">Viscosity</param>
+		</struct>
+	</struct>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 1 </param>
+	<param name="outputPath"> ./output </param>
+	<param name="dumpEvery"> 1 </param>	
+	
+	<param name="gravity"> 1 </param>	
+	
+	<!-- Journal Control -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StG_FEM">f</param>
+	<param name="journal-level-branch.debug.StG_FEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 3 </param>
+	<param name="elementResI"> 5 </param>
+	<param name="elementResJ"> 5 </param>
+	<param name="elementResK"> 5 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 1.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="allowUnbalancing"> True </param>
+
+	<!-- Set up BCs and ICs -->
+	<include> Underworld/VariableConditions/velocityBCs.freeslip.xml </include>
+	<!-- Integration Scheme configuration -->
+	<param name="gaussParticlesX"> 2 </param>
+	<param name="gaussParticlesY"> 2 </param>
+	<param name="gaussParticlesZ"> 2 </param>
+	<param name="particlesPerCell"> 20 </param>
+
+	<!-- Visualisation stuff -->
+	<!--
+	<include> ./analyticVis.xml </include>
+	<include> ./analyticVis2.xml </include>
+	-->
+</StGermainData>

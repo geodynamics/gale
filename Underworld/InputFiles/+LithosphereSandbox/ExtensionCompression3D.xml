@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<!-- This file sets up extension and compression in 3D:
+		- Sets up REP for the pressure part of the failure models
+		- Allows inflow/outflow at the base/top of the box to preserve a surface level
+		- Allows a range of layering options
+		
+	 Note that some of these options are from experimental so this needs to be 
+	 fixed before we can release this functionality
+-->		
+
+	<include> Experimental/ExtensionIncompressibleInflow.xml </include>
+	<include> Experimental/REP_Setup3D.xml </include>
+	
+	<list name="plugins" mergeType="merge">
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>	
+	</list>
+	
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>
+	</list>
+
+	<include> ./set_up.xml </include>
+	<!-- shape options -->
+	<include> ./4LayerModel.xml </include>	
+
+	<!-- weak zone options -->
+	
+	<!--
+	<include> ./shape_configurations/upper_crust_depression_absent_lower_crust.xml </include>
+	<include> ./shape_configurations/mantle_upwelling_lower_crust_absent.xml </include>
+	<include> ./shape_configurations/lower_crust_intruding_down_absent_upper_mantle.xml </include>	
+	<include> ./shape_configurations/upper_crust_into_the_lower_crust_and_raised_above_surface_oct.xml </include> 
+	-->
+	
+	<!-- rheology options -->
+	<include> ./rheology/rheology-2layer.xml </include> <!-- this is also needed if you use rheology-4layer-LC_UM.xml -->
+
+
+	<!--><include> ./rheology/rheology-4layer-LC_UM.xml </include>  <--> 	<!-- this only has added  rheologies for the upper mantle and lower crust. you still need a 2 layer rheology if you use this 4 layer rheology-->
+	
+	<!-- Visualisation -->
+
+	<!-- ><include>Viewports/ProfileSlicesXYVP.xml</include> -->
+	<!--
+	<include>Viewports/ProfileSlicesZYVP.xml</include>
+	<include>Viewports/MapViewSlicesVP.xml</include> -->
+	<!--><include>Viewports/BlockCutAwayVP.xml</include> -->
+	
+	<include> Viewports/SimpleLayersVP.xml </include>
+
+
+
+	<!-- general parameters that get changed alot -->	
+	<param name="outputPath"> ./output </param>
+	<param name="elementResI"> 24</param>
+	<param name="elementResJ"> 12 </param>
+	<param name="elementResK"> 24 </param>
+	<param name="maxTimeSteps"> 30 </param>
+
+
+	<param name="constantHeight" mergeType="replace"> 0.35 </param>
+	<param name="leftWallVelocity" mergeType="replace"> -0.5 </param>
+	<param name="rightWallVelocity" mergeType="replace"> 0.5 </param>
+	<param name="frontWallVelocity" mergeType="replace"> 0.0 </param>
+	<param name="backWallVelocity" mergeType="replace"> 0.0 </param>
+
+
+
+	<!-- box size overide -->
+	
+	<param name="maxX"> 1.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="minX"> -1.0 </param>
+	<param name="minY">  0.0 </param>
+	<param name="minZ"> -1.0 </param>
+	
+	<!-- this is used to centre the Viewports -->
+	
+	<param name="midX"> 0.0 </param>
+	<param name="midY"> 0.5 </param>
+	<param name="midZ"> 0.0 </param>
+
+	<!-- window sizes change depending on box size -->
+	
+	<param name="windowWidthZ">864</param><!--864 for maxZ=2, 1008 for maxZ=3, 1200 for maxZ=1200, 1504 for maxZ=5 -->
+	<param name="windowWidthX">864</param><!--864 for maxX=2, 1008 for maxX=3, 1200 for maxX=1200, 1504 for maxX=5 -->
+	
+</StGermainData>
+

@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- Velocity BCs -->
+	<struct name="velocityBCs" mergeType="replace">
+		<param name="type">CompositeVC</param>
+		<list name="vcList">
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> bottom </param>
+				<list name="variables">
+					<struct>
+						<param name="name">vx</param>
+						<param name="type">func</param>
+						<param name="value"> Velocity_SimpleShear </param>
+					</struct>
+					<struct>
+						<param name="name">vy</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> front </param>
+				<list name="variables">
+					<struct>
+						<param name="name">vz</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> back </param>
+				<list name="variables">
+					<struct>
+						<param name="name">vz</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> top </param>
+				<list name="variables">
+					<struct>
+						<param name="name">vx</param>
+						<param name="type">func</param>
+						<param name="value"> Velocity_SimpleShear </param>
+					</struct>
+					<struct>
+						<param name="name">vy</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+		</list>
+	</struct>
+
+	<!-- Periodic boundary conditions -->
+	<struct name="components" mergeType="merge">
+		<struct name="velocityLinkedDofs">
+			<param name="Type">LinkedDofInfo</param>
+			<param name="Mesh">linearMesh</param>
+			<param name="DofLayout">velocityDofLayout</param>
+
+			<list name="linkSpecifications">
+				<struct>
+					<param name="wallPair">left-right</param>
+					<param name="dof">0</param>
+				</struct>
+				<struct>
+					<param name="wallPair">left-right</param>
+					<param name="dof">1</param>
+				</struct>
+				<struct>
+					<param name="wallPair">left-right</param>
+					<param name="dof">2</param>
+				</struct>
+			</list>	
+		</struct>
+	</struct>
+	<param name="isPeriodicI"> t </param>
+</StGermainData>

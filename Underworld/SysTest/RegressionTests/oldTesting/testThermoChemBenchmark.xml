@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 
+ 	<include>InputFiles/ThermoChemBenchmark.xml</include>
+
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_CompareFeVariableAgainstReferenceSolution</param>
+	</list>
+	
+	<!-- Simulation control -->
+	<param name="maxTimeSteps">5</param>
+	<param name="dumpEvery">5</param>
+	<param name="outputPath"> ./output </param>
+	
+	<param name="courantFactor"> 0.25 </param>	
+	<param name="nonLinearMaxIterations"> 20 </param>
+
+	<!-- Journal Parameters -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">f</param>
+	<param name="journal-enable-branch.debug.StgFEM">f</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>
+	<param name="elementResI"> 32 </param>
+	<param name="elementResJ"> 16 </param>
+	<param name="elementResK"> 1 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 2.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="allowUnbalancing"> True </param>
+
+	<!-- Swarm parameters -->
+	<param name="particlesPerCell"> 20 </param>
+
+	<struct name="StgFEM_CompareFeVariableAgainstReferenceSolution">
+		<list name="variables">
+			<param>PressureField</param>
+			<param>VelocityField</param>
+		</list>
+		<param name="referencePath">./expected/testThermoChemBenchmark.0of1</param>
+		<param name="VelocityField-tolerance">0.000005</param>
+		<param name="PressureField-tolerance">0.005</param>
+		<param name="PressureField-useRelativeErrorMeasure">True</param>
+
+		<param name="timeStepToCompare">5</param>
+	</struct>
+	
+	<param name="interactive">false</param>
+
+</StGermainData>

@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<param name="Name">StrainWeakening</param>
+	<param name="Author">...</param>
+	<param name="Organisation">MCC</param>
+	<param name="Project">Underworld</param>
+	<param name="Location">./Underworld/Rheology/src/</param>
+	<param name="Project Web">http://www.mcc.monash.edu.au/Software/Underworld</param>
+	<param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
+	<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+	<param name="Parent">TimeIntegrand</param>
+	<param name="Reference">...</param>
+	<param name="Summary">...</param>
+	<param name="Description">This component is used in problems where the material parameters can soften (usually used with a yield rheology component). The name StrainWeakening is probably not appropriate. This component is mainly used in the following cases: to define an initial distribution of strain in a material; to calculate the accumulated strain on each particles. Since the material parameters are not softened inside that component, 'Strain' or 'AccumulatedStrain' or 'EquivalentAccumulatedPlasticStrain' may be more appropriate names.</param>
+	
+	<list name="Params">
+		<struct>
+			<param name="Name">healingRate</param>
+			<param name="Type">Double</param>
+			<param name="Default">0.0</param>
+			<param name="Description">this value defines how the material is allowed to heal (should be between 0 and 1)</param>
+		</struct>
+		<struct>
+			<param name="Name">softeningStrain</param>
+			<param name="Type">Double</param>
+			<param name="Default">HUGE_VAL</param>
+			<param name="Description">this parameter is used in the following cases:
+			If an initial random strain is defined, then the maximum value of initial strain is equal to softeningStrain*initialDamageFactor
+			It is considered as a reference strain in a ratio used to soften the material parameters. This ratio is always between 0 and 1, and is
+			set to 1 if the calculated strain is greater than softeningStrain (maximum softening allowed)</param>
+		</struct>
+		<struct>
+			<param name="Name">initialDamageFraction</param>
+			<param name="Type">Double</param>
+			<param name="Default">0.0</param>
+			<param name="Description">Defines the fraction of material whith an initial non zero random strain</param>
+		</struct>
+		<struct>
+			<param name="Name">initialDamageWavenumber</param>
+			<param name="Type">Double</param>
+			<param name="Default">-1.0</param>
+			<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
+				$\phi = \cos^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+				especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_I = n / L_I$ where $n$ is
+				an integer, and $L_I$ is the length of the box in the $I$ direction.</param>
+		</struct>
+		<struct>
+			<param name="Name">initialDamageWavenumberSinI</param>
+			<param name="Type">Double</param>
+			<param name="Default">-1.0</param>
+			<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
+				$\phi = \sin^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+				especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_I = n / L_I$ where $n$ is
+				an integer, and $L_I$ is the length of the box in the $I$ direction.</param>
+		</struct>
+		<struct>
+			<param name="Name">initialDamageWavenumberCosI</param>
+			<param name="Type">Double</param>
+			<param name="Default">-1.0</param>
+			<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
+				$\phi = \cos^2 k_I x_I$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+				especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_I = n / L_I$ where $n$ is
+				an integer, and $L_I$ is the length of the box in the $I$ direction.</param>
+		</struct>
+		<struct>
+			<param name="Name">initialDamageWavenumberSinK</param>
+			<param name="Type">Double</param>
+			<param name="Default">-1.0</param>
+			<param name="Description">>This parameter is used to set the way the initial randomly oriented damage is distributed in space
+				$\phi = \sin^2 k_K x_K$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+				especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_K = n / L_K$ where $n$ is
+				an integer, and $L_K$ is the length of the box in the $K$ direction.</param>
+		</struct>
+		<struct>
+			<param name="Name">initialDamageWavenumberCosK</param>
+			<param name="Type">Double</param>
+			<param name="Default">-1.0</param>
+			<param name="Description">This parameter is used to set the way the initial randomly oriented damage is distributed in space
+				$\phi = \cos^2 k_K x_K$.  The way the damage evolves often makes it a good idea to keep shear bands away from boundaries,
+				especially where the mesh-stretching boundary condition is applied. In this case, make sure $k_K = n / L_K$ where $n$ is
+				an integer, and $L_K$ is the length of the box in the $K$ direction.</param>
+		</struct>
+		<struct>
+			<param name="Name">initialDamageFactor</param>
+			<param name="Type">Double</param>
+			<param name="Default">1.0</param>
+			<param name="Description"> The magnitude of the initial damage value applied to individual particles whose strain-weakening is
+				controlled by this component. Note that the randomness of the damage is not in the magnitude of the value applied to each point
+				but rather is a probability of the damage being applied at that point. (see softeningStrain parameter - it makes 
+				sense to set the initial damage normalized by the saturation strain)</param>
+		</struct>
+		<struct>
+			<param name="Name">randomSeed</param>
+			<param name="Type">Int</param>
+			<param name="Default">0</param>
+			<param name="Description">This parameter is used to initialise the random function used to define the initial random strain</param>
+		</struct>
+	</list>
+
+	<list name="Dependencies">
+		<struct>
+			<param name="Essential">Yes</param>
+			<param name="Type">MaterialPointsSwarm</param>
+			<param name="Description">This defines the set of material points.</param>
+		</struct>
+		<struct>
+			<param name="Essential">No</param>
+			<param name="Type">Stg_Shape</param>
+			<param name="Name">initialStrainShape</param>
+			<param name="Description">If defined, the initial random strain will be prescibed inside this shape only (the initial strain will be zero outside the shape).</param>
+		</struct>
+	</list>
+
+	<!-- Add an example XML if possible -->
+	<param name="Example">Underworld/InputFiles/ExtensionDP.xml</param>
+	<param name="Example">Underworld/InputFiles/ExtensionFMM.xml</param>
+	<param name="Example">Underworld/InputFiles/ExtensionFMM3D.xml</param>
+	
+</StGermainData>

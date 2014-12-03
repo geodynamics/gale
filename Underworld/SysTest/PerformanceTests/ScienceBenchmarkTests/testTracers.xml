@@ -1,0 +1,93 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+ 
+	<struct name="components" mergeType="merge">
+		<struct name="passiveTracerParticleLayout">
+			<param name="Type">ManualParticleLayout</param>
+			<list name="manualParticlePositions">
+				<asciidata>		
+					<columnDefinition name = "x" type="double"/>
+					<columnDefinition name = "y" type="double"/>
+					<columnDefinition name = "z" type="double"/> 
+					0.5 0.1 0.0
+					0.5 0.9 0.0
+					0.1 0.5 0.0
+					0.9 0.5 0.0
+					0.5 0.5 0.0
+				</asciidata>		
+			</list>		
+		</struct>
+		<struct name="passiveMovementHandler"> 
+			<param name="Type">ParticleMovementHandler</param>
+		</struct>
+		<struct name="passiveTracerSwarm">
+			<param name="Type">MaterialPointsSwarm</param>
+			<param name="CellLayout">cellLayout</param>
+			<param name="ParticleLayout">passiveTracerParticleLayout</param>
+			<param name="FeMesh">elementMesh</param>
+			<list name="ParticleCommHandlers">
+				<param>passiveMovementHandler</param>
+			</list>
+		</struct>
+		<!--
+		<struct name="passiveTracerOutput">
+			<param name="Type">SwarmOutput</param>
+			<param name="Swarm">passiveTracerSwarm</param>
+		</struct>		
+		-->
+		<struct name="passiveTracerAdvector">
+			<param name="Type">SwarmAdvector</param>
+			<param name="Swarm">passiveTracerSwarm</param>
+			<param name="TimeIntegrator">timeIntegrator</param>
+			<param name="VelocityField">VelocityField</param>
+		</struct>
+		<struct name="passiveSwarmVariable">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="Swarm">passiveTracerSwarm</param>
+			<param name="FeVariable">VelocityMagnitudeField</param>
+		</struct>
+	</struct>
+
+	<!-- Visualisation stuff -->
+	<struct name="components" mergeType="merge">
+		<struct name="passiveTracerColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">black</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		
+		<struct name="passiveTracerPoints">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">passiveTracerSwarm</param>
+			<param name="ColourVariable">passiveSwarmVariable</param>
+			<param name="ColourMap">passiveTracerColourMap</param>
+			<param name="pointSize">4.0</param>
+		</struct>
+		<!--
+		This is bustered at present JulianGiordani 8 Aug 07
+			<struct name="passiveTracerTails">
+				<param name="Type">lucHistoricalSwarmTrajectory</param>
+				<param name="Swarm">passiveTracerSwarm</param>
+				<param name="ColourMap">passiveTracerColourMap</param>
+				<param name="ColourVariable">passiveSwarmVariable</param>
+				<param name="lineSize">5.0</param>
+			</struct>
+		-->
+		<struct name="passiveTracerTitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">Passive Tracers</param>
+		</struct>
+
+		<struct name="passiveTracerViewport">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camera</param>
+			<list name="DrawingObject">
+				<param>border</param>
+				<param>passiveTracerTitle</param>
+				<param>passiveTracerPoints</param>
+			</list>	
+		</struct>	
+	</struct>
+</StGermainData>

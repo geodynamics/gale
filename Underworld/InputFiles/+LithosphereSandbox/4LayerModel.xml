@@ -1,0 +1,355 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+
+	<!-- Rheology Components -->
+	<struct name="components" mergeType="merge">
+		<!-- Shape Stuff -->
+		<struct name="backgroundShape">
+			<param name="Type">Everywhere</param>
+		</struct>
+		
+		<struct name="PerturbationShapeLeft">  <!-- To help suppress edge effects -->
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> -1.5 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.83 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>		
+		<struct name="PerturbationShapeRight">
+			<param name="Type">Box</param>
+			<param name="startX"> 1.5 </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.83 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>		
+		
+		<struct name="PerturbationShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.51 </param> <param name="endX"> -0.50 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>		
+		<struct name="PerturbationShape2">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.41 </param> <param name="endX"> -0.40 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape3">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.31 </param> <param name="endX"> -0.30 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape4">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.21 </param> <param name="endX"> -0.20 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape5">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.11 </param> <param name="endX"> -0.10 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape6">
+			<param name="Type">Box</param>
+			<param name="startX"> -0.01 </param> <param name="endX"> -0.00 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape7">
+			<param name="Type">Box</param>
+			<param name="startX"> 0.10 </param> <param name="endX"> 0.11 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape8">
+			<param name="Type">Box</param>
+			<param name="startX"> 0.20 </param> <param name="endX"> 0.21 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape9">
+			<param name="Type">Box</param>
+			<param name="startX"> 0.30 </param> <param name="endX"> 0.31 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape10">
+			<param name="Type">Box</param>
+			<param name="startX"> 0.40 </param> <param name="endX"> 0.41 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="PerturbationShape11">
+			<param name="Type">Box</param>
+			<param name="startX"> 0.50 </param> <param name="endX"> 0.51 </param>
+			<param name="startY"> 0.80 </param> <param name="endY"> 0.81 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		
+		<struct name="PerturbationShape">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<!--><param>PerturbationShapeLeft</param> -->
+				<param>PerturbationShape1</param>
+				<param>PerturbationShape2</param>
+				<param>PerturbationShape3</param>
+				<param>PerturbationShape4</param>
+				<param>PerturbationShape5</param>
+				<param>PerturbationShape6</param>
+				<param>PerturbationShape7</param>
+				<param>PerturbationShape8</param>
+				<param>PerturbationShape9</param>
+				<param>PerturbationShape10</param>
+				<param>PerturbationShape11</param>
+				<!-- ><param>PerturbationShapeRight</param> -->
+			</list>
+		</struct>	
+
+		
+		
+		<struct name="LowerMantleShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.0 </param> <param name="endY"> 0.3 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+
+		<struct name="UpperMantleShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.3 </param> <param name="endY"> 0.4 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		
+		<struct name="LowerCrustShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4 </param> <param name="endY"> 0.45 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>	
+		
+		<struct name="LowerCrustNotYieldingShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> -1.8 </param>
+			<param name="startY"> 0.4 </param> <param name="endY"> 0.45 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+			
+		<struct name="LowerCrustNotYieldingShape2">
+			<param name="Type">Box</param>
+			<param name="startX"> 1.8 </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.4 </param> <param name="endY"> 0.45 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>	
+		
+		<struct name="LowerCrustNotYieldingShape">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param> LowerCrustNotYieldingShape1 </param>
+				<param> LowerCrustNotYieldingShape2 </param>
+			</list>
+		</struct>	
+		
+	
+		<struct name="UpperCrustShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.8 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>	
+
+		<struct name="UpperCrustShape1p">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param>UpperCrustShape1</param>
+				<param>PerturbationShape</param>
+			</list>
+		</struct>	
+
+		<struct name="UpperCrustNotYieldingShape1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> -1.8 </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.80 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+			
+		<struct name="UpperCrustNotYieldingShape2">
+			<param name="Type">Box</param>
+			<param name="startX"> 1.8 </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.80 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>	
+
+		<struct name="UpperCrustNotYieldingShape">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param> UpperCrustNotYieldingShape1 </param>
+				<param> UpperCrustNotYieldingShape2 </param>
+			</list>
+		</struct>	
+
+		<struct name="UpperCrustStripe1">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.8 </param>
+			<param name="startZ"> -0.1 </param> <param name="endZ"> 0.1 </param>
+		</struct>	
+		
+		<struct name="UpperCrustStripe2">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.8 </param>
+			<param name="startZ"> 0.45 </param> <param name="endZ"> 0.65 </param>
+		</struct>	
+
+		<struct name="UpperCrustStripe3">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.8 </param>
+			<param name="startZ"> -0.65 </param> <param name="endZ"> -0.45 </param>
+		</struct>	
+		
+		<struct name="UpperCrustStripe4">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.8 </param>
+			<param name="startZ"> -1.65 </param> <param name="endZ"> -1.45 </param>
+		</struct>	
+		
+		<struct name="UpperCrustStripe5">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.45 </param> <param name="endY"> 0.8 </param>
+			<param name="startZ"> 1.45 </param> <param name="endZ"> 1.65 </param>
+		</struct>	
+
+		<struct name="UpperCrustShape2">
+			<param name="Type">Union</param>
+			<list name="shapes">
+				<param>UpperCrustStripe1</param>
+				<param>UpperCrustStripe2</param>
+				<param>UpperCrustStripe3</param>
+				<param>UpperCrustStripe4</param>
+				<param>UpperCrustStripe5</param>
+			</list>
+		</struct>	
+
+		<!--Materials themselves -->
+		
+		<struct name="background"> 
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">backgroundShape</param>
+			<param name="density">0.0</param>
+			<list name="Rheology">
+				<param>backgroundViscosity</param>
+				<param>storeViscosity</param>
+			</list>
+		</struct>
+		
+		<struct name="LowerMantle"> 
+			<param name="Type">RheologyMaterial</param>
+			<list name="Shape">
+				<param>LowerMantleShape1</param>
+			</list>
+			<param name="density">1.1</param>
+			
+			<!-- Rheology Stuff -->
+			<list name="Rheology">
+				<param>LowerMantleViscosity</param>
+				<param>storeViscosity</param>
+			</list>
+		</struct>
+
+		<struct name="UpperMantle"> 
+			<param name="Type">RheologyMaterial</param>
+			<list name="Shape">
+				<param>UpperMantleShape1</param>
+			</list>
+			<param name="density">1.1</param>
+			<!-- Rheology Stuff -->
+			<list name="Rheology">
+				<param>LowerMantleViscosity</param>
+				<param>storeViscosity</param>	
+			</list>
+	
+		</struct>
+
+		<struct name="LowerCrust">
+			<param name="Type">RheologyMaterial</param>
+			<list name="Shape">
+				<param>LowerCrustShape1</param>
+			</list>
+			
+	       	<param name="density">LowerCrustDefaultDensity</param>
+	
+			<list name="Rheology">
+				<param>LowerCrustViscosity	</param>
+				<param>LowerCrustYielding	</param>
+				<param>storeViscosity		</param>
+			</list>
+		</struct>
+		
+			
+		<struct name="UpperCrust">
+			<param name="Type">RheologyMaterial</param>
+			<list name="Shape">
+				<param>UpperCrustShape1</param>
+			</list>
+			
+	       	<param name="density">UpperCrustDefaultDensity</param>
+			
+			<list name="Rheology">
+				<param>UpperCrustViscosity</param>
+				<param>UpperCrustYielding</param>
+				<param>storeViscosity</param>
+			</list>
+		</struct>
+		
+		<struct name="UpperCrust2">
+			<param name="Type">RheologyMaterial</param>
+			<list name="Shape">
+				<param>UpperCrustShape2</param>
+			</list>
+	       		<param name="density">UpperCrustDefaultDensity</param>
+			<list name="Rheology">
+				<param>UpperCrustViscosity</param>
+				<param>UpperCrustYielding</param>
+				<param>storeViscosity</param>
+			</list>
+		</struct>
+
+		<!--> These zones provide a buffer between the boundary condition and the interior yielding region -->
+
+		<!--
+		<struct name="LowerCrustNotYielding">
+			<param name="Type">RheologyMaterial</param>
+			<list name="Shape">
+				<param>LowerCrustNotYieldingShape</param>
+			</list>
+	       	<param name="density">LowerCrustDefaultDensity</param>	
+			<list name="Rheology">
+				<param>LowerCrustViscosity	</param>
+				<param>storeViscosity		</param>
+			</list>
+		</struct>
+		
+		<struct name="UpperCrustNotYielding">
+			<param name="Type">RheologyMaterial</param>
+			<list name="Shape">
+				<param>UpperCrustNotYieldingShape</param>
+			</list>			
+	       	<param name="density">UpperCrustDefaultDensity</param>			
+			<list name="Rheology">
+				<param>UpperCrustViscosity</param>
+				<param>storeViscosity</param>
+			</list>
+		</struct>
+	-->
+			
+	</struct>
+</StGermainData>

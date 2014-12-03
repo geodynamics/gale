@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include> Underworld/BaseApps/ExtensionBaseApp.xml </include>
+	
+	<list name="plugins" mergeType="merge">
+		<!-- Output Plugins -->
+		<param>StgFEM_FrequentOutput</param>	
+		<param>Underworld_Vrms</param>	
+		<param>StgFEM_CPUTime</param>	
+	</list>
+
+	<struct name="components" mergeType="merge">
+		<!-- Shape Stuff -->
+		<struct name="backgroundShape">
+			<param name="Type">Everywhere</param>
+		</struct>	
+		<struct name="box">
+			<param name="Type">Box</param>
+			<param name="startX"> minX </param> <param name="endX"> maxX </param>
+			<param name="startY"> 0.3 </param>  <param name="endY"> 0.7 </param>
+			<param name="startZ"> minZ </param> <param name="endZ"> maxZ </param>
+		</struct>
+		<struct name="weakZone">
+			<param name="Type">Box</param>
+			<param name="startX"> 0.975 </param> <param name="endX"> 1.025 </param>
+			<param name="startY"> 0.3 </param>   <param name="endY"> 0.35 </param>
+			<param name="startZ"> minZ </param>  <param name="endZ"> maxZ </param>
+		</struct>		
+		<struct name="barShape">
+			<param name="Type">Intersection</param>
+			<list name="shapes">
+				<param>box</param>
+				<param>!weakZone</param>
+			</list>
+		</struct>	
+
+		<!-- Background Material Stuff -->
+		<struct name="backgroundViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.0</param>
+		</struct>	
+		<struct name="compresibility">
+			<param name="Type">Compressible</param>
+			<param name="GeometryMesh">linearMesh</param>
+			<param name="StiffnessMatrix">c_matrix</param>
+			<param name="Swarm">picIntegrationPoints</param>			
+			<param name="oneOnLambda">10.0</param>
+		</struct>
+		<struct name="background">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">backgroundShape</param>
+			<param name="Rheology">backgroundViscosity</param>
+			<param name="Compressible">compresibility</param>
+		</struct>
+
+		<!-- Bar Material Stuff -->
+		<struct name="barViscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">100.0</param>
+		</struct>	
+		<struct name="vonMises">
+			<param name="Type">VonMises</param>
+			<param name="StrainRateField">StrainRateField</param>
+			<param name="cohesion">50.0</param>
+		</struct>
+		<struct name="bar">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">barShape</param>
+			<list name="Rheology">
+				<param>barViscosity</param>
+				<param>vonMises</param>
+			</list>
+		</struct>
+		<!--
+		-->
+		<struct name="weights" mergeType="replace">
+			<param name="Type">DVCWeights</param>
+			<param name="resolution">20</param>
+		</struct>
+	</struct>
+
+	<!-- Simulation control -->
+	<param name="maxTimeSteps"> 200000 </param>
+	<param name="outputPath"> ./output </param>
+	<param name="dumpEvery"> 1 </param>	
+
+	<!-- Non-linear stuff -->
+	<param name="nonLinearMaxIterations"> 500 </param>	
+	
+	<!-- Journal Control -->
+	<param name="journal.info.Context-verbose">True</param>
+	<param name="journal-level.info.Stg_ComponentFactory">2</param>
+	<param name="journal.debug">t</param>
+	<param name="journal-enable-branch.debug.StgFEM">t</param>
+	<param name="journal-level-branch.debug.StgFEM"> 2 </param>	
+	
+	<!-- Geometry & Mesh setup -->
+	<param name="dim"> 2 </param>
+	<param name="elementResI"> 4 </param>
+	<param name="elementResJ"> 2 </param>
+	<param name="elementResK"> 1 </param>
+	<param name="shadowDepth"> 1 </param>
+	<param name="minX"> 0.0 </param>
+	<param name="minY"> 0.0 </param>
+	<param name="minZ"> 0.0 </param>
+	<param name="maxX"> 2.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	<param name="allowUnbalancing"> True </param>
+	
+	<param name="particlesPerCell"> 4 </param>
+	<param name="nonLinearMaxIterations"> 5 </param>
+
+	<!-- Set up BCs and ICs -->
+	<include> Underworld/VariableConditions/velocityBCs.extension.xml </include>
+
+	<!-- Integration Scheme configuration -->
+
+	<struct name="StgFEM_CompareFeVariableAgainstReferenceSolution">
+		<list name="variables">
+			<param>PressureField</param>
+			<param>VelocityField</param>
+		</list>
+		<param name="VelocityField-tolerance">0.000005</param>
+	</struct>
+	<param name="interactive">false</param>
+ 
+</StGermainData>

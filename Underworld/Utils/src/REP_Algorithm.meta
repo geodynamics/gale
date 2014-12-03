@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">REP_Algorithm</param>
+<param name="Author">JulianGiordani</param>
+<param name="Organisation">MCC</param>
+<param name="Project">Underworld</param>
+<param name="Location">./Underworld/Utils/src/</param>
+<param name="Project Web">http://mcc.monash.edu.au/Underworld</param>
+<param name="Copyright">Copyright (c) 2006, Monash Cluster Computing</param>
+<param name="License"></param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference"> <![CDATA[The REP algorithm is desciped in the paper	B.Boroomand & O.C.Zienkiewicz, "An Improved REP Recovery and the Effectivity Robustness Test",	Int. J. for Numerical Methods in Engineering, vol. 40, pages 3247-3277, 1997 ]]></param>
+<param name="Summary">...</param>
+<param name="Description"><![CDATA[This is the driver component which enables a REP (Recoverey by Equilibrium in Patches) Algorithm, it provides the common functionality that a REP field needs in a strict ordering, namely:<br/>
+ 1: Assemble element H and F <br/>
+
+ 2: Communicate H and F elemental objects <br/>
+
+ 3: Assemble patch matrix, A and rightside vector b and solve for x <br/>
+
+ 4: Communicate proc boundary coefficient for completeness with respect to domain recoveries <br/> 
+
+ 5: Calculate the Boundary values <br/>
+
+ 6: Perform a final sync of the node values at proc-boundary domain-edge nodes <br/>
+
+This component uses the RecoveredFeVariable's definitions for assembling H and F and for solving the patch SLE equations. ]]></param>
+
+<list name="Params">
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">ConstitutiveMatrix</param>
+		<param name="Type">ConstitutiveMatrix</param>
+		<param name="Description">Allows the consititutive information to be calculated at a certain material Point</param>
+	</struct>
+	<struct>
+		<param name="Essential">False</param>
+		<param name="Name">IntegrationPoints</param>
+		<param name="Type">IntegrationPointsSwarm</param>
+		<param name="Description">Swarm which provides geometric information on performing the REP method. If a constitutiveMatrix is defined thiscompone will use the swarm associated with the contitutiveMatrix</param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">RepFieldList</param>
+		<param name="Type">RecoveredFeVariable List</param>
+		<param name="Description">A list of RecoveredFeVariable which will be run by this components</param>
+	</struct>
+</list>
+<param name="Example">
+<![CDATA[
+		<struct name="REP">
+			<param name="Type">REP_Algorithm</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+			<list name="RepFieldList">
+        <param>recoveredSigmaField</param>
+        <param>recoveredEpsDotField</param>
+      </list>
+		</struct>
+]]>
+</param>
+
+</StGermainData>

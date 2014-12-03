@@ -1,0 +1,74 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="cameravt">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<!--param name="coordZ">1.4762</param-->
+			<param name="coordY">1.4762</param>
+		</struct>
+				<!-- Drawing Objects -->
+		<struct name="vtparticleVector1">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-VTDrawMe1</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="colour">Red</param>
+			<param name="DirectionVariable">materialSwarm-VTStressMax</param>
+			<param name="arrowHeadSize">0.07</param>
+			<param name="LengthVariable">materialSwarm-VTLength</param>
+		</struct>		
+		<struct name="vtparticleVector2">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="MaskVariable">materialSwarm-VTDrawMe2</param>
+			<param name="maskValue">1</param>
+			<param name="maskType">EqualTo</param>
+			<param name="colour">Blue</param>
+			<param name="DirectionVariable">materialSwarm-VTStressMin</param>
+			<param name="arrowHeadSize">0.07</param>
+			<param name="LengthVariable">materialSwarm-VTLength</param>
+		</struct>		
+		<struct name="vtborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">2</param>
+		</struct>
+		<struct name="vt2title">
+			<param name="Type">lucTitle</param>
+			<param name="string">PrincipleMinStressViewport</param>
+		</struct>
+		<struct name="vt1title">
+			<param name="Type">lucTitle</param>
+			<param name="string">PrincipleMaxStressViewport</param>
+		</struct>
+
+		<!-- Viewports -->
+		<struct name="VisualizationTKStressMinVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">cameravt</param>
+			<list name="DrawingObject">
+				<param>vt2title</param>
+				<param>vtborder</param>
+				<param>vtparticleVector2</param>
+				
+			</list>
+		</struct>
+	
+	<struct name="VisualizationTKStressMaxVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">cameravt</param>
+			<list name="DrawingObject">
+				<param>vt1title</param>
+				<param>vtborder</param>
+				<param>vtparticleVector1</param>
+				<!--param>smColourBar</param-->
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

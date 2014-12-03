@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<include> testDepthDependentViscosity3D_Base.xml </include>
+
+	<!-- Analytic Solution parameters -->
+	<param name="Ra"> 10 </param>
+	<param name="V0"> 0.0337737  </param>
+	<param name="ViscosityType"> Isoviscous  </param>
+
+	<param name="VelocityField-Tolerance"> 1.0e-04 </param>
+	<param name="PressureField-Tolerance"> 5.0e-04 </param>
+	<param name="TemperatureField-Tolerance"> 5.0e-09 </param>
+	
+	<param name="elementResI"> 20 </param>
+	<param name="elementResJ"> 20 </param>
+	<param name="elementResK"> 20 </param>
+
+	<struct name="components" mergeType="merge">
+		<struct name="Viscosity">
+			<param name="Type">MaterialViscosity</param>
+			<param name="eta0">1.0</param>
+		</struct>
+		<struct name="Shape">
+			<param name="Type">Everywhere</param>
+		</struct>	
+		<struct name="Fluid">
+			<param name="Type">RheologyMaterial</param>
+			<param name="Shape">Shape</param>
+			<param name="Rheology">Viscosity</param>
+		</struct>
+	</struct>
+
+</StGermainData>

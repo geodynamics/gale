@@ -1,0 +1,50 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camerahy">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordY">1.8</param>
+		</struct>
+			<!-- Drawing Objects -->
+		<struct name="hyparticleDotsrgb">
+			<param name="Type">lucSwarmRGBColourViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourGreenVariable">materialSwarm-HasYielded</param>
+			<param name="positionRange">True</param>		
+			<param name="minPositionX">0.2</param>	
+			<param name="minPositionY">0.99</param>
+			<param name="minPositionZ">0.0</param>
+			<param name="maxPositionX">0.8</param>
+			<param name="maxPositionY">1.0</param>
+			<param name="maxPositionZ">1.0</param>
+			<param name="pointSize">2.0</param>
+		</struct>
+		
+		<struct name="hyborderrgb">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">4</param>			
+		</struct>
+		
+		<struct name="hytitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">ParticleHasYieldedViewport</param>
+		</struct>
+
+		<!-- Viewport -->
+		<struct name="ParticleHasYieldedRGBVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerahy</param>
+			<list name="DrawingObject">
+				<param>hyparticleDotsrgb</param>
+				<param>hyborderrgb</param>
+				<param>hytitle</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

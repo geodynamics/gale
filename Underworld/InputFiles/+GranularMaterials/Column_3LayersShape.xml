@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+<struct name="components" mergeType="merge">
+	<struct name="automatedShape0">
+		<param name="Type">Box</param>
+		<param name="startX"> minColumnX </param> <param name="endX"> maxColumnX </param>
+		<param name="startY"> minColumnY </param> <param name="endY"> 2.0 </param>
+		<param name="startZ"> minZ </param> <param name="endZ">       maxZ </param>
+	</struct>
+	<struct name="automatedShape2">
+		<param name="Type">Box</param>
+		<param name="startX"> minColumnX </param> <param name="endX"> maxColumnX </param>
+		<param name="startY"> 4.0 </param> <param name="endY">   maxColumnY </param>
+		<param name="startZ"> minZ </param> <param name="endZ">       maxZ </param>
+	</struct>
+	<struct name="greenShape">
+		<param name="Type">Union</param>
+		<list name="shapes">
+			<param> automatedShape0 </param>
+			<param> automatedShape2 </param>
+		</list>
+	</struct>
+	<struct name="redShape">
+		<param name="Type">Box</param>
+		<param name="startX"> minColumnX </param> <param name="endX"> maxColumnX </param>
+		<param name="startY"> 2.0 </param> <param name="endY">   4.0 </param>
+		<param name="startZ"> minZ </param> <param name="endZ">       maxZ </param>
+	</struct>
+</struct>
+</StGermainData>

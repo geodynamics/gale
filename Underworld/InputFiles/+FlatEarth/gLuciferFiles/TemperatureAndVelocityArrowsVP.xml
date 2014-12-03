@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<struct name="components" mergeType="merge">
+		
+	  <struct name="materialSwarm-Temperature">
+		<param name="Type">FeSwarmVariable</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="FeVariable">TemperatureField</param>
+	  </struct>
+
+	  <struct name="materialSwarm-dTdY">
+		<param name="Type">FeSwarmVariable</param>
+		<param name="Swarm">materialSwarm</param>
+		<param name="FeVariable">verticalTemperatureGradientField</param>
+	  </struct>
+		
+		
+	 <struct name="HotDots">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-Temperature</param>
+	 	<param name="maskValue">1.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">EqualTo</param> 
+		<param name="positionRange">False</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-dTdY</param>
+	 	<param name="ColourMap">HotDotColourMap</param>
+	 	<param name="pointSize">1.0</param>
+	 </struct>
+
+		
+	 <struct name="CoolDots">
+	 	<param name="Type">lucSwarmViewer</param>
+	 	<param name="Swarm">materialSwarm</param>
+	 	<param name="MaskVariable">materialSwarm-Temperature</param>
+	 	<param name="maskValue">0.0</param>
+	 	<param name="maskTolerance">0.1</param>
+	 	<param name="maskType">EqualTo</param> 
+		<param name="positionRange">False</param>
+	 	<param name="maxPositionZ">2.0</param> 
+	 	<param name="maxPositionX">2.0</param> 
+	 	<param name="ColourVariable">materialSwarm-dTdY</param>
+	 	<param name="ColourMap">CoolDotColourMap</param>
+	 	<param name="pointSize">1.0</param>
+	 </struct>
+	
+		
+	  <struct name="verticalTemperatureGradientField"> 
+	    <param name="Type">OperatorFeVariable</param>
+	    <param name="Operator">TakeSecondComponent</param>
+	    <param name="FeVariable">TemperatureGradientsField</param>
+	  </struct>			
+		
+		<struct name="temperatureColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">#0B0133 White #B7210B</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		
+		<struct name="HotDotColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> Yellow Orange Red</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		
+		<struct name="CoolDotColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #001133 #005577 #007755 </param>
+			<param name="dynamicRange">True</param>
+		</struct>
+			
+		<struct name="verticalTemperatureGradientColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">#000022 #FFFFFF #220000</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+		
+		
+		<!-- Drawing Objects -->
+        <struct name="tempandVelTitle" mergeType="replace">
+            <param name="Type">lucTitle</param>
+            <param name="string">TemperatureField and Velocity Arrows</param>
+        </struct>
+
+		<struct name="temperatureMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">TemperatureField</param>
+			<param name="ColourMap">temperatureColourMap</param>
+			<param name="resolution">128</param>
+		</struct>
+		
+		<struct name="verticalTemperatureGradientMap">
+			<param name="Type">lucScalarField</param>
+			<param name="FieldVariable">verticalTemperatureGradientField</param>
+			<param name="ColourMap">verticalTemperatureGradientColourMap</param>
+			<param name="resolution">128</param>
+		</struct>
+		
+		
+		<struct name="velocityArrowsLeft" mergeType="replace">
+			<param name="Type">lucVectorArrowCrossSection</param>
+			<param name="VectorVariable">VelocityField</param>
+			<param name="crossSection"> x=-1.0 </param>
+			<param name="Colour">black</param>
+			<param name="resolutionX">64</param>	
+			<param name="resolutionY">16</param>	
+			<param name="resolutionZ">64</param>	
+			<param name="arrowHeadSize">0.3</param>	
+			<param name="lengthScale">0.1</param>	
+		</struct>
+		
+		
+		<struct name="velocityArrowsRight" mergeType="replace">
+			<param name="Type">lucVectorArrowCrossSection</param>
+			<param name="VectorVariable">VelocityField</param>
+			<param name="crossSection"> x=1.0 </param>
+			<param name="Colour">black</param>
+			<param name="resolutionX">64</param>	
+			<param name="resolutionY">16</param>	
+			<param name="resolutionZ">64</param>	
+			<param name="arrowHeadSize">0.3</param>	
+			<param name="lengthScale">0.1</param>	
+		</struct>
+		
+		<struct name="velocityArrowsFront" mergeType="replace">
+			<param name="Type">lucVectorArrowCrossSection</param>
+			<param name="VectorVariable">VelocityField</param>
+			<param name="crossSection"> z=1.0 </param>
+			<param name="Colour">black</param>
+			<param name="resolutionX">64</param>	
+			<param name="resolutionY">16</param>	
+			<param name="resolutionZ">64</param>	
+			<param name="arrowHeadSize">0.3</param>	
+			<param name="lengthScale">0.1</param>	
+		</struct>
+		
+		<struct name="velocityArrowsBack" mergeType="replace">
+			<param name="Type">lucVectorArrowCrossSection</param>
+			<param name="VectorVariable">VelocityField</param>
+			<param name="crossSection"> z=-1.0 </param>
+			<param name="Colour">black</param>
+			<param name="resolutionX">64</param>	
+			<param name="resolutionY">16</param>	
+			<param name="resolutionZ">64</param>	
+			<param name="arrowHeadSize">0.3</param>	
+			<param name="lengthScale">0.1</param>	
+		</struct>
+		
+		
+		<struct name="velocityArrowsTop" mergeType="replace">
+			<param name="Type">lucVectorArrowCrossSection</param>
+			<param name="VectorVariable">VelocityField</param>
+			<param name="crossSection"> y=1.0 </param>
+			<param name="Colour">black</param>
+			<param name="resolutionX">32</param>	
+			<param name="resolutionY">16</param>	
+			<param name="resolutionZ">32</param>	
+			<param name="arrowHeadSize">0.3</param>	
+			<param name="lengthScale">0.1</param>	
+		</struct>
+		
+		<struct name="velocityArrowsBottom" mergeType="replace">
+				<param name="Type">lucVectorArrowCrossSection</param>
+				<param name="VectorVariable">VelocityField</param>
+				<param name="crossSection"> y=0.0 </param>
+				<param name="Colour">black</param>
+				<param name="resolutionX">64</param>	
+				<param name="resolutionY">16</param>	
+				<param name="resolutionZ">64</param>	
+				<param name="arrowHeadSize">0.3</param>	
+				<param name="lengthScale">0.1</param>	
+		</struct>
+
+		
+		<struct name="border" mergeType="replace">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">TemperatureField</param>
+		</struct>
+		
+		<struct name="temperatureColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">temperatureColourMap</param>
+		</struct>
+		
+		<struct name="verticalTemperatureGradientColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">verticalTemperatureGradientColourMap</param>
+		</struct>
+		
+		<!-- Put these all together in a viewport -->
+		<struct name="FlatEarthTemperatureAndVelocityArrowsVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
+			<param name="compositeEachObject">t</param>
+			<list name="DrawingObject">
+				<param>temperatureMap</param>
+				<param>border</param>
+				<param>velocityArrowsLeft</param>
+				<param>velocityArrowsRight</param>
+				<param>velocityArrowsBottom</param>
+				<param>velocityArrowsBack</param>
+				<param>velocityArrowsTop</param>
+				<param>velocityArrowsFront</param>
+				<param>tempandVelTitle</param>
+				<param>temperatureColourBar</param>
+			</list>
+		</struct>
+		
+		<struct name="FlatEarthTemperatureHotColdVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
+			<param name="compositeEachObject">t</param>
+			<list name="DrawingObject">
+				<param>border</param>
+				<param>HotDots</param>
+				<param>CoolDots</param>
+			</list>
+		</struct>
+		
+		
+		<struct name="FlatEarthVerticalTemperatureGradientVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">flatEarthPerspectiveViewCamera1</param>
+			<param name="compositeEachObject">t</param>
+			<list name="DrawingObject">
+				<param>verticalTemperatureGradientMap</param>
+				<param>border</param>
+				<param>verticalTemperatureGradientColourBar</param>
+			</list>
+		</struct>
+		
+		
+		
+	</struct>
+</StGermainData>

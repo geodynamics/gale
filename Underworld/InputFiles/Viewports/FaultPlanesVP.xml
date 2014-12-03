@@ -1,0 +1,57 @@
+<!-- Rayleigh-Taylor lucifer viewports -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+        <struct name="components" mergeType="merge">
+		<!-- Camera And Colour Maps -->
+		<struct name="camerafp">
+			<param name="Type">lucCamera</param>
+			<param name="CentreFieldVariable">VelocityField</param>
+			<param name="coordZ">2.0</param>
+			<param name="coordY">1.0</param>
+		</struct>
+		
+		<struct name="hasyieldedColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours">White Green</param>
+			<param name="dynamicRange">True</param>
+		</struct>
+	
+		<!-- Drawing Objects -->
+		<struct name="faultPlanes">
+			<param name="Type">lucSwarmVectors</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">materialSwarm-HasYielded</param>
+			<param name="ColourMap">hasyieldedColourMap</param>
+			<!--param name="Colour">Green</param>
+			<param name="OpacityVariable">materialSwarm-YieldTypeOpacity</param-->
+			<param name="DirectionVariable">materialSwarm-PBSlipVector</param>
+			<param name="arrowHeadSize">0.0</param>
+			<param name="LengthVariable">materialSwarm-PBLength</param>
+		</struct>
+
+		
+		<struct name="fpborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+			<param name="lineWidth">2</param>			
+		</struct>
+		
+		<struct name="fptitle">
+			<param name="Type">lucTitle</param>
+			<param name="string">FaultPlanesViewport</param>
+		</struct>
+
+		<!-- Viewport -->
+		<struct name="FaultPlanesVP">
+			<param name="Type">lucViewport</param>
+			<param name="Camera">camerafp</param>
+			<list name="DrawingObject">
+				<param>faultPlanes</param>
+				<param>fpborder</param>
+				<param>fptitle</param>
+			</list>
+		</struct>
+	</struct>
+
+</StGermainData>

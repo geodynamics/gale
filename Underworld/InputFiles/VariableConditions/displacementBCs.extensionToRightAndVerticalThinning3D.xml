@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- A StGermain input file -->
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+
+	<!-- Note: we don't apply BCs to the total displacement field - we're not going to solve based on it, and 
+	we want to start the totalDisplacementField as globally zero, then just update it each increment after
+	we get a new incremental displacement solution. - PatrickSunter 5 July 2006 -->
+
+	<!-- Incremental Displacement BCs -->
+	<!-- Note that the left and right wall are function BCs that automatically scale the BC applied based
+	on the load increment factor calculated by the context -->
+	<param name="totalDisplacementRightWall"> 0.1 </param>
+	
+	<struct name="incrementalDisplacementBCs">
+		<param name="type">CompositeVC</param>
+		<list name="vcList">
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> bottom </param>
+				<list name="variables">
+					<struct>
+						<param name="name">incrementalDisplacementY</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+					<struct>
+						<param name="name">incrementalDisplacementZ</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> left </param>
+				<list name="variables">
+					<struct>
+						<param name="name">incrementalDisplacementX</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+					<struct>
+						<param name="name">incrementalDisplacementZ</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> right </param>
+				<list name="variables">
+					<struct>
+						<param name="name">incrementalDisplacementX</param>
+						<param name="type">func</param>
+						<param name="value"> IncrementalDisplacement_RightWall </param>
+					</struct>
+					<struct>
+						<param name="name">incrementalDisplacementZ</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> front </param>
+				<list name="variables">
+					<struct>
+						<param name="name">incrementalDisplacementZ</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<struct>
+				<param name="type"> WallVC </param>
+				<param name="wall"> back </param>
+				<list name="variables">
+					<struct>
+						<param name="name">incrementalDisplacementZ</param>
+						<param name="type">double</param>
+						<param name="value"> 0 </param>
+					</struct>
+				</list>
+			</struct>
+			<!-- No BCs on top layer since we want to allow it to thin out in Y dir as a result of stretching applied
+			in X direction -->
+		</list>
+	</struct>
+</StGermainData>

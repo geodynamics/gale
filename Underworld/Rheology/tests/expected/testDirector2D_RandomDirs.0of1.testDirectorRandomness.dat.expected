@@ -1,0 +1,6 @@
+Swarm has 2000 local particles, therefore expect average of 55.6 director normals in each 10 degrees of arc.
+
+For confidence interval of 99 percent:
+The standard deviation of director normals is within tolerance, 1.0, of expected standard deviation, 13.6 
+
+All circle angle counts are within range.

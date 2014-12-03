@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Byerlee</param>
+<param name="Author">...</param>
+<param name="Organisation">MCC</param>
+<param name="Project">Underworld</param>
+<param name="Location">./Underworld/Rheology/src/</param>
+<param name="Project Web">http://www.mcc.monash.edu.au/Software/Underworld</param>
+<param name="Copyright">Copyright (c) 2005, Monash Cluster Computing</param>
+<param name="License">http://www.opensource.org/licenses/bsd-license.php</param>
+<param name="Parent">VonMises</param>
+<param name="Reference">...</param>
+<param name="Summary">...</param>
+<param name="Description">This component adds a depth dependent term to the yielding criterion of VonMises. See L. N. Moresi and V. S. Solomatov. Mantle convection with a brittle lithosphere: thoughts on the global tectonic styles of the Earth and Venus. Geophysicical Journal International, 133:669-682, 1998.</param>
+<param name="Equation">$\tau_{yield} = c_0 + c_1 d$</param>
+
+
+<!--Now the interesting stuff-->
+<list name="Params">
+	<struct>
+		<param name="Name">depthCoefficient</param>
+		<param name="Type">Double</param>
+		<param name="Default">0.0</param>
+		<param name="Description">Gives the $c_1$ in the equation above.</param>
+	</struct>
+
+</list>
+
+<list name="Dependencies">
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">BlockGeometry</param>
+		<param name="Type">BlockGeometry</param>
+		<param name="Description">The geometry given so that this component can find the height of the box.</param>
+	</struct>
+	<struct>
+		<param name="Essential">True</param>
+		<param name="Name">FeMesh</param>
+		<param name="Type">FeMesh</param>
+		<param name="Description">The mesh given so that this component can find the global coordinate of the particle.</param>
+	</struct>
+</list>
+<!-- Add an exmaple XML if possible -->
+<param name="Example"><![CDATA[
+	<struct name="yielding">
+		<param name="Type">Byerlee</param>
+		<param name="cohesion">0.04</param>
+		<param name="depthCoefficient">0.25</param>
+		<param name="FeMesh">mesh-linear</param>
+		<param name="BlockGeometry">geometry</param>
+	</struct>]]>
+</param>
+
+</StGermainData>

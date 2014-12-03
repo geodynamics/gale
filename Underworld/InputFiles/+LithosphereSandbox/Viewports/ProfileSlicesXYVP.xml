@@ -1,0 +1,2014 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<!-- this VP was designed for 2 layered 3D extension problems where the material id of the mantle = 2 and all crustal material is 3 or higher - it works with the orginal but the colours maps are wrong and the extra crustal material (eg stripes) are included with the mantle layer. if you are using a xml where the mantle is not = 2 then change so that CrustColourmap = MantleColourMap and you wont be able to tell the diff	
+	this VP produces a series of 2D slices through the 3D model at varring Z coordinates. it displays these slices with the persepctive preserved and with no persepctive. the slices produced are either the crust only or the crust and mantle together
+	-->
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+	<struct name="components" mergeType="merge">
+		<!-- setting up the cameras -->	
+		<struct name="PSXYFrontViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">-0.9</param>
+	 		<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">midZ</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+		<struct name="PSXYFrontViewCameramc">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">-1.25</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">midZ</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+		<struct name="PSXYSideViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">4</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">midZ</param>
+			<param name="focalPointX">minX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">midZ</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+		<struct name="PSXYFrontViewProfile1Cameramc">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">-1.3</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">0.0</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+		<struct name="PSXYFrontViewProfile2Cameramc">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">-0.8</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">0.5</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+		<struct name="PSXYFrontViewProfile3Cameramc">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">-0.3</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">1</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+		<struct name="PSXYFrontViewProfile4Cameramc">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">0.2</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">1.5</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+		<struct name="PSXYFrontViewProfile5Cameramc">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">0.7</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">1.95</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+
+		<struct name="PSXYFrontViewProfile1Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">-1</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">0.0</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSXYFrontViewProfile2Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">-0.5</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">0.5</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSXYFrontViewProfile3Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">0.0</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">1</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSXYFrontViewProfile4Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">0.5</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">1.5</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSXYFrontViewProfile5Camera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">midX</param>
+			<param name="coordY">midY</param>
+			<param name="coordZ">1</param>
+			<param name="focalPointX">midX</param>
+			<param name="focalPointY">midY</param>
+			<param name="focalPointZ">1.95</param>
+	 		<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+	 		<param name="stereoType">Mono</param>
+	 		<param name="eyeSeparation">0.2</param>
+	 		<param name="focalLength">0</param>
+	 	</struct>
+
+		<struct name="PSXYStrainRateParticleVariable">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">StrainRateInvariantField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+		
+		<!-- defining the slices -->		
+				
+		<struct name="PSXYLowerCrustSlice-3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-2.0</param>
+			<param name="maxPositionZ">-1.95</param>
+		</struct>
+
+		
+		<struct name="PSXYUpperCrustSlice-3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-2.0</param>
+			<param name="maxPositionZ">-1.95</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice-3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-2.0</param>
+			<param name="maxPositionZ">-1.95</param>
+		</struct>
+
+
+
+		<struct name="PSXYUpperMantleSlice-3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-2.0</param>
+			<param name="maxPositionZ">-1.95</param>
+		</struct>
+
+
+		<struct name="PSXYUpperCrustSlice-2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.55</param>
+			<param name="maxPositionZ">-1.5</param>
+		</struct>
+
+
+		<struct name="PSXYLowerCrustSlice-2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.55</param>
+			<param name="maxPositionZ">-1.5</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice-2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.55</param>
+			<param name="maxPositionZ">-1.5</param>
+		</struct>
+
+
+		<struct name="PSXYLowerMantleSlice-2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.55</param>
+			<param name="maxPositionZ">-1.5</param>
+		</struct>
+
+
+
+		<struct name="PSXYUpperCrustSlice-1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.0</param>
+			<param name="maxPositionZ">-0.95</param>
+		</struct>
+
+
+		<struct name="PSXYLowerCrustSlice-1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.0</param>
+			<param name="maxPositionZ">-0.95</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice-1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.0</param>
+			<param name="maxPositionZ">-0.95</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice-1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-1.0</param>
+			<param name="maxPositionZ">-0.95</param>
+		</struct>
+
+
+		<struct name="PSXYUpperCrustSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-0.55</param>
+			<param name="maxPositionZ">-0.5</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-0.55</param>
+			<param name="maxPositionZ">-0.5</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-0.55</param>
+			<param name="maxPositionZ">-0.5</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">-0.55</param>
+			<param name="maxPositionZ">-0.5</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.0</param>
+			<param name="maxPositionZ">0.05</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.0</param>
+			<param name="maxPositionZ">0.05</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.0</param>
+			<param name="maxPositionZ">0.05</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.0</param>
+			<param name="maxPositionZ">0.05</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.5</param>
+			<param name="maxPositionZ">0.55</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.5</param>
+			<param name="maxPositionZ">0.55</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.5</param>
+			<param name="maxPositionZ">0.55</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">0.5</param>
+			<param name="maxPositionZ">0.55</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.0</param>
+			<param name="maxPositionZ">1.05</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.0</param>
+			<param name="maxPositionZ">1.05</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.0</param>
+			<param name="maxPositionZ">1.05</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.0</param>
+			<param name="maxPositionZ">1.05</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.5</param>
+			<param name="maxPositionZ">1.55</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.5</param>
+			<param name="maxPositionZ">1.55</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">minY</param>
+			<param name="maxPositionY">maxY</param>
+			<param name="minPositionZ">1.50</param>
+			<param name="maxPositionZ">1.55</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">minY</param>
+			<param name="maxPositionY">maxY</param>
+			<param name="minPositionZ">1.50</param>
+			<param name="maxPositionZ">1.55</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.95</param>
+			<param name="maxPositionZ">2.0</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.95</param>
+			<param name="maxPositionZ">2.0</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.95</param>
+			<param name="maxPositionZ">2.0</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">1.95</param>
+			<param name="maxPositionZ">2.0</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.5</param>
+			<param name="maxPositionZ">2.55</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.5</param>
+			<param name="maxPositionZ">2.55</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.5</param>
+			<param name="maxPositionZ">2.55</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.5</param>
+			<param name="maxPositionZ">2.55</param>
+		</struct>
+			
+		<struct name="PSXYUpperCrustSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.95</param>
+			<param name="maxPositionZ">3.0</param>
+		</struct>
+
+
+		<struct name="PSXYLowerCrustSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.95</param>
+			<param name="maxPositionZ">3.0</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.95</param>
+			<param name="maxPositionZ">3.00</param>
+		</struct>
+
+
+		<struct name="PSXYLowerMantleSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">2.95</param>
+			<param name="maxPositionZ">3.00</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">3.45</param>
+			<param name="maxPositionZ">3.50</param>
+		</struct>
+
+
+		<struct name="PSXYLowerCrustSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">3.45</param>
+			<param name="maxPositionZ">3.50</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">3.45</param>
+			<param name="maxPositionZ">3.50</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">3.45</param>
+			<param name="maxPositionZ">3.50</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice9">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">3.95</param>
+			<param name="maxPositionZ">4.00</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice9">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">3.95</param>
+			<param name="maxPositionZ">4.00</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice9">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.95</param>
+			<param name="maxPositionZ">4</param>
+		</struct>
+
+
+		<struct name="PSXYLowerMantleSlice9">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.95</param>
+			<param name="maxPositionZ">4</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice10">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.45</param>
+			<param name="maxPositionZ">4.50</param>
+		</struct>
+
+
+		<struct name="PSXYLowerCrustSlice10">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.45</param>
+			<param name="maxPositionZ">4.50</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice10">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.45</param>
+			<param name="maxPositionZ">4.50</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice10">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.45</param>
+			<param name="maxPositionZ">4.50</param>
+		</struct>
+
+		<struct name="PSXYUpperCrustSlice11">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.95</param>
+			<param name="maxPositionZ">5</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustSlice11">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.95</param>
+			<param name="maxPositionZ">5</param>
+		</struct>
+
+		<struct name="PSXYUpperMantleSlice11">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.95</param>
+			<param name="maxPositionZ">5</param>
+		</struct>
+
+		<struct name="PSXYLowerMantleSlice11">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">PSXYStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">-10</param>
+			<param name="maxPositionY">10</param>
+			<param name="minPositionZ">4.95</param>
+			<param name="maxPositionZ">5</param>
+		</struct>
+		
+		<struct name="PSXYUpperCrustColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+		</struct>
+
+		<struct name="PSXYLowerCrustColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+		</struct>
+		
+		<struct name="PSXYUpperMantleColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+		</struct>
+
+
+		<struct name="PSXYLowerMantleColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+		</struct>
+
+		<struct name="PSXYborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+		</struct>
+	
+		<struct name="z0Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">z = 0.00 </param>
+		</struct>
+	
+		<struct name="z05Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">z = 0.50 </param>
+		</struct>
+	
+		<struct name="z1Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">z = 1.00 </param>
+		</struct>
+	
+		<struct name="z15Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">z = 1.50 </param>
+		</struct>
+	
+		<struct name="z2Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">z = 2.00</param>
+		</struct>
+
+		<struct name="PSXYAxis">
+			<param name="Type">lucAxis</param>
+			<param name="originX">2.05</param>
+		</struct>	
+		
+		<struct name="PSXYProfile1PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYLowerMantleColourBar</param>
+				<param>PSXYUpperCrustColourBar</param>
+				-->
+				<param>z0Title</param>
+				<param>PSXYUpperCrustSlice1</param>
+				<param>PSXYLowerCrustSlice1</param>
+				<param>PSXYUpperMantleSlice1</param>
+				<param>PSXYLowerMantleSlice1</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile2PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z05Title</param>
+				<param>PSXYUpperCrustSlice2</param>
+				<param>PSXYLowerCrustSlice2</param>
+				<param>PSXYUpperMantleSlice2</param>
+				<param>PSXYLowerMantleSlice2</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile3PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z1Title</param>
+				<param>PSXYUpperCrustSlice3</param>
+				<param>PSXYLowerCrustSlice3</param>
+				<param>PSXYUpperMantleSlice3</param>
+				<param>PSXYLowerMantleSlice3</param>
+			</list>
+	 	</struct>
+
+		
+		<struct name="PSXYProfile4PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z15Title</param>
+				<param>PSXYUpperCrustSlice4</param>
+				<param>PSXYLowerCrustSlice4</param>
+				<param>PSXYUpperMantleSlice4</param>
+				<param>PSXYLowerMantleSlice4</param>
+				<param>PSXYLowerMantleColourBar</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile5PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice5</param>
+				<param>PSXYLowerCrustSlice5</param>
+				<param>PSXYUpperMantleSlice5</param>
+				<param>PSXYLowerMantleSlice5</param>
+				<param>PSXYLowerCrustColourBar</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile6PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice6</param>
+				<param>PSXYLowerCrustSlice6</param>
+				<param>PSXYUpperMantleSlice6</param>
+				<param>PSXYLowerMantleSlice6</param>
+				<param>PSXYUpperCrustColourBar</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile7PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice7</param>
+				<param>PSXYLowerCrustSlice7</param>
+				<param>PSXYUpperMantleSlice7</param>
+				<param>PSXYLowerMantleSlice7</param>
+				<param>PSXYLowerCrustColourBar</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile8PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice8</param>
+				<param>PSXYLowerCrustSlice8</param>
+				<param>PSXYUpperMantleSlice8</param>
+				<param>PSXYLowerMantleSlice8</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile9PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice9</param>
+				<param>PSXYLowerCrustSlice9</param>
+				<param>PSXYUpperMantleSlice9</param>
+				<param>PSXYLowerMantleSlice9</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile10PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice10</param>
+				<param>PSXYLowerCrustSlice10</param>
+				<param>PSXYUpperMantleSlice10</param>
+				<param>PSXYLowerMantleSlice10</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile11PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice11</param>
+				<param>PSXYLowerCrustSlice11</param>
+				<param>PSXYUpperMantleSlice11</param>
+				<param>PSXYLowerMantleSlice11</param>
+			</list>
+	 	</struct>
+		
+		<struct name="PSXYProfile1Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile1Cameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				-->
+				<param>z0Title</param>
+				<param>PSXYUpperCrustSlice1</param>
+				<param>PSXYLowerCrustSlice1</param>
+				<param>PSXYUpperMantleSlice1</param>
+				<param>PSXYLowerMantleSlice1</param>
+				<param>PSXYLowerCrustColourBar</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile2Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile2Cameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z05Title</param>
+				<param>PSXYUpperCrustSlice2</param>
+				<param>PSXYLowerCrustSlice2</param>
+				<param>PSXYUpperMantleSlice2</param>
+				<param>PSXYLowerMantleSlice2</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile3Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile3Cameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z1Title</param>
+				<param>PSXYUpperCrustSlice3</param>
+				<param>PSXYLowerCrustSlice3</param>
+				<param>PSXYUpperMantleSlice3</param>
+				<param>PSXYLowerMantleSlice3</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile4Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile4Cameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z15Title</param>
+				<param>PSXYUpperCrustSlice4</param>
+				<param>PSXYLowerCrustSlice4</param>
+				<param>PSXYUpperMantleSlice4</param>
+				<param>PSXYLowerMantleSlice4</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile5Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile5Cameramc</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYMantleColourBar</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice5</param>
+				<param>PSXYLowerCrustSlice5</param>
+				<param>PSXYUpperMantleSlice5</param>
+				<param>PSXYLowerMantleSlice5</param>
+			</list>
+		</struct>
+
+		
+		<!-- VP with only the crust displayed -->
+		<struct name="PSXYProfile1CrustViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile1Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				-->
+				<param>PSXYUpperCrustSlice1</param>
+				<param>PSXYLowerCrustSlice1</param>
+				<param>z0Title</param>
+				<param>PSXYUpperCrustColourBar</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile2CrustViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile2Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z05Title</param>
+				<param>PSXYUpperCrustSlice2</param>
+				<param>PSXYLowerCrustSlice2</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile3CrustViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile3Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z1Title</param>
+				<param>PSXYUpperCrustSlice3</param>
+				<param>PSXYLowerCrustSlice3</param>
+			</list>
+	 	</struct>
+
+		
+		<struct name="PSXYProfile4CrustViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile4Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z15Title</param>
+				<param>PSXYUpperCrustSlice4</param>
+				<param>PSXYLowerCrustSlice4</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile5CrustViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewProfile5Camera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice5</param>
+				<param>PSXYLowerCrustSlice5</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile1CrustPerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				-->
+				<param>z0Title</param>
+				<param>PSXYUpperCrustSlice1</param>
+				<param>PSXYLowerCrustSlice1</param>
+				<param>PSXYUpperCrustColourBar</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile2CrustPerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z05Title</param>
+				<param>PSXYUpperCrustSlice2</param>
+				<param>PSXYLowerCrustSlice2</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile3CrustPerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z1Title</param>
+				<param>PSXYUpperCrustSlice3</param>
+				<param>PSXYLowerCrustSlice3</param>
+			</list>
+	 	</struct>
+
+		
+		<struct name="PSXYProfile4CrustPerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z15Title</param>
+				<param>PSXYUpperCrustSlice4</param>
+				<param>PSXYLowerCrustSlice4</param>
+			</list>
+	 	</struct>
+
+		<struct name="PSXYProfile5CrustPerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYFrontViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>PSXYborder</param>
+				<param>PSXYCrustColourBar</param>
+				-->
+				<param>z2Title</param>
+				<param>PSXYUpperCrustSlice5</param>
+				<param>PSXYLowerCrustSlice5</param>
+			</list>
+	 	</struct>
+		
+		<struct name="PSXYSideViewport">
+	       		<param name="Type">lucViewport</param>
+			<param name="Camera">PSXYSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param>PSXYborder</param>
+				<param>PSXYUpperCrustSlice-3</param>
+				<param>PSXYLowerCrustSlice-3</param>
+				<param>PSXYUpperMantleSlice-3</param>
+				<param>PSXYLowerMantleSlice-3</param>
+				<param>PSXYUpperCrustSlice-2</param>
+				<param>PSXYLowerCrustSlice-2</param>
+				<param>PSXYUpperMantleSlice-2</param>
+				<param>PSXYLowerMantleSlice-2</param>
+				<param>PSXYUpperCrustSlice-1</param>
+				<param>PSXYLowerCrustSlice-1</param>
+				<param>PSXYUpperMantleSlice-1</param>
+				<param>PSXYLowerMantleSlice-1</param>
+				<param>PSXYUpperCrustSlice0</param>
+				<param>PSXYLowerCrustSlice0</param>
+				<param>PSXYUpperMantleSlice0</param>
+				<param>PSXYLowerMantleSlice0</param>
+				<param>PSXYUpperCrustSlice1</param>
+				<param>PSXYLowerCrustSlice1</param>
+				<param>PSXYUpperMantleSlice1</param>
+				<param>PSXYLowerMantleSlice1</param>
+				<param>PSXYUpperCrustSlice2</param>
+				<param>PSXYLowerCrustSlice2</param>
+				<param>PSXYUpperMantleSlice2</param>
+				<param>PSXYLowerMantleSlice2</param>
+				<param>PSXYUpperCrustSlice3</param>
+				<param>PSXYLowerCrustSlice3</param>
+				<param>PSXYUpperMantleSlice3</param>
+				<param>PSXYLowerMantleSlice3</param>
+				<param>PSXYUpperCrustSlice4</param>
+				<param>PSXYLowerCrustSlice4</param>
+				<param>PSXYUpperMantleSlice4</param>
+				<param>PSXYLowerMantleSlice4</param>
+				<param>PSXYUpperCrustSlice5</param>
+				<param>PSXYLowerCrustSlice5</param>
+				<param>PSXYUpperMantleSlice5</param>
+				<param>PSXYLowerMantleSlice5</param>
+				<param>PSXYUpperCrustSlice6</param>
+				<param>PSXYLowerCrustSlice6</param>
+				<param>PSXYUpperMantleSlice6</param>
+				<param>PSXYLowerMantleSlice6</param>
+				<param>PSXYUpperCrustSlice7</param>
+				<param>PSXYLowerCrustSlice7</param>
+				<param>PSXYUpperMantleSlice7</param>
+				<param>PSXYLowerMantleSlice7</param>
+				<param>PSXYUpperCrustSlice8</param>
+				<param>PSXYLowerCrustSlice8</param>
+				<param>PSXYUpperMantleSlice8</param>
+				<param>PSXYLowerMantleSlice8</param>
+				<param>PSXYUpperCrustSlice9</param>
+				<param>PSXYLowerCrustSlice9</param>
+				<param>PSXYUpperMantleSlice9</param>
+				<param>PSXYLowerMantleSlice9</param>
+				<param>PSXYUpperCrustSlice10</param>
+				<param>PSXYLowerCrustSlice10</param>
+				<param>PSXYUpperMantleSlice10</param>
+				<param>PSXYLowerMantleSlice10</param>
+				<param>PSXYUpperCrustSlice11</param>
+				<param>PSXYLowerCrustSlice11</param>
+				<param>PSXYUpperMantleSlice11</param>
+				<param>PSXYLowerMantleSlice11</param>
+				<param>PSXYAxis</param>
+				<param>PSXYLowerCrustColourBar</param>
+			</list>
+		</struct>
+		<!--	
+		<struct name="PSXYrenderingEngine">
+			<param name="Type">lucRenderingEngineGL</param>
+		
+		</struct>
+	
+		<struct name="PSXYpngOutput">
+			<param name="Type">lucOutputPNG</param>
+		</struct>
+		-->
+		<!-- making a window with both crust and mantle with perspectives -->	
+		<struct name="PSXYProfilePerspWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">1008</param>
+			<param name="width">windowWidthX</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>PSXYProfile5PerspViewport</param> 
+				<param>PSXYProfile4PerspViewport</param>
+				<param>PSXYProfile3PerspViewport</param>
+				<param>PSXYProfile2PerspViewport</param>
+				<param>PSXYProfile1PerspViewport</param>
+			</list>
+		</struct>
+
+
+		<!-- making a window with both crust and mantle with no perspectives -->	
+		<struct name="PSXYProfileWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">1008</param>
+			<param name="width">windowWidthX</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>PSXYProfile5Viewport</param> 
+				<param>PSXYProfile4Viewport</param>
+				<param>PSXYProfile3Viewport</param>
+				<param>PSXYProfile2Viewport</param>
+				<param>PSXYProfile1Viewport</param>
+			</list>
+		</struct>
+
+    
+		<!-- making a window with only crust with no perspectives -->	
+		<struct name="PSXYProfileCrustWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">1008</param>
+			<param name="width">windowWidthX</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>PSXYProfile5CrustViewport</param> 
+				<param>PSXYProfile4CrustViewport</param>
+				<param>PSXYProfile3CrustViewport</param>
+				<param>PSXYProfile2CrustViewport</param>
+				<param>PSXYProfile1CrustViewport</param>
+			</list>
+		</struct>
+
+
+		<!-- making a window with only crust with perspectives -->	
+		<struct name="PSXYProfileCrustPerspWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">1008</param>
+			<param name="width">windowWidthX</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>PSXYProfile5CrustPerspViewport</param> 
+				<param>PSXYProfile4CrustPerspViewport</param>
+				<param>PSXYProfile3CrustPerspViewport</param>
+				<param>PSXYProfile2CrustPerspViewport</param>
+				<param>PSXYProfile1CrustPerspViewport</param>
+			</list>
+		</struct>
+   
+		
+		<!-- making a window with both the crust and mantle with all VP on the same axis -->
+		<struct name="PSXYSideWindow">
+	                <param name="Type">lucDefaultWindow</param>
+	                <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">592</param>
+			<param name="width">1008</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+	      			<param>PSXYSideViewport</param>
+			</list>
+		</struct>
+
+		<!-- making Movies >	
+		
+		<struct name="PSXYProfileCrustPerspWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSXYProfileCrustPerspWindow</param>
+		</struct>
+		
+		<struct name="PSXYProfileCrustWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSXYProfileCrustWindow</param>
+		</struct>
+		<struct name="PSXYProfilePerspWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSXYProfilePerspWindow</param>
+		</struct>
+		<struct name="PSXYProfileWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSXYProfileWindow</param>
+		</struct>
+		<struct name="PSXYSideWindow4Movie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">PSXYSideWindow</param>
+		</struct-->
+ 
+	</struct>
+
+</StGermainData>

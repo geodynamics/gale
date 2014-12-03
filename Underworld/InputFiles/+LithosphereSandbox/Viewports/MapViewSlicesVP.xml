@@ -1,0 +1,1418 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+									
+		<struct name="MVtopDownCamera0">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.0</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.0</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera1">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.1</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.1</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera2">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.2</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.2</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera3">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.3</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.3</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera4">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.4</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.4</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera5">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.5</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera6">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.6</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.6</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera7">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.7</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.7</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+		
+		<struct name="MVtopDownCamera8">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1</param>
+			<param name="coordY">3.8</param>
+			<param name="coordZ">1.0053</param>
+			<param name="focalPointX">1</param>
+			<param name="focalPointY">0.8</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>				
+
+		<struct name="MVSideViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">4</param>
+			<param name="coordY">0.5</param>
+			<param name="coordZ">1</param>
+			<param name="focalPointX">1</param>
+	 		<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">1</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+
+		<struct name="MVStrainRateParticleVariable">
+			<param name="Type">FeSwarmVariable</param>
+			<param name="FeVariable">StrainRateInvariantField</param>
+			<param name="Swarm">materialSwarm</param>
+		</struct>
+		<!--
+		<struct name="MVUpperCrustColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #800080 #0099FF #99FFFF </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">1</param>
+		</struct>
+
+
+		<struct name="MVLowerCrustColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #003300 #339900 #99FF00 </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">1</param>
+		</struct>
+
+		<struct name="MVUpperMantleColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #660033 #990066 #9966CC </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">1</param>
+		</struct>
+	
+		<struct name="MVLowerMantleColourMap">
+			<param name="Type">lucColourMap</param>
+			<param name="colours"> #990000 #FF6600 #FFFF00 </param>
+			<param name="dynamicRange">False</param>
+			<param name="minimum">0</param>
+			<param name="maximum">1</param>
+		</struct>
+		-->
+			
+		<struct name="MVUpperCrustSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.80</param>
+			<param name="maxPositionY">0.85</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="MVLowerCrustSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.80</param>
+			<param name="maxPositionY">0.85</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.80</param>
+			<param name="maxPositionY">0.85</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice8">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.80</param>
+			<param name="maxPositionY">0.85</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperCrustSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.70</param>
+			<param name="maxPositionY">0.75</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+
+		<struct name="MVLowerCrustSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.70</param>
+			<param name="maxPositionY">0.75</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.70</param>
+			<param name="maxPositionY">0.75</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice7">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.70</param>
+			<param name="maxPositionY">0.75</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperCrustSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.60</param>
+			<param name="maxPositionY">0.65</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerCrustSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.60</param>
+			<param name="maxPositionY">0.65</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.60</param>
+			<param name="maxPositionY">0.65</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice6">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.60</param>
+			<param name="maxPositionY">0.65</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperCrustSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.50</param>
+			<param name="maxPositionY">0.55</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerCrustSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.50</param>
+			<param name="maxPositionY">0.55</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.50</param>
+			<param name="maxPositionY">0.55</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice5">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.50</param>
+			<param name="maxPositionY">0.55</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperCrustSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.40</param>
+			<param name="maxPositionY">0.45</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerCrustSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.40</param>
+			<param name="maxPositionY">0.45</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.40</param>
+			<param name="maxPositionY">0.45</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice4">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.40</param>
+			<param name="maxPositionY">0.45</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+		
+		<struct name="MVUpperCrustSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.30</param>
+			<param name="maxPositionY">0.35</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerCrustSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.30</param>
+			<param name="maxPositionY">0.35</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.30</param>
+			<param name="maxPositionY">0.35</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice3">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.30</param>
+			<param name="maxPositionY">0.35</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+			
+		<struct name="MVUpperCrustSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="maskVariable">materialswarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">true</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.20</param>
+			<param name="maxPositionY">0.25</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerCrustSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="maskVariable">materialswarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">true</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.20</param>
+			<param name="maxPositionY">0.25</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.20</param>
+			<param name="maxPositionY">0.25</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice2">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.20</param>
+			<param name="maxPositionY">0.25</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperCrustSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">2.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.10</param>
+			<param name="maxPositionY">0.15</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerCrustSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.10</param>
+			<param name="maxPositionY">0.15</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.10</param>
+			<param name="maxPositionY">0.15</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice1">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.10</param>
+			<param name="maxPositionY">0.15</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+		
+		<struct name="MVUpperCrustSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">5.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.00</param>
+			<param name="maxPositionY">0.05</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerCrustSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">4.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.00</param>
+			<param name="maxPositionY">0.05</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVUpperMantleSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">3.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.00</param>
+			<param name="maxPositionY">0.05</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+
+		<struct name="MVLowerMantleSlice0">
+			<param name="Type">lucSwarmViewer</param>
+			<param name="Swarm">materialSwarm</param>
+			<param name="ColourVariable">MVStrainRateParticleVariable</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+			<param name="MaskVariable">materialSwarm-MaterialIndex</param>
+			<param name="maskType">EqualTo</param>
+			<param name="maskValue">2.0</param>
+			<param name="pointSize">1.0</param>
+			<param name="positionRange">True</param>
+			<param name="minPositionX">-10</param>
+			<param name="maxPositionX">10</param>
+			<param name="minPositionY">0.00</param>
+			<param name="maxPositionY">0.05</param>
+			<param name="minPositionZ">-10</param>
+			<param name="maxPositionZ">10</param>
+		</struct>
+		
+		<struct name="MVUpperCrustColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">UpperCrustColourMap</param>
+		</struct>
+
+		<struct name="MVLowerCrustColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">LowerCrustColourMap</param>
+		</struct>
+		
+		<struct name="MVUpperMantleColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">UpperMantleColourMap</param>
+		</struct>
+
+		<struct name="MVLowerMantleColourBar">
+			<param name="Type">lucColourBar</param>
+			<param name="ColourMap">LowerMantleColourMap</param>
+		</struct>
+
+		<struct name="MVborder">
+			<param name="Type">lucFieldVariableBorder</param>
+			<param name="FieldVariable">VelocityField</param>
+		</struct>
+	
+		<struct name="y8Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.80 </param>
+		</struct>
+	
+		<struct name="y7Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.70 </param>
+		</struct>
+	
+		<struct name="y6Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.60 </param>
+		</struct>
+	
+		<struct name="y5Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.50 </param>
+		</struct>
+					
+		<struct name="y4Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.40</param>
+		</struct>
+		
+		<struct name="y3Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.30</param>
+		</struct>
+		<struct name="y2Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.20</param>
+		</struct>
+		<struct name="y1Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.10</param>
+		</struct>
+		<struct name="y0Title">
+			<param name="Type">lucTitle</param>
+			<param name="string">y = 0.00</param>
+		</struct>
+
+		<struct name="MVAxis">
+			<param name="Type">lucAxis</param>
+			<param name="originX">2.05</param>
+		</struct>	
+			
+		<struct name="MapView8PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice8</param>
+				<param>MVUpperMantleSlice8</param>
+				<param>MVLowerCrustSlice8</param>
+				<param>MVUpperCrustSlice8</param>
+				<param>MVUpperCrustColourBar</param>
+				<param>y8Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView7PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice7</param>
+				<param>MVUpperMantleSlice7</param>
+				<param>MVLowerCrustSlice7</param>
+				<param>MVUpperCrustSlice7</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>y7Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView6PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				<param>MVborder</param>
+				-->
+				<param>MVLowerMantleSlice6</param>
+				<param>MVUpperMantleSlice6</param>
+				<param>MVLowerCrustSlice6</param>
+				<param>MVUpperCrustSlice6</param>
+				<param>y6Title</param>
+				<param>MVLowerMantleColourBar</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView5PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice5</param>
+				<param>MVUpperMantleSlice5</param>
+				<param>MVLowerCrustSlice5</param>
+				<param>MVUpperCrustSlice5</param>
+				<param>y5Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView4PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice4</param>
+				<param>MVUpperMantleSlice4</param>
+				<param>MVLowerCrustSlice4</param>
+				<param>MVUpperCrustSlice4</param>
+				<param>y4Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView3PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice3</param>
+				<param>MVUpperMantleSlice3</param>
+				<param>MVLowerCrustSlice3</param>
+				<param>MVUpperCrustSlice3</param>
+				<param>y3Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView2PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				<param>MVborder</param>
+				-->
+				<param>MVLowerMantleSlice2</param>
+				<param>MVUpperMantleSlice2</param>
+				<param>MVLowerCrustSlice2</param>
+				<param>MVUpperCrustSlice2</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>y2Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView1PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				<param>MVborder</param>
+				-->
+				<param>MVLowerMantleSlice1</param>
+				<param>MVUpperMantleSlice1</param>
+				<param>MVLowerCrustSlice1</param>
+				<param>MVUpperCrustSlice1</param>
+				<param>y1Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView0PerspViewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVUpperCrustColourBar</param>
+				<param>MVborder</param>
+				-->
+				<param>MVLowerMantleSlice0</param>
+				<param>MVUpperMantleSlice0</param>
+				<param>MVLowerCrustSlice0</param>
+				<param>MVUpperCrustSlice0</param>
+				<param>y0Title</param>
+			</list>
+	 	</struct>
+
+		<struct name="MapView8Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera8</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				<param>MVborder</param>
+				-->
+				<param>MVLowerMantleSlice8</param>
+				<param>MVUpperMantleSlice8</param>
+				<param>MVLowerCrustSlice8</param>
+				<param>MVUpperCrustSlice8</param>
+				<param>MVUpperCrustColourBar</param>
+				<param>y8Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView7Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera7</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice7</param>
+				<param>MVUpperMantleSlice7</param>
+				<param>MVLowerCrustSlice7</param>
+				<param>MVUpperCrustSlice7</param>
+				<param>y7Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView6Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera6</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice6</param>
+				<param>MVUpperMantleSlice6</param>
+				<param>MVLowerCrustSlice6</param>
+				<param>MVUpperCrustSlice6</param>
+				<param>y6Title</param>
+			</list>
+	 	</struct>
+
+								
+		<struct name="MapView5Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera5</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice5</param>
+				<param>MVUpperMantleSlice5</param>
+				<param>MVLowerCrustSlice5</param>
+				<param>MVUpperCrustSlice5</param>
+				<param>y5Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView4Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera4</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice4</param>
+				<param>MVUpperMantleSlice4</param>
+				<param>MVLowerCrustSlice4</param>
+				<param>MVUpperCrustSlice4</param>
+				<param>y4Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView3Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera3</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice3</param>
+				<param>MVUpperMantleSlice3</param>
+				<param>MVLowerCrustSlice3</param>
+				<param>MVUpperCrustSlice3</param>
+				<param>y3Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView2Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera2</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice2</param>
+				<param>MVUpperMantleSlice2</param>
+				<param>MVLowerCrustSlice2</param>
+				<param>MVUpperCrustSlice2</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>y2Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView1Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera1</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice1</param>
+				<param>MVUpperMantleSlice1</param>
+				<param>MVLowerCrustSlice1</param>
+				<param>MVUpperCrustSlice1</param>
+				<param>y1Title</param>
+			</list>
+	 	</struct>
+
+							
+		<struct name="MapView0Viewport">
+       			<param name="Type">lucViewport</param>
+			<param name="Camera">MVtopDownCamera0</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<!--
+				<param>MVborder</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+				-->
+				<param>MVLowerMantleSlice0</param>
+				<param>MVUpperMantleSlice0</param>
+				<param>MVLowerCrustSlice0</param>
+				<param>MVUpperCrustSlice0</param>
+				<param>y0Title</param>
+			</list>
+	 	</struct>
+
+		<struct name="MVSideViewport">
+	       		<param name="Type">lucViewport</param>
+			<param name="Camera">MVSideViewCamera</param>
+			<param name="compositeEachObject">true</param>
+			<list name="DrawingObject">
+				<param>MVborder</param>
+				<param>MVLowerCrustSlice7</param>
+				<param>MVUpperCrustSlice7</param>
+				<param>MVLowerMantleSlice7</param>
+				<param>MVUpperMantleSlice7</param>
+				<param>MVLowerCrustSlice6</param>
+				<param>MVUpperCrustSlice6</param>
+				<param>MVLowerMantleSlice6</param>
+				<param>MVUpperMantleSlice6</param>
+				<param>MVLowerCrustSlice5</param>
+				<param>MVUpperCrustSlice5</param>
+				<param>MVLowerMantleSlice5</param>
+				<param>MVUpperMantleSlice5</param>
+				<param>MVLowerCrustSlice4</param>
+				<param>MVUpperCrustSlice4</param>
+				<param>MVLowerMantleSlice4</param>
+				<param>MVUpperMantleSlice4</param>
+				<param>MVLowerCrustSlice3</param>
+				<param>MVUpperCrustSlice3</param>
+				<param>MVLowerMantleSlice3</param>
+				<param>MVUpperMantleSlice3</param>
+				<param>MVLowerCrustSlice2</param>
+				<param>MVUpperCrustSlice2</param>
+				<param>MVLowerMantleSlice2</param>
+				<param>MVUpperMantleSlice2</param>
+				<param>MVLowerCrustSlice1</param>
+				<param>MVUpperCrustSlice1</param>
+				<param>MVLowerMantleSlice1</param>
+				<param>MVUpperMantleSlice1</param>
+				<param>MVLowerCrustSlice0</param>
+				<param>MVUpperCrustSlice0</param>
+				<param>MVLowerMantleSlice0</param>
+				<param>MVUpperMantleSlice0</param>
+				<param>MVAxis</param>
+				<param>MVUpperMantleColourBar</param>
+				<param>MVLowerMantleColourBar</param>
+				<param>MVLowerCrustColourBar</param>
+			</list>
+		</struct>
+		<!--	
+		<struct name="MVrenderingEngine">
+			<param name="Type">lucRenderingEngineGL</param>
+		</struct>
+	
+		<struct name="MVpngOutput">
+			<param name="Type">lucOutputPNG</param>
+		</struct>
+		-->
+		<struct name="MVSideWindow">
+	                <param name="Type">lucDefaultWindow</param>
+	                <param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">592</param>
+			<param name="width">1008</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+	      			<param>MVSideViewport</param>
+			</list>
+		</struct>
+
+		<struct name="MVWindow">
+	                <param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">592</param>
+			<param name="width">1008</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>MapView0Viewport MapView3Viewport MapView6Viewport</param>
+				<param>MapView1Viewport MapView4Viewport MapView7Viewport</param>
+				<param>MapView2Viewport MapView5Viewport MapView8Viewport</param>
+			</list>
+		</struct>
+
+
+		<struct name="MVPerspWindow">
+			<param name="Type">lucDefaultWindow</param>
+			<param name="RenderingEngine">RenderingEngine</param>
+			<param name="OutputFormat">PNGOutput</param>
+			<param name="height">592</param>
+			<param name="width">1008</param>
+			<param name="interactive">f</param>
+			<param name="backgroundColour">White</param>
+			<list name="Viewport">
+				<param>MapView0PerspViewport MapView3PerspViewport MapView6PerspViewport</param>
+				<param>MapView1PerspViewport MapView4PerspViewport MapView7PerspViewport</param>
+				<param>MapView2PerspViewport MapView5PerspViewport MapView8PerspViewport</param>
+ 			</list>
+
+		</struct>
+			
+		<!--struct name="MVWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">MVWindow</param>
+		</struct>
+
+		<struct name="MVPerspWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">MVPerspWindow</param>
+		</struct>
+
+		<struct name="MVSideWindowMovie">
+			<param name="Type">lucEncoderLibfame</param>
+			<param name="Window">MVSideWindow</param>
+		</struct-->
+
+
+	</struct>
+
+</StGermainData>

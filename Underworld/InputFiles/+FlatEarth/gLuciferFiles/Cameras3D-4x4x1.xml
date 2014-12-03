@@ -1,0 +1,152 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+	<list name="plugins" mergeType="merge">
+		<param>lucPlugin</param>
+	</list>
+
+	<struct name="components" mergeType="merge">
+
+
+	<!--
+	<struct name="light1">
+		<param name="Type">lucLight</param>
+			<param name="posX">0 </param>
+			<param name="posY">3.33</param>
+			<param name="posZ">0.1 </param>
+			<param name="posW">0.0 </param>
+			<param name="model"> Ambient </param>
+			<param name="ambX">0 </param>
+			<param name="ambY">3.33</param>
+			<param name="ambZ">0.1 </param>
+			<param name="ambW">0.0 </param>
+			<param name="ambW">0.0 </param>
+		 	<param name="ambW">0.0 </param>
+	
+	</struct>
+	-->
+
+		<!-- setting up several default camera angles -->
+		
+		
+		<struct name="flatEarthMidViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">1.75</param>
+			<param name="coordY">4.00</param>
+			<param name="coordZ">0.0</param>
+			<param name="focalPointX">0</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">0</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+	
+	
+		<struct name="flatEarthTopDownCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">0 </param>
+			<param name="coordY">7.50</param>
+			<param name="coordZ">0.1 </param>
+			<param name="focalPointX">0.0</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">0.0</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+
+		<struct name="flatEarthHighViewCamera">
+			<param name="Type">lucCamera</param>
+			<param name="coordX">0.0</param>
+			<param name="coordY">4.5</param>
+			<param name="coordZ">0.7</param>
+			<param name="focalPointX">0</param>
+			<param name="focalPointY">0.5</param>
+			<param name="focalPointZ">0</param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+
+
+
+		<struct name="flatEarthPerspectiveViewCamera1">
+		        <param name="Type">lucCamera</param>
+		        <param name="coordX">-0.25</param>
+		        <param name="coordY"> 3.5</param>
+		        <param name="coordZ"> 7.0</param>
+		        <param name="focalPointX">0.0</param>
+		        <param name="focalPointY">0.22</param>
+		        <param name="focalPointZ">0.0</param>
+		        <param name="upDirectionX">0</param>
+		        <param name="upDirectionY">1</param>
+		        <param name="upDirectionZ">0</param>
+		        <param name="stereoType">Mono</param>
+		        <param name="eyeSeparation">0.2</param>
+		        <param name="focalLength">0</param>
+		</struct>	
+
+		<struct name="flatEarthPerspectiveViewCamera2">
+			<param name="Type">lucCamera</param>
+			<param name="coordX"> 0 </param>
+			<param name="coordY"> 3.8 </param>
+			<param name="coordZ">-3.5 </param>
+			<param name="focalPointX">0.0 </param>
+			<param name="focalPointY">0.2 </param>
+			<param name="focalPointZ">0.0 </param>
+			<param name="upDirectionX">0</param>
+			<param name="upDirectionY">1</param>
+			<param name="upDirectionZ">0</param>
+			<param name="stereoType">Mono</param>
+			<param name="eyeSeparation">0.2</param>
+			<param name="focalLength">0</param>
+		</struct>
+
+		<struct name="flatEarthPerspectiveViewCamera3">
+		        <param name="Type">lucCamera</param>
+		        <param name="coordX">0.0</param>
+		        <param name="coordY">5.0</param>
+		        <param name="coordZ">7.5</param>
+		        <param name="focalPointX">0.0</param>
+		        <param name="focalPointY">0.5</param>
+		        <param name="focalPointZ">0.0</param>
+		        <param name="upDirectionX">0</param>
+		        <param name="upDirectionY">1</param>
+		        <param name="upDirectionZ">0</param>
+		        <param name="stereoType">Mono</param>
+		        <param name="eyeSeparation">0.2</param>
+		        <param name="focalLength">0</param>
+		</struct>	
+
+		<struct name="flatEarthPerspectiveViewCamera4">
+		        <param name="Type">lucCamera</param>
+				<param name="coordX">-1.247</param>
+		        <param name="coordY">2.2715</param>
+		        <param name="coordZ">-1.2747</param>
+		        <param name="focalPointX">0.89117</param>
+		        <param name="focalPointY">0.22</param>
+		        <param name="focalPointZ">0.81161</param>
+		        <param name="upDirectionX">0</param>
+		        <param name="upDirectionY">1</param>
+		        <param name="upDirectionZ">0</param>
+		        <param name="stereoType">Mono</param>
+		        <param name="eyeSeparation">0.2</param>
+		        <param name="focalLength">0</param>
+		</struct>	
+	</struct>
+</StGermainData>
+
+
+

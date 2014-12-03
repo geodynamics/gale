@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<!-- This file sets up extension and compression in 3D:
+		- Sets up REP for the pressure part of the failure models
+		- Allows inflow/outflow at the base/top of the box to preserve a surface level
+		- Allows a range of layering options
+		
+	 Note that some of these options are from experimental so this needs to be 
+	 fixed before we can release this functionality
+-->		
+
+	<include> ./BaseApps/ExtensionCompressionShearQ1Q1BaseApp.xml </include>	
+	<!--><include> Underworld/BaseApps/ExtensionIncompressibleShearBaseApp.xml </include> 
+	<include>Experimental/StoreViscosity.xml</include> -->
+	
+	
+	<list name="plugins" mergeType="merge">
+		<param>StgFEM_FrequentOutput </param>	
+		<param>Underworld_Vrms </param>	
+		<param>StgFEM_CPUTime </param>	
+		<param>StgFEM_FeVariableList </param>
+		<param>Experimental_ShearBandAnalysis</param>
+	</list>
+		
+	<struct name="ShearBandAnalysis" mergeType="replace">
+		<list name="materialIndices">
+			<param> 1 </param>
+			<param> 2 </param>
+			<param> 3 </param>
+			<param> 4 </param>
+			<param> 5 </param>
+		</list>	
+		<param name="weakeningThreshold"> 0.2 </param>
+		<param name="notIfHealing"> True </param>
+	</struct>	
+
+	<param name="extensionReferenceHeight">0.8</param>
+
+	<!-- All stuff associated with recovered pressures/stresses etc --> 
+	
+	<struct name="components" mergeType="merge">
+		<struct name="recoveredStrainRateField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="recoverStrain">true</param>
+			<param name="recoverPressure">false</param>
+		</struct>
+		<struct name="recoveredStressField" mergeType="replace">
+			<param name="Type">RecoveredFeVariable</param>
+			<param name="RawField">StrainRateField</param>
+			<param name="recoverPressure">False</param>
+			<param name="OrderOfInterpolation">1</param>
+			<param name="RawPressureField">PressureField</param>
+			<param name="CalibratePressure"> 1 </param>
+			
+		</struct>
+		<struct name="REP">
+			<param name="Type">REP_Algorithm</param>
+			<param name="IntegrationPoints">picIntegrationPoints</param>
+			<param name="ConstitutiveMatrix">constitutiveMatrix</param>
+			<list name="RepFieldList">
+				<param>recoveredStrainRateField</param>
+				<param>recoveredStressField</param>
+			</list>
+		    
+		</struct>
+		
+		<struct name="recoveredStrainRateInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredStrainRateField</param>
+		</struct>
+		
+		<struct name="recoveredDeviatoricStressField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_MakeDeviatoric</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>
+		
+		<struct name="recoveredPressureField"> 
+			<param name="Type">OperatorFeVariable</param>
+			<param name="Operator">SymmetricTensor_NegAverageTrace</param>
+			<param name="FeVariable">recoveredStressField</param>
+		</struct>		
+		
+		
+		<struct name="recoveredDeviatoricStressInvariantField"> 
+			<param name="Type">OperatorFeVariable</param>
+		     	<param name="Operator">SymmetricTensor_Invariant</param>
+			<param name="FeVariable">recoveredDeviatoricStressField</param>
+		</struct>
+	</struct> 
+
+
+	<include> ./set_up.xml </include>
+	
+	<!-- shape options -->
+	
+	<include> ./4LayerModel.xml </include>	
+	<include> ./PassiveTracer3DTopography.xml </include>
+	<include> ./PassiveTracers3D.xml </include>
+	
+	<!-- rheology options -->
+	<include> ./rheology/rheology-2layer.xml </include> <!-- this is also needed if you use rheology-4layer-LC_UM.xml -->
+	<!--><include> ./rheology/rheology-4layer-LC_UM.xml </include>  <--> 	<!-- this only has added  rheologies for the upper mantle and lower crust. you still need a 2 layer rheology if you use this 4 layer rheology-->
+	
+	<!-- Visualisation -->
+
+
+	<include> Viewports/Cameras3DBigger.xml </include> 
+	<!-- <include> Viewports/RecoveredPressureVP.xml </include>   -->
+	<!--><include> Viewports/RecoveredStrainRateVP.xml </include> -->
+	<!--><include> Viewports/RecoveredStressVP.xml </include>     -->
+
+	<include> Viewports/StrainRateVP.xml </include> 
+	<include> Viewports/PressureVP.xml </include> 
+	<include> Viewports/ShearBandVP.xml </include> 
+		
+
+	<!-- general parameters that get changed alot -->	
+	<param name="outputPath"> ./output </param>
+	<param name="elementResI"> 24</param>
+	<param name="elementResJ"> 12 </param>
+	<param name="elementResK"> 24 </param>
+	<param name="maxTimeSteps"> 30 </param>
+
+
+	<param name="constantHeight" mergeType="replace"> 0.5 </param>
+	<param name="leftWallVelocity" mergeType="replace"> -0.5 </param>
+	<param name="leftWallShearVelocity" mergeType="replace"> -0.5 </param>
+	<param name="rightWallVelocity" mergeType="replace"> 0.5 </param>
+	<param name="rightWallShearVelocity" mergeType="replace"> 0.5 </param>
+	<param name="frontWallVelocity" mergeType="replace"> 0.0 </param>
+	<param name="backWallVelocity" mergeType="replace"> 0.0 </param>
+
+
+
+	<!-- box size overide -->
+	
+	<param name="maxX"> 1.0 </param>
+	<param name="maxY"> 1.0 </param>
+	<param name="maxZ"> 1.0 </param>
+	
+	<param name="minX"> -1.0 </param>
+	<param name="minY">  0.0 </param>
+	<param name="minZ"> -1.0 </param>
+	
+	<!-- this is needed for centering the Viewports -->
+	<param name="midX"> 0 </param>
+	<param name="midY"> 0.5 </param>
+	<param name="midZ"> 0 </param>
+
+	<!-- window sizes change depending on box size -->
+	
+	<param name="windowWidthZ">864</param><!--864 for maxZ=2, 1008 for maxZ=3, 1200 for maxZ=1200, 1504 for maxZ=5 -->
+	<param name="windowWidthX">864</param><!--864 for maxX=2, 1008 for maxX=3, 1200 for maxX=1200, 1504 for maxX=5 -->
+	
+</StGermainData>
+

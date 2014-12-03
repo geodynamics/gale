@@ -1,0 +1,796 @@
+<?xml version="1.0"?>
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+  <import>
+    <toolbox>Underworld</toolbox>
+    <toolbox>Underworld</toolbox>
+  </import>
+  <plugins>
+    <plugin>StgFEM_StandardConditionFunctions</plugin>
+    <plugin>Underworld_Ra_Scaling</plugin>
+    <plugin>StgFEM_FrequentOutput</plugin>
+    <plugin>Underworld_Nusselt</plugin>
+    <plugin>Underworld_Vrms</plugin>
+    <plugin>StgFEM_CPUTime</plugin>
+    <plugin>Underworld_MaterialThermalDiffusivity</plugin>
+    <plugin>Underworld_ShapeFemIC</plugin>
+    <plugin>lucPlugin</plugin>
+  </plugins>
+  <components>
+    <element type="struct" name="constantMesh">
+      <element type="param" name="Type">FeMesh</element>
+      <element type="param" name="elementType">constant</element>
+    </element>
+    <element type="struct" name="constantMeshGenerator">
+      <element type="param" name="Type">C0Generator</element>
+      <element type="param" name="mesh">constantMesh</element>
+      <element type="param" name="elementMesh">elementMesh</element>
+    </element>
+    <element type="struct" name="linearMesh">
+      <element type="param" name="Type">FeMesh</element>
+      <element type="param" name="elementType">linear</element>
+    </element>
+    <element type="struct" name="linearMeshGenerator">
+      <element type="param" name="Type">CartesianGenerator</element>
+      <element type="param" name="mesh">linearMesh</element>
+      <element type="param" name="dims">dim</element>
+      <element type="param" name="shadowDepth">shadowDepth</element>
+      <element type="list" name="size">
+        <element type="param">elementResI</element>
+        <element type="param">elementResJ</element>
+        <element type="param">elementResK</element>
+      </element>
+      <element type="list" name="minCoord">
+        <element type="param">minX</element>
+        <element type="param">minY</element>
+        <element type="param">minZ</element>
+      </element>
+      <element type="list" name="maxCoord">
+        <element type="param">maxX</element>
+        <element type="param">maxY</element>
+        <element type="param">maxZ</element>
+      </element>
+    </element>
+    <element type="struct" name="velocity">
+      <element type="param" name="Type">MeshVariable</element>
+      <element type="param" name="mesh">velocityMesh</element>
+      <element type="param" name="Rank">Vector</element>
+      <element type="param" name="DataType">Double</element>
+      <element type="param" name="VectorComponentCount">dim</element>
+      <element type="list" name="names">
+        <element type="param">vx</element>
+        <element type="param">vy</element>
+        <element type="param">vz</element>
+      </element>
+    </element>
+    <element type="struct" name="velocityBCs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">velocityMesh</element>
+    </element>
+    <element type="struct" name="velocityICs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">velocityMesh</element>
+    </element>
+    <element type="struct" name="velocityDofLayout">
+      <element type="param" name="Type">DofLayout</element>
+      <element type="param" name="mesh">velocityMesh</element>
+      <element type="param" name="BaseVariableCount">dim</element>
+      <element type="list" name="BaseVariables">
+        <element type="param">vx</element>
+        <element type="param">vy</element>
+        <element type="param">vz</element>
+      </element>
+    </element>
+    <element type="struct" name="VelocityField">
+      <element type="param" name="Type">FeVariable</element>
+      <element type="param" name="FEMesh">velocityMesh</element>
+      <element type="param" name="DofLayout">velocityDofLayout</element>
+      <element type="param" name="BC">velocityBCs</element>
+      <element type="param" name="IC">velocityICs</element>
+      <element type="param" name="LinkedDofInfo">velocityLinkedDofs</element>
+    </element>
+    <element type="struct" name="VelocityMagnitudeField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">Magnitude</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="VelocityGradientsField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">Gradient</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="VelocityGradientsInvariantField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TensorInvariant</element>
+      <element type="param" name="FeVariable">VelocityGradientsField</element>
+    </element>
+    <element type="struct" name="VelocityXXField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeFirstComponent</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="VelocityYYField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeSecondComponent</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="StrainRateField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TensorSymmetricPart</element>
+      <element type="param" name="FeVariable">VelocityGradientsField</element>
+    </element>
+    <element type="struct" name="VorticityField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TensorAntisymmetricPart</element>
+      <element type="param" name="FeVariable">VelocityGradientsField</element>
+    </element>
+    <element type="struct" name="StrainRateInvariantField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">SymmetricTensor_Invariant</element>
+      <element type="param" name="FeVariable">StrainRateField</element>
+    </element>
+    <element type="struct" name="StrainRateXXField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeFirstComponent</element>
+      <element type="param" name="FeVariable">StrainRateField</element>
+    </element>
+    <element type="struct" name="StrainRateYYField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">TakeSecondComponent</element>
+      <element type="param" name="FeVariable">StrainRateField</element>
+    </element>
+    <element type="struct" name="temperature">
+      <element type="param" name="Type">MeshVariable</element>
+      <element type="param" name="Rank">Scalar</element>
+      <element type="param" name="DataType">Double</element>
+      <element type="param" name="mesh">temperatureMesh</element>
+    </element>
+    <element type="struct" name="temperatureBCs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">temperatureMesh</element>
+    </element>
+    <element type="struct" name="temperatureICs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">temperatureMesh</element>
+    </element>
+    <element type="struct" name="temperatureDofLayout">
+      <element type="param" name="Type">DofLayout</element>
+      <element type="param" name="mesh">temperatureMesh</element>
+      <element type="list" name="BaseVariables">
+        <element type="param">temperature</element>
+      </element>
+    </element>
+    <element type="struct" name="TemperatureField">
+      <element type="param" name="Type">FeVariable</element>
+      <element type="param" name="FEMesh">temperatureMesh</element>
+      <element type="param" name="DofLayout">temperatureDofLayout</element>
+      <element type="param" name="BC">temperatureBCs</element>
+      <element type="param" name="IC">temperatureICs</element>
+      <element type="param" name="LinkedDofInfo">temperatureLinkedDofs</element>
+    </element>
+    <element type="struct" name="TemperatureGradientsField">
+      <element type="param" name="Type">OperatorFeVariable</element>
+      <element type="param" name="Operator">Gradient</element>
+      <element type="param" name="FeVariable">TemperatureField</element>
+    </element>
+    <element type="struct" name="pressure">
+      <element type="param" name="Type">MeshVariable</element>
+      <element type="param" name="mesh">pressureMesh</element>
+      <element type="param" name="Rank">Scalar</element>
+      <element type="param" name="DataType">Double</element>
+    </element>
+    <element type="struct" name="pressureBCs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">pressureMesh</element>
+    </element>
+    <element type="struct" name="pressureICs">
+      <element type="param" name="Type">CompositeVC</element>
+      <element type="param" name="Data">pressureMesh</element>
+    </element>
+    <element type="struct" name="pressureDofLayout">
+      <element type="param" name="Type">DofLayout</element>
+      <element type="param" name="mesh">pressureMesh</element>
+      <element type="list" name="BaseVariables">
+        <element type="param">pressure</element>
+      </element>
+    </element>
+    <element type="struct" name="PressureField">
+      <element type="param" name="Type">FeVariable</element>
+      <element type="param" name="FEMesh">pressureMesh</element>
+      <element type="param" name="DofLayout">pressureDofLayout</element>
+      <element type="param" name="BC">pressureBCs</element>
+      <element type="param" name="IC">pressureICs</element>
+      <element type="param" name="LinkedDofInfo">pressureLinkedDofs</element>
+    </element>
+    <element type="struct" name="cellLayout">
+      <element type="param" name="Type">SingleCellLayout</element>
+    </element>
+    <element type="struct" name="particleLayout">
+      <element type="param" name="Type">GaussParticleLayout</element>
+    </element>
+    <element type="struct" name="gaussSwarm">
+      <element type="param" name="Type">IntegrationPointsSwarm</element>
+      <element type="param" name="CellLayout">cellLayout</element>
+      <element type="param" name="ParticleLayout">particleLayout</element>
+      <element type="param" name="FeMesh">elementMesh</element>
+      <element type="param" name="TimeIntegrator">timeIntegrator</element>
+      <element type="param" name="IntegrationPointMapper">gaussMapper</element>
+    </element>
+    <element type="struct" name="gaussMapper">
+      <element type="param" name="Type">GaussMapper</element>
+      <element type="param" name="IntegrationPointsSwarm">gaussSwarm</element>
+      <element type="param" name="MaterialPointsSwarm">gaussMaterialSwarm</element>
+    </element>
+    <element type="struct" name="backgroundLayout">
+      <element type="param" name="Type">BackgroundParticleLayout</element>
+    </element>
+    <element type="struct" name="gaussMSwarmMovementHandler">
+      <element type="param" name="Type">ParticleMovementHandler</element>
+    </element>
+    <element type="struct" name="gaussMaterialSwarm">
+      <element type="param" name="Type">MaterialPointsSwarm</element>
+      <element type="param" name="CellLayout">cellLayout</element>
+      <element type="param" name="ParticleLayout">backgroundLayout</element>
+      <element type="param" name="FeMesh">elementMesh</element>
+      <element type="list" name="ParticleCommHandlers">
+        <element type="param">gaussMSwarmMovementHandler</element>
+      </element>
+    </element>
+    <element type="struct" name="timeIntegrator">
+      <element type="param" name="Type">TimeIntegrator</element>
+      <element type="param" name="order">timeIntegratorOrder</element>
+      <element type="param" name="simultaneous">f</element>
+      <element type="param" name="Context">context</element>
+    </element>
+    <element type="struct" name="elementCellLayout">
+      <element type="param" name="Type">ElementCellLayout</element>
+      <element type="param" name="Mesh">elementMesh</element>
+    </element>
+    <element type="struct" name="weights">
+      <element type="param" name="Type">PCDVC</element>
+      <element type="param" name="resolutionX">10</element>
+      <element type="param" name="resolutionY">10</element>
+      <element type="param" name="resolutionZ">10</element>
+      <element type="param" name="lowerT">0.6</element>
+      <element type="param" name="upperT">25</element>
+      <element type="param" name="maxDeletions">3</element>
+      <element type="param" name="maxSplits">3</element>
+      <element type="param" name="MaterialPointsSwarm">materialSwarm</element>
+    </element>
+    <element type="struct" name="localLayout">
+      <element type="param" name="Type">MappedParticleLayout</element>
+    </element>
+    <element type="struct" name="picIntegrationPoints">
+      <element type="param" name="Type">IntegrationPointsSwarm</element>
+      <element type="param" name="CellLayout">elementCellLayout</element>
+      <element type="param" name="ParticleLayout">localLayout</element>
+      <element type="param" name="FeMesh">elementMesh</element>
+      <element type="param" name="WeightsCalculator">weights</element>
+      <element type="param" name="TimeIntegrator">timeIntegrator</element>
+      <element type="param" name="IntegrationPointMapper">mapper</element>
+    </element>
+    <element type="struct" name="mapper">
+      <element type="param" name="Type">CoincidentMapper</element>
+      <element type="param" name="IntegrationPointsSwarm">picIntegrationPoints</element>
+      <element type="param" name="MaterialPointsSwarm">materialSwarm</element>
+    </element>
+    <element type="struct" name="materialSwarmParticleLayout">
+      <element type="param" name="Type">SpaceFillerParticleLayout</element>
+      <element type="param" name="averageInitialParticlesPerCell">particlesPerCell</element>
+    </element>
+    <element type="struct" name="pMovementHandler">
+      <element type="param" name="Type">ParticleMovementHandler</element>
+    </element>
+    <element type="struct" name="pShadowSync">
+      <element type="param" name="Type">ParticleShadowSync</element>
+    </element>
+    <element type="struct" name="materialSwarm">
+      <element type="param" name="Type">MaterialPointsSwarm</element>
+      <element type="param" name="CellLayout">elementCellLayout</element>
+      <element type="param" name="ParticleLayout">materialSwarmParticleLayout</element>
+      <element type="param" name="FeMesh">elementMesh</element>
+      <element type="list" name="ParticleCommHandlers">
+        <element type="param">pMovementHandler</element>
+        <element type="param">pShadowSync</element>
+      </element>
+      <element type="param" name="SplittingRoutine">splittingRoutine</element>
+      <element type="param" name="RemovalRoutine">removalRoutine</element>
+      <element type="param" name="EscapedRoutine">escapedRoutine</element>
+    </element>
+    <element type="struct" name="materialSwarmAdvector">
+      <element type="param" name="Type">SwarmAdvector</element>
+      <element type="param" name="Swarm">materialSwarm</element>
+      <element type="param" name="TimeIntegrator">timeIntegrator</element>
+      <element type="param" name="VelocityField">VelocityField</element>
+      <element type="param" name="PeriodicBCsManager">periodicBCsManager</element>
+      <element type="param" name="allowFallbackToFirstOrder">True</element>
+    </element>
+    <element type="struct" name="solutionVelocity">
+      <element type="param" name="Type">SolutionVector</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="solutionPressure">
+      <element type="param" name="Type">SolutionVector</element>
+      <element type="param" name="FeVariable">PressureField</element>
+    </element>
+    <element type="struct" name="mom_force">
+      <element type="param" name="Type">ForceVector</element>
+      <element type="param" name="FeVariable">VelocityField</element>
+      <element type="param" name="ExtraInfo">context</element>
+    </element>
+    <element type="struct" name="cont_force">
+      <element type="param" name="Type">ForceVector</element>
+      <element type="param" name="FeVariable">PressureField</element>
+      <element type="param" name="ExtraInfo">context</element>
+    </element>
+    <element type="struct" name="k_matrix">
+      <element type="param" name="Type">StiffnessMatrix</element>
+      <element type="param" name="RowVariable">VelocityField</element>
+      <element type="param" name="ColumnVariable">VelocityField</element>
+      <element type="param" name="RHS">mom_force</element>
+      <element type="param" name="allowZeroElementContributions">False</element>
+    </element>
+    <element type="struct" name="constitutiveMatrix">
+      <element type="param" name="Type">ConstitutiveMatrixCartesian</element>
+      <element type="param" name="Swarm">picIntegrationPoints</element>
+      <element type="param" name="StiffnessMatrix">k_matrix</element>
+    </element>
+    <element type="struct" name="g_matrix">
+      <element type="param" name="Type">StiffnessMatrix</element>
+      <element type="param" name="RowVariable">VelocityField</element>
+      <element type="param" name="ColumnVariable">PressureField</element>
+      <element type="param" name="RHS">mom_force</element>
+      <element type="param" name="transposeRHS">cont_force</element>
+      <element type="param" name="allowZeroElementContributions">False</element>
+    </element>
+    <element type="struct" name="gradientStiffnessMatrixTerm">
+      <element type="param" name="Type">GradientStiffnessMatrixTerm</element>
+      <element type="param" name="Swarm">gaussSwarm</element>
+      <element type="param" name="StiffnessMatrix">g_matrix</element>
+    </element>
+    <element type="struct" name="preconditioner">
+      <element type="param" name="Type">StiffnessMatrix</element>
+      <element type="param" name="RowVariable">PressureField</element>
+      <element type="param" name="ColumnVariable">PressureField</element>
+      <element type="param" name="RHS">cont_force</element>
+      <element type="param" name="allowZeroElementContributions">True</element>
+    </element>
+    <element type="struct" name="preconditionerTerm">
+      <element type="param" name="Type">UzawaPreconditionerTerm</element>
+      <element type="param" name="Swarm">picIntegrationPoints</element>
+      <element type="param" name="StiffnessMatrix">preconditioner</element>
+    </element>
+    <element type="struct" name="uzawa">
+      <element type="param" name="Type">Stokes_SLE_UzawaSolver</element>
+      <element type="param" name="velocitySolver">matrixSolver</element>
+      <element type="param" name="Preconditioner">preconditioner</element>
+      <element type="param" name="tolerance">1.0e-5</element>
+      <element type="param" name="monitor">false</element>
+      <element type="param" name="maxIterations">5000</element>
+      <element type="param" name="minIterations">1</element>
+    </element>
+    <element type="struct" name="stokesEqn">
+      <element type="param" name="Type">Stokes_SLE</element>
+      <element type="param" name="SLE_Solver">uzawa</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="StressTensorMatrix">k_matrix</element>
+      <element type="param" name="GradientMatrix">g_matrix</element>
+      <element type="param" name="DivergenceMatrix"></element>
+      <element type="param" name="CompressibilityMatrix">c_matrix</element>
+      <element type="param" name="VelocityVector">solutionVelocity</element>
+      <element type="param" name="PressureVector">solutionPressure</element>
+      <element type="param" name="ForceVector">mom_force</element>
+      <element type="param" name="ContinuityForceVector">cont_force</element>
+      <element type="param" name="killNonConvergent">false</element>
+      <element type="param" name="nonLinearMaxIterations">nonLinearMaxIterations</element>
+      <element type="param" name="nonLinearTolerance">nonLinearTolerance</element>
+      <element type="param" name="makeConvergenceFile">false</element>
+    </element>
+    <element type="struct" name="residual">
+      <element type="param" name="Type">ForceVector</element>
+      <element type="param" name="FeVariable">TemperatureField</element>
+    </element>
+    <element type="struct" name="massMatrix">
+      <element type="param" name="Type">ForceVector</element>
+      <element type="param" name="FeVariable">TemperatureField</element>
+    </element>
+    <element type="struct" name="predictorMulticorrector">
+      <element type="param" name="Type">AdvDiffMulticorrector</element>
+    </element>
+    <element type="struct" name="EnergyEqn">
+      <element type="param" name="Type">AdvectionDiffusionSLE</element>
+      <element type="param" name="SLE_Solver">predictorMulticorrector</element>
+      <element type="param" name="Context">context</element>
+      <element type="param" name="PhiField">TemperatureField</element>
+      <element type="param" name="Residual">residual</element>
+      <element type="param" name="MassMatrix">massMatrix</element>
+      <element type="param" name="courantFactor">courantFactor</element>
+    </element>
+    <element type="struct" name="lumpedMassMatrixForceTerm">
+      <element type="param" name="Type">LumpedMassMatrixForceTerm</element>
+      <element type="param" name="Swarm">gaussSwarm</element>
+      <element type="param" name="ForceVector">massMatrix</element>
+    </element>
+    <element type="struct" name="defaultResidualForceTerm">
+      <element type="param" name="Type">AdvDiffResidualForceTerm</element>
+      <element type="param" name="Swarm">gaussSwarm</element>
+      <element type="param" name="ForceVector">residual</element>
+      <element type="param" name="ExtraInfo">EnergyEqn</element>
+      <element type="param" name="VelocityField">VelocityField</element>
+      <element type="param" name="defaultDiffusivity">defaultDiffusivity</element>
+      <element type="param" name="UpwindXiFunction">DoublyAsymptoticAssumption</element>
+    </element>
+    <element type="struct" name="buoyancyForceTerm">
+      <element type="param" name="Type">ThermalBuoyancyForceTerm</element>
+      <element type="param" name="ForceVector">mom_force</element>
+      <element type="param" name="TemperatureField">TemperatureField</element>
+      <element type="param" name="Swarm">gaussSwarm</element>
+      <element type="param" name="Ra">Ra</element>
+    </element>
+    <element type="struct" name="isotropicViscosity">
+      <element type="param" name="Type">MaterialViscosity</element>
+      <element type="param" name="eta0">1.0</element>
+    </element>
+    <element type="struct" name="shapeA">
+      <element type="param" name="Type">PolygonShape</element>
+      <element type="list" name="vertices">
+        <asciidata>
+
+<columnDefinition name="x" paramType="string"/>
+<columnDefinition name="y" paramType="string"/>
+<columnDefinition name="z" paramType="string"/>
+
+                            0.0                             0.0                             0.0 
+                         0.3333                             0.0                             0.0 
+                         0.3333                             1.0                             0.0 
+                            0.0                             1.0                             0.0 
+
+</asciidata>
+      </element>
+    </element>
+    <element type="struct" name="materialA">
+      <element type="param" name="Type">RheologyMaterial</element>
+      <element type="param" name="Shape">shapeA</element>
+      <element type="param" name="thermalDiffusivity">1</element>
+      <element type="list" name="Rheology">
+        <element type="param">isotropicViscosity</element>
+      </element>
+    </element>
+    <element type="struct" name="shapeB">
+      <element type="param" name="Type">PolygonShape</element>
+      <element type="list" name="vertices">
+        <asciidata>
+
+<columnDefinition name="x" paramType="string"/>
+<columnDefinition name="y" paramType="string"/>
+<columnDefinition name="z" paramType="string"/>
+
+                         0.3333                             0.0                             0.0 
+                         0.6666                             0.0                             0.0 
+                         0.6666                             1.0                             0.0 
+                         0.3333                             1.0                             0.0 
+
+</asciidata>
+      </element>
+    </element>
+    <element type="struct" name="materialB">
+      <element type="param" name="Type">RheologyMaterial</element>
+      <element type="param" name="Shape">shapeB</element>
+      <element type="param" name="thermalDiffusivity">10</element>
+      <element type="list" name="Rheology">
+        <element type="param">isotropicViscosity</element>
+      </element>
+    </element>
+    <element type="struct" name="shapeC">
+      <element type="param" name="Type">PolygonShape</element>
+      <element type="list" name="vertices">
+        <asciidata>
+
+<columnDefinition name="x" paramType="string"/>
+<columnDefinition name="y" paramType="string"/>
+<columnDefinition name="z" paramType="string"/>
+
+                         0.6666                             0.0                             0.0 
+                            1.0                             0.0                             0.0 
+                            1.0                             1.0                             0.0 
+                         0.6666                             1.0                             0.0 
+
+</asciidata>
+      </element>
+    </element>
+    <element type="struct" name="materialC">
+      <element type="param" name="Type">RheologyMaterial</element>
+      <element type="param" name="Shape">shapeC</element>
+      <element type="param" name="thermalDiffusivity">100</element>
+      <element type="list" name="Rheology">
+        <element type="param">isotropicViscosity</element>
+      </element>
+    </element>
+    <element type="struct" name="HeatShape">
+      <element type="param" name="Type">PolygonShape</element>
+      <element type="list" name="vertices">
+        <asciidata>
+
+<columnDefinition name="x" paramType="string"/>
+<columnDefinition name="y" paramType="string"/>
+<columnDefinition name="z" paramType="string"/>
+
+                            0.1                            0.25                             0.0 
+                            0.9                            0.25                             0.0 
+                            0.9                             0.5                             0.0 
+                            0.1                             0.5                             0.0 
+
+</asciidata>
+      </element>
+    </element>
+    <element type="struct" name="camera">
+      <element type="param" name="Type">lucCamera</element>
+      <element type="param" name="CentreFieldVariable">VelocityField</element>
+      <element type="param" name="coordZ">1.4762</element>
+    </element>
+    <element type="struct" name="temperatureColourMap">
+      <element type="param" name="Type">lucColourMap</element>
+      <element type="param" name="colours">#0B0133 White #B7210B</element>
+      <element type="param" name="dynamicRange">True</element>
+    </element>
+    <element type="struct" name="tempandVelTitle">
+      <element type="param" name="Type">lucTitle</element>
+      <element type="param" name="string">TemperatureField and Velocity Arrows</element>
+    </element>
+    <element type="struct" name="temperatureMap">
+      <element type="param" name="Type">lucScalarField</element>
+      <element type="param" name="FieldVariable">TemperatureField</element>
+      <element type="param" name="ColourMap">temperatureColourMap</element>
+      <element type="param" name="resolution">128</element>
+    </element>
+    <element type="struct" name="velocityArrows">
+      <element type="param" name="Type">lucVectorArrows</element>
+      <element type="param" name="VectorVariable">VelocityField</element>
+      <element type="param" name="Colour">black</element>
+      <element type="param" name="arrowHeadSize">0.15</element>
+      <element type="param" name="lengthScale">0.15</element>
+    </element>
+    <element type="struct" name="border">
+      <element type="param" name="Type">lucFieldVariableBorder</element>
+      <element type="param" name="FieldVariable">VelocityField</element>
+    </element>
+    <element type="struct" name="temperatureColourBar">
+      <element type="param" name="Type">lucColourBar</element>
+      <element type="param" name="ColourMap">temperatureColourMap</element>
+    </element>
+    <element type="struct" name="TemperatureAndVelocityArrowsVP">
+      <element type="param" name="Type">lucViewport</element>
+      <element type="param" name="Camera">camera</element>
+      <element type="param" name="compositeEachObject">t</element>
+      <element type="list" name="DrawingObject">
+        <element type="param">tempandVelTitle</element>
+        <element type="param">temperatureMap</element>
+        <element type="param">border</element>
+        <element type="param">velocityArrows</element>
+        <element type="param">temperatureColourBar</element>
+      </element>
+    </element>
+    <element type="struct" name="velocityMagnitudeColourMap">
+      <element type="param" name="Type">lucColourMap</element>
+      <element type="param" name="colours">Purple Blue Green Yellow Orange Red</element>
+      <element type="param" name="dynamicRange">true</element>
+    </element>
+    <element type="struct" name="timeStep">
+      <element type="param" name="Type">lucTimeStep</element>
+      <element type="param" name="colour">Black</element>
+      <element type="param" name="frame">false</element>
+      <element type="param" name="time">true</element>
+    </element>
+    <element type="struct" name="velocityMagnitudeTitle">
+      <element type="param" name="Type">lucTitle</element>
+      <element type="param" name="string">Velocity Magnitude</element>
+    </element>
+    <element type="struct" name="velocityMagnitudeMap">
+      <element type="param" name="Type">lucScalarField</element>
+      <element type="param" name="FieldVariable">VelocityMagnitudeField</element>
+      <element type="param" name="ColourMap">velocityMagnitudeColourMap</element>
+      <element type="param" name="resolution">128</element>
+    </element>
+    <element type="struct" name="velocityMagnitudeColourBar">
+      <element type="param" name="Type">lucColourBar</element>
+      <element type="param" name="ColourMap">velocityMagnitudeColourMap</element>
+    </element>
+    <element type="struct" name="VelocityMagnitudeVP">
+      <element type="param" name="Type">lucViewport</element>
+      <element type="param" name="Camera">camera</element>
+      <element type="list" name="DrawingObject">
+        <element type="param">velocityMagnitudeTitle</element>
+        <element type="param">velocityMagnitudeMap</element>
+        <element type="param">timeStep</element>
+        <element type="param">border</element>
+        <element type="param">velocityArrows</element>
+        <element type="param">velocityMagnitudeColourBar</element>
+      </element>
+    </element>
+    <element type="struct" name="renderingEngine">
+      <element type="param" name="Type">lucRenderingEngineGL</element>
+    </element>
+    <element type="struct" name="imageOutput">
+      <element type="param" name="Type">lucOutputPNG</element>
+    </element>
+    <element type="struct" name="window">
+      <element type="param" name="Type">lucDefaultWindow</element>
+      <element type="param" name="RenderingEngine">renderingEngine</element>
+      <element type="list" name="OutputFormat">
+        <element type="param">imageOutput</element>
+      </element>
+      <element type="param" name="height">400</element>
+      <element type="param" name="width">800</element>
+      <element type="param" name="backgroundColour">white</element>
+      <element type="param" name="interactive">False</element>
+      <element type="param" name="xFontName">-adobe-helvetica-bold-r-normal--14-140-75-75-p-82-iso8859-1</element>
+      <element type="param" name="Viewport">TemperatureAndVelocityArrowsVP ParticleVP</element>
+    </element>
+    <element type="struct" name="densityColourMap">
+      <element type="param" name="Type">lucColourMap</element>
+      <element type="param" name="colours">Red Green Blue</element>
+      <element type="param" name="dynamicRange">True</element>
+    </element>
+    <element type="struct" name="particleDots">
+      <element type="param" name="Type">lucSwarmViewer</element>
+      <element type="param" name="Swarm">materialSwarm</element>
+      <element type="param" name="ColourVariable">materialSwarm-MaterialIndex</element>
+      <element type="param" name="ColourMap">densityColourMap</element>
+      <element type="param" name="pointSize">2.0</element>
+    </element>
+    <element type="struct" name="particleTypeTitle">
+      <element type="param" name="Type">lucTitle</element>
+      <element type="param" name="string">Particle Types</element>
+    </element>
+    <element type="struct" name="ParticleVP">
+      <element type="param" name="Type">lucViewport</element>
+      <element type="param" name="Camera">camera</element>
+      <element type="list" name="DrawingObject">
+        <element type="param">particleDots</element>
+        <element type="param">particleTypeTitle</element>
+        <element type="param">border</element>
+      </element>
+    </element>
+  </components>
+  <element type="param" name="velocityMesh">linearMesh</element>
+  <element type="param" name="elementMesh">linearMesh</element>
+  <element type="param" name="temperatureMesh">linearMesh</element>
+  <element type="param" name="pressureMesh">constantMesh</element>
+  <element type="list" name="FieldVariablesToCheckpoint">
+    <element type="param">VelocityField</element>
+    <element type="param">PressureField</element>
+    <element type="param">VelocityField</element>
+    <element type="param">TemperatureField</element>
+    <element type="param">TemperatureField-phiDotField</element>
+  </element>
+  <element type="param" name="maxTimeSteps">10</element>
+  <element type="param" name="outputPath">./expected/MultiThermalDiffusivity.xml</element>
+  <element type="param" name="dumpEvery">0</element>
+  <element type="param" name="checkpointEvery">10</element>
+  <element type="param" name="Ra">1e5</element>
+  <element type="param" name="courantFactor">0.25</element>
+  <element type="param" name="journal.info.Context-verbose">True</element>
+  <element type="param" name="journal-level.info.Stg_ComponentFactory">2</element>
+  <element type="param" name="journal-level.info.lucInfo">2</element>
+  <element type="param" name="journal-level.debug.lucDebug">1</element>
+  <element type="param" name="journal-enable-branch.debug.lucDebug">f</element>
+  <element type="param" name="journal-enable-branch.debug.StgFEM">t</element>
+  <element type="param" name="journal-level-branch.debug.StgFEM">2</element>
+  <element type="param" name="journal.debug">t</element>
+  <element type="param" name="dim">2</element>
+  <element type="param" name="elementResI">64</element>
+  <element type="param" name="elementResJ">64</element>
+  <element type="param" name="elementResK">1</element>
+  <element type="param" name="shadowDepth">1</element>
+  <element type="param" name="minX">0.0</element>
+  <element type="param" name="minY">0.0</element>
+  <element type="param" name="minZ">0.0</element>
+  <element type="param" name="maxX">1.0</element>
+  <element type="param" name="maxY">1.0</element>
+  <element type="param" name="maxZ">1.0</element>
+  <element type="param" name="allowUnbalancing">True</element>
+  <element type="param" name="ShapeFemIC">HeatShape</element>
+  <element type="struct" name="temperatureICs">
+    <element type="param" name="type">CompositeVC</element>
+    <element type="list" name="vcList">
+      <element type="struct">
+        <element type="param" name="type">AllNodesVC</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">temperature</element>
+            <element type="param" name="type">func</element>
+            <element type="param" name="value">Inside1_Outside0_ShapeIC</element>
+          </element>
+        </element>
+      </element>
+    </element>
+  </element>
+  <element type="struct" name="velocityBCs">
+    <element type="param" name="type">CompositeVC</element>
+    <element type="list" name="vcList">
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">bottom</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">vy</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">left</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">vx</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">right</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">vx</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">front</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">vz</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">back</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">vz</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+      <element type="struct">
+        <element type="param" name="type">WallVC</element>
+        <element type="param" name="wall">top</element>
+        <element type="list" name="variables">
+          <element type="struct">
+            <element type="param" name="name">vy</element>
+            <element type="param" name="type">double</element>
+            <element type="param" name="value">0</element>
+          </element>
+        </element>
+      </element>
+    </element>
+  </element>
+  <element type="param" name="particlesPerCell">20</element>
+  <element type="struct" name="pluginData">
+    <element type="param" name="appendToAnalysisFile">True</element>
+  </element>
+  <element type="param" name="outputEvery">1</element>
+  <element type="param" name="saveDataEvery">0</element>
+  <element type="param" name="checkpointAtTimeInc">0</element>
+  <element type="param" name="experimentName">experiment</element>
+  <element type="param" name="checkpointPath">./expected/MultiThermalDiffusivity.xml</element>
+  <element type="param" name="checkpointReadPath">./expected/MultiThermalDiffusivity.xml</element>
+  <element type="param" name="checkpointWritePath">./expected/MultiThermalDiffusivity.xml</element>
+  <element type="param" name="checkpointAppendStep">false</element>
+  <element type="param" name="startTime">0</element>
+  <element type="param" name="stopTime">0</element>
+  <element type="param" name="finalTimeStep">0</element>
+  <element type="param" name="restartTimestep">0</element>
+  <element type="param" name="checkPointPrefixString"></element>
+  <element type="param" name="timestepFactor">1</element>
+</StGermainData>
