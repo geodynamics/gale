@@ -1,0 +1,14 @@
+import os, glob
+Import('env')
+
+# Copy headers to our build directory.
+incs = env['helpers']['copyHdrs'](env)
+env.Install(os.path.join(env['prefix'], 'include'), incs)
+
+# Build our source files if CSoap is present.
+if env['csoap']:
+   objs = env['helpers']['buildCSrcs'](env)
+else:
+   objs = []
+
+Return('objs')

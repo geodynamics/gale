@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Stg_Component</param>
+  <param name="Author">CSD Team</param>
+  <param name="Organisation">VPAC</param>
+  <param name="Project">StGermain</param>
+  <param name="Location">./StGermain/Base/Automation/src/</param>
+  <param name="Description">An abstract class representing the parent of all Components</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">Stg_Class</param>
+
+  <param name="Description">
+    The base class for every other component class in StGermain (and super projects).
+    Components provide an interface for information to be read from the dictionary and
+    introduce 'phases' into the system, namely the construction phase, the build phase,
+    the initialisation phase and the execution phase.
+  </param>
+
+  <list name="Params">
+    n/a
+  </list>
+
+  <list name="Dependencies">
+    n/a
+  </list>
+
+  <param name="Example">
+    n/a
+  </param>
+
+</StGermainData>

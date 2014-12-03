@@ -1,0 +1,74 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StGermain/Base/Container
+#define CLASSNAME AbsArray
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+
+MEMBER( int, itmSize )
+MEMBER( int, delta )
+MEMBER( int, maxSize )
+MEMBER( int, size )
+MEMBER( void*, ptr )
+MEMBER( Bool, own )
+
+
+VOIDOVERRIDE( Init, void, 
+	      (void* self), 
+	      (self) ) 
+
+VOIDOVERRIDE( Destruct, void, 
+	      (void* self), 
+	      (self) )
+
+VOIDOVERRIDE( Copy, void, 
+	      (void* self, const void* op), 
+	      (self, op) )
+
+
+METHOD( SetItemSize, void,
+	(void* self, int itmSize),
+	(self, itmSize) )
+
+METHOD( SetDelta, void, 
+	(void* self, int delta),
+	(self, delta) )
+
+METHOD( Resize, void, 
+	(void* self, int size), 
+	(self, size) )
+
+METHOD( SoftResize, void, 
+	(void* self, int size), 
+	(self, size) )
+
+METHOD( Offset, void, 
+	(void* self, int delta),
+	(self, delta) )
+
+METHOD( Push, void, 
+	(void* self, void* itm),
+	(self, itm) )
+
+METHOD( Pop, void, 
+	(void* self, void* itm),
+	(self, itm) )
+
+METHOD( Set, void, 
+	(void* self, void* itm),
+	(self, itm) )
+
+METHOD( Clear, void, 
+	(void* self), 
+	(self) )
+
+METHOD( GetSize, int, 
+	(const void* self), 
+	(self) )
+
+METHOD( GetPtr, const int*, 
+	(const void* self), 
+	(self) )

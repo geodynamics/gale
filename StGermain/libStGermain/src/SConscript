@@ -1,0 +1,11 @@
+import os
+Import('env')
+
+# These guys go somewhere different than their source location.
+hdrs = Split('Init.h Finalise.h main.h StGermain.h')
+env.Install('#build/include/StGermain', hdrs)
+
+# Build our source files.
+objs = env['helpers']['buildCSrcs'](env)
+
+Return('objs')

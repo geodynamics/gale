@@ -1,0 +1,53 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StGermain/Base/Automation
+#define CLASSNAME Comm
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+OVERRIDE( CalcMem, SizeT, (const void* self, PtrMap* ptrs), (self, ptrs) )
+
+METHOD( SetMPIComm, void, (void* self, MPI_Comm mpiComm), (self, mpiComm) )
+METHOD( SetNeighbours, void, (void* self, int nNbrs, const int* nbrs), 
+	(self, nNbrs, nbrs) )
+METHOD( AddNeighbours, void, (void* self, int nNbrs, const int* nbrs), 
+	(self, nNbrs, nbrs) )
+METHOD( RemoveNeighbours, void, (void* self, int nNbrs, const int* nbrLocalIndices, IMap* map), 
+	(self, nNbrs, nbrs, map) )
+
+METHOD( GetMPIComm, MPI_Comm, (const void* self), (self) )
+METHOD( GetNumNeighbours, int, (const void* self), (self) )
+METHOD( GetNeighbours, void, (const void* self, int* nNbrs, const int** nbrs), 
+	(self, nNbrs, nbrs) )
+METHOD( RankLocalToGlobal, int, (const void* self, int local), (self, local) )
+METHOD( RankGlobalToLocal, Bool, (const void* self, int global, int* local), 
+	(self, global, local) )
+METHOD( AllgatherInit, void, (const void* self, int srcSize, int* dstSizes, int itmSize), 
+	(self, srcSize, dstSizes, itmSize) )
+METHOD( AllgatherBegin, void, (const void* self, const void* srcArray, void** dstArrays), 
+	(self, srcArray, dstArrays) )
+METHOD( AllgatherEnd, void, (const void* self), (self) )
+METHOD( AlltoallInit, void, (const void* self, const int* srcSizes, 
+			     int* dstSizes, int itmSize), 
+	(self, srcSizes, dstSizes, itmSize) )
+METHOD( AlltoallBegin, void, (const void* self, const void** srcArrays, void** dstArrays), 
+	(self, srcArrays, dstArrays) )
+METHOD( AlltoallEnd, void, (const void* self), (self) )
+
+
+MEMBER( MPI_Comm, mpiComm )
+MEMBER( IArray, nbrs )
+/* "inv" member is a Map of global rank to local rank indices */ 
+MEMBER( IMap, inv )
+MEMBER( MPI_Request*, recvs )
+MEMBER( MPI_Request*, sends )
+MEMBER( MPI_Status*, stats )
+MEMBER( int*, recvSizes )
+MEMBER( int, itmSize )
+MEMBER( int, srcSize )
+MEMBER( int*, srcSizes )

@@ -1,0 +1,37 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StGermain/Base/Container
+#define CLASSNAME ISet
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+
+METHOD( UseArray, void, (void* self, int size, const int* array), 
+	(self, size, array) )
+METHOD( SetMaxSize, void, (void* self, int size), (self, size) )
+METHOD( Insert, void, (void* self, int key), (self, key) )
+METHOD( TryInsert, Bool, (void* self, int key), (self, key) )
+METHOD( Remove, void, (void* self, int key), (self, key) )
+METHOD( TryRemove, Bool, (void* self, int key), (self, key) )
+METHOD( Clear, void, (void* self), (self) )
+METHOD( Union, void, (void* self, const void* op), (self, op) )
+METHOD( Isect, void, (void* self, const void* op), (self, op) )
+METHOD( Subtr, void, (void* self, const void* op), (self, op) )
+
+METHOD( GetMaxSize, int, (const void* self), (self) )
+METHOD( GetSize, int, (const void* self), (self) )
+METHOD( GetArray, void, (const void* self, int* array), (self, array) )
+METHOD( Has, Bool, (const void* self, int key), (self, key) )
+METHOD( Hash, int, (const void* self, int key), (self, key) )
+METHOD( First, void, (const void* self, ISetIter* iter), (self, iter) )
+
+MEMBER( int, maxSize )
+MEMBER( int, curSize )
+MEMBER( int, tblSize )
+MEMBER( ISetItem*, tbl )
+MEMBER( Bool*, used )

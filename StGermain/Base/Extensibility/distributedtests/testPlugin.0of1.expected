@@ -1,0 +1,15 @@
+Plugin "LocalPlugin" found using LocalPluginmodule.so
+PluginLoader_GetName(): LocalPlugin
+Plugin: LocalPlugin
+	Module: LocalPlugin
+		Version: (version) Unknown
+		Stg_Object (ptr): 0x806a328
+			Stg_Class (ptr): 0x806a328
+				sizeOfSelf: 64
+				_deleteSelf: Yes
+				type: Plugin
+				_delete (func ptr): 0x400283e7
+				_print (func ptr): 0x40028410
+				_copy (func ptr): (nil)
+			name: LocalPlugin
+			nameAllocationType: NON_GLOBAL

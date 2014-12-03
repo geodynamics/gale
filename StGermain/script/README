@@ -1,0 +1,58 @@
+This README file is designed to help the user in how to run the document creation script,
+createDocs.py and related scripts.
+**********************************
+
+Running through scons:
+----------------------
+This is the desired way to run the script, and they have been designed to run best through this method.
+
+To run, first follow the configure instructions for StGermain/Underworld project, then go to the base stgUnderworld directory and type 
+
+'scons doc'
+
+All the defaults have been setup to run through this method. Running this way, the script will create a directory called 'doc' in the base directory. In this directory will be 2 sub-directories. These will be 'Codex' and 'Doxygen/html/' In each of these subdirectories will be a number of html files. The files to load are called 'index.html' eg. 'stgUnderworldE/Codex/index.html' Load these to access the created documents.
+
+createDocs.py : 
+---------------
+This file is designed to be run with scons doc.
+It will not work properly run by iteself, as it has a number of default values specified.
+Try running 'scons doc' from the stgUnderworld ( or equiv.) directory.
+To get a help message, type 'createDocs.py -h'
+
+To run with input options: 
+./createDocs.py METATYPE WEBPAGES EMAIL DOXYGENCONFIG
+
+Defaults:
+METATYPE: 'dtd' or 'xsd'
+WEBPAGES: [['http://www.underworldproject.org','Underworld Home Page']]
+EMAIL: 'underworld-users@vpac.org'
+DOXYGENCONFIG: Doxyfile
+
+createHTMLDocuments.py:
+-----------------------
+This is the standalone python script to create the Component Codex web pages. To get help on the input options needed to run this file,
+type 'createHTMLDocuments.py -h' which will give a list of the available options and their default values.
+
+createDoxygen.py:
+-----------------
+This is a standalone python script to be run from this directory.
+it creates just the Doxygen web pages. Type 'createDoxygen.py -h' for a list of available options.
+
+
+createCodex.py:
+---------------
+This is a standalone python script to be run from this directory. It creates the codex with the same default settings as createDocs.py. It is designed to be a quick way of creating the default codex without creating the Doxygen package as well. Type 'createCodex.py -h' for a list of available options. It is not as flexible as createHTMLDocuments.py for creating the codex.
+
+createDocument.py:
+------------------
+This is a class for document creation, with createHTMLDocuments.py being a child of this class. It cannot be run by iteself.
+
+
+Stg*.py and util.py:
+--------
+These are parsing scripts for meta files and scripts needed to accomplish this end.
+
+
+headerfilter.py:
+----------------
+This is the python script used by Doxygen to make Stgermain/Underworld *.h header files readable by Doxygen. It enables classes, TODO's and meta file information to be included in the html output files.

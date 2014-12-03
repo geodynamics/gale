@@ -1,0 +1,30 @@
+Plugin "LocalPlugin1" found using LocalPlugin1module.so
+Plugin "LocalPlugin2" found using LocalPlugin2module.so
+
+Creating Stg_Components from the component-list
+
+
+Constructing Stg_Components from the live-component register
+
+Constructing LocalPlugin2..
+	context has not been constructed yet. Constructing now.
+		Constructing context..
+Constructing LocalPlugin1..
+LocalPlugin2_Function
+LocalPlugin1_Function()
+LocalPlugin2 value: 2
+Plugins (ptr): 0x8072708
+ModulesManager (ptr): 0x8072708
+Stg_Class (ptr): 0x8072708
+	sizeOfSelf: 52
+	_deleteSelf: Yes
+	type: PluginsManager
+	_delete (func ptr): 0x4002968f
+	_print (func ptr): 0x400296b8
+	_copy (func ptr): (nil)
+Search Path:
+	(path) /home/steve/Projects/ComputationalMechanics/ClubStGermain/v0.3/build/lib
+Loaded modules:
+	LocalPlugin2
+	LocalPlugin1
+		(version) 4163

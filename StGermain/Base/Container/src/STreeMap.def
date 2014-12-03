@@ -1,0 +1,42 @@
+#include INHERIT( StGermain/Base/Container/STree )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Container
+#define PARENT STree
+#define CLASSDIR StGermain/Base/Container
+#define CLASSNAME STreeMap
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+
+MEMBER( int, keySize )
+MEMBER( int, valSize )
+
+
+VOIDOVERRIDE( Init, void, 
+	      (void* self), 
+	      (self) ) 
+
+VOIDOVERRIDE( Destruct, void, 
+	      (void* self), 
+	      (self) )
+
+
+METHOD( SetItemSize, void,
+	(void* self, int keySize, int valSize),
+	(self, keySize, valSize) )
+
+METHOD( Insert, void,
+	(void* self, const void* key, const void* val),
+	(self, key, val) )
+
+METHOD( Remove, void, 
+	(void* self, const void* key),
+	(self, key) )
+
+METHOD( Map, void*,
+	(const void* self, const void* key),
+	(self, key) )
+
+METHOD( HasKey, Bool,
+	(const void* self, const void* key),
+	(self, key) )

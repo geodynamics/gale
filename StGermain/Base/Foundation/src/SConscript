@@ -1,0 +1,16 @@
+import os
+Import('env')
+
+# Copy headers to our build directory.
+incs = env['helpers']['copyHdrs'](env)
+incs.append(env['helpers']['copyDefs'](env))
+
+# ... we have a couple of special headers to copy.
+for h in ['ClassSetup.h', 'ClassEmpty.h']:
+    dst = env['helpers']['buildHdrPath'](env, h)
+    incs.append(env['helpers']['copyFile'](env, h, dst))
+
+# Build our source files.
+objs = env['helpers']['buildCSrcs'](env)
+
+Return('objs')

@@ -1,0 +1,10 @@
+import os
+Import('env')
+
+# Copy headers to our build directory.
+incs = env['helpers']['copyHdrs'](env)
+
+# Build our source files.
+objs = env['helpers']['buildCSrcs'](env)
+
+Return('objs')

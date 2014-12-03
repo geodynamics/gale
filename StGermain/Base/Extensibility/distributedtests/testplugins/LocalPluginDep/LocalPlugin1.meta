@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<!-- DTD to validate against -->
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">LocalPlugin1</param>
+<param name="Author">Steve Quenette</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StGermain</param>
+<param name="Location">./StGermain/Base/Extensibility/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference"></param>
+<param name="Summary">LocalPlugin1 (test)</param>
+<param name="Description">LocalPlugin1 (in the unit tests)</param>
+
+<list name="dependenices">
+	<struct>
+		<param name="plugin">LocalPlugin2</param>
+		<param name="version">1</param>
+	</struct>
+</list>
+
+</StGermainData>

@@ -1,0 +1,6 @@
+#ifndef StGermain_RegisterFactorySuite_h
+#define StGermain_RegisterFactorySuite_h
+
+void RegisterFactorySuite( pcu_suite_t* suite );
+
+#endif

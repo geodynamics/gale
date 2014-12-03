@@ -1,0 +1,8 @@
+import os, glob
+Import('env')
+
+# Execute subdirectory SConscripts.
+if env['useMpiRecord']:
+    pass
+else:
+    SConscript('none/SConscript', exports='env')

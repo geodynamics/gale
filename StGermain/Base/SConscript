@@ -1,0 +1,24 @@
+import os
+Import('env')
+
+# Execute subdirectory SConscripts.
+objs = SConscript('Foundation/SConscript', exports='env')
+objs += SConscript('IO/SConscript', exports='env')
+objs += SConscript('Container/SConscript', exports='env')
+objs += SConscript('Automation/SConscript', exports='env')
+objs += SConscript('Extensibility/SConscript', exports='env')
+objs += SConscript('Context/SConscript', exports='env')
+objs += SConscript('src/SConscript', exports='env')
+
+# Build libraries.
+libs = env.Library(env['helpers']['buildLibDir'](env), objs)
+libs += env.LoadableModule(env['helpers']['buildLibDir'](env), objs)
+env.Install(os.path.join(env['prefix'], 'lib'), libs)
+
+# Build tests.
+SConscript('tests/SConscript', exports='env')
+
+# Build programs.
+SConscript('FlattenXML/SConscript', exports='env')
+
+Return('objs')

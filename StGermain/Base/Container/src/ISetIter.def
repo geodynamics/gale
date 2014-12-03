@@ -1,0 +1,18 @@
+#include INHERIT( StGermain/Base/Container/Iter )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Container
+#define PARENT Iter
+#define CLASSDIR StGermain/Base/Container
+#define CLASSNAME ISetIter
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+VOIDOVERRIDE( Next, void, (void* self), (self) )
+
+METHOD( GetKey, int, (const void* self), (self) )
+
+MEMBER( ISet*, iset )
+MEMBER( int, tblInd )
+MEMBER( ISetItem*, cur )

@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">SetVC</param>
+  <param name="Author">...</param>
+  <param name="Organisation">VPAC</param>
+  <param name="Project">StGermain</param>
+  <param name="Location">./StGermain/Base/Context/src/</param>
+  <param name="Project Web">http://www.stgermainproject.org/</param>
+  <param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+  <param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+  <param name="Parent">VariableCondition</param>
+  <param name="Reference">...</param>
+  <param name="Summary">...</param>
+
+  <param name="Description">
+    Selects a definite set of entries from a variable to have a condition
+    applied.
+  </param>
+
+  <list name="Params">
+    <struct>
+      <param name="Name">indexCount</param>
+      <param name="Type">Integer</param>
+      <param name="Default"></param>
+      <param name="Description">
+        The number of entries in the index set.
+      </param>
+    </struct>
+    <struct>
+      <param name="Name">indices</param>
+      <param name="Type">List</param>
+      <param name="Default"></param>
+      <param name="Description">
+        A list of integers representing the indices in the set to be applied to.
+      </param>
+    </struct>
+    <struct>
+      <param name="Name">variables</param>
+      <param name="Type">List</param>
+      <param name="Default"></param>
+      <param name="Description">
+        A list of variable structures describing a Variable object to have values set and
+        the values to apply.  Each structure has three parameters: 'name' (the name of the
+        Variable object), 'type' (the type of the value, either double or func) and 'value'
+        (for a double this is a number and for a func this is the name of the condition
+        function).
+      </param>
+    </struct>
+  </list>
+
+  <list name="Dependencies">
+    n/a
+  </list>
+
+  <param name="Example">
+    No examples available.
+  </param>
+
+</StGermainData>

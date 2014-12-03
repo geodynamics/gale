@@ -1,0 +1,32 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StGermain/Base/Container
+#define CLASSNAME IMap
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Destruct, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+
+METHOD( SetMaxSize, void, (void* self, int maxSize), (self, maxSize) )
+METHOD( Insert, void, (void* self, int key, int val), (self, key, val) )
+METHOD( SetValue, void, (void* self, int key, int val), (self, key, val) )
+METHOD( Remove, void, (void* self, int key), (self, key) )
+METHOD( Clear, void, (void* self), (self) )
+
+METHOD( GetSize, int, (const void* self), (self) )
+METHOD( GetMaxSize, int, (const void* self), (self) )
+METHOD( Map, int, (const void* self, int key), (self, key) )
+METHOD( TryMap, Bool, (const void* self, int key, int* val), (self, key, val) )
+METHOD( Has, Bool, (const void* self, int key), (self, key) )
+METHOD( Hash, int, (const void* self, int key), (self, key) )
+METHOD( First, void, (const void* self, IMapIter* iter), (self, iter) )
+
+MEMBER( int, maxSize )
+MEMBER( int, curSize )
+MEMBER( int, tblSize )
+MEMBER( IMapItem*, tbl )
+MEMBER( Bool*, used )

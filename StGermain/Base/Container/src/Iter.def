@@ -1,0 +1,16 @@
+#include INHERIT( StGermain/Base/Foundation/NewClass )
+#include "StGermain/Base/Foundation/ClassClear.h"
+
+#define PARENTDIR StGermain/Base/Foundation
+#define PARENT NewClass
+#define CLASSDIR StGermain/Base/Container
+#define CLASSNAME Iter
+#include "StGermain/Base/Foundation/ClassSetup.h"
+
+VOIDOVERRIDE( Init, void, (void* self), (self) )
+VOIDOVERRIDE( Copy, void, (void* self, const void* op), (self, op) )
+VOIDABSTRACTMETHOD( Next, void, (void* self), (self) )
+
+METHOD( IsValid, Bool, (void* self), (self) )
+
+MEMBER( Bool, valid )

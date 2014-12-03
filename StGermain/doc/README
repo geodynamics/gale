@@ -1,0 +1,47 @@
+This is the README for the StGermain/doc/ directory.
+
+The files in this directory are the default files needed to run the scripts to create
+the Component Codex and the Doxygen code. These scripts live in StGermain/scripts/ 
+and there is a README file in this directory explaining how they work.
+
+ALL of these files are necessary to get the Codex and Doxygen outptting correctly. This file will briefly describe the files in this directory.
+**********************************************************************
+Doxyfile:
+---------
+The configuration file for Doxygen with all the defaults.
+
+generateForWeb.sh and *.in files:
+---------------------------------
+Old Doxygen configuration and creation files written in shell script.
+
+
+header.html and footer.html:
+----------------------------
+Old header and footer files for old Doxygen configuration files.
+
+Will be updated in the future.
+
+doxygen.css:
+------------
+The stylesheet for Doxygen.
+
+headerfilter.py:
+----------------
+
+Python script to filter C files so that they parse out their class information to Doxygen. May soon move into scripts directory.
+
+codexStylesheet.css, print.css and menu.css:
+--------------------------------------------
+Stylesheets for creation of the Component Codex
+
+menusript.js:
+-------------
+java script code to create moving menus in the Component Codex website. Used by Codex creation scripts.
+
+IndexContent*.html:
+-------------------
+Content for the Component Codex's index.html page. Explains what each of the meta files do. There is a version for 'dtd' and 'xsd' versions of meta files.
+
+images/ :
+---------
+The directory containing all the default images for the Component Codex html pages.  

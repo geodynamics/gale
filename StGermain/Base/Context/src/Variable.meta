@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!DOCTYPE StGermainData SYSTEM "stgermain.dtd">
+<StGermainData xmlns="http://www.vpac.org/StGermain/XML_IO_Handler/Jun2003">
+
+<param name="Name">Variable</param>
+<param name="Author">Steve Quenette</param>
+<param name="Organisation">VPAC</param>
+<param name="Project">StGermain</param>
+<param name="Location">./StGermain/Base/Context/src/</param>
+<param name="Project Web">http://www.stgermainproject.org/</param>
+<param name="Copyright">StGermain Framework. Copyright (C) 2003-2005 VPAC.</param>
+<param name="License">The Gnu Lesser General Public License v2.1 - http://www.gnu.org/licenses/old-licenses/lgpl-2.1.html</param>
+<param name="Parent">Stg_Component</param>
+<param name="Reference"></param>
+<param name="Summary">Associates a textual label with a piece of data in memory, which can then be referred to via the Variable Register.</param>
+<param name="Description">
+
+<p>Variable makes an association between a defined, textual name and a chunk of data in memory.  This data could take the form of a basic type (such as an int or double), or an element of an array, or an entire array or struct.  Variable may also index a regular series of non-contiguous locations in memory.  This capability to define arbitrary data within a datastructure makes it very powerful.</p>
+
+<p>For example, a Variable can refer to a series of ints in an array with an offset of 1 and a stride of 3.  This terminology will be familiar to those who are accustomed with  MPI. Once a Variable is defined, it is stored in the Variable Register.  Like other Registers of StGermain, it can be accessed by any other Component.
+</p>
+
+<p>The benefit of using Variable is that it provides access to data without the need for the original source code or linking to the header file.  Practically everything you need to use the data is supplied by Variable: the memory location, a name for the data, its type and its size.</p>
+
+<p>When specified throught the XML system, the Variable will actually allocate the memory of the underlying memory variable itself. When used in the C API, the Variable must be passed the underlying memory chunk (but the memory chunk itself need not yet be allocated until just before the Variable undergoes its build phase).</p>
+
+<p>The XML implementation of Variable doesn't allow the specification of complex data types or arrays. For arrays, components such as MeshVariable should be used</p>
+
+</param>
+
+
+<list name="Params">
+	<struct>
+		<param name="Name">DataType</param>
+		<param name="Type">String</param>
+		<param name="Default">[Double,Float,Int,Char,Short], None - not specifying causes an error</param>
+		<param name="Description">Specifies the fundamental data type of the variable.</param>
+	</struct>
+	<struct>
+		<param name="Name">Rank</param>
+		<param name="Type">String</param>
+		<param name="Default">[Scalar,Vector], None - not specifying causes an error</param>
+		<param name="Description">Specifies whether the variable is of a vector not. If it is of a vector, VectorComponentCount and names is used to specify the number of vector subcomponents and the name of the variables to create for each component.</param>
+	</struct>
+	<struct>
+		<param name="Name">VectorComponentCount</param>
+		<param name="Type">UnsignedInt</param>
+		<param name="Default">0</param>
+		<param name="Description">The count of subcomponents inside this Variable that are also to become variables.</param>
+	</struct>
+	<struct>
+		<param name="Name">names</param>
+		<param name="Type">list</param>
+		<param name="Default">(empty)</param>
+		<param name="Description">The list of textual names for the subcomponents if this variable. A good example is a Variable named velocity which has the subcomponents vx, vy, vz.</param>
+	</struct>
+</list>
+
+
+<list name="Dependencies">
+</list>
+
+
+<param name="Example"><![CDATA[
+<p>Examples:
+XML version / MDF (Model Description File):
+Unlike the C usage, MDF automatically handles memory allocation.
+</p>
+<p>
+<struct name="velocity">
+  <param name="Type">Variable</param>
+  <param name="Rank">Vector</param>
+  <param name="DataType">Double</param>
+  <param name="VectorComponentCount">3</param>
+  <list name="names">
+    <param>vx</param>
+    <param>vy</param>
+    <param>vz</param>
+  </list>
+</struct>
+</p>
+<p>
+This example create an entry in the variable register of the name "velocity", 
+which is a vector of 3 double components. Also, 3 more entries into the variable
+ register will be made, targetting the 3 vector components of "velocity",
+ named "vx", "vy", "vz".
+</p>
+
+<p>C version:
+Using Variable in C is different to the XML implementation because you need to
+ do own memory handling.
+This example is based on the sourcecode in 
+~/code/StGermain/Base/Context/tests/testVariable.c </p>
+<p>
+/* Construct phase */
+double* velocity;
+Variable_NewVector("velocity", 
+                   Variable_DataType_Double, 
+                   3, 
+                   &amp;aSize[1], 
+                   (void**)&amp;velocity, 
+                   vr, 
+                   "vx", 
+                   "vy", 
+                   "vz");
+
+/* Build phase*/
+velocity = malloc(...);
+component_Build(v);
+
+A general form of the C version:
+Variable_NewVector(name, 
+                   type, 
+                   length, 
+                   array size, 
+                   data array, 
+                   variable register, 
+                   [optional: list of names of array items]);
+</p>]]>
+</param>
+
+</StGermainData>
