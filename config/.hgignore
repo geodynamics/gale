@@ -1,0 +1,10 @@
+# use glob syntax.
+syntax: glob
+
+*.pyc
+
+# switch to regexp syntax.
+syntax: regexp
+(^|/)\.svn($|/)
+(^|/)\.hg($|/)
+(^|/)\.hgtags($|/)
